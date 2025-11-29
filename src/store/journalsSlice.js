@@ -1,0 +1,192 @@
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+
+const BASE_URL = 'https://lightidea.org:8007/api';
+
+// Async thunks for Journal Entries
+export const fetchJournals = createAsyncThunk(
+  'journals/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/journals/`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to fetch journals');
+    }
+  }
+);
+
+export const createJournal = createAsyncThunk(
+  'journals/create',
+  async (journalData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/journals/`, journalData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to create journal');
+    }
+  }
+);
+
+export const updateJournal = createAsyncThunk(
+  'journals/update',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await axios.patch(`${BASE_URL}/journals/${id}/`, data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to update journal');
+    }
+  }
+);
+
+export const deleteJournal = createAsyncThunk(
+  'journals/delete',
+  async (id, { rejectWithValue }) => {
+    try {
+      await axios.delete(`${BASE_URL}/journals/${id}/`);
+      return id;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to delete journal');
+    }
+  }
+);
+
+export const postJournal = createAsyncThunk(
+  'journals/post',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/journals/${id}/post/`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to post journal');
+    }
+  }
+);
+
+export const reverseJournal = createAsyncThunk(
+  'journals/reverse',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/journals/${id}/reverse/`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to reverse journal');
+    }
+  }
+);
+
+const journalsSlice = createSlice({
+  name: 'journals',
+  initialState: {
+    journals: [],
+    loading: false,
+    error: null,
+  },
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    // Fetch Journals
+    builder
+      .addCase(fetchJournals.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchJournals.fulfilled, (state, action) => {
+        state.loading = false;
+        state.journals = action.payload;
+      })
+      .addCase(fetchJournals.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Create Journal
+    builder
+      .addCase(createJournal.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createJournal.fulfilled, (state, action) => {
+        state.loading = false;
+        state.journals.push(action.payload);
+      })
+      .addCase(createJournal.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Update Journal
+    builder
+      .addCase(updateJournal.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateJournal.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.journals.findIndex((journal) => journal.id === action.payload.id);
+        if (index !== -1) {
+          state.journals[index] = action.payload;
+        }
+      })
+      .addCase(updateJournal.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Delete Journal
+    builder
+      .addCase(deleteJournal.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteJournal.fulfilled, (state, action) => {
+        state.loading = false;
+        state.journals = state.journals.filter((journal) => journal.id !== action.payload);
+      })
+      .addCase(deleteJournal.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Post Journal
+    builder
+      .addCase(postJournal.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(postJournal.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.journals.findIndex((journal) => journal.id === action.payload.id);
+        if (index !== -1) {
+          state.journals[index] = action.payload;
+        }
+      })
+      .addCase(postJournal.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Reverse Journal
+    builder
+      .addCase(reverseJournal.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(reverseJournal.fulfilled, (state, action) => {
+        state.loading = false;
+        // Add the reversed journal entry
+        state.journals.push(action.payload);
+      })
+      .addCase(reverseJournal.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
+});
+
+export const { clearError } = journalsSlice.actions;
+export default journalsSlice.reducer;
