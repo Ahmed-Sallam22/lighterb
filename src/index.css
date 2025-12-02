@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-
-
 body {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -34,4 +32,11 @@ body {
 .animate-fadeInUp {
   animation: fadeInUp 0.6s ease-out forwards;
   opacity: 0;
+}
+
+@layer theme {
+  :root {
+    --primary-bg: #08252f;
+    --card-bg: #28819c;
+  }
 }
