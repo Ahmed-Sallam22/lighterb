@@ -1,32 +1,40 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import MainLayout from './layouts/MainLayout';
-import Home from './pages/Home';
-import QuickActionDetail from './pages/QuickActionDetail';
-import PaymentsPage from './pages/PaymentsPage';
-import ARInvoicesPage from './pages/ARInvoicesPage';
-import APInvoicesPage from './pages/APInvoicesPage';
-import JournalEntriesPage from './pages/JournalEntriesPage';
-import JournalLinesPage from './pages/JournalLinesPage';
-import CreateJournalPage from './pages/CreateJournalPage';
-import SegmentsPage from './pages/SegmentsPage';
-import CurrencyPage from './pages/CurrencyPage';
-import ExchangeRatesPage from './pages/ExchangeRatesPage';
-import TaxRatesPage from './pages/TaxRatesPage';
-import InvoiceApprovalsPage from './pages/InvoiceApprovalsPage';
-import CustomersPage from './pages/CustomersPage';
-import SuppliersPage from './pages/SuppliersPage';
-import ReportsPage from './pages/ReportsPage';
-import ScrollToTop from './components/ScrollToTop';
-import ProcurementDashboard from './pages/ProcurementDashboard';
-import ProcurementApprovals from './pages/ProcurementApprovals';
-import ProcurementApprovalDetail from './pages/ProcurementApprovalDetail';
-import ProcurementCatalog from './pages/ProcurementCatalog';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import MainLayout from "./layouts/MainLayout";
+import Home from "./pages/Home";
+import QuickActionDetail from "./pages/QuickActionDetail";
+import PaymentsPage from "./pages/PaymentsPage";
+import ARInvoicesPage from "./pages/ARInvoicesPage";
+import APInvoicesPage from "./pages/APInvoicesPage";
+import JournalEntriesPage from "./pages/JournalEntriesPage";
+import JournalLinesPage from "./pages/JournalLinesPage";
+import CreateJournalPage from "./pages/CreateJournalPage";
+import SegmentsPage from "./pages/SegmentsPage";
+import CurrencyPage from "./pages/CurrencyPage";
+import ExchangeRatesPage from "./pages/ExchangeRatesPage";
+import TaxRatesPage from "./pages/TaxRatesPage";
+import InvoiceApprovalsPage from "./pages/InvoiceApprovalsPage";
+import CustomersPage from "./pages/CustomersPage";
+import SuppliersPage from "./pages/SuppliersPage";
+import ReportsPage from "./pages/ReportsPage";
+import ScrollToTop from "./components/ScrollToTop";
+import ProcurementDashboard from "./pages/ProcurementDashboard";
+import ProcurementApprovals from "./pages/ProcurementApprovals";
+import ProcurementApprovalDetail from "./pages/ProcurementApprovalDetail";
+import ProcurementCatalog from "./pages/ProcurementCatalog";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import ForgetPasswordPage from "./pages/ForgetPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const App = () => {
   return (
     <BrowserRouter>
       <ScrollToTop />
       <Routes>
+        <Route path="/auth/login" element={<LoginPage />} />
+        <Route path="/auth/register" element={<RegisterPage />} />
+        <Route path="/auth/forgot-password" element={<ForgetPasswordPage />} />
+        <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="dashboard" element={<Home />} />
