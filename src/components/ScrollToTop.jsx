@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useEffect } from "react";
+import { useLocation } from "react-router";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -9,7 +9,7 @@ const ScrollToTop = () => {
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: 'instant', // instant scroll (no smooth animation)
+      behavior: "instant", // instant scroll (no smooth animation)
     });
   }, [pathname]);
 

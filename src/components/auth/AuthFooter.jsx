@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 const AuthFooter = ({ text, linkText, linkTo }) => {
   if (!text || !linkText || !linkTo) return null;
