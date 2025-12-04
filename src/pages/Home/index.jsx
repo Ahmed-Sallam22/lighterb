@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { HiBookOpen } from "react-icons/hi";
 import QuickActionsPanel from "../../components/shared/QuickActionsPanel";
-import { QUICK_ACTIONS } from "../../constants/quickActions";
+import { QUICK_ACTIONS } from "./constants/quickActions";
 import { useLocale } from "../../hooks/useLocale";
 import { getCardsData } from "./constants/cardsData";
 import { getHomeRoutes } from "./constants/routes";
