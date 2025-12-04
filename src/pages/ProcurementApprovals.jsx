@@ -312,7 +312,7 @@ const ProcurementApprovals = () => {
 													</div>
 													<div>
 														<p className="text-base font-semibold text-[#1f4560]">
-															Step {workflowStepDetails?.sequence}:{' '}
+															Step {workflowStepDetails?.sequence}:
 															{workflowStepDetails?.name || 'N/A'}
 														</p>
 														<p className="text-sm text-gray-500">

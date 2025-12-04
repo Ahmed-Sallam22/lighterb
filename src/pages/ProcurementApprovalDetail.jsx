@@ -323,14 +323,14 @@ const ProcurementApprovalDetail = () => {
 														</p>
 														<div className="text-xs text-gray-500 mt-2 space-y-1">
 															<p>
-																Approver Type:{' '}
+																Approver Type:
 																<span className="font-medium">
 																	{workflowStep?.approver_type || 'N/A'}
 																</span>
 															</p>
 															{workflowStep?.role_name && (
 																<p>
-																	Role:{' '}
+																	Role:
 																	<span className="font-medium">
 																		{workflowStep.role_name}
 																	</span>
@@ -338,7 +338,7 @@ const ProcurementApprovalDetail = () => {
 															)}
 															{step.activated_at && (
 																<p>
-																	Activated:{' '}
+																	Activated:
 																	<span className="font-medium">
 																		{new Date(step.activated_at).toLocaleString()}
 																	</span>
@@ -346,7 +346,7 @@ const ProcurementApprovalDetail = () => {
 															)}
 															{step.due_at && (
 																<p>
-																	Due:{' '}
+																	Due:
 																	<span className="font-medium">
 																		{new Date(step.due_at).toLocaleString()}
 																	</span>
@@ -354,7 +354,7 @@ const ProcurementApprovalDetail = () => {
 															)}
 															{step.completed_at && (
 																<p>
-																	Completed:{' '}
+																	Completed:
 																	<span className="font-medium">
 																		{new Date(step.completed_at).toLocaleString()}
 																	</span>

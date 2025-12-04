@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import AuthLayout from '../components/auth/AuthLayout';
 import AuthInput from '../components/auth/AuthInput';
 import AuthButton from '../components/auth/AuthButton';
 import AuthLogo from '../components/auth/AuthLogo';
 
 const ForgetPasswordPage = () => {
+	const { t } = useTranslation();
 	const [email, setEmail] = useState('');
 	const navigate = useNavigate();
 
@@ -20,24 +22,28 @@ const ForgetPasswordPage = () => {
 	};
 
 	return (
-		<AuthLayout footerText="Already have an account?" footerLinkText="Sign in" footerLinkTo="/auth/login">
-			<AuthLogo title="Forgot Password ?" subtitle="No worries, we'll send you reset instructions." />
+		<AuthLayout
+			footerText={t('auth.forgotPassword.haveAccount')}
+			footerLinkText={t('auth.forgotPassword.signIn')}
+			footerLinkTo="/auth/login"
+		>
+			<AuthLogo title={t('auth.forgotPassword.title')} subtitle={t('auth.forgotPassword.subtitle')} />
 
 			{/* Forgot Password Form */}
 			<form onSubmit={handleSubmit} className="space-y-5">
 				<AuthInput
 					id="email"
-					label="Email Address"
+					label={t('auth.forgotPassword.email')}
 					type="email"
 					value={email}
 					onChange={e => setEmail(e.target.value)}
-					placeholder="Enter your Email Address"
+					placeholder={t('auth.forgotPassword.emailPlaceholder')}
 					autoComplete="email"
 					required
 				/>
 
 				<div className="pt-1">
-					<AuthButton type="submit">Send Reset Link</AuthButton>
+					<AuthButton type="submit">{t('auth.forgotPassword.sendResetLink')}</AuthButton>
 				</div>
 			</form>
 		</AuthLayout>

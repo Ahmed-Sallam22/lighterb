@@ -731,7 +731,7 @@ const CreateJournalPage = () => {
 																clipRule="evenodd"
 															/>
 														</svg>
-														Not Balanced (Diff:{' '}
+														Not Balanced (Diff:
 														{Math.abs(totalDebit - totalCredit).toFixed(2)})
 													</span>
 												)}

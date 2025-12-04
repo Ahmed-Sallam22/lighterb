@@ -1,13 +1,44 @@
 export const QUICK_ACTIONS = [
-  { id: 'create-ar-invoice', label: 'Create AR Invoice', description: 'Generate a customer AR invoice with required billing details.' },
-  { id: 'create-ap-invoice', label: 'Create AP Invoice', description: 'Capture supplier invoices and schedule payments.' },
-  { id: 'receive-payment', label: 'Receive Payment', description: 'Record incoming customer payments and allocations.' },
-  { id: 'make-payment', label: 'Make Payment', description: 'Disburse supplier or expense payments securely.' },
-  { id: 'create-vendor-bill', label: 'Create Vendor Bill', description: 'Enter vendor bills for approval and posting.' },
-  { id: 'new-payment-request', label: 'New Payment Request', description: 'Initiate a payment request for internal review.' },
-  { id: 'new-asset-category', label: 'New Asset Category', description: 'Define and classify a new fixed asset group.' },
-  { id: 'register-new-asset', label: 'Register New Asset', description: 'Add an asset record with cost and depreciation info.' },
+	{
+		id: 'create-ar-invoice',
+		labelKey: 'home.quickActionsList.createArInvoice.label',
+		descriptionKey: 'home.quickActionsList.createArInvoice.description',
+	},
+	{
+		id: 'create-ap-invoice',
+		labelKey: 'home.quickActionsList.createApInvoice.label',
+		descriptionKey: 'home.quickActionsList.createApInvoice.description',
+	},
+	{
+		id: 'receive-payment',
+		labelKey: 'home.quickActionsList.receivePayment.label',
+		descriptionKey: 'home.quickActionsList.receivePayment.description',
+	},
+	{
+		id: 'make-payment',
+		labelKey: 'home.quickActionsList.makePayment.label',
+		descriptionKey: 'home.quickActionsList.makePayment.description',
+	},
+	{
+		id: 'create-vendor-bill',
+		labelKey: 'home.quickActionsList.createVendorBill.label',
+		descriptionKey: 'home.quickActionsList.createVendorBill.description',
+	},
+	{
+		id: 'new-payment-request',
+		labelKey: 'home.quickActionsList.newPaymentRequest.label',
+		descriptionKey: 'home.quickActionsList.newPaymentRequest.description',
+	},
+	{
+		id: 'new-asset-category',
+		labelKey: 'home.quickActionsList.newAssetCategory.label',
+		descriptionKey: 'home.quickActionsList.newAssetCategory.description',
+	},
+	{
+		id: 'register-new-asset',
+		labelKey: 'home.quickActionsList.registerNewAsset.label',
+		descriptionKey: 'home.quickActionsList.registerNewAsset.description',
+	},
 ];
 
-export const getQuickActionById = (id) =>
-  QUICK_ACTIONS.find((action) => action.id === id);
+export const getQuickActionById = id => QUICK_ACTIONS.find(action => action.id === id);
