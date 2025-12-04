@@ -1,96 +1,202 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
+import { HiBookOpen, HiChevronRight, HiChevronLeft } from 'react-icons/hi';
 import Group1 from '../ui/icons/Group1';
 import Group2 from '../ui/icons/Group2';
 import Group3 from '../ui/icons/Group3';
 import Group4 from '../ui/icons/Group4';
 import Group5 from '../ui/icons/Group5';
 import Group6 from '../ui/icons/Group6';
+import logo from '../assets/Logo.png';
 import QuickActionsPanel from '../components/shared/QuickActionsPanel';
 import { QUICK_ACTIONS } from '../constants/quickActions';
+import { useLocale } from '../hooks/useLocale';
 const Home = () => {
 	const scrollContainerRef = useRef(null);
 	const navigate = useNavigate();
+	const { t } = useTranslation();
+	const { locale } = useLocale();
+	const isRTL = locale === 'AR';
+	const [canScrollLeft, setCanScrollLeft] = useState(false);
 	const [canScrollRight, setCanScrollRight] = useState(false);
 	const [activeRoute, setActiveRoute] = useState('Dashboard');
 	const [isAnimating, setIsAnimating] = useState(false);
 
 	const routes = [
-		{ name: 'Dashboard', path: '/dashboard' },
-		{ name: 'Assets', path: '/assets' },
-		{ name: 'Procurement', path: '/procurement' },
-		{ name: 'Accounts', path: '/accounts' },
-		{ name: 'Suppliers', path: '/suppliers' },
-		{ name: 'Customers', path: '/customers' },
-		{ name: 'Journal', path: '/journal' },
-		{ name: 'AR Invoices', path: '/ar-invoices' },
-		{ name: 'AR Payments', path: '/payments/ar' },
-		{ name: 'AP Invoices', path: '/ap-invoices' },
-		{ name: 'AP Payments', path: '/payments/ap' },
-		{ name: 'Reports', path: '/reports' },
+		{ name: t('home.routes.dashboard'), key: 'Dashboard', path: '/dashboard' },
+		{ name: t('home.routes.assets'), key: 'Assets', path: '/assets' },
+		{ name: t('home.routes.procurement'), key: 'Procurement', path: '/procurement' },
+		{ name: t('home.routes.accounts'), key: 'Accounts', path: '/accounts' },
+		{ name: t('home.routes.suppliers'), key: 'Suppliers', path: '/suppliers' },
+		{ name: t('home.routes.customers'), key: 'Customers', path: '/customers' },
+		{ name: t('home.routes.journal'), key: 'Journal', path: '/journal' },
+		{ name: t('home.routes.arInvoices'), key: 'AR Invoices', path: '/ar-invoices' },
+		{ name: t('home.routes.arPayments'), key: 'AR Payments', path: '/payments/ar' },
+		{ name: t('home.routes.apInvoices'), key: 'AP Invoices', path: '/ap-invoices' },
+		{ name: t('home.routes.apPayments'), key: 'AP Payments', path: '/payments/ap' },
+		{ name: t('home.routes.reports'), key: 'Reports', path: '/reports' },
 	];
 
-	const createCardIcon = () => (
-		<svg width="29" height="27" viewBox="0 0 29 27" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<g clipPath="url(#clip0_22_314)">
-				<path
-					d="M0.0200195 11.24C0.0200195 8.24 0.0200195 5.31999 0.0200195 2.35999C0.0200195 0.719994 0.610017 -0.0600522 2.33002 -5.2179e-05C4.95002 0.0999478 7.70001 -1.3113e-05 10.14 0.289987C11.5808 0.438995 12.9961 0.77516 14.35 1.28999C15.8111 0.836921 17.3108 0.518908 18.83 0.339975C21.46 0.0899747 24.48 0.0399869 27.35 0.0399869C28.44 0.0399869 28.96 0.659967 28.96 1.76997C28.96 8.08997 28.96 14.4233 28.96 20.77C28.96 22.37 28.02 22.65 26.72 22.64C24.18 22.64 21.63 22.64 19.09 22.64C17.46 22.64 16.15 23.1 15.98 25.03C15.9 25.97 15.44 26.62 14.44 26.59C14.2531 26.5863 14.0688 26.5449 13.8983 26.4683C13.7277 26.3917 13.5744 26.2815 13.4474 26.1442C13.3204 26.007 13.2224 25.8455 13.1593 25.6695C13.0962 25.4935 13.0692 25.3066 13.08 25.1199C12.93 23.0399 11.52 22.64 9.81001 22.64C7.34001 22.64 4.88001 22.59 2.42001 22.64C0.780013 22.64 0.0100128 22.12 0.0600128 20.36C0.150013 17.36 0.0600128 14.2799 0.0600128 11.2499L0.0200195 11.24ZM26.35 11.46V8.99C26.35 2.24 26.35 2.23995 19.57 2.87995C19.3246 2.88957 19.0804 2.9197 18.84 2.96998C17.32 3.42998 16.07 4.34998 16.03 5.96998C15.91 10.33 15.98 14.69 16.03 19.04C16.03 19.6 15.95 20.29 16.89 20.04C19.57 19.42 22.29 19.8199 24.99 19.7499C26.05 19.7499 26.43 19.38 26.41 18.32C26.31 16.06 26.35 13.76 26.35 11.46ZM2.68002 11.26C2.68002 13.48 2.78002 15.71 2.68002 17.92C2.58002 19.52 3.22002 19.82 4.68002 19.82C7.13002 19.82 9.61002 19.4799 12.04 20.0599C13.34 20.3699 13.1 19.45 13.1 18.77C13.1 14.66 13.16 10.55 13.1 6.43995C13.1189 5.98491 13.0454 5.53076 12.8839 5.10493C12.7224 4.67909 12.4763 4.29041 12.1604 3.96235C11.8445 3.63429 11.4654 3.37368 11.0459 3.19624C10.6265 3.01879 10.1754 2.92826 9.72002 2.93C8.00002 2.77 6.27002 2.92996 4.55002 2.82996C3.18002 2.73996 2.65002 3.17999 2.72002 4.60999C2.76002 6.81999 2.69002 9.03996 2.69002 11.26H2.68002Z"
-					fill="#D3D3D3"
-				/>
-			</g>
-			<defs>
-				<clipPath id="clip0_22_314">
-					<rect width="28.95" height="26.57" fill="white" />
-				</clipPath>
-			</defs>
-		</svg>
-	);
+	const createCardIcon = () => <HiBookOpen className="w-7 h-7 text-[#D3D3D3]" />;
 
 	// Card data for each route
 	const cardsData = {
 		Dashboard: [
-			{ title: 'Setup', description: 'Segments & Types' },
-			{ title: 'Journal Entries', description: 'General Ledger' },
-			{ title: 'Journal Lines', description: 'Line Item Analysis' },
-			{ title: 'Accounts Receivable', description: 'Customer Invoices' },
-			{ title: 'Accounts Payable', description: 'Supplier Invoices' },
-			{ title: 'Reports', description: 'Financial Reports' },
-			{ title: 'Currencies', description: 'Currency Management' },
-			{ title: 'Exchange Rates', description: 'FX Management' },
-			{ title: 'FX Configuration', description: 'Base Currency & Accounts' },
-			{ title: 'Tax Rates', description: 'VAT/Tax Configuration' },
-			{ title: 'Corporate Tax', description: 'Income Tax Management' },
-			{ title: 'Customers', description: 'Customer Management' },
-			{ title: 'Suppliers', description: 'Customer Management' },
-			{ title: 'Invoice Approvals', description: 'Review & Approve' },
+			{ title: t('home.cards.setup.title'), description: t('home.cards.setup.description'), key: 'Setup' },
+			{
+				title: t('home.cards.journalEntries.title'),
+				description: t('home.cards.journalEntries.description'),
+				key: 'Journal Entries',
+			},
+			{
+				title: t('home.cards.journalLines.title'),
+				description: t('home.cards.journalLines.description'),
+				key: 'Journal Lines',
+			},
+			{
+				title: t('home.cards.accountsReceivable.title'),
+				description: t('home.cards.accountsReceivable.description'),
+				key: 'Accounts Receivable',
+			},
+			{
+				title: t('home.cards.accountsPayable.title'),
+				description: t('home.cards.accountsPayable.description'),
+				key: 'Accounts Payable',
+			},
+			{ title: t('home.cards.reports.title'), description: t('home.cards.reports.description'), key: 'Reports' },
+			{
+				title: t('home.cards.currencies.title'),
+				description: t('home.cards.currencies.description'),
+				key: 'Currencies',
+			},
+			{
+				title: t('home.cards.exchangeRates.title'),
+				description: t('home.cards.exchangeRates.description'),
+				key: 'Exchange Rates',
+			},
+			{
+				title: t('home.cards.fxConfiguration.title'),
+				description: t('home.cards.fxConfiguration.description'),
+				key: 'FX Configuration',
+			},
+			{
+				title: t('home.cards.taxRates.title'),
+				description: t('home.cards.taxRates.description'),
+				key: 'Tax Rates',
+			},
+			{
+				title: t('home.cards.corporateTax.title'),
+				description: t('home.cards.corporateTax.description'),
+				key: 'Corporate Tax',
+			},
+			{
+				title: t('home.cards.customers.title'),
+				description: t('home.cards.customers.description'),
+				key: 'Customers',
+			},
+			{
+				title: t('home.cards.suppliers.title'),
+				description: t('home.cards.suppliers.description'),
+				key: 'Suppliers',
+			},
+			{
+				title: t('home.cards.invoiceApprovals.title'),
+				description: t('home.cards.invoiceApprovals.description'),
+				key: 'Invoice Approvals',
+			},
 		],
 		Assets: [
-			{ title: 'Asset Register', description: 'All Assets' },
-			{ title: 'Asset Categories', description: 'Categories & Setup' },
-			{ title: 'Asset Locations', description: 'Location & Custodians' },
-			{ title: 'Depreciation', description: 'Calculate & Post' },
+			{
+				title: t('home.cards.assetRegister.title'),
+				description: t('home.cards.assetRegister.description'),
+				key: 'Asset Register',
+			},
+			{
+				title: t('home.cards.assetCategories.title'),
+				description: t('home.cards.assetCategories.description'),
+				key: 'Asset Categories',
+			},
+			{
+				title: t('home.cards.assetLocations.title'),
+				description: t('home.cards.assetLocations.description'),
+				key: 'Asset Locations',
+			},
+			{
+				title: t('home.cards.depreciation.title'),
+				description: t('home.cards.depreciation.description'),
+				key: 'Depreciation',
+			},
 		],
 		Procurement: [
-			{ title: 'Procurement Dashboard', description: 'Analytics & Insights' },
-			{ title: 'Procurement', description: 'PRs, POs, Bills and Payments' },
+			{
+				title: t('home.cards.procurementDashboard.title'),
+				description: t('home.cards.procurementDashboard.description'),
+				key: 'Procurement Dashboard',
+			},
+			{
+				title: t('home.cards.procurement.title'),
+				description: t('home.cards.procurement.description'),
+				key: 'Procurement',
+			},
 		],
 		Accounts: [
-			{ title: 'Chart of Accounts', description: 'Account Structure' },
-			{ title: 'General Ledger', description: 'GL Entries' },
-			{ title: 'Trial Balance', description: 'Account Balances' },
-			{ title: 'Bank Accounts', description: 'Banking Operations' },
-			{ title: 'Reconciliation', description: 'Account Reconciliation' },
-			{ title: 'Budget', description: 'Budget Management' },
-			{ title: 'Cost Centers', description: 'Cost Allocation' },
-			{ title: 'Financial Reports', description: 'Financial Statements' },
+			{
+				title: t('home.cards.chartOfAccounts.title'),
+				description: t('home.cards.chartOfAccounts.description'),
+				key: 'Chart of Accounts',
+			},
+			{
+				title: t('home.cards.generalLedger.title'),
+				description: t('home.cards.generalLedger.description'),
+				key: 'General Ledger',
+			},
+			{
+				title: t('home.cards.trialBalance.title'),
+				description: t('home.cards.trialBalance.description'),
+				key: 'Trial Balance',
+			},
+			{
+				title: t('home.cards.bankAccounts.title'),
+				description: t('home.cards.bankAccounts.description'),
+				key: 'Bank Accounts',
+			},
+			{
+				title: t('home.cards.reconciliation.title'),
+				description: t('home.cards.reconciliation.description'),
+				key: 'Reconciliation',
+			},
+			{ title: t('home.cards.budget.title'), description: t('home.cards.budget.description'), key: 'Budget' },
+			{
+				title: t('home.cards.costCenters.title'),
+				description: t('home.cards.costCenters.description'),
+				key: 'Cost Centers',
+			},
+			{
+				title: t('home.cards.financialReports.title'),
+				description: t('home.cards.financialReports.description'),
+				key: 'Financial Reports',
+			},
 		],
 		Journal: [
-			{ title: 'Journal Entries', description: 'General Ledger' },
-			{ title: 'Journal Lines', description: 'Line Item Analysis' },
+			{
+				title: t('home.cards.journalEntries.title'),
+				description: t('home.cards.journalEntries.description'),
+				key: 'Journal Entries',
+			},
+			{
+				title: t('home.cards.journalLines.title'),
+				description: t('home.cards.journalLines.description'),
+				key: 'Journal Lines',
+			},
 		],
 	};
 
-	const quickActionItems = QUICK_ACTIONS;
+	const quickActionItems = QUICK_ACTIONS.map(action => ({
+		id: action.id,
+		label: t(action.labelKey),
+		description: t(action.descriptionKey),
+	}));
 
 	const cards = (cardsData[activeRoute] || cardsData.Dashboard).map(card => ({
 		...card,
@@ -101,69 +207,69 @@ const Home = () => {
 		navigate(`/quick-actions/${action.id}`);
 	};
 
-	const handleCardClick = cardTitle => {
+	const handleCardClick = cardKey => {
 		// Special handling for Journal cards
 		if (activeRoute === 'Journal') {
-			if (cardTitle === 'Journal Entries') {
+			if (cardKey === 'Journal Entries') {
 				navigate('/journal/entries');
-			} else if (cardTitle === 'Journal Lines') {
+			} else if (cardKey === 'Journal Lines') {
 				navigate('/journal/lines');
 			}
 		}
 
 		// Special handling for Dashboard cards
 		if (activeRoute === 'Dashboard') {
-			if (cardTitle === 'Setup') {
+			if (cardKey === 'Setup') {
 				navigate('/segments');
-			} else if (cardTitle === 'Currencies') {
+			} else if (cardKey === 'Currencies') {
 				navigate('/currency');
-			} else if (cardTitle === 'Exchange Rates') {
+			} else if (cardKey === 'Exchange Rates') {
 				navigate('/exchange-rates');
-			} else if (cardTitle === 'Tax Rates') {
+			} else if (cardKey === 'Tax Rates') {
 				navigate('/tax-rates');
-			} else if (cardTitle === 'Invoice Approvals') {
+			} else if (cardKey === 'Invoice Approvals') {
 				navigate('/invoice-approvals');
-			} else if (cardTitle === 'Journal Entries') {
+			} else if (cardKey === 'Journal Entries') {
 				navigate('/journal/entries');
-			} else if (cardTitle === 'Journal Lines') {
+			} else if (cardKey === 'Journal Lines') {
 				navigate('/journal/lines');
-			} else if (cardTitle === 'Customers') {
+			} else if (cardKey === 'Customers') {
 				navigate('/customers');
-			} else if (cardTitle === 'Suppliers') {
+			} else if (cardKey === 'Suppliers') {
 				navigate('/Suppliers');
-			} else if (cardTitle === 'Reports') {
+			} else if (cardKey === 'Reports') {
 				navigate('/reports');
-			} else if (cardTitle === 'Accounts Receivable') {
+			} else if (cardKey === 'Accounts Receivable') {
 				navigate('/ar-invoices');
-			} else if (cardTitle === 'Accounts Payable') {
+			} else if (cardKey === 'Accounts Payable') {
 				navigate('/ap-invoices');
 			}
 		}
 
 		// Procurement dashboard card
 		if (activeRoute === 'Procurement') {
-			if (cardTitle === 'Procurement Dashboard' || cardTitle === 'Procurement') {
+			if (cardKey === 'Procurement Dashboard' || cardKey === 'Procurement') {
 				navigate('/procurement');
-			} else if (cardTitle === 'Catalog Reference') {
+			} else if (cardKey === 'Catalog Reference') {
 				navigate('/procurement/catalog');
 			}
 		}
 	};
 
-	const handleRouteClick = routeName => {
+	const handleRouteClick = routeKey => {
 		// Check if this route has cards data (children)
-		const hasChildren = cardsData[routeName] && cardsData[routeName].length > 0;
+		const hasChildren = cardsData[routeKey] && cardsData[routeKey].length > 0;
 
 		if (hasChildren) {
 			// If it has children, just change the active view (don't navigate)
-			if (routeName !== activeRoute) {
+			if (routeKey !== activeRoute) {
 				setIsAnimating(true);
-				setActiveRoute(routeName);
+				setActiveRoute(routeKey);
 				setTimeout(() => setIsAnimating(false), 300);
 			}
 		} else {
 			// If it doesn't have children, navigate to the route
-			const route = routes.find(r => r.name === routeName);
+			const route = routes.find(r => r.key === routeKey);
 			if (route && route.path) {
 				navigate(route.path);
 			}
@@ -174,6 +280,7 @@ const Home = () => {
 		if (!scrollContainerRef.current) return;
 		const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
 		const maxScrollLeft = scrollWidth - clientWidth - 1;
+		setCanScrollLeft(scrollLeft > 1);
 		setCanScrollRight(scrollLeft < maxScrollLeft);
 	};
 
@@ -231,33 +338,25 @@ const Home = () => {
 				{/* Title Section */}
 				<div className="text-left">
 					<h1 className="text-[32px] font-bold text-[#D3D3D3]  flex items-center gap-2">
-						Let's get started with
-						<svg width="60" height="22" viewBox="0 0 66 23" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path
-								opacity="0.8"
-								d="M5.37415 8.97832L7.80908 11.4449L5.42137 13.8639H18.2648V8.97832H5.37415Z"
-								fill="white"
-							/>
-							<path opacity="0.8" d="M18.2649 17.9567H0V22.8422H18.2649V17.9567Z" fill="white" />
-							<path
-								opacity="0.8"
-								d="M45.9346 22.8372V0.035614H54.1556C57.2699 0.035614 59.3006 0.148784 60.2476 0.375125C61.7121 0.723899 63.0003 1.5114 63.8991 2.60741C64.8801 3.75382 65.3706 5.23409 65.3706 7.04821C65.3706 8.44926 65.0879 9.62623 64.5225 10.5791C64.0156 11.4732 63.2762 12.2442 62.3671 12.8267C61.57 13.3414 60.6673 13.7089 59.7111 13.908C58.4871 14.1253 56.7158 14.234 54.3973 14.234H51.0576V22.8355L45.9346 22.8372ZM51.0576 3.89246V10.3635H53.8609C55.8758 10.3635 57.2258 10.2441 57.9109 10.0053C58.5603 9.78861 59.1196 9.39742 59.5128 8.88496C59.904 8.36175 60.1065 7.74297 60.0927 7.11272C60.1234 6.3597 59.832 5.62472 59.2786 5.05868C58.741 4.51867 58.0148 4.15941 57.2195 4.04014C56.6075 3.93716 55.3784 3.8851 53.5322 3.88397L51.0576 3.89246Z"
-								fill="white"
-							/>
-							<path
-								opacity="0.8"
-								d="M20.693 22.8372V0.035614H31.4774C34.1875 0.035614 36.1577 0.240453 37.3881 0.650129C38.617 1.0596 39.6565 1.82926 40.3387 2.83488C41.0861 3.9116 41.4706 5.15977 41.4457 6.4286C41.4457 8.1386 40.8865 9.55323 39.7683 10.6725C38.65 11.7917 36.9763 12.4945 34.7473 12.7808C35.7609 13.2951 36.6856 13.9396 37.492 14.694C38.2123 15.3889 39.1845 16.6224 40.4086 18.3947L43.5066 22.8439H37.3768L33.6724 17.882C32.3577 16.1097 31.4578 14.9928 30.973 14.531C30.5519 14.1084 30.0239 13.7829 29.4335 13.5821C28.8894 13.4101 28.0293 13.3246 26.8531 13.3258H25.816V22.8439L20.693 22.8372ZM25.8179 9.67942H29.6072C32.0655 9.67942 33.6 9.58605 34.2108 9.39932C34.7959 9.23038 35.3017 8.89112 35.6483 8.43511C36.0111 7.92549 36.1923 7.32856 36.1678 6.72398C36.1678 5.95668 35.9399 5.33707 35.484 4.86515C34.9794 4.37003 34.2949 4.05282 33.5534 3.97054C33.1378 3.91848 31.8917 3.89246 29.815 3.89246H25.816L25.8179 9.67942Z"
-								fill="white"
-							/>
-							<path opacity="0.8" d="M18.2649 0H0V4.87707H18.2649V0Z" fill="white" />
-						</svg>
+						{t('home.title')}
+						<img src={logo} alt="Light ERP Logo" className="w-28 h-auto inline-block ml-2" />
 					</h1>
 				</div>
-
 				{/* Navigation Bar */}
 				<div className="my-7 relative">
 					<div className="flex items-center gap-3">
 						{/* Left Arrow */}
+						<button
+							onClick={() => scroll(isRTL ? 'right' : 'left')}
+							className="shrink-0 p-2 border border-white/20 bg-white/10 text-white rounded-full transition-all duration-300 transform backdrop-blur-md hover:bg-white/20 hover:border-white/40 hover:scale-110"
+							aria-label={t('common.scrollLeft')}
+						>
+							{isRTL ? (
+								<HiChevronRight className="w-5 h-5 text-[#48C1F0]" />
+							) : (
+								<HiChevronLeft className="w-5 h-5 text-[#48C1F0]" />
+							)}
+						</button>
 
 						<div
 							ref={scrollContainerRef}
@@ -267,9 +366,9 @@ const Home = () => {
 							{routes.map((route, index) => (
 								<button
 									key={index}
-									onClick={() => handleRouteClick(route.name)}
+									onClick={() => handleRouteClick(route.key)}
 									className={`px-6 py-3 rounded-lg whitespace-nowrap border text-sm font-semibold tracking-wide transition-all duration-300 transform backdrop-blur-md shadow-lg ${
-										activeRoute === route.name
+										activeRoute === route.key
 											? 'border-[#48C1F0] bg-[#48C1F0]/20 text-white scale-105 shadow-[0_0_20px_rgba(72,193,240,0.4)]'
 											: 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/40 hover:-translate-y-0.5'
 									}`}
@@ -280,32 +379,18 @@ const Home = () => {
 						</div>
 						{/* Right Arrow */}
 						<button
-							onClick={() => scroll('right')}
-							className={`shrink-0 p-2 border border-white/20 bg-white/10 text-white rounded-full transition-all duration-300 transform backdrop-blur-md ${
-								canScrollRight
-									? 'opacity-100 hover:bg-white/20 hover:border-white/40 hover:scale-110'
-									: 'opacity-0 pointer-events-none'
-							}`}
-							aria-label="Scroll right"
+							onClick={() => scroll(isRTL ? 'left' : 'right')}
+							className="shrink-0 p-2 border border-white/20 bg-white/10 text-white rounded-full transition-all duration-300 transform backdrop-blur-md hover:bg-white/20 hover:border-white/40 hover:scale-110"
+							aria-label={t('common.scrollRight')}
 						>
-							<svg
-								width="20"
-								height="20"
-								viewBox="0 0 11 16"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									fillRule="evenodd"
-									clipRule="evenodd"
-									d="M2.16939 -3.49691e-07L10.8474 8L2.16939 16L-0.000120827 14L6.5084 8L-0.000120258 2L2.16939 -3.49691e-07Z"
-									fill="#48C1F0"
-								/>
-							</svg>
+							{isRTL ? (
+								<HiChevronLeft className="w-5 h-5 text-[#48C1F0]" />
+							) : (
+								<HiChevronRight className="w-5 h-5 text-[#48C1F0]" />
+							)}
 						</button>
 					</div>
 				</div>
-
 				{/* Cards Section */}
 				<div
 					className={`grid grid-cols-1 md:grid-cols-2 ${
@@ -317,17 +402,17 @@ const Home = () => {
 					{cards.map((card, index) => (
 						<div
 							key={`${activeRoute}-${index}`}
-							onClick={() => handleCardClick(card.title)}
+							onClick={() => handleCardClick(card.key)}
 							className={`rounded-xl border border-white/10 bg-[#28819C]/30 py-6 px-3 shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:bg-white/20 hover:shadow-[0_10px_30px_rgba(72,193,240,0.3)] animate-fadeInUp ${
 								activeRoute === 'Journal' ||
 								(activeRoute === 'Dashboard' &&
-									(card.title === 'Setup' ||
-										card.title === 'Journal Entries' ||
-										card.title === 'Journal Lines' ||
-										card.title === 'Currencies' ||
-										card.title === 'Exchange Rates' ||
-										card.title === 'Tax Rates' ||
-										card.title === 'Invoice Approvals'))
+									(card.key === 'Setup' ||
+										card.key === 'Journal Entries' ||
+										card.key === 'Journal Lines' ||
+										card.key === 'Currencies' ||
+										card.key === 'Exchange Rates' ||
+										card.key === 'Tax Rates' ||
+										card.key === 'Invoice Approvals'))
 									? 'cursor-pointer'
 									: 'cursor-pointer'
 							}`}
@@ -342,17 +427,7 @@ const Home = () => {
 								</div>
 
 								{/* Border */}
-								<div className="shrink-0">
-									<svg
-										width="1"
-										height="81"
-										viewBox="0 0 1 81"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<rect opacity="0.5" width="0.942444" height="80.5992" fill="#7A9098" />
-									</svg>
-								</div>
+								<div className="shrink-0 w-[1px] h-20 bg-[#7A9098] opacity-50"></div>
 
 								{/* Title and Description */}
 								<div className="flex-1">
@@ -365,10 +440,9 @@ const Home = () => {
 						</div>
 					))}
 				</div>
-
 				<div className="mt-12">
 					<QuickActionsPanel
-						title="Quick Actions"
+						title={t('home.quickActions')}
 						actions={quickActionItems}
 						onActionClick={handleQuickActionClick}
 					/>

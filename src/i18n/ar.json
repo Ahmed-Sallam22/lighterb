@@ -1,0 +1,240 @@
+{
+	"home": {
+		"title": "لنبدأ مع",
+		"quickActions": "الإجراءات السريعة",
+		"quickActionsList": {
+			"createArInvoice": {
+				"label": "إنشاء فاتورة مبيعات",
+				"description": "إنشاء فاتورة مبيعات للعملاء مع تفاصيل الفوترة المطلوبة."
+			},
+			"createApInvoice": {
+				"label": "إنشاء فاتورة شراء",
+				"description": "تسجيل فواتير الموردين وجدولة المدفوعات."
+			},
+			"receivePayment": {
+				"label": "استلام دفعة",
+				"description": "تسجيل المدفوعات الواردة من العملاء والتخصيصات."
+			},
+			"makePayment": {
+				"label": "إجراء دفعة",
+				"description": "صرف مدفوعات الموردين أو المصروفات بشكل آمن."
+			},
+			"createVendorBill": {
+				"label": "إنشاء فاتورة مورد",
+				"description": "إدخال فواتير الموردين للموافقة والترحيل."
+			},
+			"newPaymentRequest": {
+				"label": "طلب دفع جديد",
+				"description": "بدء طلب دفع للمراجعة الداخلية."
+			},
+			"newAssetCategory": {
+				"label": "فئة أصل جديدة",
+				"description": "تحديد وتصنيف مجموعة أصول ثابتة جديدة."
+			},
+			"registerNewAsset": {
+				"label": "تسجيل أصل جديد",
+				"description": "إضافة سجل أصل مع معلومات التكلفة والإهلاك."
+			}
+		},
+		"routes": {
+			"dashboard": "لوحة التحكم",
+			"assets": "الأصول",
+			"procurement": "المشتريات",
+			"accounts": "الحسابات",
+			"suppliers": "الموردين",
+			"customers": "العملاء",
+			"journal": "اليومية",
+			"arInvoices": "فواتير المبيعات",
+			"arPayments": "مدفوعات المبيعات",
+			"apInvoices": "فواتير الشراء",
+			"apPayments": "مدفوعات الشراء",
+			"reports": "التقارير"
+		},
+		"cards": {
+			"setup": {
+				"title": "الإعدادات",
+				"description": "القطاعات والأنواع"
+			},
+			"journalEntries": {
+				"title": "قيود اليومية",
+				"description": "دفتر الأستاذ العام"
+			},
+			"journalLines": {
+				"title": "بنود اليومية",
+				"description": "تحليل البنود"
+			},
+			"accountsReceivable": {
+				"title": "المدينون",
+				"description": "فواتير العملاء"
+			},
+			"accountsPayable": {
+				"title": "الدائنون",
+				"description": "فواتير الموردين"
+			},
+			"reports": {
+				"title": "التقارير",
+				"description": "التقارير المالية"
+			},
+			"currencies": {
+				"title": "العملات",
+				"description": "إدارة العملات"
+			},
+			"exchangeRates": {
+				"title": "أسعار الصرف",
+				"description": "إدارة الصرف الأجنبي"
+			},
+			"fxConfiguration": {
+				"title": "إعدادات الصرف",
+				"description": "العملة الأساسية والحسابات"
+			},
+			"taxRates": {
+				"title": "معدلات الضريبة",
+				"description": "إعدادات ضريبة القيمة المضافة"
+			},
+			"corporateTax": {
+				"title": "ضريبة الشركات",
+				"description": "إدارة ضريبة الدخل"
+			},
+			"customers": {
+				"title": "العملاء",
+				"description": "إدارة العملاء"
+			},
+			"suppliers": {
+				"title": "الموردون",
+				"description": "إدارة الموردين"
+			},
+			"invoiceApprovals": {
+				"title": "اعتمادات الفواتير",
+				"description": "المراجعة والموافقة"
+			},
+			"assetRegister": {
+				"title": "سجل الأصول",
+				"description": "جميع الأصول"
+			},
+			"assetCategories": {
+				"title": "فئات الأصول",
+				"description": "الفئات والإعدادات"
+			},
+			"assetLocations": {
+				"title": "مواقع الأصول",
+				"description": "المواقع والأمناء"
+			},
+			"depreciation": {
+				"title": "الإهلاك",
+				"description": "الحساب والترحيل"
+			},
+			"procurementDashboard": {
+				"title": "لوحة المشتريات",
+				"description": "التحليلات والرؤى"
+			},
+			"procurement": {
+				"title": "المشتريات",
+				"description": "الطلبات وأوامر الشراء والفواتير"
+			},
+			"chartOfAccounts": {
+				"title": "دليل الحسابات",
+				"description": "هيكل الحسابات"
+			},
+			"generalLedger": {
+				"title": "دفتر الأستاذ العام",
+				"description": "القيود المحاسبية"
+			},
+			"trialBalance": {
+				"title": "ميزان المراجعة",
+				"description": "أرصدة الحسابات"
+			},
+			"bankAccounts": {
+				"title": "الحسابات البنكية",
+				"description": "العمليات المصرفية"
+			},
+			"reconciliation": {
+				"title": "التسوية",
+				"description": "تسوية الحسابات"
+			},
+			"budget": {
+				"title": "الميزانية",
+				"description": "إدارة الميزانية"
+			},
+			"costCenters": {
+				"title": "مراكز التكلفة",
+				"description": "توزيع التكاليف"
+			},
+			"financialReports": {
+				"title": "التقارير المالية",
+				"description": "القوائم المالية"
+			}
+		}
+	},
+	"auth": {
+		"login": {
+			"title": "قوّة عملياتك",
+			"subtitle": "سجّل الدخول لإدارة الأموال وتتبع المشتريات وتبسيط الموافقات.",
+			"username": "اسم المستخدم",
+			"usernamePlaceholder": "أدخل اسم المستخدم",
+			"password": "كلمة المرور",
+			"passwordPlaceholder": "أدخل كلمة المرور",
+			"rememberMe": "تذكرني",
+			"forgotPassword": "نسيت كلمة المرور؟",
+			"signIn": "تسجيل الدخول",
+			"noAccount": "ليس لديك حساب؟",
+			"createAccount": "إنشاء حساب"
+		},
+		"register": {
+			"title": "إنشاء حساب",
+			"subtitle": "ابدأ بإدخال تفاصيلك لإعداد حسابك الجديد.",
+			"username": "اسم المستخدم",
+			"usernamePlaceholder": "أدخل اسم المستخدم",
+			"email": "البريد الإلكتروني",
+			"emailPlaceholder": "أدخل البريد الإلكتروني",
+			"password": "كلمة المرور",
+			"passwordPlaceholder": "أدخل كلمة المرور",
+			"createAccount": "إنشاء حساب",
+			"haveAccount": "لديك حساب بالفعل؟",
+			"signIn": "تسجيل الدخول"
+		},
+		"social": {
+			"continueWith": "أو تابع باستخدام",
+			"signInWithMicrosoft": "تسجيل الدخول باستخدام مايكروسوفت"
+		},
+		"forgotPassword": {
+			"title": "نسيت كلمة المرور؟",
+			"subtitle": "لا تقلق، سنرسل لك تعليمات إعادة التعيين.",
+			"email": "عنوان البريد الإلكتروني",
+			"emailPlaceholder": "أدخل عنوان بريدك الإلكتروني",
+			"sendResetLink": "إرسال رابط إعادة التعيين",
+			"haveAccount": "لديك حساب بالفعل؟",
+			"signIn": "تسجيل الدخول"
+		},
+		"resetPassword": {
+			"title": "إعادة تعيين كلمة المرور",
+			"subtitle": "أدخل كلمة المرور الجديدة أدناه.",
+			"newPassword": "أدخل كلمة المرور الجديدة",
+			"newPasswordPlaceholder": "أدخل كلمة المرور الجديدة",
+			"confirmPassword": "تأكيد كلمة المرور",
+			"confirmPasswordPlaceholder": "تأكيد كلمة المرور",
+			"confirm": "تأكيد",
+			"haveAccount": "لديك حساب بالفعل؟",
+			"signIn": "تسجيل الدخول",
+			"passwordMinLength": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+			"passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+			"resetSuccess": "تم إعادة تعيين كلمة المرور بنجاح! جارٍ إعادة التوجيه لتسجيل الدخول..."
+		}
+	},
+	"sidebar": {
+		"title": "لايت إي آر بي",
+		"dashboard": "لوحة التحكم",
+		"accounts": "الحسابات",
+		"journalEntries": "قيود اليومية",
+		"customers": "العملاء",
+		"suppliers": "الموردون",
+		"arInvoices": "فواتير المبيعات",
+		"arPayments": "مدفوعات المبيعات",
+		"apInvoices": "فواتير الشراء",
+		"apPayments": "مدفوعات الشراء",
+		"reports": "التقارير"
+	},
+	"common": {
+		"scrollLeft": "التمرير لليسار",
+		"scrollRight": "التمرير لليمين"
+	}
+}

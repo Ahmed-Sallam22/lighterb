@@ -1,0 +1,240 @@
+{
+	"home": {
+		"title": "Let's get started with",
+		"quickActions": "Quick Actions",
+		"quickActionsList": {
+			"createArInvoice": {
+				"label": "Create AR Invoice",
+				"description": "Generate a customer AR invoice with required billing details."
+			},
+			"createApInvoice": {
+				"label": "Create AP Invoice",
+				"description": "Capture supplier invoices and schedule payments."
+			},
+			"receivePayment": {
+				"label": "Receive Payment",
+				"description": "Record incoming customer payments and allocations."
+			},
+			"makePayment": {
+				"label": "Make Payment",
+				"description": "Disburse supplier or expense payments securely."
+			},
+			"createVendorBill": {
+				"label": "Create Vendor Bill",
+				"description": "Enter vendor bills for approval and posting."
+			},
+			"newPaymentRequest": {
+				"label": "New Payment Request",
+				"description": "Initiate a payment request for internal review."
+			},
+			"newAssetCategory": {
+				"label": "New Asset Category",
+				"description": "Define and classify a new fixed asset group."
+			},
+			"registerNewAsset": {
+				"label": "Register New Asset",
+				"description": "Add an asset record with cost and depreciation info."
+			}
+		},
+		"routes": {
+			"dashboard": "Dashboard",
+			"assets": "Assets",
+			"procurement": "Procurement",
+			"accounts": "Accounts",
+			"suppliers": "Suppliers",
+			"customers": "Customers",
+			"journal": "Journal",
+			"arInvoices": "AR Invoices",
+			"arPayments": "AR Payments",
+			"apInvoices": "AP Invoices",
+			"apPayments": "AP Payments",
+			"reports": "Reports"
+		},
+		"cards": {
+			"setup": {
+				"title": "Setup",
+				"description": "Segments & Types"
+			},
+			"journalEntries": {
+				"title": "Journal Entries",
+				"description": "General Ledger"
+			},
+			"journalLines": {
+				"title": "Journal Lines",
+				"description": "Line Item Analysis"
+			},
+			"accountsReceivable": {
+				"title": "Accounts Receivable",
+				"description": "Customer Invoices"
+			},
+			"accountsPayable": {
+				"title": "Accounts Payable",
+				"description": "Supplier Invoices"
+			},
+			"reports": {
+				"title": "Reports",
+				"description": "Financial Reports"
+			},
+			"currencies": {
+				"title": "Currencies",
+				"description": "Currency Management"
+			},
+			"exchangeRates": {
+				"title": "Exchange Rates",
+				"description": "FX Management"
+			},
+			"fxConfiguration": {
+				"title": "FX Configuration",
+				"description": "Base Currency & Accounts"
+			},
+			"taxRates": {
+				"title": "Tax Rates",
+				"description": "VAT/Tax Configuration"
+			},
+			"corporateTax": {
+				"title": "Corporate Tax",
+				"description": "Income Tax Management"
+			},
+			"customers": {
+				"title": "Customers",
+				"description": "Customer Management"
+			},
+			"suppliers": {
+				"title": "Suppliers",
+				"description": "Supplier Management"
+			},
+			"invoiceApprovals": {
+				"title": "Invoice Approvals",
+				"description": "Review & Approve"
+			},
+			"assetRegister": {
+				"title": "Asset Register",
+				"description": "All Assets"
+			},
+			"assetCategories": {
+				"title": "Asset Categories",
+				"description": "Categories & Setup"
+			},
+			"assetLocations": {
+				"title": "Asset Locations",
+				"description": "Location & Custodians"
+			},
+			"depreciation": {
+				"title": "Depreciation",
+				"description": "Calculate & Post"
+			},
+			"procurementDashboard": {
+				"title": "Procurement Dashboard",
+				"description": "Analytics & Insights"
+			},
+			"procurement": {
+				"title": "Procurement",
+				"description": "PRs, POs, Bills and Payments"
+			},
+			"chartOfAccounts": {
+				"title": "Chart of Accounts",
+				"description": "Account Structure"
+			},
+			"generalLedger": {
+				"title": "General Ledger",
+				"description": "GL Entries"
+			},
+			"trialBalance": {
+				"title": "Trial Balance",
+				"description": "Account Balances"
+			},
+			"bankAccounts": {
+				"title": "Bank Accounts",
+				"description": "Banking Operations"
+			},
+			"reconciliation": {
+				"title": "Reconciliation",
+				"description": "Account Reconciliation"
+			},
+			"budget": {
+				"title": "Budget",
+				"description": "Budget Management"
+			},
+			"costCenters": {
+				"title": "Cost Centers",
+				"description": "Cost Allocation"
+			},
+			"financialReports": {
+				"title": "Financial Reports",
+				"description": "Financial Statements"
+			}
+		}
+	},
+	"auth": {
+		"login": {
+			"title": "Power Your Operations",
+			"subtitle": "Sign in to manage finances, track purchases, and streamline approvals.",
+			"username": "Username",
+			"usernamePlaceholder": "Enter your Username",
+			"password": "Password",
+			"passwordPlaceholder": "Enter your Password",
+			"rememberMe": "Remember me",
+			"forgotPassword": "Forgot Password ?",
+			"signIn": "Sign in",
+			"noAccount": "You don't have an account?",
+			"createAccount": "Create an account"
+		},
+		"register": {
+			"title": "Create Account",
+			"subtitle": "Start by entering your details to set up your new account.",
+			"username": "Username",
+			"usernamePlaceholder": "Enter Username",
+			"email": "Email",
+			"emailPlaceholder": "Enter Email",
+			"password": "Password",
+			"passwordPlaceholder": "Enter Password",
+			"createAccount": "Create Account",
+			"haveAccount": "Already have an account?",
+			"signIn": "Sign in"
+		},
+		"social": {
+			"continueWith": "Or continue with",
+			"signInWithMicrosoft": "Sign in with Microsoft"
+		},
+		"forgotPassword": {
+			"title": "Forgot Password ?",
+			"subtitle": "No worries, we'll send you reset instructions.",
+			"email": "Email Address",
+			"emailPlaceholder": "Enter your Email Address",
+			"sendResetLink": "Send Reset Link",
+			"haveAccount": "Already have an account?",
+			"signIn": "Sign in"
+		},
+		"resetPassword": {
+			"title": "Reset Password",
+			"subtitle": "Enter your new password below.",
+			"newPassword": "Enter New Password",
+			"newPasswordPlaceholder": "Enter New Password",
+			"confirmPassword": "Confirm Password",
+			"confirmPasswordPlaceholder": "Confirm Password",
+			"confirm": "Confirm",
+			"haveAccount": "Already have an account?",
+			"signIn": "Sign in",
+			"passwordMinLength": "Password must be at least 8 characters",
+			"passwordsDoNotMatch": "Passwords do not match",
+			"resetSuccess": "Password reset successful! Redirecting to login..."
+		}
+	},
+	"sidebar": {
+		"title": "LightERP",
+		"dashboard": "Dashboard",
+		"accounts": "Accounts",
+		"journalEntries": "Journal Entries",
+		"customers": "Customers",
+		"suppliers": "Suppliers",
+		"arInvoices": "AR Invoices",
+		"arPayments": "AR Payments",
+		"apInvoices": "AP Invoices",
+		"apPayments": "AP Payments",
+		"reports": "Reports"
+	},
+	"common": {
+		"scrollLeft": "Scroll left",
+		"scrollRight": "Scroll right"
+	}
+}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import AuthLayout from '../components/auth/AuthLayout';
 import AuthInput from '../components/auth/AuthInput';
 import AuthButton from '../components/auth/AuthButton';
@@ -7,13 +7,13 @@ import SocialLogin from '../components/auth/SocialLogin';
 import AuthLogo from '../components/auth/AuthLogo';
 
 const RegisterPage = () => {
+	const { t } = useTranslation();
 	const [formData, setFormData] = useState({
 		username: '',
 		email: '',
 		password: '',
 	});
 	const [errors, setErrors] = useState({});
-	const navigate = useNavigate();
 
 	const handleChange = e => {
 		const { id, value } = e.target;
@@ -39,40 +39,44 @@ const RegisterPage = () => {
 	};
 
 	return (
-		<AuthLayout footerText="Already have an account?" footerLinkText="Sign in" footerLinkTo="/auth/login">
-			<AuthLogo title="Create Account" subtitle="Start by entering your details to set up your new account." />
+		<AuthLayout
+			footerText={t('auth.register.haveAccount')}
+			footerLinkText={t('auth.register.signIn')}
+			footerLinkTo="/auth/login"
+		>
+			<AuthLogo title={t('auth.register.title')} subtitle={t('auth.register.subtitle')} />
 
 			{/* Register Form */}
 			<form onSubmit={handleSubmit} className="space-y-5">
 				<AuthInput
 					id="username"
-					label="Username"
+					label={t('auth.register.username')}
 					type="text"
 					value={formData.username}
 					onChange={handleChange}
-					placeholder="Enter Username"
+					placeholder={t('auth.register.usernamePlaceholder')}
 					autoComplete="username"
 					required
 				/>
 
 				<AuthInput
 					id="email"
-					label="Email"
+					label={t('auth.register.email')}
 					type="email"
 					value={formData.email}
 					onChange={handleChange}
-					placeholder="Enter Email"
+					placeholder={t('auth.register.emailPlaceholder')}
 					autoComplete="email"
 					required
 				/>
 
 				<AuthInput
 					id="password"
-					label="Password"
+					label={t('auth.register.password')}
 					type="password"
 					value={formData.password}
 					onChange={handleChange}
-					placeholder="Enter Password"
+					placeholder={t('auth.register.passwordPlaceholder')}
 					autoComplete="new-password"
 					error={errors.password}
 					required
@@ -80,7 +84,7 @@ const RegisterPage = () => {
 				/>
 
 				<div className="pt-1">
-					<AuthButton type="submit">Create Account</AuthButton>
+					<AuthButton type="submit">{t('auth.register.createAccount')}</AuthButton>
 				</div>
 			</form>
 

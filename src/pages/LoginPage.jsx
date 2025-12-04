@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import AuthLayout from '../components/auth/AuthLayout';
 import AuthInput from '../components/auth/AuthInput';
 import AuthButton from '../components/auth/AuthButton';
@@ -7,6 +8,7 @@ import SocialLogin from '../components/auth/SocialLogin';
 import AuthLogo from '../components/auth/AuthLogo';
 
 const LoginPage = () => {
+	const { t } = useTranslation();
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [rememberMe, setRememberMe] = useState(false);
@@ -22,35 +24,32 @@ const LoginPage = () => {
 
 	return (
 		<AuthLayout
-			footerText="You don't have an account?"
-			footerLinkText="Create an account"
+			footerText={t('auth.login.noAccount')}
+			footerLinkText={t('auth.login.createAccount')}
 			footerLinkTo="/auth/register"
 		>
-			<AuthLogo
-				title="Power Your Operations"
-				subtitle="Sign in to manage finances, track purchases, and streamline approvals."
-			/>
+			<AuthLogo title={t('auth.login.title')} subtitle={t('auth.login.subtitle')} />
 
 			{/* Login Form */}
 			<form onSubmit={handleSubmit} className="space-y-5">
 				<AuthInput
 					id="username"
-					label="Username"
+					label={t('auth.login.username')}
 					type="text"
 					value={username}
 					onChange={e => setUsername(e.target.value)}
-					placeholder="Enter your Username"
+					placeholder={t('auth.login.usernamePlaceholder')}
 					autoComplete="username"
 					required
 				/>
 
 				<AuthInput
 					id="password"
-					label="Password"
+					label={t('auth.login.password')}
 					type="password"
 					value={password}
 					onChange={e => setPassword(e.target.value)}
-					placeholder="Enter your Password"
+					placeholder={t('auth.login.passwordPlaceholder')}
 					autoComplete="current-password"
 					required
 					showPasswordToggle
@@ -65,14 +64,14 @@ const LoginPage = () => {
 							onChange={e => setRememberMe(e.target.checked)}
 							className="w-4 h-4 text-[#11576C] border-gray-300 rounded focus:ring-[#11576C] cursor-pointer"
 						/>
-						<span className="ml-2 text-gray-700">Remember me</span>
+						<span className="ml-2 text-gray-700">{t('auth.login.rememberMe')}</span>
 					</label>
 					<Link to="/auth/forgot-password" className="text-gray-700 hover:text-[#11576C] transition-colors">
-						Forgot Password ?
+						{t('auth.login.forgotPassword')}
 					</Link>
 				</div>
 
-				<AuthButton type="submit">Sign in</AuthButton>
+				<AuthButton type="submit">{t('auth.login.signIn')}</AuthButton>
 			</form>
 
 			<SocialLogin />

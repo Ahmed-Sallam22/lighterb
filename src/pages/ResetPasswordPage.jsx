@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import AuthLayout from '../components/auth/AuthLayout';
 import AuthInput from '../components/auth/AuthInput';
 import AuthButton from '../components/auth/AuthButton';
 import AuthLogo from '../components/auth/AuthLogo';
 
 const ResetPasswordPage = () => {
+	const { t } = useTranslation();
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const token = searchParams.get('token'); // Get reset token from URL
@@ -37,10 +39,10 @@ const ResetPasswordPage = () => {
 		// Validation
 		const newErrors = {};
 		if (formData.newPassword.length < 8) {
-			newErrors.newPassword = 'Password must be at least 8 characters';
+			newErrors.newPassword = t('auth.resetPassword.passwordMinLength');
 		}
 		if (formData.newPassword !== formData.confirmPassword) {
-			newErrors.confirmPassword = 'Passwords do not match';
+			newErrors.confirmPassword = t('auth.resetPassword.passwordsDoNotMatch');
 		}
 
 		if (Object.keys(newErrors).length > 0) {
@@ -51,23 +53,27 @@ const ResetPasswordPage = () => {
 		// Add your password reset logic here
 		console.log('Reset password with token:', token, formData);
 		// After successful reset, redirect to login
-		alert('Password reset successful! Redirecting to login...');
+		alert(t('auth.resetPassword.resetSuccess'));
 		navigate('/auth/login');
 	};
 
 	return (
-		<AuthLayout footerText="Already have an account?" footerLinkText="Sign in" footerLinkTo="/auth/login">
-			<AuthLogo title="Forgot Password ?" subtitle="No worries, we'll send you reset instructions." />
+		<AuthLayout
+			footerText={t('auth.resetPassword.haveAccount')}
+			footerLinkText={t('auth.resetPassword.signIn')}
+			footerLinkTo="/auth/login"
+		>
+			<AuthLogo title={t('auth.resetPassword.title')} subtitle={t('auth.resetPassword.subtitle')} />
 
 			{/* Reset Password Form */}
 			<form onSubmit={handleSubmit} className="space-y-5">
 				<AuthInput
 					id="newPassword"
-					label="Enter New Password"
+					label={t('auth.resetPassword.newPassword')}
 					type="password"
 					value={formData.newPassword}
 					onChange={handleChange}
-					placeholder="Enter New Password"
+					placeholder={t('auth.resetPassword.newPasswordPlaceholder')}
 					autoComplete="new-password"
 					error={errors.newPassword}
 					required
@@ -76,11 +82,11 @@ const ResetPasswordPage = () => {
 
 				<AuthInput
 					id="confirmPassword"
-					label="Confirm Password"
+					label={t('auth.resetPassword.confirmPassword')}
 					type="password"
 					value={formData.confirmPassword}
 					onChange={handleChange}
-					placeholder="Confirm Password"
+					placeholder={t('auth.resetPassword.confirmPasswordPlaceholder')}
 					autoComplete="new-password"
 					error={errors.confirmPassword}
 					required
@@ -88,7 +94,7 @@ const ResetPasswordPage = () => {
 				/>
 
 				<div className="pt-1">
-					<AuthButton type="submit">Confirm</AuthButton>
+					<AuthButton type="submit">{t('auth.resetPassword.confirm')}</AuthButton>
 				</div>
 			</form>
 		</AuthLayout>
