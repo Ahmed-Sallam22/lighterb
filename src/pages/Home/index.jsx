@@ -1,25 +1,25 @@
-import React, { useRef } from "react";
-import { useNavigate } from "react-router";
-import { useTranslation } from "react-i18next";
-import { HiBookOpen } from "react-icons/hi";
-import QuickActionsPanel from "../../components/shared/QuickActionsPanel";
-import { QUICK_ACTIONS } from "./constants/quickActions";
-import { useLocale } from "../../hooks/useLocale";
-import { getCardsData } from "./constants/cardsData";
-import { getHomeRoutes } from "./constants/routes";
-import { useScrollNavigation } from "./hooks/useScrollNavigation";
-import { useRouteNavigation } from "./hooks/useRouteNavigation";
-import HomeBackground from "./components/HomeBackground";
-import HomeHeader from "./components/HomeHeader";
-import NavigationBar from "./components/NavigationBar";
-import CardsGrid from "./components/CardsGrid";
+import React, { useRef } from 'react';
+import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
+import { HiBookOpen } from 'react-icons/hi';
+import QuickActionsPanel from '../../components/shared/QuickActionsPanel';
+import { QUICK_ACTIONS } from '../../constants/quickActions';
+import { useLocale } from '../../hooks/useLocale';
+import { getCardsData } from './constants/cardsData';
+import { getHomeRoutes } from './constants/routes';
+import { useScrollNavigation } from './hooks/useScrollNavigation';
+import { useRouteNavigation } from './hooks/useRouteNavigation';
+import HomeBackground from './components/HomeBackground';
+import HomeHeader from './components/HomeHeader';
+import NavigationBar from './components/NavigationBar';
+import CardsGrid from './components/CardsGrid';
 
 const Home = () => {
 	const scrollContainerRef = useRef(null);
 	const navigate = useNavigate();
 	const { t } = useTranslation();
 	const { locale } = useLocale();
-	const isRTL = locale === "AR";
+	const isRTL = locale === 'AR';
 
 	const routes = getHomeRoutes(t);
 	const cardsData = getCardsData(t);
@@ -49,7 +49,7 @@ const Home = () => {
 			<HomeBackground />
 
 			<div className="relative mx-auto">
-				<HomeHeader title={t("home.title")} />
+				<HomeHeader title={t('home.title')} />
 
 				<NavigationBar
 					routes={routes}
@@ -70,7 +70,7 @@ const Home = () => {
 
 				<div className="mt-12">
 					<QuickActionsPanel
-						title={t("home.quickActions")}
+						title={t('home.quickActions')}
 						actions={quickActionItems}
 						onActionClick={handleQuickActionClick}
 					/>
