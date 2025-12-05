@@ -2,18 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import PageHeader from "../../components/shared/PageHeader";
-import APInvoiceIcon from "../../ui/icons/APInvoiceIcon";
-import { useAPInvoices } from "./hooks/useAPInvoices";
-import { buildInvoiceTableColumns } from "../InvoicesShared/utils/buildTableColumns";
-import { buildInvoiceTableData } from "../InvoicesShared/utils/buildTableData";
-import InvoiceTable from "../InvoicesShared/components/InvoiceTable";
-import InvoiceModal from "../InvoicesShared/components/InvoiceModal";
-import InvoiceToolbarFilters from "../InvoicesShared/components/InvoiceToolbarFilters";
-import { PAGE_CONFIG } from "./constants/pageConfig";
-import { useInvoiceHandlers } from "../InvoicesShared/handlers/useInvoiceHandlers";
+import PageHeader from "../../../components/shared/PageHeader";
+import { useARInvoices } from "../hooks/useARInvoices";
+import { buildInvoiceTableColumns } from "../utils/buildTableColumns";
+import { buildInvoiceTableData } from "../utils/buildTableData";
+import InvoiceTable from "../components/InvoiceTable";
+import InvoiceModal from "../components/InvoiceModal";
+import InvoiceToolbarFilters from "../components/InvoiceToolbarFilters";
+import { PAGE_CONFIG } from "../constants/arPageConfig";
+import { useInvoiceHandlers } from "../handlers/useInvoiceHandlers";
 
-const APInvoicesPage = () => {
+const ARInvoicesPage = () => {
 	const navigate = useNavigate();
 
 	// Custom hook for invoice data and operations
@@ -26,15 +25,12 @@ const APInvoicesPage = () => {
 		reverseInvoice,
 		postInvoiceToGL,
 		submitForApproval,
-		performThreeWayMatch,
-	} = useAPInvoices();
+	} = useARInvoices();
 
 	// Component state
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedInvoice, setSelectedInvoice] = useState(null);
 	const [actionType, setActionType] = useState(null); // 'delete', 'reverse', 'post'
-
-	// Page configuration
 
 	// Show error toast when error occurs
 	useEffect(() => {
@@ -52,8 +48,8 @@ const APInvoicesPage = () => {
 	}, []);
 
 	// Prepare table data and columns
-	const tableData = buildInvoiceTableData(invoices, "AP");
-	const tableColumns = buildInvoiceTableColumns("Supplier");
+	const tableData = buildInvoiceTableData(invoices, "AR");
+	const tableColumns = buildInvoiceTableColumns("Customer");
 
 	// Event handlers
 	const {
@@ -64,7 +60,6 @@ const APInvoicesPage = () => {
 		handleDelete,
 		handleSubmitForApproval,
 		handlePostToGL,
-		handleThreeWayMatch,
 		handleConfirmAction,
 		handleCloseModal,
 	} = useInvoiceHandlers({
@@ -74,7 +69,6 @@ const APInvoicesPage = () => {
 		setActionType,
 		setIsModalOpen,
 		submitForApproval,
-		performThreeWayMatch,
 		refreshInvoices,
 		deleteInvoice,
 		reverseInvoice,
@@ -92,7 +86,7 @@ const APInvoicesPage = () => {
 					onSearch={handleSearch}
 					onFilter={handleFilter}
 					onCreateClick={handleCreate}
-					createButtonText="New AP Invoice"
+					createButtonText="New AR Invoice"
 				/>
 			</div>
 
@@ -104,11 +98,17 @@ const APInvoicesPage = () => {
 					loading={loading}
 					onEdit={handleEdit}
 					onDelete={handleDelete}
-					onThreeWayMatch={handleThreeWayMatch}
 					onSubmitForApproval={handleSubmitForApproval}
 					onPostToGL={handlePostToGL}
-					emptyMessage="No AP invoices found"
-					showActionsCondition={row => row.rawData?.approval_status === "DRAFT"}
+					emptyMessage="No AR invoices found"
+					showActionsCondition={row => {
+						const approvalStatus = row.rawData?.approval_status;
+						return approvalStatus !== "APPROVED";
+					}}
+					showDeleteCondition={row => {
+						const approvalStatus = row.rawData?.approval_status;
+						return approvalStatus !== "APPROVED";
+					}}
 				/>
 			</div>
 
@@ -137,4 +137,4 @@ const APInvoicesPage = () => {
 	);
 };
 
-export default APInvoicesPage;
+export default ARInvoicesPage;

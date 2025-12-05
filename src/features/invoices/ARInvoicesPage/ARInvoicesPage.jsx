@@ -9,7 +9,7 @@ import { buildInvoiceTableData } from "../InvoicesShared/utils/buildTableData";
 import InvoiceTable from "../InvoicesShared/components/InvoiceTable";
 import InvoiceModal from "../InvoicesShared/components/InvoiceModal";
 import InvoiceToolbarFilters from "../InvoicesShared/components/InvoiceToolbarFilters";
-import { PAGE_CONFIG } from "./constants/pageConfig";
+import { PAGE_CONFIG } from "./constants/arPageConfig";
 import { useInvoiceHandlers } from "../InvoicesShared/handlers/useInvoiceHandlers";
 
 const ARInvoicesPage = () => {
