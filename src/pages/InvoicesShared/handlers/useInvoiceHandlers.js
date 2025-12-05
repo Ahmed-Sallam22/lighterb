@@ -7,7 +7,7 @@ export const useInvoiceHandlers = ({
 	setActionType,
 	setIsModalOpen,
 	submitForApproval,
-	performThreeWayMatch,
+	performThreeWayMatch, // Optional - only for AP
 	refreshInvoices,
 	deleteInvoice,
 	reverseInvoice,
@@ -69,17 +69,19 @@ export const useInvoiceHandlers = ({
 		setIsModalOpen(true);
 	};
 
-	// Three-way match handler
-	const handleThreeWayMatch = async row => {
-		const invoice = row.rawData || row;
-		try {
-			await performThreeWayMatch(invoice.id);
-			toast.success("Three-way match completed successfully");
-			refreshInvoices();
-		} catch (error) {
-			console.error("Failed to perform three-way match:", error);
-		}
-	};
+	// Three-way match handler (AP only)
+	const handleThreeWayMatch = performThreeWayMatch
+		? async row => {
+				const invoice = row.rawData || row;
+				try {
+					await performThreeWayMatch(invoice.id);
+					toast.success("Three-way match completed successfully");
+					refreshInvoices();
+				} catch (error) {
+					console.error("Failed to perform three-way match:", error);
+				}
+		  }
+		: undefined;
 
 	// Modal handlers
 	const handleConfirmAction = async (actionType, selectedInvoice) => {

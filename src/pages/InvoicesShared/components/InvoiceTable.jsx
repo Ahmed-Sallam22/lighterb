@@ -7,9 +7,12 @@ const InvoiceTable = ({
 	loading,
 	onEdit,
 	onDelete,
-	onThreeWayMatch,
+	onThreeWayMatch, // Optional - only for AP
 	onSubmitForApproval,
 	onPostToGL,
+	emptyMessage = "No invoices found",
+	showActionsCondition,
+	showDeleteCondition,
 }) => {
 	if (loading) {
 		return (
@@ -20,7 +23,8 @@ const InvoiceTable = ({
 	}
 
 	const actions = [
-		{
+		// Three-Way Match (AP only)
+		onThreeWayMatch && {
 			label: "Three-Way Match",
 			onClick: onThreeWayMatch,
 			condition: row =>
@@ -39,7 +43,7 @@ const InvoiceTable = ({
 			onClick: onPostToGL,
 			condition: row => row.rawData?.approval_status === "APPROVED" && !row.rawData?.is_posted,
 		},
-	];
+	].filter(Boolean); // Remove undefined actions
 
 	return (
 		<Table
@@ -47,8 +51,9 @@ const InvoiceTable = ({
 			data={data}
 			onEdit={onEdit}
 			onDelete={onDelete}
-			emptyMessage="No AP invoices found"
-			showActions={row => row.rawData?.approval_status === "DRAFT"}
+			emptyMessage={emptyMessage}
+			showActions={showActionsCondition}
+			showDeleteButton={showDeleteCondition}
 			actions={actions}
 		/>
 	);

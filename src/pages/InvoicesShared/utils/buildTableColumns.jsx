@@ -1,14 +1,14 @@
 import React from "react";
 import InvoiceStatusBadge from "../components/InvoiceStatusBadge";
 
-export const buildTableColumns = () => [
+export const buildInvoiceTableColumns = (customerLabel = "Customer") => [
 	{
 		header: "Invoice",
 		accessor: "invoice",
 		render: value => <span className="font-semibold text-blue-600">{value}</span>,
 	},
 	{
-		header: "Supplier",
+		header: customerLabel,
 		accessor: "customer",
 	},
 	{

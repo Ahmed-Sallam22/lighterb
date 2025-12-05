@@ -8,7 +8,7 @@ const FILTER_OPTIONS = [
 	{ value: "partial", label: "Partial" },
 ];
 
-const ToolbarFilters = ({ onSearch, onFilter, onCreateClick }) => {
+const InvoiceToolbarFilters = ({ onSearch, onFilter, onCreateClick, createButtonText = "New Invoice" }) => {
 	return (
 		<Toolbar
 			searchPlaceholder="Search invoices..."
@@ -16,10 +16,10 @@ const ToolbarFilters = ({ onSearch, onFilter, onCreateClick }) => {
 			filterOptions={FILTER_OPTIONS}
 			filterLabel="Filter by Payment Status"
 			onFilterChange={onFilter}
-			createButtonText="New AP Invoice"
+			createButtonText={createButtonText}
 			onCreateClick={onCreateClick}
 		/>
 	);
 };
 
-export default ToolbarFilters;
+export default InvoiceToolbarFilters;
