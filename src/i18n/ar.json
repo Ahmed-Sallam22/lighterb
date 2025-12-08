@@ -329,5 +329,52 @@
 			"selectThisItem": "اختر هذا العنصر",
 			"noItemsFound": "لا توجد عناصر مطابقة لبحثك"
 		}
+	},
+	"assets": {
+		"title": "سجل الأصول",
+		"subtitle": "جميع الأصول",
+		"newAsset": "أصل جديد",
+		"fromAPInvoice": "من فاتورة الموردين",
+		"fromGRN": "من إشعار الاستلام",
+		"approvals": "الموافقات",
+		"transfer": "نقل",
+		"adjustments": "التعديلات",
+		"retirements": "الاستبعادات",
+		"categories": "الفئات",
+		"locations": "المواقع",
+		"depreciation": "الإهلاك",
+		"settings": "الإعدادات",
+		"stats": {
+			"totalAssets": "إجمالي الأصول",
+			"activeAssets": "الأصول النشطة",
+			"draftAssets": "الأصول المسودة",
+			"totalNetBookValue": "إجمالي صافي القيمة الدفترية"
+		},
+		"table": {
+			"assetNumber": "رقم الأصل",
+			"name": "الاسم",
+			"category": "الفئة",
+			"location": "الموقع",
+			"acquisitionCost": "تكلفة الاقتناء",
+			"netBookValue": "صافي القيمة الدفترية",
+			"status": "الحالة",
+			"actions": "الإجراءات"
+		},
+		"status": {
+			"capitalized": "مرسمل",
+			"cip": "قيد التنفيذ",
+			"draft": "مسودة",
+			"retired": "مستبعد",
+			"allStatuses": "جميع الحالات"
+		},
+		"filters": {
+			"allCategories": "جميع الفئات",
+			"office": "مكتبية",
+			"electronics": "إلكترونيات",
+			"furniture": "أثاث",
+			"itEquipment": "معدات تقنية المعلومات"
+		},
+		"searchPlaceholder": "بحث عن الأصول...",
+		"emptyMessage": "لم يتم العثور على أصول"
 	}
 }

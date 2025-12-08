@@ -15,6 +15,7 @@ const FloatingLabelSelect = ({
 	className = "",
 	searchable = true,
 	icon = false,
+	buttonClassName = "",
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -147,6 +148,7 @@ const FloatingLabelSelect = ({
               focus:outline-none
               disabled:cursor-not-allowed
               flex items-center justify-between
+			  ${buttonClassName}
             `}
 					>
 						{icon && <span>{icon}</span>}

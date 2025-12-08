@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast, ToastContainer } from 'react-toastify';
-import PageHeader from '../components/shared/PageHeader';
-import Toolbar from '../components/shared/Toolbar';
-import Table from '../components/shared/Table';
-import ConfirmModal from '../components/shared/ConfirmModal';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
+import PageHeader from "../components/shared/PageHeader";
+import Toolbar from "../components/shared/Toolbar";
+import Table from "../components/shared/Table";
+import ConfirmModal from "../components/shared/ConfirmModal";
 import {
 	fetchARInvoices,
 	deleteARInvoice,
 	submitARInvoiceForApproval,
 	reverseARInvoice,
 	postARInvoiceToGL,
-} from '../store/arInvoicesSlice';
+} from "../store/arInvoicesSlice";
 
 const ARInvoiceIcon = () => (
 	<svg width="28" height="27" viewBox="0 0 28 27" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -34,11 +34,11 @@ const ARInvoicesPage = () => {
 	const [selectedInvoice, setSelectedInvoice] = useState(null);
 	const [actionType, setActionType] = useState(null); // 'delete', 'submit', 'reverse', 'post'
 
-	const title = 'AR Invoices';
-	const subtitle = 'Accounts Receivable Invoices - Customer Invoices';
+	const title = "AR Invoices";
+	const subtitle = "Accounts Receivable Invoices - Customer Invoices";
 	const icon = <ARInvoiceIcon />;
-	const buttonText = 'New AR Invoice';
-	const quickActionPath = '/quick-actions/create-ar-invoice';
+	const buttonText = "New AR Invoice";
+	const quickActionPath = "/quick-actions/create-ar-invoice";
 
 	// Fetch invoices on mount
 	useEffect(() => {
@@ -49,7 +49,7 @@ const ARInvoicesPage = () => {
 	useEffect(() => {
 		document.title = `${title} - LightERP`;
 		return () => {
-			document.title = 'LightERP';
+			document.title = "LightERP";
 		};
 	}, [title]);
 
@@ -63,87 +63,87 @@ const ARInvoicesPage = () => {
 	// Transform API data for table display
 	const sampleData = invoices.map(invoice => ({
 		id: invoice.id,
-		invoice: invoice.invoice_number || invoice.number || '-',
-		customer: invoice.customer_name || '-',
-		date: invoice.date || '-',
-		dueDate: invoice.due_date || '-',
-		currency: invoice.currency_code || '-',
-		total: invoice.total || '-',
-		rate: invoice.exchange_rate || '-',
-		baseTotal: invoice.base_currency_total || '-',
-		balance: invoice.balance || '-',
-		postingStatus: invoice.is_posted ? 'Posted' : 'Draft',
+		invoice: invoice.invoice_number || invoice.number || "-",
+		customer: invoice.customer_name || "-",
+		date: invoice.date || "-",
+		dueDate: invoice.due_date || "-",
+		currency: invoice.currency_code || "-",
+		total: invoice.total || "-",
+		rate: invoice.exchange_rate || "-",
+		baseTotal: invoice.base_currency_total || "-",
+		balance: invoice.balance || "-",
+		postingStatus: invoice.is_posted ? "Posted" : "Draft",
 		paymentStatus:
-			invoice.payment_status === 'PAID'
-				? 'Paid'
-				: invoice.payment_status === 'PARTIALLY_PAID'
-				? 'Partial'
-				: 'Unpaid',
+			invoice.payment_status === "PAID"
+				? "Paid"
+				: invoice.payment_status === "PARTIALLY_PAID"
+				? "Partial"
+				: "Unpaid",
 		approvalStatus:
-			invoice.approval_status === 'APPROVED'
-				? 'Approved'
-				: invoice.approval_status === 'PENDING'
-				? 'Pending'
-				: invoice.approval_status === 'REJECTED'
-				? 'Rejected'
-				: 'Draft',
+			invoice.approval_status === "APPROVED"
+				? "Approved"
+				: invoice.approval_status === "PENDING"
+				? "Pending"
+				: invoice.approval_status === "REJECTED"
+				? "Rejected"
+				: "Draft",
 		rawData: invoice,
 	}));
 
 	// Table columns configuration
 	const columns = [
 		{
-			header: 'Invoice',
-			accessor: 'invoice',
+			header: "Invoice",
+			accessor: "invoice",
 			render: value => <span className="font-semibold text-blue-600">{value}</span>,
 		},
 		{
-			header: 'Customer',
-			accessor: 'customer',
+			header: "Customer",
+			accessor: "customer",
 		},
 		{
-			header: 'Date',
-			accessor: 'date',
+			header: "Date",
+			accessor: "date",
 		},
 		{
-			header: 'Due Date',
-			accessor: 'dueDate',
+			header: "Due Date",
+			accessor: "dueDate",
 		},
 		{
-			header: 'Currency',
-			accessor: 'currency',
+			header: "Currency",
+			accessor: "currency",
 		},
 		{
-			header: 'Total',
-			accessor: 'total',
+			header: "Total",
+			accessor: "total",
 			render: value => <span className="font-semibold">{value}</span>,
 		},
 		{
-			header: 'Rate',
-			accessor: 'rate',
+			header: "Rate",
+			accessor: "rate",
 		},
 		{
-			header: 'Base Total',
-			accessor: 'baseTotal',
+			header: "Base Total",
+			accessor: "baseTotal",
 			render: value => <span className="font-semibold">{value}</span>,
 		},
 		{
-			header: 'Balance',
-			accessor: 'balance',
+			header: "Balance",
+			accessor: "balance",
 			render: value => <span className="font-semibold text-orange-600">{value}</span>,
 		},
 		{
-			header: 'Posting Status',
-			accessor: 'postingStatus',
+			header: "Posting Status",
+			accessor: "postingStatus",
 			render: value => {
 				const statusColors = {
-					Posted: 'bg-green-100 text-green-800',
-					Draft: 'bg-gray-100 text-gray-800',
+					Posted: "bg-green-100 text-green-800",
+					Draft: "bg-gray-100 text-gray-800",
 				};
 				return (
 					<span
 						className={`px-3 py-1 rounded-full text-xs font-semibold ${
-							statusColors[value] || 'bg-gray-100 text-gray-800'
+							statusColors[value] || "bg-gray-100 text-gray-800"
 						}`}
 					>
 						{value}
@@ -152,19 +152,19 @@ const ARInvoicesPage = () => {
 			},
 		},
 		{
-			header: 'Payment Status',
-			accessor: 'paymentStatus',
+			header: "Payment Status",
+			accessor: "paymentStatus",
 			//   width: '150px',
 			render: value => {
 				const statusColors = {
-					Paid: 'bg-green-100 text-green-800',
-					Unpaid: 'bg-red-100 text-red-800',
-					Partial: 'bg-yellow-100 text-yellow-800',
+					Paid: "bg-green-100 text-green-800",
+					Unpaid: "bg-red-100 text-red-800",
+					Partial: "bg-yellow-100 text-yellow-800",
 				};
 				return (
 					<span
 						className={`px-3 py-1 rounded-full text-xs font-semibold ${
-							statusColors[value] || 'bg-gray-100 text-gray-800'
+							statusColors[value] || "bg-gray-100 text-gray-800"
 						}`}
 					>
 						{value}
@@ -173,18 +173,18 @@ const ARInvoicesPage = () => {
 			},
 		},
 		{
-			header: 'Approval Status',
-			accessor: 'approvalStatus',
+			header: "Approval Status",
+			accessor: "approvalStatus",
 			render: value => {
 				const statusColors = {
-					Approved: 'bg-green-100 text-green-800',
-					Pending: 'bg-yellow-100 text-yellow-800',
-					Rejected: 'bg-red-100 text-red-800',
+					Approved: "bg-green-100 text-green-800",
+					Pending: "bg-yellow-100 text-yellow-800",
+					Rejected: "bg-red-100 text-red-800",
 				};
 				return (
 					<span
 						className={`px-3 py-1 rounded-full text-xs font-semibold ${
-							statusColors[value] || 'bg-gray-100 text-gray-800'
+							statusColors[value] || "bg-gray-100 text-gray-800"
 						}`}
 					>
 						{value}
@@ -196,20 +196,20 @@ const ARInvoicesPage = () => {
 
 	// Filter options for toolbar
 	const filterOptions = [
-		{ value: '', label: 'All Status' },
-		{ value: 'paid', label: 'Paid' },
-		{ value: 'unpaid', label: 'Unpaid' },
-		{ value: 'partial', label: 'Partial' },
+		{ value: "", label: "All Status" },
+		{ value: "paid", label: "Paid" },
+		{ value: "unpaid", label: "Unpaid" },
+		{ value: "partial", label: "Partial" },
 	];
 
 	// Handlers
 	const handleSearch = searchValue => {
-		console.log('Search:', searchValue);
+		console.log("Search:", searchValue);
 		// Implement search logic here
 	};
 
 	const handleFilter = filterValue => {
-		console.log('Filter:', filterValue);
+		console.log("Filter:", filterValue);
 		// Implement filter logic here
 	};
 
@@ -219,7 +219,7 @@ const ARInvoicesPage = () => {
 
 	const handleEdit = row => {
 		const invoice = row.rawData || row;
-		navigate(quickActionPath, { state: { invoice, mode: 'edit' } });
+		navigate(quickActionPath, { state: { invoice, mode: "edit" } });
 	};
 
 	const handleDelete = row => {
@@ -228,9 +228,9 @@ const ARInvoicesPage = () => {
 
 		// If invoice is posted, use reverse action instead of delete
 		if (invoice.is_posted) {
-			setActionType('reverse');
+			setActionType("reverse");
 		} else {
-			setActionType('delete');
+			setActionType("delete");
 		}
 
 		setIsDeleteModalOpen(true);
@@ -240,31 +240,31 @@ const ARInvoicesPage = () => {
 		const invoice = row.rawData || row;
 		try {
 			await dispatch(submitARInvoiceForApproval(invoice.id)).unwrap();
-			toast.success('Invoice submitted for approval successfully');
+			toast.success("Invoice submitted for approval successfully");
 			dispatch(fetchARInvoices());
 		} catch (error) {
-			console.error('Failed to submit invoice for approval:', error);
+			console.error("Failed to submit invoice for approval:", error);
 		}
 	};
 
 	const handlePostToGL = async row => {
 		const invoice = row.rawData || row;
 		setSelectedInvoice(invoice);
-		setActionType('post');
+		setActionType("post");
 		setIsDeleteModalOpen(true);
 	};
 
 	const handleConfirmAction = async () => {
 		try {
-			if (actionType === 'delete') {
+			if (actionType === "delete") {
 				await dispatch(deleteARInvoice(selectedInvoice.id)).unwrap();
-				toast.success('Invoice deleted successfully');
-			} else if (actionType === 'reverse') {
+				toast.success("Invoice deleted successfully");
+			} else if (actionType === "reverse") {
 				await dispatch(reverseARInvoice(selectedInvoice.id)).unwrap();
-				toast.success('Invoice reversed successfully');
-			} else if (actionType === 'post') {
+				toast.success("Invoice reversed successfully");
+			} else if (actionType === "post") {
 				await dispatch(postARInvoiceToGL(selectedInvoice.id)).unwrap();
-				toast.success('Invoice posted to GL successfully');
+				toast.success("Invoice posted to GL successfully");
 			}
 
 			setIsDeleteModalOpen(false);
@@ -278,29 +278,29 @@ const ARInvoicesPage = () => {
 
 	const getModalConfig = () => {
 		switch (actionType) {
-			case 'delete':
+			case "delete":
 				return {
-					title: 'Delete Invoice',
+					title: "Delete Invoice",
 					message: `Are you sure you want to delete invoice ${selectedInvoice?.invoice_number}? This action cannot be undone.`,
-					confirmText: 'Delete',
+					confirmText: "Delete",
 				};
-			case 'reverse':
+			case "reverse":
 				return {
-					title: 'Reverse Invoice',
+					title: "Reverse Invoice",
 					message: `Are you sure you want to reverse invoice ${selectedInvoice?.invoice_number}? This will create a reversal entry.`,
-					confirmText: 'Reverse',
+					confirmText: "Reverse",
 				};
-			case 'post':
+			case "post":
 				return {
-					title: 'Post Invoice to GL',
+					title: "Post Invoice to GL",
 					message: `Are you sure you want to post invoice ${selectedInvoice?.invoice_number} to the General Ledger?`,
-					confirmText: 'Post',
+					confirmText: "Post",
 				};
 			default:
 				return {
-					title: 'Confirm Action',
-					message: 'Are you sure you want to proceed?',
-					confirmText: 'Confirm',
+					title: "Confirm Action",
+					message: "Are you sure you want to proceed?",
+					confirmText: "Confirm",
 				};
 		}
 	};
@@ -341,24 +341,24 @@ const ARInvoicesPage = () => {
 						showActions={row => {
 							// Show edit/delete actions only if approval status is NOT approved
 							const approvalStatus = row.rawData?.approval_status;
-							return approvalStatus !== 'APPROVED';
+							return approvalStatus !== "APPROVED";
 						}}
 						showDeleteButton={row => {
 							// Can delete if approval status is NOT approved
 							const approvalStatus = row.rawData?.approval_status;
-							return approvalStatus !== 'APPROVED';
+							return approvalStatus !== "APPROVED";
 						}}
 						actions={[
 							{
-								label: 'Submit for Approval',
+								label: "Submit for Approval",
 								onClick: handleSubmitForApproval,
-								condition: row => row.rawData?.approval_status === 'DRAFT' && !row.rawData?.is_posted,
+								condition: row => row.rawData?.approval_status === "DRAFT" && !row.rawData?.is_posted,
 							},
 							{
-								label: 'Post to GL',
+								label: "Post to GL",
 								onClick: handlePostToGL,
 								condition: row =>
-									row.rawData?.approval_status === 'APPROVED' && !row.rawData?.is_posted,
+									row.rawData?.approval_status === "APPROVED" && !row.rawData?.is_posted,
 							},
 						]}
 					/>

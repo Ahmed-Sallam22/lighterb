@@ -29,7 +29,7 @@ import ForgetPasswordPage from "./pages/ForgetPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { useEffect } from "react";
 import Requisitions from "./pages/Requisitions";
-import NewRequisition from "./pages/Requisitions/components/NewRequisition";
+import AssetsPage from "./pages/Assets";
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -57,6 +57,7 @@ const App = () => {
 					<Route path="journal/lines" element={<JournalLinesPage />} />
 					<Route path="journal/create" element={<CreateJournalPage />} />
 					<Route path="segments" element={<SegmentsPage />} />
+					<Route path="assets" element={<AssetsPage />} />
 					<Route path="currency" element={<CurrencyPage />} />
 					<Route path="exchange-rates" element={<ExchangeRatesPage />} />
 					<Route path="tax-rates" element={<TaxRatesPage />} />

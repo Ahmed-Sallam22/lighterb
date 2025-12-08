@@ -329,5 +329,52 @@
 			"selectThisItem": "Select This Item",
 			"noItemsFound": "No items found matching your search"
 		}
+	},
+	"assets": {
+		"title": "Asset Register",
+		"subtitle": "All Asset",
+		"newAsset": "New Asset",
+		"fromAPInvoice": "From AP Invoice",
+		"fromGRN": "From GRN",
+		"approvals": "Approvals",
+		"transfer": "Transfer",
+		"adjustments": "Adjustments",
+		"retirements": "Retirements",
+		"categories": "Categories",
+		"locations": "Locations",
+		"depreciation": "Depreciation",
+		"settings": "Settings",
+		"stats": {
+			"totalAssets": "Total Assets",
+			"activeAssets": "Active Assets",
+			"draftAssets": "Draft Assets",
+			"totalNetBookValue": "Total Net Book Value"
+		},
+		"table": {
+			"assetNumber": "Asset Number",
+			"name": "Name",
+			"category": "Category",
+			"location": "Location",
+			"acquisitionCost": "Acquisition Cost",
+			"netBookValue": "Net Book Value",
+			"status": "Status",
+			"actions": "Actions"
+		},
+		"status": {
+			"capitalized": "Capitalized",
+			"cip": "CIP",
+			"draft": "Draft",
+			"retired": "Retired",
+			"allStatuses": "All Statuses"
+		},
+		"filters": {
+			"allCategories": "All Categories",
+			"office": "Office",
+			"electronics": "Electronics",
+			"furniture": "Furniture",
+			"itEquipment": "IT Equipment"
+		},
+		"searchPlaceholder": "Search assets...",
+		"emptyMessage": "No assets found"
 	}
 }
