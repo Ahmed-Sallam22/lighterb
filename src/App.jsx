@@ -28,6 +28,8 @@ import RegisterPage from "./pages/RegisterPage";
 import ForgetPasswordPage from "./pages/ForgetPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { useEffect } from "react";
+import Requisitions from "./pages/Requisitions";
+import NewRequisition from "./pages/Requisitions/components/NewRequisition";
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -64,6 +66,7 @@ const App = () => {
 					<Route path="reports" element={<ReportsPage />} />
 					<Route path="procurement" element={<ProcurementDashboard />} />
 					<Route path="procurement/approvals" element={<ProcurementApprovals />} />
+					<Route path="requisitions" element={<Requisitions />} />
 					<Route path="procurement/approvals/:instanceId" element={<ProcurementApprovalDetail />} />
 					<Route path="procurement/catalog" element={<ProcurementCatalog />} />
 				</Route>
