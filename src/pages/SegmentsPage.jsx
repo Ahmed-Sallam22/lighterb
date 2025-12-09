@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/shared/PageHeader';
 import FloatingLabelInput from '../components/shared/FloatingLabelInput';
 import FloatingLabelSelect from '../components/shared/FloatingLabelSelect';
@@ -31,6 +32,8 @@ const AddIcon = () => (
 );
 
 const SegmentsPage = () => {
+	const { t, i18n } = useTranslation();
+	const isRtl = i18n.dir() === 'rtl';
 	const dispatch = useDispatch();
 	const { types, values, loading, typesLoading, valuesLoading } = useSelector(state => state.segments);
 
@@ -98,19 +101,19 @@ const SegmentsPage = () => {
 		const newErrors = {};
 
 		if (!formData.segment_name.trim()) {
-			newErrors.segment_name = 'Segment name is required';
+			newErrors.segment_name = t('segments.validation.nameRequired');
 		}
 
 		if (!formData.segment_type.trim()) {
-			newErrors.segment_type = 'Technical type is required';
+			newErrors.segment_type = t('segments.validation.techTypeRequired');
 		}
 
 		if (!formData.length) {
-			newErrors.length = 'Fixed code length is required';
+			newErrors.length = t('segments.validation.lengthRequired');
 		}
 
 		if (!formData.display_order) {
-			newErrors.display_order = 'Display order is required';
+			newErrors.display_order = t('segments.validation.orderRequired');
 		}
 
 		setErrors(newErrors);
@@ -136,16 +139,16 @@ const SegmentsPage = () => {
 		try {
 			if (isEditMode && currentSegmentId) {
 				await dispatch(updateSegmentType({ id: currentSegmentId, data: segmentData })).unwrap();
-				toast.success('Segment type updated successfully!');
+				toast.success(t('segments.messages.typeUpdated'));
 			} else {
 				await dispatch(createSegmentType(segmentData)).unwrap();
-				toast.success('Segment type created successfully!');
+				toast.success(t('segments.messages.typeCreated'));
 			}
 			handleCloseModal();
 			dispatch(fetchSegmentTypes());
 		} catch (error) {
 			console.error('Error saving segment:', error);
-			toast.error(isEditMode ? 'Failed to update segment type' : 'Failed to create segment type');
+			toast.error(isEditMode ? t('segments.messages.errorUpdateType') : t('segments.messages.errorCreateType'));
 		}
 	};
 
@@ -191,13 +194,13 @@ const SegmentsPage = () => {
 		if (itemToDelete) {
 			try {
 				await dispatch(deleteSegmentType(itemToDelete.segment_id)).unwrap();
-				toast.success('Segment type deleted successfully!');
+				toast.success(t('segments.messages.typeDeleted'));
 				setShowDeleteTypeModal(false);
 				setItemToDelete(null);
 				dispatch(fetchSegmentTypes());
 			} catch (error) {
 				console.error('Error deleting segment:', error);
-				toast.error('Failed to delete segment type');
+				toast.error(t('segments.messages.errorDeleteType'));
 			}
 		}
 	};
@@ -210,11 +213,11 @@ const SegmentsPage = () => {
 					data: { ...segment, is_required: !segment.is_required },
 				})
 			).unwrap();
-			toast.success(`Segment type "${segment.segment_name}" updated successfully!`);
+			toast.success(t('segments.messages.typeUpdated'));
 			dispatch(fetchSegmentTypes());
 		} catch (error) {
 			console.error('Error updating segment:', error);
-			toast.error('Failed to update segment type');
+			toast.error(t('segments.messages.errorUpdateType'));
 		}
 	};
 
@@ -226,11 +229,11 @@ const SegmentsPage = () => {
 					data: { ...segment, has_hierarchy: !segment.has_hierarchy },
 				})
 			).unwrap();
-			toast.success(`Segment type "${segment.segment_name}" updated successfully!`);
+			toast.success(t('segments.messages.typeUpdated'));
 			dispatch(fetchSegmentTypes());
 		} catch (error) {
 			console.error('Error updating segment:', error);
-			toast.error('Failed to update segment type');
+			toast.error(t('segments.messages.errorUpdateType'));
 		}
 	};
 
@@ -243,7 +246,6 @@ const SegmentsPage = () => {
 			const selectedType = types.find(type => type.segment_id.toString() === value);
 			if (selectedType) {
 				setSelectedSegmentTypeLength(selectedType.length);
-				console.log('Selected segment type length:', selectedType.length);
 			} else {
 				setSelectedSegmentTypeLength(null);
 			}
@@ -258,17 +260,17 @@ const SegmentsPage = () => {
 		const newErrors = {};
 
 		if (!valueFormData.segment_type) {
-			newErrors.segment_type = 'Segment type is required';
+			newErrors.segment_type = t('segments.validation.typeRequired');
 		}
 
 		if (!valueFormData.code.trim()) {
-			newErrors.code = 'Code is required';
+			newErrors.code = t('segments.validation.codeRequired');
 		} else if (selectedSegmentTypeLength && valueFormData.code.length !== selectedSegmentTypeLength) {
-			newErrors.code = `Code must be exactly ${selectedSegmentTypeLength} characters`;
+			newErrors.code = t('segments.validation.codeLength', { length: selectedSegmentTypeLength });
 		}
 
 		if (!valueFormData.alias.trim()) {
-			newErrors.alias = 'Alias is required';
+			newErrors.alias = t('segments.validation.aliasRequired');
 		}
 
 		setValueErrors(newErrors);
@@ -294,16 +296,18 @@ const SegmentsPage = () => {
 		try {
 			if (isValueEditMode && currentValueId) {
 				await dispatch(updateSegmentValue({ id: currentValueId, data: valueData })).unwrap();
-				toast.success('Segment value updated successfully!');
+				toast.success(t('segments.messages.valueUpdated'));
 			} else {
 				await dispatch(createSegmentValue(valueData)).unwrap();
-				toast.success('Segment value created successfully!');
+				toast.success(t('segments.messages.valueCreated'));
 			}
 			handleCloseValueModal();
 			dispatch(fetchSegmentValues({ segment_type: selectedSegmentType }));
 		} catch (error) {
 			console.error('Error saving segment value:', error);
-			toast.error(isValueEditMode ? 'Failed to update segment value' : 'Failed to create segment value');
+			toast.error(
+				isValueEditMode ? t('segments.messages.errorUpdateValue') : t('segments.messages.errorCreateValue')
+			);
 		}
 	};
 
@@ -355,13 +359,13 @@ const SegmentsPage = () => {
 		if (itemToDelete) {
 			try {
 				await dispatch(deleteSegmentValue(itemToDelete.id)).unwrap();
-				toast.success('Segment value deleted successfully!');
+				toast.success(t('segments.messages.valueDeleted'));
 				setShowDeleteValueModal(false);
 				setItemToDelete(null);
 				dispatch(fetchSegmentValues({ segment_type: selectedSegmentType }));
 			} catch (error) {
 				console.error('Error deleting segment value:', error);
-				toast.error('Failed to delete segment value');
+				toast.error(t('segments.messages.errorDeleteValue'));
 			}
 		}
 	};
@@ -375,72 +379,75 @@ const SegmentsPage = () => {
 	};
 
 	// Table columns for segment values
-	const valueColumns = [
-		{
-			header: 'ID',
-			accessor: 'id',
-			width: '80px',
-			render: value => <span className="font-semibold text-gray-900">{value}</span>,
-		},
-		{
-			header: 'Code',
-			accessor: 'code',
-			width: '120px',
-			render: value => <span className="font-semibold text-gray-700">{value}</span>,
-		},
-		{
-			header: 'Alias',
-			accessor: 'alias',
-			render: value => <span className="text-gray-900">{value}</span>,
-		},
-		{
-			header: 'Name',
-			accessor: 'name',
-			render: value => <span className="text-gray-600 text-sm">{value}</span>,
-		},
-		{
-			header: 'Segment Type',
-			accessor: 'segment_type_name',
-			width: '140px',
-			render: value => <span className="font-semibold text-[#28819C]">{value}</span>,
-		},
-		{
-			header: 'Parent',
-			accessor: 'parent_code',
-			width: '100px',
-			render: value => <span className="text-gray-600">{value || '-'}</span>,
-		},
-		{
-			header: 'Node Type',
-			accessor: 'node_type',
-			width: '100px',
-			render: value => (
-				<span className={`font-medium ${value === 'parent' ? 'text-blue-600' : 'text-green-600'}`}>
-					{value}
-				</span>
-			),
-		},
-		{
-			header: 'Level',
-			accessor: 'level',
-			width: '80px',
-			render: value => <span className="text-gray-600">{value}</span>,
-		},
-		{
-			header: 'Status',
-			accessor: 'is_active',
-			width: '100px',
-			render: value => (
-				<span
-					className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-						value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-					}`}
-				>
-					{value ? 'Active' : 'Inactive'}
-				</span>
-			),
-		},
-	];
+	const valueColumns = useMemo(
+		() => [
+			{
+				header: t('segments.table.id'),
+				accessor: 'id',
+				width: '80px',
+				render: value => <span className="font-semibold text-gray-900">{value}</span>,
+			},
+			{
+				header: t('segments.table.code'),
+				accessor: 'code',
+				width: '120px',
+				render: value => <span className="font-semibold text-gray-700">{value}</span>,
+			},
+			{
+				header: t('segments.table.alias'),
+				accessor: 'alias',
+				render: value => <span className="text-gray-900">{value}</span>,
+			},
+			{
+				header: t('segments.table.name'),
+				accessor: 'name',
+				render: value => <span className="text-gray-600 text-sm">{value}</span>,
+			},
+			{
+				header: t('segments.table.type'),
+				accessor: 'segment_type_name',
+				width: '140px',
+				render: value => <span className="font-semibold text-[#28819C]">{value}</span>,
+			},
+			{
+				header: t('segments.table.parent'),
+				accessor: 'parent_code',
+				width: '100px',
+				render: value => <span className="text-gray-600">{value || '-'}</span>,
+			},
+			{
+				header: t('segments.table.nodeType'),
+				accessor: 'node_type',
+				width: '100px',
+				render: value => (
+					<span className={`font-medium ${value === 'parent' ? 'text-blue-600' : 'text-green-600'}`}>
+						{value === 'parent' ? t('segments.form.parentNode') : t('segments.form.childNode')}
+					</span>
+				),
+			},
+			{
+				header: t('segments.table.level'),
+				accessor: 'level',
+				width: '80px',
+				render: value => <span className="text-gray-600">{value}</span>,
+			},
+			{
+				header: t('segments.table.status'),
+				accessor: 'is_active',
+				width: '100px',
+				render: value => (
+					<span
+						className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+							value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+						}`}
+					>
+						{value ? t('segments.status.active') : t('segments.status.inactive')}
+					</span>
+				),
+			},
+		],
+		[t]
+	);
 
 	// Segment type options for values dropdown
 	const segmentTypeOptions = types.map(type => ({
@@ -449,8 +456,8 @@ const SegmentsPage = () => {
 	}));
 
 	const nodeTypeOptions = [
-		{ value: 'child', label: 'Child Node' },
-		{ value: 'parent', label: 'Parent Node' },
+		{ value: 'child', label: t('segments.form.childNode') },
+		{ value: 'parent', label: t('segments.form.parentNode') },
 	];
 
 	// Filter values based on search query
@@ -467,8 +474,8 @@ const SegmentsPage = () => {
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<PageHeader
-				title="Segments"
-				subtitle="Manage your chart of accounts segments and types"
+				title={t('segments.title')}
+				subtitle={t('segments.subtitle')}
 				icon={
 					<svg width="29" height="35" viewBox="0 0 29 35" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path
@@ -482,21 +489,21 @@ const SegmentsPage = () => {
 			<div className="w-[95%] mx-auto py-6">
 				{/* Header with Add Button */}
 				<div className="flex justify-between items-center mb-6">
-					<h2 className="text-2xl font-bold text-gray-900">Segment Types</h2>
+					<h2 className="text-2xl font-bold text-gray-900">{t('segments.types.title')}</h2>
 					<button
 						onClick={() => setIsModalOpen(true)}
 						className="flex items-center gap-2 px-6 py-3 bg-[#28819C] text-white rounded-lg hover:bg-[#206a82] transition-colors font-medium shadow-md"
 						disabled={typesLoading}
 					>
 						<AddIcon />
-						Add Segment Type
+						{t('segments.types.addBtn')}
 					</button>
 				</div>
 
 				{/* Segments Grid */}
 				{typesLoading ? (
 					<div className="text-center py-10">
-						<p className="text-gray-500">Loading segment types...</p>
+						<p className="text-gray-500">{t('segments.types.loading')}</p>
 					</div>
 				) : (
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -515,7 +522,7 @@ const SegmentsPage = () => {
 											type="button"
 											onClick={() => handleEditSegment(segment)}
 											className="rounded-full hover:bg-[#E7F3F6] transition-colors"
-											title="Edit"
+											title={t('segments.actions.edit')}
 										>
 											<svg
 												width="32"
@@ -548,7 +555,7 @@ const SegmentsPage = () => {
 											type="button"
 											onClick={() => handleDeleteSegmentClick(segment)}
 											className="rounded-full hover:bg-red-50 transition-colors"
-											title="Delete"
+											title={t('segments.actions.delete')}
 										>
 											<svg
 												width="24"
@@ -614,7 +621,7 @@ const SegmentsPage = () => {
 												</svg>
 											)}
 										</span>
-										Required
+										{t('segments.types.required')}
 									</button>
 
 									<button
@@ -647,12 +654,12 @@ const SegmentsPage = () => {
 												</svg>
 											)}
 										</span>
-										Has Hierarchy
+										{t('segments.types.hasHierarchy')}
 									</button>
 								</div>
 
 								<p className="mt-3 text-[15px] leading-relaxed text-gray-600">
-									{segment.description || 'No description provided'}
+									{segment.description || t('segments.types.noDescription')}
 								</p>
 
 								<div className="mt-3 flex items-center justify-between border-gray-100 pt-4">
@@ -663,11 +670,17 @@ const SegmentsPage = () => {
 												: 'bg-gray-100 text-gray-600'
 										}`}
 									>
-										{segment.is_active ? 'Active' : 'Inactive'}
+										{segment.is_active
+											? t('segments.status.active')
+											: t('segments.status.inactive')}
 									</span>
-									<div className="text-xs text-gray-500">
-										<div>Length: {segment.length}</div>
-										<div>Order: {segment.display_order}</div>
+									<div className={`text-xs text-gray-500 ${isRtl ? 'text-left' : 'text-right'}`}>
+										<div>
+											{t('segments.types.length')}: {segment.length}
+										</div>
+										<div>
+											{t('segments.types.order')}: {segment.display_order}
+										</div>
 									</div>
 								</div>
 							</div>
@@ -680,14 +693,14 @@ const SegmentsPage = () => {
 			<SlideUpModal
 				isOpen={isModalOpen}
 				onClose={handleCloseModal}
-				title={isEditMode ? 'Edit Segment Type' : 'Add Segment Type'}
+				title={isEditMode ? t('segments.modals.editType') : t('segments.modals.addType')}
 				className="w-full"
 				maxWidth="550px"
 			>
 				<div className="relative overflow-hidden py-2">
 					<div className="grid gap-4">
 						<FloatingLabelInput
-							label="Segment Name"
+							label={t('segments.form.segmentName')}
 							value={formData.segment_name}
 							onChange={e => handleInputChange('segment_name', e.target.value)}
 							required
@@ -696,7 +709,7 @@ const SegmentsPage = () => {
 						/>
 
 						<FloatingLabelInput
-							label="Technical Type"
+							label={t('segments.form.technicalType')}
 							value={formData.segment_type}
 							onChange={e => handleInputChange('segment_type', e.target.value)}
 							required
@@ -705,7 +718,7 @@ const SegmentsPage = () => {
 						/>
 
 						<FloatingLabelInput
-							label="Fixed Code Length"
+							label={t('segments.form.fixedLength')}
 							type="number"
 							value={formData.length}
 							onChange={e => handleInputChange('length', e.target.value)}
@@ -715,7 +728,7 @@ const SegmentsPage = () => {
 						/>
 
 						<FloatingLabelInput
-							label="Display Order"
+							label={t('segments.form.displayOrder')}
 							type="number"
 							value={formData.display_order}
 							onChange={e => handleInputChange('display_order', e.target.value)}
@@ -728,24 +741,24 @@ const SegmentsPage = () => {
 							<textarea
 								value={formData.description}
 								onChange={e => handleInputChange('description', e.target.value)}
-								placeholder="Description"
+								placeholder={t('segments.form.placeholders.description')}
 								rows="4"
 								className="w-full bg-transparent px-5 pt-5 pb-3 text-gray-900 focus:outline-none"
 							/>
 						</div>
 
 						<Toggle
-							label="Mandatory Segment"
+							label={t('segments.form.mandatory')}
 							checked={formData.is_required}
 							onChange={() => handleInputChange('is_required', !formData.is_required)}
 						/>
 						<Toggle
-							label="Has Hierarchy"
+							label={t('segments.form.hierarchy')}
 							checked={formData.has_hierarchy}
 							onChange={() => handleInputChange('has_hierarchy', !formData.has_hierarchy)}
 						/>
 						<Toggle
-							label="Status"
+							label={t('segments.form.status')}
 							checked={formData.is_active}
 							onChange={() => handleInputChange('is_active', !formData.is_active)}
 						/>
@@ -757,7 +770,7 @@ const SegmentsPage = () => {
 							onClick={handleCloseModal}
 							className="rounded-full border border-gray-300 px-6 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50"
 						>
-							Cancel
+							{t('segments.actions.cancel')}
 						</button>
 						<button
 							type="button"
@@ -765,7 +778,11 @@ const SegmentsPage = () => {
 							disabled={loading}
 							className="rounded-full bg-[#1E7A96] px-8 py-2 text-sm font-semibold text-white hover:bg-[#16637A] disabled:opacity-50"
 						>
-							{loading ? 'Saving...' : isEditMode ? 'Update Segment Type' : 'Add Segment Type'}
+							{loading
+								? t('segments.actions.saving')
+								: isEditMode
+								? t('segments.actions.update')
+								: t('segments.modals.addType')}
 						</button>
 					</div>
 				</div>
@@ -773,13 +790,13 @@ const SegmentsPage = () => {
 
 			{/* Segment Values Section */}
 			<div className="w-[95%] mx-auto py-6">
-				<h2 className="text-2xl font-bold text-gray-900 mb-6">Segment Values</h2>
+				<h2 className="text-2xl font-bold text-gray-900 mb-6">{t('segments.values.title')}</h2>
 
 				{/* Toolbar */}
 				<Toolbar
-					searchPlaceholder="Search segment values..."
-					filterOptions={[{ value: '', label: 'All Types' }, ...segmentTypeOptions]}
-					createButtonText="Add Segment Value"
+					searchPlaceholder={t('segments.values.searchPlaceholder')}
+					filterOptions={[{ value: '', label: t('segments.values.allTypes') }, ...segmentTypeOptions]}
+					createButtonText={t('segments.values.addBtn')}
 					onSearchChange={handleSearchChange}
 					onFilterChange={handleFilterChange}
 					onCreateClick={() => setIsValueModalOpen(true)}
@@ -789,7 +806,7 @@ const SegmentsPage = () => {
 				<div className="mt-6">
 					{valuesLoading ? (
 						<div className="text-center py-10">
-							<p className="text-gray-500">Loading segment values...</p>
+							<p className="text-gray-500">{t('segments.values.loading')}</p>
 						</div>
 					) : (
 						<Table
@@ -798,7 +815,7 @@ const SegmentsPage = () => {
 							onEdit={handleEditValue}
 							onDelete={handleDeleteValueClick}
 							editIcon="edit"
-							emptyMessage="No segment values found"
+							emptyMessage={t('segments.values.empty')}
 							showDeleteButton={row => row.can_delete !== false}
 						/>
 					)}
@@ -809,12 +826,12 @@ const SegmentsPage = () => {
 			<SlideUpModal
 				isOpen={isValueModalOpen}
 				onClose={handleCloseValueModal}
-				title={isValueEditMode ? 'Edit Segment Value' : 'Add New Segment Value'}
+				title={isValueEditMode ? t('segments.modals.editValue') : t('segments.modals.addValue')}
 				maxWidth="550px"
 			>
 				<div className="space-y-4">
 					<FloatingLabelSelect
-						label="Segment Type"
+						label={t('segments.form.segmentType')}
 						value={valueFormData.segment_type}
 						onChange={e => handleValueInputChange('segment_type', e.target.value)}
 						options={segmentTypeOptions}
@@ -823,40 +840,45 @@ const SegmentsPage = () => {
 					/>
 					{selectedSegmentTypeLength && (
 						<p className="text-xs text-blue-600 font-medium mt-1 px-1">
-							ℹ️ Code length for this segment type: {selectedSegmentTypeLength} characters
+							{t('segments.values.infoLength', { length: selectedSegmentTypeLength })}
 						</p>
 					)}
 
 					<FloatingLabelInput
-						label="Code"
+						label={t('segments.form.code')}
 						value={valueFormData.code}
 						onChange={e => handleValueInputChange('code', e.target.value)}
 						required
 						error={valueErrors.code}
 						maxLength={selectedSegmentTypeLength || undefined}
 						placeholder={
-							selectedSegmentTypeLength ? `Enter ${selectedSegmentTypeLength} characters` : 'Enter code'
+							selectedSegmentTypeLength
+								? t('segments.form.placeholders.codeWithLen', { length: selectedSegmentTypeLength })
+								: t('segments.form.placeholders.code')
 						}
 					/>
 					{selectedSegmentTypeLength && (
 						<p className="text-xs text-gray-500 mt-1 px-1">
-							Required length: {selectedSegmentTypeLength} characters
+							{t('segments.values.requiredLength', { length: selectedSegmentTypeLength })}
 							{valueFormData.code && (
 								<span
-									className={
+									className={`mx-1 ${
 										valueFormData.code.length === selectedSegmentTypeLength
 											? 'text-green-600 font-semibold'
 											: 'text-orange-600 font-semibold'
-									}
+									}`}
 								>
-									(Current: {valueFormData.code.length}/{selectedSegmentTypeLength})
+									{t('segments.values.currentLength', {
+										current: valueFormData.code.length,
+										max: selectedSegmentTypeLength,
+									})}
 								</span>
 							)}
 						</p>
 					)}
 
 					<FloatingLabelInput
-						label="Alias"
+						label={t('segments.form.alias')}
 						value={valueFormData.alias}
 						onChange={e => handleValueInputChange('alias', e.target.value)}
 						required
@@ -864,21 +886,21 @@ const SegmentsPage = () => {
 					/>
 
 					<FloatingLabelInput
-						label="Parent Code"
+						label={t('segments.form.parentCode')}
 						value={valueFormData.parent_code || ''}
 						onChange={e => handleValueInputChange('parent_code', e.target.value || null)}
-						placeholder="Leave empty if no parent"
+						placeholder={t('segments.form.placeholders.parent')}
 					/>
 
 					<FloatingLabelSelect
-						label="Node Type"
+						label={t('segments.form.nodeType')}
 						value={valueFormData.node_type}
 						onChange={e => handleValueInputChange('node_type', e.target.value)}
 						options={nodeTypeOptions}
 					/>
 
 					<Toggle
-						label="Status"
+						label={t('segments.form.status')}
 						checked={valueFormData.is_active}
 						onChange={() => handleValueInputChange('is_active', !valueFormData.is_active)}
 					/>
@@ -890,7 +912,7 @@ const SegmentsPage = () => {
 							onClick={handleCloseValueModal}
 							className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
 						>
-							Close
+							{t('segments.actions.close')}
 						</button>
 						<button
 							type="button"
@@ -898,7 +920,11 @@ const SegmentsPage = () => {
 							disabled={loading}
 							className="px-6 py-2 bg-[#28819C] text-white rounded-lg hover:bg-[#206a82] transition-colors font-medium disabled:opacity-50"
 						>
-							{loading ? 'Saving...' : isValueEditMode ? 'Update Segment Value' : 'Add Segment Value'}
+							{loading
+								? t('segments.actions.saving')
+								: isValueEditMode
+								? t('segments.actions.update')
+								: t('segments.modals.addValue')}
 						</button>
 					</div>
 				</div>
@@ -912,10 +938,10 @@ const SegmentsPage = () => {
 					setItemToDelete(null);
 				}}
 				onConfirm={handleConfirmDeleteSegment}
-				title="Delete Segment Type"
-				message={`Are you sure you want to delete the segment type "${itemToDelete?.segment_name}"? This action cannot be undone.`}
-				confirmText="Delete"
-				cancelText="Cancel"
+				title={t('segments.modals.deleteType')}
+				message={t('segments.modals.deleteTypeMsg', { name: itemToDelete?.segment_name })}
+				confirmText={t('segments.actions.delete')}
+				cancelText={t('segments.actions.cancel')}
 			/>
 
 			{/* Delete Segment Value Confirmation Modal */}
@@ -926,20 +952,20 @@ const SegmentsPage = () => {
 					setItemToDelete(null);
 				}}
 				onConfirm={handleConfirmDeleteValue}
-				title="Delete Segment Value"
-				message={`Are you sure you want to delete the segment value "${itemToDelete?.code} - ${itemToDelete?.alias}"? This action cannot be undone.`}
-				confirmText="Delete"
-				cancelText="Cancel"
+				title={t('segments.modals.deleteValue')}
+				message={t('segments.modals.deleteValueMsg', { code: itemToDelete?.code, alias: itemToDelete?.alias })}
+				confirmText={t('segments.actions.delete')}
+				cancelText={t('segments.actions.cancel')}
 			/>
 
 			{/* Toast Container */}
 			<ToastContainer
-				position="top-right"
+				position={isRtl ? 'top-left' : 'top-right'}
 				autoClose={3000}
 				hideProgressBar={false}
 				newestOnTop={false}
 				closeOnClick
-				rtl={false}
+				rtl={isRtl}
 				pauseOnFocusLoss
 				draggable
 				pauseOnHover

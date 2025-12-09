@@ -1105,5 +1105,112 @@
 			"downloadExcel": "تحميل Excel",
 			"downloadCsv": "تحميل CSV"
 		}
+	},
+	"segments": {
+		"title": "القطاعات",
+		"subtitle": "إدارة قطاعات وأنواع دليل الحسابات",
+		"types": {
+			"title": "أنواع القطاعات",
+			"addBtn": "إضافة نوع قطاع",
+			"loading": "جارٍ تحميل أنواع القطاعات...",
+			"required": "إلزامي",
+			"hasHierarchy": "له تسلسل هرمي",
+			"length": "الطول",
+			"order": "الترتيب",
+			"noDescription": "لا يوجد وصف"
+		},
+		"values": {
+			"title": "قيم القطاعات",
+			"addBtn": "إضافة قيمة قطاع",
+			"searchPlaceholder": "بحث في قيم القطاعات...",
+			"allTypes": "جميع الأنواع",
+			"loading": "جارٍ تحميل قيم القطاعات...",
+			"empty": "لم يتم العثور على قيم",
+			"infoLength": "ℹ️ طول الرمز لهذا النوع: {{length}} حرف",
+			"requiredLength": "الطول المطلوب: {{length}} حرف",
+			"currentLength": "(الحالي: {{current}}/{{max}})"
+		},
+		"table": {
+			"id": "الرقم",
+			"code": "الرمز",
+			"alias": "الاسم المستعار",
+			"name": "الاسم",
+			"type": "نوع القطاع",
+			"parent": "الأصل",
+			"nodeType": "نوع العقدة",
+			"level": "المستوى",
+			"status": "الحالة"
+		},
+		"form": {
+			"segmentName": "اسم القطاع",
+			"technicalType": "النوع الفني",
+			"fixedLength": "طول الرمز الثابت",
+			"displayOrder": "ترتيب العرض",
+			"description": "الوصف",
+			"mandatory": "قطاع إلزامي",
+			"hierarchy": "له تسلسل هرمي",
+			"status": "الحالة",
+			"segmentType": "نوع القطاع",
+			"code": "الرمز",
+			"alias": "الاسم المستعار",
+			"parentCode": "رمز الأصل",
+			"nodeType": "نوع العقدة",
+			"childNode": "فرعي",
+			"parentNode": "رئيسي",
+			"placeholders": {
+				"description": "الوصف",
+				"code": "أدخل الرمز",
+				"codeWithLen": "أدخل {{length}} حرف",
+				"parent": "اتركه فارغاً إذا لم يوجد أصل"
+			}
+		},
+		"modals": {
+			"addType": "إضافة نوع قطاع",
+			"editType": "تعديل نوع قطاع",
+			"addValue": "إضافة قيمة قطاع جديدة",
+			"editValue": "تعديل قيمة قطاع",
+			"deleteType": "حذف نوع القطاع",
+			"deleteValue": "حذف قيمة القطاع",
+			"deleteTypeMsg": "هل أنت متأكد من أنك تريد حذف نوع القطاع \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"deleteValueMsg": "هل أنت متأكد من أنك تريد حذف قيمة القطاع \"{{code}} - {{alias}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+		},
+		"actions": {
+			"save": "حفظ",
+			"saving": "جارٍ الحفظ...",
+			"update": "تحديث",
+			"create": "إنشاء",
+			"cancel": "إلغاء",
+			"delete": "حذف",
+			"close": "إغلاق",
+			"edit": "تعديل"
+		},
+		"messages": {
+			"typeCreated": "تم إنشاء نوع القطاع بنجاح!",
+			"typeUpdated": "تم تحديث نوع القطاع بنجاح!",
+			"typeDeleted": "تم حذف نوع القطاع بنجاح!",
+			"valueCreated": "تم إنشاء قيمة القطاع بنجاح!",
+			"valueUpdated": "تم تحديث قيمة القطاع بنجاح!",
+			"valueDeleted": "تم حذف قيمة القطاع بنجاح!",
+			"errorCreateType": "فشل إنشاء نوع القطاع",
+			"errorUpdateType": "فشل تحديث نوع القطاع",
+			"errorDeleteType": "فشل حذف نوع القطاع",
+			"errorCreateValue": "فشل إنشاء قيمة القطاع",
+			"errorUpdateValue": "فشل تحديث قيمة القطاع",
+			"errorDeleteValue": "فشل حذف قيمة القطاع"
+		},
+		"validation": {
+			"nameRequired": "اسم القطاع مطلوب",
+			"techTypeRequired": "النوع الفني مطلوب",
+			"lengthRequired": "طول الرمز الثابت مطلوب",
+			"orderRequired": "ترتيب العرض مطلوب",
+			"typeRequired": "نوع القطاع مطلوب",
+			"codeRequired": "الرمز مطلوب",
+			"codeLength": "يجب أن يكون الرمز مكوناً من {{length}} حرف بالضبط",
+			"aliasRequired": "الاسم المستعار مطلوب"
+		},
+		"status": {
+			"active": "نشط",
+			"inactive": "غير نشط"
+		}
 	}
 }

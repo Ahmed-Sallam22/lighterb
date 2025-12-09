@@ -1105,5 +1105,112 @@
 			"downloadExcel": "Download Excel",
 			"downloadCsv": "Download CSV"
 		}
+	},
+	"segments": {
+		"title": "Segments",
+		"subtitle": "Manage your chart of accounts segments and types",
+		"types": {
+			"title": "Segment Types",
+			"addBtn": "Add Segment Type",
+			"loading": "Loading segment types...",
+			"required": "Required",
+			"hasHierarchy": "Has Hierarchy",
+			"length": "Length",
+			"order": "Order",
+			"noDescription": "No description provided"
+		},
+		"values": {
+			"title": "Segment Values",
+			"addBtn": "Add Segment Value",
+			"searchPlaceholder": "Search segment values...",
+			"allTypes": "All Types",
+			"loading": "Loading segment values...",
+			"empty": "No segment values found",
+			"infoLength": "ℹ️ Code length for this segment type: {{length}} characters",
+			"requiredLength": "Required length: {{length}} characters",
+			"currentLength": "(Current: {{current}}/{{max}})"
+		},
+		"table": {
+			"id": "ID",
+			"code": "Code",
+			"alias": "Alias",
+			"name": "Name",
+			"type": "Segment Type",
+			"parent": "Parent",
+			"nodeType": "Node Type",
+			"level": "Level",
+			"status": "Status"
+		},
+		"form": {
+			"segmentName": "Segment Name",
+			"technicalType": "Technical Type",
+			"fixedLength": "Fixed Code Length",
+			"displayOrder": "Display Order",
+			"description": "Description",
+			"mandatory": "Mandatory Segment",
+			"hierarchy": "Has Hierarchy",
+			"status": "Status",
+			"segmentType": "Segment Type",
+			"code": "Code",
+			"alias": "Alias",
+			"parentCode": "Parent Code",
+			"nodeType": "Node Type",
+			"childNode": "Child Node",
+			"parentNode": "Parent Node",
+			"placeholders": {
+				"description": "Description",
+				"code": "Enter code",
+				"codeWithLen": "Enter {{length}} characters",
+				"parent": "Leave empty if no parent"
+			}
+		},
+		"modals": {
+			"addType": "Add Segment Type",
+			"editType": "Edit Segment Type",
+			"addValue": "Add New Segment Value",
+			"editValue": "Edit Segment Value",
+			"deleteType": "Delete Segment Type",
+			"deleteValue": "Delete Segment Value",
+			"deleteTypeMsg": "Are you sure you want to delete the segment type \"{{name}}\"? This action cannot be undone.",
+			"deleteValueMsg": "Are you sure you want to delete the segment value \"{{code}} - {{alias}}\"? This action cannot be undone."
+		},
+		"actions": {
+			"save": "Save",
+			"saving": "Saving...",
+			"update": "Update",
+			"create": "Create",
+			"cancel": "Cancel",
+			"delete": "Delete",
+			"close": "Close",
+			"edit": "Edit"
+		},
+		"messages": {
+			"typeCreated": "Segment type created successfully!",
+			"typeUpdated": "Segment type updated successfully!",
+			"typeDeleted": "Segment type deleted successfully!",
+			"valueCreated": "Segment value created successfully!",
+			"valueUpdated": "Segment value updated successfully!",
+			"valueDeleted": "Segment value deleted successfully!",
+			"errorCreateType": "Failed to create segment type",
+			"errorUpdateType": "Failed to update segment type",
+			"errorDeleteType": "Failed to delete segment type",
+			"errorCreateValue": "Failed to create segment value",
+			"errorUpdateValue": "Failed to update segment value",
+			"errorDeleteValue": "Failed to delete segment value"
+		},
+		"validation": {
+			"nameRequired": "Segment name is required",
+			"techTypeRequired": "Technical type is required",
+			"lengthRequired": "Fixed code length is required",
+			"orderRequired": "Display order is required",
+			"typeRequired": "Segment type is required",
+			"codeRequired": "Code is required",
+			"codeLength": "Code must be exactly {{length}} characters",
+			"aliasRequired": "Alias is required"
+		},
+		"status": {
+			"active": "Active",
+			"inactive": "Inactive"
+		}
 	}
 }
