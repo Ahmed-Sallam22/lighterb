@@ -777,5 +777,63 @@
 			"reverseError": "Failed to reverse journal entry",
 			"reverseInfo": "Only posted journal entries can be reversed"
 		}
+	},
+	"journalLines": {
+		"title": "Journal Lines",
+		"subtitle": "Detailed view of old journal entry line items with filtering and analysis",
+		"stats": {
+			"totalLines": "Total Lines",
+			"totalDebits": "Total Debits",
+			"totalCredits": "Total Credits",
+			"posted": "Posted",
+			"draft": "Draft"
+		},
+		"filters": {
+			"title": "Filters",
+			"code": "Code",
+			"codePlaceholder": "Enter code",
+			"name": "Name",
+			"namePlaceholder": "Enter name",
+			"dateFrom": "Date From",
+			"dateTo": "Date To",
+			"status": "Status",
+			"allStatuses": "All Statuses",
+			"clearAll": "Clear all",
+			"applyFilters": "Apply filters"
+		},
+		"table": {
+			"account": "Account",
+			"id": "ID",
+			"date": "Date",
+			"entry": "Entry",
+			"type": "Type",
+			"debit": "Debit",
+			"credit": "Credit",
+			"status": "Status",
+			"emptyMessage": "No journal lines found"
+		},
+		"status": {
+			"posted": "Posted",
+			"draft": "Draft"
+		},
+		"type": {
+			"debit": "Debit",
+			"credit": "Credit"
+		},
+		"modal": {
+			"title": "Journal Line Details",
+			"lineTitle": "Journal Line",
+			"partOf": "Part of Journal Entry",
+			"entryDetails": "Journal Entry Details",
+			"entryId": "Entry ID",
+			"memo": "Memo",
+			"na": "—",
+			"accountDetails": "Account details",
+			"code": "Code",
+			"name": "Name",
+			"type": "Type",
+			"totalDebits": "Total Debits",
+			"totalCredits": "Total Credits"
+		}
 	}
 }

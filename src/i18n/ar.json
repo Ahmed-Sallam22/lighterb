@@ -777,5 +777,63 @@
 			"reverseError": "فشل عكس قيد اليومية",
 			"reverseInfo": "يمكن عكس القيود المرحلة فقط"
 		}
+	},
+	"journalLines": {
+		"title": "بنود اليومية",
+		"subtitle": "عرض تفصيلي لبنود قيود اليومية السابقة مع التصفية والتحليل",
+		"stats": {
+			"totalLines": "إجمالي البنود",
+			"totalDebits": "إجمالي المدين",
+			"totalCredits": "إجمالي الدائن",
+			"posted": "مرحّل",
+			"draft": "مسودة"
+		},
+		"filters": {
+			"title": "التصفية",
+			"code": "الرمز",
+			"codePlaceholder": "أدخل الرمز",
+			"name": "الاسم",
+			"namePlaceholder": "أدخل الاسم",
+			"dateFrom": "من تاريخ",
+			"dateTo": "إلى تاريخ",
+			"status": "الحالة",
+			"allStatuses": "جميع الحالات",
+			"clearAll": "مسح الكل",
+			"applyFilters": "تطبيق المرشحات"
+		},
+		"table": {
+			"account": "الحساب",
+			"id": "الرقم",
+			"date": "التاريخ",
+			"entry": "القيد",
+			"type": "النوع",
+			"debit": "مدين",
+			"credit": "دائن",
+			"status": "الحالة",
+			"emptyMessage": "لم يتم العثور على بنود يومية"
+		},
+		"status": {
+			"posted": "مرحّل",
+			"draft": "مسودة"
+		},
+		"type": {
+			"debit": "مدين",
+			"credit": "دائن"
+		},
+		"modal": {
+			"title": "تفاصيل بند اليومية",
+			"lineTitle": "بند اليومية",
+			"partOf": "جزء من قيد اليومية",
+			"entryDetails": "تفاصيل قيد اليومية",
+			"entryId": "رقم القيد",
+			"memo": "الملاحظات",
+			"na": "—",
+			"accountDetails": "تفاصيل الحساب",
+			"code": "الرمز",
+			"name": "الاسم",
+			"type": "النوع",
+			"totalDebits": "إجمالي المدين",
+			"totalCredits": "إجمالي الدائن"
+		}
 	}
 }
