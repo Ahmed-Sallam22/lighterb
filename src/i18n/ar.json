@@ -923,5 +923,56 @@
 			"REJECTED": "مرفوض",
 			"IN_PROGRESS": "قيد المعالجة"
 		}
+	},
+	"procurementApprovals": {
+		"title": "الموافقات",
+		"subtitle": "إدارة سير العمل",
+		"sectionTitle": "سير عمل الموافقات",
+		"metaTitle": "الموافقات - لايت إي آر بي",
+		"tabs": {
+			"pending": "في انتظار موافقتي",
+			"manage": "إدارة سير العمل",
+			"all": "جميع الموافقات"
+		},
+		"loading": "جارٍ تحميل سير عمل الموافقات...",
+		"error": "خطأ: {{message}}",
+		"noWorkflows": "لم يتم العثور على سير عمل للموافقات",
+		"card": {
+			"instance": "مثيل #{{id}}",
+			"workflow": "سير العمل: {{name}}",
+			"unknownWorkflow": "سير عمل غير معروف",
+			"submitted": "تم التقديم: {{date}}",
+			"progress": "التقدم: {{approved}} من {{total}} خطوات",
+			"viewDetails": "عرض التفاصيل",
+			"step": "خطوة {{sequence}}: {{name}}",
+			"noDescription": "لا يوجد وصف",
+			"status": "الحالة: {{status}}",
+			"allCompleted": "✓ اكتملت جميع الخطوات",
+			"workflowRejected": "✗ تم رفض سير العمل",
+			"na": "غير متاح"
+		},
+		"actions": {
+			"approve": "موافقة",
+			"reject": "رفض",
+			"processing": "جارٍ المعالجة..."
+		},
+		"modals": {
+			"approveTitle": "الموافقة على الخطوة",
+			"rejectTitle": "رفض الخطوة",
+			"approveMessage": "هل أنت متأكد من أنك تريد الموافقة على هذه الخطوة؟",
+			"rejectMessage": "هل أنت متأكد من أنك تريد رفض هذه الخطوة؟",
+			"commentsLabel": "تعليقات (اختياري)",
+			"reasonLabel": "السبب (اختياري)",
+			"commentsPlaceholder": "أضف تعليقاتك...",
+			"reasonPlaceholder": "يرجى تقديم سبب الرفض...",
+			"approving": "جارٍ الموافقة...",
+			"rejecting": "جارٍ الرفض..."
+		},
+		"status": {
+			"PENDING": "قيد الانتظار",
+			"APPROVED": "تمت الموافقة",
+			"REJECTED": "مرفوض",
+			"IN_PROGRESS": "قيد المعالجة"
+		}
 	}
 }

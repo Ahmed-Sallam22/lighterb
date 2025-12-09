@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/shared/PageHeader';
 import ConfirmModal from '../components/shared/ConfirmModal';
 import { fetchApprovalSteps, approveStep, rejectStep } from '../store/approvalStepsSlice';
@@ -43,36 +44,29 @@ const statusStyles = {
 		text: 'text-blue-700',
 		border: 'border-blue-200',
 	},
-	// Legacy support
-	Pending: {
-		bg: 'bg-amber-100',
-		text: 'text-amber-700',
-		border: 'border-amber-200',
-	},
-	Approved: {
-		bg: 'bg-emerald-100',
-		text: 'text-emerald-700',
-		border: 'border-emerald-200',
-	},
-	Rejected: {
-		bg: 'bg-red-100',
-		text: 'text-red-700',
-		border: 'border-red-200',
-	},
 };
 
 const ProcurementApprovals = () => {
+	const { t, i18n } = useTranslation();
+	const isRtl = i18n.dir() === 'rtl';
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
 	const { steps, loading, error, actionLoading } = useSelector(state => state.approvalSteps);
 
-	const [activeTab, setActiveTab] = useState('All Approvals');
+	// Use IDs for tabs to maintain logic across languages
+	const [activeTab, setActiveTab] = useState('pending');
 	const [showApproveModal, setShowApproveModal] = useState(false);
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [selectedStep, setSelectedStep] = useState(null);
 	const [comments, setComments] = useState('');
 	const [reason, setReason] = useState('');
+
+	const tabOptions = [
+		{ id: 'pending', label: t('procurementApprovals.tabs.pending') },
+		{ id: 'manage', label: t('procurementApprovals.tabs.manage') },
+		{ id: 'all', label: t('procurementApprovals.tabs.all') },
+	];
 
 	// Fetch approval steps on mount
 	useEffect(() => {
@@ -80,11 +74,11 @@ const ProcurementApprovals = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		document.title = 'Approvals - LightERP';
+		document.title = t('procurementApprovals.metaTitle');
 		return () => {
 			document.title = 'LightERP';
 		};
-	}, []);
+	}, [t]);
 
 	// Group steps by approval instance
 	const groupedSteps = useMemo(() => {
@@ -121,16 +115,20 @@ const ProcurementApprovals = () => {
 			return {
 				instance: parseInt(instanceId),
 				status: overallStatus,
-				workflow: workflowDetails?.workflow ? `Workflow #${workflowDetails.workflow}` : 'Unknown Workflow',
-				submittedDate: firstStep?.activated_at ? new Date(firstStep.activated_at).toLocaleDateString() : 'N/A',
-				progress: `${approvedCount}/${totalSteps} steps`,
+				workflow: workflowDetails?.workflow
+					? t('procurementApprovals.card.workflow', { name: `#${workflowDetails.workflow}` })
+					: t('procurementApprovals.card.unknownWorkflow'),
+				submittedDate: firstStep?.activated_at
+					? new Date(firstStep.activated_at).toLocaleDateString(i18n.language)
+					: t('procurementApprovals.card.na'),
+				progress: t('procurementApprovals.card.progress', { approved: approvedCount, total: totalSteps }),
 				steps: instanceSteps,
 			};
 		});
-	}, [groupedSteps]);
+	}, [groupedSteps, t, i18n.language]);
 
 	const filteredWorkflows = useMemo(() => {
-		if (activeTab === 'Pending My Approval') {
+		if (activeTab === 'pending') {
 			return workflows.filter(wf => wf.status === 'PENDING');
 		}
 		return workflows;
@@ -186,26 +184,32 @@ const ProcurementApprovals = () => {
 
 	return (
 		<section className="min-h-screen bg-[#f2f3f5] pb-12">
-			<PageHeader icon={<HeaderIcon />} title="Approvals" subtitle="Workflow Management" />
+			<PageHeader
+				icon={<HeaderIcon />}
+				title={t('procurementApprovals.title')}
+				subtitle={t('procurementApprovals.subtitle')}
+			/>
 
 			<div className="max-w-6xl mx-auto px-6 mt-8 space-y-6">
 				<div className="bg-white rounded-3xl border border-gray-200 shadow-lg p-6 md:p-8">
 					<div className="flex flex-col gap-4">
 						<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-							<h2 className="text-2xl font-semibold text-[#1f4560]">Approval Workflows</h2>
+							<h2 className="text-2xl font-semibold text-[#1f4560]">
+								{t('procurementApprovals.sectionTitle')}
+							</h2>
 							<div className="flex flex-wrap gap-2">
-								{['Pending My Approval', 'Manage Workflows', 'All Approvals'].map(tab => (
+								{tabOptions.map(tab => (
 									<button
-										key={tab}
+										key={tab.id}
 										type="button"
-										onClick={() => setActiveTab(tab)}
+										onClick={() => setActiveTab(tab.id)}
 										className={`px-4 py-2 rounded-xl border text-sm font-semibold transition-colors ${
-											activeTab === tab
+											activeTab === tab.id
 												? 'border-[#48C1F0] bg-[#e5f6ff] text-[#0c2a3c]'
 												: 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
 										}`}
 									>
-										{tab}
+										{tab.label}
 									</button>
 								))}
 							</div>
@@ -213,18 +217,28 @@ const ProcurementApprovals = () => {
 
 						<div className="space-y-4">
 							{loading ? (
-								<div className="text-center py-8 text-gray-500">Loading approval workflows...</div>
+								<div className="text-center py-8 text-gray-500">
+									{t('procurementApprovals.loading')}
+								</div>
 							) : error ? (
-								<div className="text-center py-8 text-red-600">Error: {error}</div>
+								<div className="text-center py-8 text-red-600">
+									{t('procurementApprovals.error', { message: error })}
+								</div>
 							) : filteredWorkflows.length === 0 ? (
-								<div className="text-center py-8 text-gray-500">No approval workflows found</div>
+								<div className="text-center py-8 text-gray-500">
+									{t('procurementApprovals.noWorkflows')}
+								</div>
 							) : (
 								filteredWorkflows.map(wf => {
 									const wfStyle = statusStyles[wf.status] || statusStyles.PENDING;
 									// Find first pending step
 									const pendingStep = wf.steps.find(s => s.status === 'PENDING');
 									const displayStep = pendingStep || wf.steps[0];
-									const stepStyle = statusStyles[displayStep?.status] || statusStyles.PENDING;
+
+									// Normalize status keys for style lookup (handle Mixed Case if API returns it)
+									const stepStatusKey = displayStep?.status?.toUpperCase() || 'PENDING';
+									const stepStyle = statusStyles[stepStatusKey] || statusStyles.PENDING;
+
 									const workflowStepDetails = displayStep?.workflow_step_details;
 
 									return (
@@ -236,17 +250,22 @@ const ProcurementApprovals = () => {
 												<div>
 													<div className="flex items-center gap-3">
 														<p className="text-sm font-semibold text-[#0d2438]">
-															Instance #{wf.instance}
+															{t('procurementApprovals.card.instance', {
+																id: wf.instance,
+															})}
 														</p>
 														<span
 															className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${wfStyle.bg} ${wfStyle.text} ${wfStyle.border}`}
 														>
-															{wf.status}
+															{t(`procurementApprovals.status.${wf.status}`)}
 														</span>
 													</div>
 													<p className="text-sm text-gray-600 mt-1">
-														Workflow: {wf.workflow} • Submitted: {wf.submittedDate} •
-														Progress: {wf.progress}
+														{wf.workflow} •{' '}
+														{t('procurementApprovals.card.submitted', {
+															date: wf.submittedDate,
+														})}{' '}
+														• {wf.progress}
 													</p>
 												</div>
 												<button
@@ -260,6 +279,7 @@ const ProcurementApprovals = () => {
 														viewBox="0 0 18 18"
 														fill="none"
 														xmlns="http://www.w3.org/2000/svg"
+														className={isRtl ? 'rotate-180' : ''}
 													>
 														<path
 															d="M1.5 9C1.5 9 4.5 3 9 3C13.5 3 16.5 9 16.5 9C16.5 9 13.5 15 9 15C4.5 15 1.5 9 1.5 9Z"
@@ -276,7 +296,7 @@ const ProcurementApprovals = () => {
 															strokeWidth="1.5"
 														/>
 													</svg>
-													View Details
+													{t('procurementApprovals.card.viewDetails')}
 												</button>
 											</div>
 
@@ -312,12 +332,22 @@ const ProcurementApprovals = () => {
 													</div>
 													<div>
 														<p className="text-base font-semibold text-[#1f4560]">
-															Step {workflowStepDetails?.sequence}:
-															{workflowStepDetails?.name || 'N/A'}
+															{t('procurementApprovals.card.step', {
+																sequence: workflowStepDetails?.sequence,
+																name:
+																	workflowStepDetails?.name ||
+																	t('procurementApprovals.card.na'),
+															})}
 														</p>
 														<p className="text-sm text-gray-500">
-															{workflowStepDetails?.description || 'No description'} •
-															Status: {displayStep?.status}
+															{workflowStepDetails?.description ||
+																t('procurementApprovals.card.noDescription')}{' '}
+															•{' '}
+															{t('procurementApprovals.card.status', {
+																status: t(
+																	`procurementApprovals.status.${stepStatusKey}`
+																),
+															})}
 														</p>
 													</div>
 												</div>
@@ -329,7 +359,9 @@ const ProcurementApprovals = () => {
 															disabled={actionLoading}
 															className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 														>
-															{actionLoading ? 'Processing...' : 'Approve'}
+															{actionLoading
+																? t('procurementApprovals.actions.processing')
+																: t('procurementApprovals.actions.approve')}
 														</button>
 														<button
 															type="button"
@@ -337,7 +369,9 @@ const ProcurementApprovals = () => {
 															disabled={actionLoading}
 															className="px-4 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 														>
-															{actionLoading ? 'Processing...' : 'Reject'}
+															{actionLoading
+																? t('procurementApprovals.actions.processing')
+																: t('procurementApprovals.actions.reject')}
 														</button>
 													</div>
 												)}
@@ -345,12 +379,12 @@ const ProcurementApprovals = () => {
 
 											{wf.status === 'APPROVED' && (
 												<p className="mt-3 text-sm font-semibold text-emerald-600">
-													✓ All steps completed
+													{t('procurementApprovals.card.allCompleted')}
 												</p>
 											)}
 											{wf.status === 'REJECTED' && (
 												<p className="mt-3 text-sm font-semibold text-red-600">
-													✗ Workflow rejected
+													{t('procurementApprovals.card.workflowRejected')}
 												</p>
 											)}
 										</div>
@@ -372,25 +406,30 @@ const ProcurementApprovals = () => {
 						setSelectedStep(null);
 					}}
 					onConfirm={handleApprove}
-					title="Approve Step"
+					title={t('procurementApprovals.modals.approveTitle')}
 					message={
 						<div>
-							<p className="mb-4">Are you sure you want to approve this step?</p>
+							<p className="mb-4">{t('procurementApprovals.modals.approveMessage')}</p>
 							<div className="mb-4">
 								<label className="block text-sm font-medium text-gray-700 mb-2">
-									Comments (optional)
+									{t('procurementApprovals.modals.commentsLabel')}
 								</label>
 								<textarea
 									value={comments}
 									onChange={e => setComments(e.target.value)}
-									placeholder="Add your comments..."
+									placeholder={t('procurementApprovals.modals.commentsPlaceholder')}
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
 									rows="3"
 								/>
 							</div>
 						</div>
 					}
-					confirmText={actionLoading ? 'Approving...' : 'Approve'}
+					confirmText={
+						actionLoading
+							? t('procurementApprovals.modals.approving')
+							: t('procurementApprovals.actions.approve')
+					}
+					cancelText={t('common.cancel', 'Cancel')}
 					confirmButtonClass="bg-emerald-500 hover:bg-emerald-600"
 					disabled={actionLoading}
 				/>
@@ -406,25 +445,30 @@ const ProcurementApprovals = () => {
 						setSelectedStep(null);
 					}}
 					onConfirm={handleReject}
-					title="Reject Step"
+					title={t('procurementApprovals.modals.rejectTitle')}
 					message={
 						<div>
-							<p className="mb-4">Are you sure you want to reject this step?</p>
+							<p className="mb-4">{t('procurementApprovals.modals.rejectMessage')}</p>
 							<div className="mb-4">
 								<label className="block text-sm font-medium text-gray-700 mb-2">
-									Reason (optional)
+									{t('procurementApprovals.modals.reasonLabel')}
 								</label>
 								<textarea
 									value={reason}
 									onChange={e => setReason(e.target.value)}
-									placeholder="Please provide a reason for rejection..."
+									placeholder={t('procurementApprovals.modals.reasonPlaceholder')}
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
 									rows="3"
 								/>
 							</div>
 						</div>
 					}
-					confirmText={actionLoading ? 'Rejecting...' : 'Reject'}
+					confirmText={
+						actionLoading
+							? t('procurementApprovals.modals.rejecting')
+							: t('procurementApprovals.actions.reject')
+					}
+					cancelText={t('common.cancel', 'Cancel')}
 					confirmButtonClass="bg-red-500 hover:bg-red-600"
 					disabled={actionLoading}
 				/>

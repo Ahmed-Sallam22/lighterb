@@ -923,5 +923,56 @@
 			"REJECTED": "REJECTED",
 			"IN_PROGRESS": "IN PROGRESS"
 		}
+	},
+	"procurementApprovals": {
+		"title": "Approvals",
+		"subtitle": "Workflow Management",
+		"sectionTitle": "Approval Workflows",
+		"metaTitle": "Approvals - LightERP",
+		"tabs": {
+			"pending": "Pending My Approval",
+			"manage": "Manage Workflows",
+			"all": "All Approvals"
+		},
+		"loading": "Loading approval workflows...",
+		"error": "Error: {{message}}",
+		"noWorkflows": "No approval workflows found",
+		"card": {
+			"instance": "Instance #{{id}}",
+			"workflow": "Workflow: {{name}}",
+			"unknownWorkflow": "Unknown Workflow",
+			"submitted": "Submitted: {{date}}",
+			"progress": "Progress: {{approved}}/{{total}} steps",
+			"viewDetails": "View Details",
+			"step": "Step {{sequence}}: {{name}}",
+			"noDescription": "No description",
+			"status": "Status: {{status}}",
+			"allCompleted": "✓ All steps completed",
+			"workflowRejected": "✗ Workflow rejected",
+			"na": "N/A"
+		},
+		"actions": {
+			"approve": "Approve",
+			"reject": "Reject",
+			"processing": "Processing..."
+		},
+		"modals": {
+			"approveTitle": "Approve Step",
+			"rejectTitle": "Reject Step",
+			"approveMessage": "Are you sure you want to approve this step?",
+			"rejectMessage": "Are you sure you want to reject this step?",
+			"commentsLabel": "Comments (optional)",
+			"reasonLabel": "Reason (optional)",
+			"commentsPlaceholder": "Add your comments...",
+			"reasonPlaceholder": "Please provide a reason for rejection...",
+			"approving": "Approving...",
+			"rejecting": "Rejecting..."
+		},
+		"status": {
+			"PENDING": "PENDING",
+			"APPROVED": "APPROVED",
+			"REJECTED": "REJECTED",
+			"IN_PROGRESS": "IN PROGRESS"
+		}
 	}
 }
