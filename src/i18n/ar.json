@@ -647,5 +647,83 @@
 			"exchangeRate": "سعر الصرف",
 			"rateDate": "تاريخ السعر"
 		}
+	},
+	"invoiceApprovals": {
+		"title": "اعتمادات الفواتير",
+		"subtitle": "مراجعة واعتماد الفواتير المعلقة",
+		"actions": {
+			"createApproval": "إنشاء اعتماد",
+			"searchPlaceholder": "بحث...",
+			"filterAllTypes": "جميع الأنواع",
+			"apInvoice": "فاتورة مشتريات",
+			"arInvoice": "فاتورة مبيعات",
+			"approve": "اعتماد",
+			"reject": "رفض",
+			"cancel": "إلغاء",
+			"delete": "حذف",
+			"update": "تحديث",
+			"create": "إنشاء",
+			"approving": "جارٍ الاعتماد...",
+			"rejecting": "جارٍ الرفض...",
+			"updating": "جارٍ التحديث...",
+			"creating": "جارٍ الإنشاء..."
+		},
+		"stats": {
+			"totals": "الإجمالي",
+			"approved": "معتمد",
+			"pending": "قيد الانتظار",
+			"rejected": "مرفوض"
+		},
+		"tabs": {
+			"all": "الكل",
+			"approved": "معتمد",
+			"pending": "قيد الانتظار",
+			"rejected": "مرفوض"
+		},
+		"table": {
+			"type": "النوع",
+			"invoiceNumber": "رقم الفاتورة",
+			"submittedBy": "مقدم الطلب",
+			"approver": "المعتمد",
+			"status": "الحالة",
+			"submittedDate": "تاريخ التقديم",
+			"actions": "الإجراءات",
+			"statusValues": {
+				"approved": "معتمد",
+				"pending": "قيد الانتظار",
+				"rejected": "مرفوض"
+			}
+		},
+		"modals": {
+			"createTitle": "إنشاء اعتماد فاتورة",
+			"editTitle": "تعديل اعتماد فاتورة",
+			"deleteTitle": "حذف اعتماد الفاتورة",
+			"approveTitle": "اعتماد الفاتورة",
+			"rejectTitle": "رفض الفاتورة",
+			"deleteMessage": "هل أنت متأكد من أنك تريد حذف اعتماد الفاتورة هذا؟ لا يمكن التراجع عن هذا الإجراء.",
+			"approveMessage": "هل أنت متأكد من اعتماد هذه الفاتورة؟ يمكنك إضافة تعليقات اختيارية أدناه.",
+			"rejectMessage": "هل أنت متأكد من رفض هذه الفاتورة؟ يرجى ذكر سبب الرفض.",
+			"commentsLabel": "تعليقات (اختياري)",
+			"rejectionReasonLabel": "سبب الرفض"
+		},
+		"form": {
+			"invoiceType": "نوع الفاتورة",
+			"invoice": "الفاتورة",
+			"submittedBy": "مقدم الطلب",
+			"selectInvoiceType": "اختر النوع",
+			"na": "غير متاح"
+		},
+		"messages": {
+			"fillRequired": "يرجى ملء جميع الحقول المطلوبة",
+			"deleteSuccess": "تم حذف اعتماد الفاتورة بنجاح",
+			"approveSuccess": "تم اعتماد الفاتورة بنجاح",
+			"rejectSuccess": "تم رفض الفاتورة بنجاح",
+			"createSuccess": "تم إنشاء اعتماد الفاتورة بنجاح",
+			"updateSuccess": "تم تحديث اعتماد الفاتورة بنجاح",
+			"deleteError": "فشل حذف اعتماد الفاتورة",
+			"approveError": "فشل اعتماد الفاتورة",
+			"rejectError": "فشل رفض الفاتورة",
+			"saveError": "فشل حفظ اعتماد الفاتورة"
+		}
 	}
 }

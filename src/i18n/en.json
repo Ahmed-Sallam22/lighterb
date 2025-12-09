@@ -647,5 +647,83 @@
 			"exchangeRate": "Exchange Rate",
 			"rateDate": "Rate Date"
 		}
+	},
+	"invoiceApprovals": {
+		"title": "Invoice Approvals",
+		"subtitle": "Review and approve pending invoices",
+		"actions": {
+			"createApproval": "+ Create Approval",
+			"searchPlaceholder": "Search...",
+			"filterAllTypes": "All Types",
+			"apInvoice": "AP Invoice",
+			"arInvoice": "AR Invoice",
+			"approve": "Approve",
+			"reject": "Reject",
+			"cancel": "Cancel",
+			"delete": "Delete",
+			"update": "Update",
+			"create": "Create",
+			"approving": "Approving...",
+			"rejecting": "Rejecting...",
+			"updating": "Updating...",
+			"creating": "Creating..."
+		},
+		"stats": {
+			"totals": "Totals",
+			"approved": "Approved",
+			"pending": "Pending",
+			"rejected": "Rejected"
+		},
+		"tabs": {
+			"all": "All",
+			"approved": "Approved",
+			"pending": "Pending",
+			"rejected": "Rejected"
+		},
+		"table": {
+			"type": "Type",
+			"invoiceNumber": "Invoice #",
+			"submittedBy": "Submitted By",
+			"approver": "Approver",
+			"status": "Status",
+			"submittedDate": "Submitted Date",
+			"actions": "Actions",
+			"statusValues": {
+				"approved": "Approved",
+				"pending": "Pending",
+				"rejected": "Rejected"
+			}
+		},
+		"modals": {
+			"createTitle": "Create Invoice Approval",
+			"editTitle": "Edit Invoice Approval",
+			"deleteTitle": "Delete Invoice Approval",
+			"approveTitle": "Approve Invoice",
+			"rejectTitle": "Reject Invoice",
+			"deleteMessage": "Are you sure you want to delete this invoice approval? This action cannot be undone.",
+			"approveMessage": "Are you sure you want to approve this invoice? You can add optional comments below.",
+			"rejectMessage": "Are you sure you want to reject this invoice? Please provide a reason for rejection.",
+			"commentsLabel": "Comments (Optional)",
+			"rejectionReasonLabel": "Rejection Reason"
+		},
+		"form": {
+			"invoiceType": "Invoice Type",
+			"invoice": "Invoice",
+			"submittedBy": "Submitted By",
+			"selectInvoiceType": "Select Type",
+			"na": "N/A"
+		},
+		"messages": {
+			"fillRequired": "Please fill in all required fields",
+			"deleteSuccess": "Invoice approval deleted successfully",
+			"approveSuccess": "Invoice approved successfully",
+			"rejectSuccess": "Invoice rejected successfully",
+			"createSuccess": "Invoice approval created successfully",
+			"updateSuccess": "Invoice approval updated successfully",
+			"deleteError": "Failed to delete invoice approval",
+			"approveError": "Failed to approve invoice",
+			"rejectError": "Failed to reject invoice",
+			"saveError": "Failed to save invoice approval"
+		}
 	}
 }
