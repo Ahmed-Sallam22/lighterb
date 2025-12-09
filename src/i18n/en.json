@@ -974,5 +974,59 @@
 			"REJECTED": "REJECTED",
 			"IN_PROGRESS": "IN PROGRESS"
 		}
+	},
+	"procurementCatalog": {
+		"title": "Catalogue Reference",
+		"subtitle": "Browse Catalogue Items Reference only (use PR page to request items)",
+		"actions": {
+			"newItem": "New Item",
+			"view": "View",
+			"cancel": "Cancel",
+			"create": "Create",
+			"saving": "Saving...",
+			"close": "Close",
+			"updatePrice": "Update Price",
+			"updating": "Updating..."
+		},
+		"filters": {
+			"searchPlaceholder": "Search by code or name ...",
+			"category": "Category",
+			"allCategories": "All Categories",
+			"status": "Status",
+			"allStatus": "All Status",
+			"active": "Active",
+			"inactive": "Inactive"
+		},
+		"status": {
+			"posted": "Posted",
+			"inactive": "Inactive"
+		},
+		"table": {
+			"description": "Description",
+			"code": "Code",
+			"name": "Name",
+			"price": "Price",
+			"uom": "UOM",
+			"supplier": "Supplier",
+			"status": "Status"
+		},
+		"modals": {
+			"newTitle": "New Catalogue Item",
+			"editTitle": "Catalogue Item Details",
+			"itemCode": "Item Code",
+			"categoryId": "Category (ID)",
+			"supplierId": "Supplier (ID)",
+			"unitPrice": "Unit Price",
+			"description": "Description"
+		},
+		"placeholders": {
+			"code": "CAT-001",
+			"name": "Item Name",
+			"categoryId": "1",
+			"supplierId": "Supplier ID",
+			"price": "25.00",
+			"description": "Item description"
+		},
+		"na": "—"
 	}
 }

@@ -974,5 +974,59 @@
 			"REJECTED": "مرفوض",
 			"IN_PROGRESS": "قيد المعالجة"
 		}
+	},
+	"procurementCatalog": {
+		"title": "مرجع الكتالوج",
+		"subtitle": "تصفح عناصر الكتالوج (للمرجعية فقط، استخدم صفحة الطلبات لطلب العناصر)",
+		"actions": {
+			"newItem": "عنصر جديد",
+			"view": "عرض",
+			"cancel": "إلغاء",
+			"create": "إنشاء",
+			"saving": "جارٍ الحفظ...",
+			"close": "إغلاق",
+			"updatePrice": "تحديث السعر",
+			"updating": "جارٍ التحديث..."
+		},
+		"filters": {
+			"searchPlaceholder": "البحث بالكود أو الاسم...",
+			"category": "الفئة",
+			"allCategories": "جميع الفئات",
+			"status": "الحالة",
+			"allStatus": "جميع الحالات",
+			"active": "نشط",
+			"inactive": "غير نشط"
+		},
+		"status": {
+			"posted": "مرحّل",
+			"inactive": "غير نشط"
+		},
+		"table": {
+			"description": "الوصف",
+			"code": "الرمز",
+			"name": "الاسم",
+			"price": "السعر",
+			"uom": "وحدة القياس",
+			"supplier": "المورد",
+			"status": "الحالة"
+		},
+		"modals": {
+			"newTitle": "عنصر كتالوج جديد",
+			"editTitle": "تفاصيل عنصر الكتالوج",
+			"itemCode": "رمز العنصر",
+			"categoryId": "الفئة (رقم)",
+			"supplierId": "المورد (رقم)",
+			"unitPrice": "سعر الوحدة",
+			"description": "الوصف"
+		},
+		"placeholders": {
+			"code": "CAT-001",
+			"name": "اسم العنصر",
+			"categoryId": "1",
+			"supplierId": "رقم المورد",
+			"price": "25.00",
+			"description": "وصف العنصر"
+		},
+		"na": "—"
 	}
 }
