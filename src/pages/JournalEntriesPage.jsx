@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/shared/PageHeader';
 import Table from '../components/shared/Table';
 import Toolbar from '../components/shared/Toolbar';
@@ -26,37 +27,37 @@ const StatPattern = () => (
 				<path
 					d="M185.206 64.0737L159.069 77.8952L211.325 108.498L185.206 64.0737Z"
 					stroke="#7A9098"
-					stroke-width="3"
+					strokeWidth="3"
 				/>
 				<path
 					d="M258.398 91.7837L235.567 84.3174L267.607 136.441L258.398 91.7837Z"
 					stroke="#7A9098"
-					stroke-width="3"
+					strokeWidth="3"
 				/>
 				<path
 					d="M114.257 92.693L103.282 123.022L144.403 96.1051L114.257 92.693Z"
 					stroke="#7A9098"
-					stroke-width="3"
+					strokeWidth="3"
 				/>
 				<path
 					d="M8.56127 93.1316L-2.03999 75.0951L-2.14153 120.528L18.3103 109.713L8.56127 93.1316Z"
 					stroke="#7A9098"
-					stroke-width="3"
+					strokeWidth="3"
 				/>
 				<path
 					d="M196.949 -2.34499L181.268 9.32849L208.636 24.0049L208.656 -11.0629L196.949 -2.34499Z"
 					stroke="#7A9098"
-					stroke-width="3"
+					strokeWidth="3"
 				/>
 				<path
 					d="M63.541 92.7497L47.8596 104.423L75.2274 119.1L75.2475 84.0319L63.541 92.7497Z"
 					stroke="#7A9098"
-					stroke-width="3"
+					strokeWidth="3"
 				/>
 				<path
 					d="M246.766 28.9628L260.84 -13.2088L239.212 -15.0905L246.766 28.9628Z"
 					stroke="#7A9098"
-					stroke-width="3"
+					strokeWidth="3"
 				/>
 			</g>
 		</g>
@@ -106,6 +107,8 @@ const DraftIcon = () => (
 );
 
 const JournalEntriesPage = () => {
+	const { t, i18n } = useTranslation();
+	const isRtl = i18n.dir() === 'rtl';
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
@@ -168,28 +171,29 @@ const JournalEntriesPage = () => {
 			lines: journal.lines?.length || 0,
 			totalDebit: `$${totalDebit.toFixed(2)}`,
 			totalCredit: `$${totalCredit.toFixed(2)}`,
-			status: isPosted ? 'Posted' : 'Draft',
+			// Use localized keys for logic, we will translate in render
+			status: isPosted ? 'posted' : 'draft',
 			rawData: journal, // Keep original data for actions
 		};
 	});
 
 	const statCards = [
 		{
-			title: 'Total Entries',
+			title: t('journals.stats.totalEntries'),
 			value: totalEntries.toString(),
 			icon: <TotalEntriesIcon />,
 			iconBg: 'bg-[#E1F5FE]',
 			valueColor: 'text-gray-900',
 		},
 		{
-			title: 'Posted',
+			title: t('journals.stats.posted'),
 			value: postedEntries.toString(),
 			icon: <PostedIcon />,
 			iconBg: 'bg-green-50',
 			valueColor: 'text-green-600',
 		},
 		{
-			title: 'Draft',
+			title: t('journals.stats.draft'),
 			value: draftEntries.toString(),
 			icon: <DraftIcon />,
 			iconBg: 'bg-gray-50',
@@ -199,59 +203,60 @@ const JournalEntriesPage = () => {
 
 	const columns = [
 		{
-			header: 'Name',
+			header: t('journals.table.name'),
 			accessor: 'name',
 		},
 		{
-			header: 'ID',
+			header: t('journals.table.id'),
 			accessor: 'id',
 			width: '140px',
 		},
 		{
-			header: 'Date',
+			header: t('journals.table.date'),
 			accessor: 'date',
 			width: '130px',
 		},
 		{
-			header: 'Lines',
+			header: t('journals.table.lines'),
 			accessor: 'lines',
 			width: '100px',
 			render: value => <span className="font-semibold">{value}</span>,
 		},
 		{
-			header: 'Total Debit',
+			header: t('journals.table.totalDebit'),
 			accessor: 'totalDebit',
 			width: '140px',
 			render: value => <span className="font-semibold text-red-600">{value}</span>,
 		},
 		{
-			header: 'Total Credit',
+			header: t('journals.table.totalCredit'),
 			accessor: 'totalCredit',
 			width: '140px',
 			render: value => <span className="font-semibold text-green-600">{value}</span>,
 		},
 		{
-			header: 'Status',
+			header: t('journals.table.status'),
 			accessor: 'status',
 			width: '120px',
 			render: value => {
 				const statusColors = {
-					Posted: 'bg-green-100 text-green-800',
-					Draft: 'bg-gray-100 text-gray-800',
+					posted: 'bg-green-100 text-green-800',
+					draft: 'bg-gray-100 text-gray-800',
 				};
+				// Translate the value (which is 'posted' or 'draft')
 				return (
 					<span
 						className={`px-3 py-1 rounded-full text-xs font-semibold ${
 							statusColors[value] || 'bg-gray-100 text-gray-800'
 						}`}
 					>
-						{value}
+						{t(`journals.status.${value}`)}
 					</span>
 				);
 			},
 		},
 		{
-			header: 'Actions',
+			header: t('journals.table.actions'),
 			accessor: 'actions',
 			width: '200px',
 			render: (_, row) => {
@@ -265,9 +270,9 @@ const JournalEntriesPage = () => {
 									handlePostJournal(row);
 								}}
 								className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs font-medium"
-								title="Post Journal"
+								title={t('journals.actions.post')}
 							>
-								Post
+								{t('journals.actions.post')}
 							</button>
 						)}
 						{isPosted && (
@@ -277,9 +282,9 @@ const JournalEntriesPage = () => {
 									handleReverseJournal(row);
 								}}
 								className="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 text-xs font-medium"
-								title="Reverse Journal"
+								title={t('journals.actions.reverse')}
 							>
-								Reverse
+								{t('journals.actions.reverse')}
 							</button>
 						)}
 					</div>
@@ -303,12 +308,12 @@ const JournalEntriesPage = () => {
 		if (journalToDelete) {
 			try {
 				await dispatch(deleteJournal(journalToDelete.id)).unwrap();
-				toast.success('Journal entry deleted successfully!');
+				toast.success(t('journals.messages.deleteSuccess'));
 				setConfirmDelete(false);
 				setJournalToDelete(null);
 			} catch (err) {
 				// Display detailed error message from API response
-				const errorMessage = err?.message || err?.error || err?.detail || 'Failed to delete journal entry';
+				const errorMessage = err?.message || err?.error || err?.detail || t('journals.messages.deleteError');
 				toast.error(errorMessage);
 			}
 		}
@@ -317,17 +322,17 @@ const JournalEntriesPage = () => {
 	const handlePostJournal = async row => {
 		const isPosted = row.rawData?.is_posted || row.rawData?.posted;
 		if (isPosted) {
-			toast.info('This journal entry is already posted');
+			toast.info(t('journals.messages.postInfo'));
 			return;
 		}
 
 		try {
 			await dispatch(postJournal(row.id)).unwrap();
-			toast.success('Journal entry posted successfully!');
+			toast.success(t('journals.messages.postSuccess'));
 			dispatch(fetchJournals()); // Refresh the list
 		} catch (err) {
 			// Display detailed error message from API response
-			const errorMessage = err?.message || err?.error || err?.detail || 'Failed to post journal entry';
+			const errorMessage = err?.message || err?.error || err?.detail || t('journals.messages.postError');
 			toast.error(errorMessage);
 		}
 	};
@@ -335,17 +340,17 @@ const JournalEntriesPage = () => {
 	const handleReverseJournal = async row => {
 		const isPosted = row.rawData?.is_posted || row.rawData?.posted;
 		if (!isPosted) {
-			toast.info('Only posted journal entries can be reversed');
+			toast.info(t('journals.messages.reverseInfo'));
 			return;
 		}
 
 		try {
 			await dispatch(reverseJournal(row.id)).unwrap();
-			toast.success('Journal entry reversed successfully!');
+			toast.success(t('journals.messages.reverseSuccess'));
 			dispatch(fetchJournals()); // Refresh the list
 		} catch (err) {
 			// Display detailed error message from API response
-			const errorMessage = err?.message || err?.error || err?.detail || 'Failed to reverse journal entry';
+			const errorMessage = err?.message || err?.error || err?.detail || t('journals.messages.reverseError');
 			toast.error(errorMessage);
 		}
 	};
@@ -365,12 +370,12 @@ const JournalEntriesPage = () => {
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<ToastContainer
-				position="top-right"
+				position={isRtl ? 'top-left' : 'top-right'}
 				autoClose={3000}
 				hideProgressBar={false}
 				newestOnTop
 				closeOnClick
-				rtl={false}
+				rtl={isRtl}
 				pauseOnFocusLoss
 				draggable
 				pauseOnHover
@@ -384,16 +389,16 @@ const JournalEntriesPage = () => {
 					setJournalToDelete(null);
 				}}
 				onConfirm={handleConfirmDelete}
-				title="Delete Journal Entry"
-				message={`Are you sure you want to delete journal entry "${journalToDelete?.name}"? This action cannot be undone.`}
-				confirmText="Delete"
-				cancelText="Cancel"
+				title={t('journals.modals.deleteTitle')}
+				message={t('journals.modals.deleteMessage', { name: journalToDelete?.name })}
+				confirmText={t('journals.modals.deleteConfirm')}
+				cancelText={t('journals.modals.cancel')}
 			/>
 
 			{/* Header */}
 			<PageHeader
-				title="Journal Entries"
-				subtitle="View all general ledger entries"
+				title={t('journals.title')}
+				subtitle={t('journals.subtitle')}
 				icon={
 					<svg width="29" height="35" viewBox="0 0 29 35" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<g opacity="0.5">
@@ -462,7 +467,7 @@ const JournalEntriesPage = () => {
 
 			<div className="w-[95%] mx-auto py-6 space-y-6">
 				{/* Statistics Cards */}
-				<div className="grid grid-cols-3 gap-6">
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 					{statCards.map((card, index) => (
 						<div
 							key={index}
@@ -473,7 +478,7 @@ const JournalEntriesPage = () => {
 								<div className="flex flex-row items-center gap-2">
 									<div className="text-[#28819C] opacity-80">{card.icon}</div>
 
-									<p className="text-[#000000]  text-lg ">{card.title}</p>
+									<p className="text-[#000000] text-lg">{card.title}</p>
 								</div>
 								<p className="text-3xl font-bold text-[#28819C]">{card.value}</p>
 							</div>
@@ -483,13 +488,13 @@ const JournalEntriesPage = () => {
 
 				{/* Toolbar */}
 				<Toolbar
-					searchPlaceholder="Search journal entries..."
+					searchPlaceholder={t('journals.toolbar.searchPlaceholder')}
 					filterOptions={[
-						{ value: '', label: 'All Status' },
-						{ value: 'posted', label: 'Posted' },
-						{ value: 'draft', label: 'Draft' },
+						{ value: '', label: t('journals.toolbar.filterAll') },
+						{ value: 'posted', label: t('journals.toolbar.posted') },
+						{ value: 'draft', label: t('journals.toolbar.draft') },
 					]}
-					createButtonText="New Journal"
+					createButtonText={t('journals.toolbar.newJournal')}
 					onSearchChange={handleSearchChange}
 					onFilterChange={handleFilterChange}
 					onCreateClick={handleCreateJournal}
@@ -500,7 +505,7 @@ const JournalEntriesPage = () => {
 					<div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
 						<div className="flex items-center justify-center gap-2">
 							<div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-							<span className="text-gray-600">Loading journal entries...</span>
+							<span className="text-gray-600">{t('journals.table.loading')}</span>
 						</div>
 					</div>
 				) : (
@@ -510,7 +515,7 @@ const JournalEntriesPage = () => {
 						onDelete={handleDelete}
 						onEdit={handleView}
 						className="mb-8"
-						emptyMessage="No journal entries found"
+						emptyMessage={t('journals.table.emptyMessage')}
 					/>
 				)}
 			</div>

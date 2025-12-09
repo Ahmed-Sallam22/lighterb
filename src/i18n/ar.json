@@ -725,5 +725,57 @@
 			"rejectError": "فشل رفض الفاتورة",
 			"saveError": "فشل حفظ اعتماد الفاتورة"
 		}
+	},
+	"journals": {
+		"title": "قيود اليومية",
+		"subtitle": "عرض جميع قيود دفتر الأستاذ العام",
+		"stats": {
+			"totalEntries": "إجمالي القيود",
+			"posted": "مرحّل",
+			"draft": "مسودة"
+		},
+		"toolbar": {
+			"searchPlaceholder": "بحث في قيود اليومية...",
+			"filterAll": "جميع الحالات",
+			"posted": "مرحّل",
+			"draft": "مسودة",
+			"newJournal": "قيد جديد"
+		},
+		"table": {
+			"name": "الاسم",
+			"id": "الرقم التعريفي",
+			"date": "التاريخ",
+			"lines": "الأسطر",
+			"totalDebit": "إجمالي المدين",
+			"totalCredit": "إجمالي الدائن",
+			"status": "الحالة",
+			"actions": "الإجراءات",
+			"loading": "جارٍ تحميل قيود اليومية...",
+			"emptyMessage": "لم يتم العثور على قيود يومية"
+		},
+		"status": {
+			"posted": "مرحّل",
+			"draft": "مسودة"
+		},
+		"actions": {
+			"post": "ترحيل",
+			"reverse": "عكس القيد"
+		},
+		"modals": {
+			"deleteTitle": "حذف قيد اليومية",
+			"deleteMessage": "هل أنت متأكد من أنك تريد حذف القيد \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"deleteConfirm": "حذف",
+			"cancel": "إلغاء"
+		},
+		"messages": {
+			"deleteSuccess": "تم حذف قيد اليومية بنجاح!",
+			"deleteError": "فشل حذف قيد اليومية",
+			"postSuccess": "تم ترحيل قيد اليومية بنجاح!",
+			"postError": "فشل ترحيل قيد اليومية",
+			"postInfo": "تم ترحيل هذا القيد بالفعل",
+			"reverseSuccess": "تم عكس قيد اليومية بنجاح!",
+			"reverseError": "فشل عكس قيد اليومية",
+			"reverseInfo": "يمكن عكس القيود المرحلة فقط"
+		}
 	}
 }

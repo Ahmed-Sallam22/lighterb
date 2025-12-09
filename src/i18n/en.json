@@ -725,5 +725,57 @@
 			"rejectError": "Failed to reject invoice",
 			"saveError": "Failed to save invoice approval"
 		}
+	},
+	"journals": {
+		"title": "Journal Entries",
+		"subtitle": "View all general ledger entries",
+		"stats": {
+			"totalEntries": "Total Entries",
+			"posted": "Posted",
+			"draft": "Draft"
+		},
+		"toolbar": {
+			"searchPlaceholder": "Search journal entries...",
+			"filterAll": "All Status",
+			"posted": "Posted",
+			"draft": "Draft",
+			"newJournal": "New Journal"
+		},
+		"table": {
+			"name": "Name",
+			"id": "ID",
+			"date": "Date",
+			"lines": "Lines",
+			"totalDebit": "Total Debit",
+			"totalCredit": "Total Credit",
+			"status": "Status",
+			"actions": "Actions",
+			"loading": "Loading journal entries...",
+			"emptyMessage": "No journal entries found"
+		},
+		"status": {
+			"posted": "Posted",
+			"draft": "Draft"
+		},
+		"actions": {
+			"post": "Post",
+			"reverse": "Reverse"
+		},
+		"modals": {
+			"deleteTitle": "Delete Journal Entry",
+			"deleteMessage": "Are you sure you want to delete journal entry \"{{name}}\"? This action cannot be undone.",
+			"deleteConfirm": "Delete",
+			"cancel": "Cancel"
+		},
+		"messages": {
+			"deleteSuccess": "Journal entry deleted successfully!",
+			"deleteError": "Failed to delete journal entry",
+			"postSuccess": "Journal entry posted successfully!",
+			"postError": "Failed to post journal entry",
+			"postInfo": "This journal entry is already posted",
+			"reverseSuccess": "Journal entry reversed successfully!",
+			"reverseError": "Failed to reverse journal entry",
+			"reverseInfo": "Only posted journal entries can be reversed"
+		}
 	}
 }
