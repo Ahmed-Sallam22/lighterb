@@ -1028,5 +1028,37 @@
 			"description": "وصف العنصر"
 		},
 		"na": "—"
+	},
+	"procurementDashboard": {
+		"title": "لوحة المشتريات",
+		"subtitle": "التحليلات والرؤى",
+		"metaTitle": "لوحة المشتريات - لايت إي آر بي",
+		"open": "فتح",
+		"cards": {
+			"requisitions": {
+				"title": "طلبات الشراء",
+				"description": "طلبات وموافقات الشراء"
+			},
+			"prToPo": {
+				"title": "تحويل الطلب لأمر شراء",
+				"description": "إنشاء أوامر شراء من الطلبات"
+			},
+			"purchaseOrders": {
+				"title": "أوامر الشراء",
+				"description": "إدارة أوامر الشراء والطلبات"
+			},
+			"receiving": {
+				"title": "الاستلام",
+				"description": "استلام البضائع والجودة"
+			},
+			"approvals": {
+				"title": "الموافقات",
+				"description": "إدارة سير العمل"
+			},
+			"catalog": {
+				"title": "مرجع الكتالوج",
+				"description": "تصفح العناصر والأسعار"
+			}
+		}
 	}
 }

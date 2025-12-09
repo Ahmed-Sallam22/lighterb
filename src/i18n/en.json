@@ -1028,5 +1028,37 @@
 			"description": "Item description"
 		},
 		"na": "—"
+	},
+	"procurementDashboard": {
+		"title": "Procurement Dashboard",
+		"subtitle": "Analytics & Insights",
+		"metaTitle": "Procurement Dashboard - LightERP",
+		"open": "Open",
+		"cards": {
+			"requisitions": {
+				"title": "Requisitions",
+				"description": "Purchase Requests & Approvals"
+			},
+			"prToPo": {
+				"title": "PR to PO",
+				"description": "Create POs from PRs"
+			},
+			"purchaseOrders": {
+				"title": "Purchase Orders",
+				"description": "Manage POs & Orders"
+			},
+			"receiving": {
+				"title": "Receiving",
+				"description": "Goods Receipt & Quality"
+			},
+			"approvals": {
+				"title": "Approvals",
+				"description": "Workflow Management"
+			},
+			"catalog": {
+				"title": "Catalog Reference",
+				"description": "Browse Items & Prices"
+			}
+		}
 	}
 }
