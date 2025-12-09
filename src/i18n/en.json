@@ -835,5 +835,47 @@
 			"totalDebits": "Total Debits",
 			"totalCredits": "Total Credits"
 		}
+	},
+	"payments": {
+		"ar": {
+			"title": "AR Payments",
+			"subtitle": "Receive payments from customers",
+			"deleteSuccess": "AR Payment deleted successfully",
+			"emptyMessage": "No customer payments found",
+			"customer": "Customer"
+		},
+		"ap": {
+			"title": "AP Payments",
+			"subtitle": "Make Payments to Suppliers",
+			"deleteSuccess": "AP Payment deleted successfully",
+			"emptyMessage": "No supplier payments found",
+			"supplier": "Supplier"
+		},
+		"common": {
+			"newPayment": "New Payment",
+			"paymentDate": "Payment Date",
+			"reference": "Reference",
+			"amount": "Amount",
+			"currency": "Currency",
+			"paymentMethod": "Payment Method",
+			"status": "Status",
+			"actions": "Actions",
+			"searchPlaceholder": "Search payments...",
+			"filterStatus": "Filter by Status",
+			"deleteError": "Failed to delete payment"
+		},
+		"status": {
+			"all": "All Status",
+			"completed": "Completed",
+			"pending": "Pending",
+			"failed": "Failed",
+			"cancelled": "Cancelled"
+		},
+		"modals": {
+			"deleteTitle": "Delete Payment",
+			"deleteMessage": "Are you sure you want to delete payment \"{{reference}}\"? This action cannot be undone.",
+			"delete": "Delete",
+			"cancel": "Cancel"
+		}
 	}
 }

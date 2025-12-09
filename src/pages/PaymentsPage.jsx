@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/shared/PageHeader';
 import Toolbar from '../components/shared/Toolbar';
 import Table from '../components/shared/Table';
@@ -35,6 +36,8 @@ const APPaymentIcon = () => (
 );
 
 const PaymentsPage = () => {
+	const { t, i18n } = useTranslation();
+	const isRtl = i18n.dir() === 'rtl';
 	const { type } = useParams(); // 'ar' or 'ap'
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -54,10 +57,11 @@ const PaymentsPage = () => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [filterStatus, setFilterStatus] = useState('');
 
-	const title = isAR ? 'AR Payments' : 'AP Payments';
-	const subtitle = isAR ? 'Receive payments from customers' : 'Make Payments to Suppliers';
+	// Localized Text
+	const title = t(isAR ? 'payments.ar.title' : 'payments.ap.title');
+	const subtitle = t(isAR ? 'payments.ar.subtitle' : 'payments.ap.subtitle');
 	const icon = isAR ? <ARPaymentIcon /> : <APPaymentIcon />;
-	const buttonText = 'New Payment';
+	const buttonText = t('payments.common.newPayment');
 	const quickActionPath = isAR ? '/quick-actions/receive-payment' : '/quick-actions/make-payment';
 
 	// Fetch payments on mount
@@ -93,44 +97,45 @@ const PaymentsPage = () => {
 	// Table columns configuration
 	const columns = [
 		{
-			header: 'Payment Date',
+			header: t('payments.common.paymentDate'),
 			accessor: 'date',
 			sortable: true,
 			render: value => value || '-',
 		},
 		{
-			header: isAR ? 'Customer' : 'Supplier',
+			header: t(isAR ? 'payments.ar.customer' : 'payments.ap.supplier'),
 			accessor: isAR ? 'customer_name' : 'supplier_name',
 			sortable: true,
 			render: value => value || '-',
 		},
 		{
-			header: 'Reference',
+			header: t('payments.common.reference'),
 			accessor: 'reference',
 			sortable: true,
 			render: value => value || '-',
 		},
 		{
-			header: 'Amount',
+			header: t('payments.common.amount'),
 			accessor: isAR ? 'total_amount' : 'amount',
 			sortable: true,
 			render: value => <span className="font-semibold">{parseFloat(value || 0).toFixed(2)}</span>,
 		},
 		{
-			header: 'Currency',
+			header: t('payments.common.currency'),
 			accessor: 'currency_code',
 			render: value => value || '-',
 		},
 		{
-			header: 'Payment Method',
+			header: t('payments.common.paymentMethod'),
 			accessor: 'payment_method',
 			render: value => {
 				if (!value) return '-';
+				// You might want to add specific translations for payment methods in the JSON
 				return value.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 			},
 		},
 		{
-			header: 'Status',
+			header: t('payments.common.status'),
 			accessor: 'status',
 			render: value => {
 				const statusColors = {
@@ -145,7 +150,8 @@ const PaymentsPage = () => {
 							statusColors[value] || 'bg-gray-100 text-gray-800'
 						}`}
 					>
-						{value || 'PENDING'}
+						{/* Translate status, fallback to uppercase English */}
+						{t(`payments.status.${value?.toLowerCase()}`, value || 'PENDING')}
 					</span>
 				);
 			},
@@ -154,11 +160,11 @@ const PaymentsPage = () => {
 
 	// Filter options for toolbar
 	const filterOptions = [
-		{ value: '', label: 'All Status' },
-		{ value: 'completed', label: 'Completed' },
-		{ value: 'pending', label: 'Pending' },
-		{ value: 'failed', label: 'Failed' },
-		{ value: 'cancelled', label: 'Cancelled' },
+		{ value: '', label: t('payments.status.all') },
+		{ value: 'completed', label: t('payments.status.completed') },
+		{ value: 'pending', label: t('payments.status.pending') },
+		{ value: 'failed', label: t('payments.status.failed') },
+		{ value: 'cancelled', label: t('payments.status.cancelled') },
 	];
 
 	// Handlers
@@ -190,15 +196,15 @@ const PaymentsPage = () => {
 		try {
 			if (isAR) {
 				await dispatch(deleteARPayment(paymentToDelete.id)).unwrap();
-				toast.success('AR Payment deleted successfully');
+				toast.success(t('payments.ar.deleteSuccess'));
 			} else {
 				await dispatch(deleteAPPayment(paymentToDelete.id)).unwrap();
-				toast.success('AP Payment deleted successfully');
+				toast.success(t('payments.ap.deleteSuccess'));
 			}
 			setIsDeleteModalOpen(false);
 			setPaymentToDelete(null);
 		} catch (error) {
-			toast.error(error || 'Failed to delete payment');
+			toast.error(error || t('payments.common.deleteError'));
 		}
 	};
 
@@ -215,10 +221,10 @@ const PaymentsPage = () => {
 			{/* Toolbar */}
 			<div className="px-6 mt-6">
 				<Toolbar
-					searchPlaceholder="Search payments..."
+					searchPlaceholder={t('payments.common.searchPlaceholder')}
 					onSearchChange={handleSearch}
 					filterOptions={filterOptions}
-					filterLabel="Filter by Status"
+					filterLabel={t('payments.common.filterStatus')}
 					onFilterChange={handleFilter}
 					createButtonText={buttonText}
 					onCreateClick={handleCreate}
@@ -237,7 +243,7 @@ const PaymentsPage = () => {
 						data={filteredPayments}
 						onEdit={handleEdit}
 						onDelete={handleDeleteClick}
-						emptyMessage={`No ${isAR ? 'customer' : 'supplier'} payments found`}
+						emptyMessage={t(isAR ? 'payments.ar.emptyMessage' : 'payments.ap.emptyMessage')}
 					/>
 				)}
 			</div>
@@ -247,12 +253,12 @@ const PaymentsPage = () => {
 				isOpen={isDeleteModalOpen}
 				onClose={handleCancelDelete}
 				onConfirm={handleConfirmDelete}
-				title="Delete Payment"
-				message={`Are you sure you want to delete payment "${
-					paymentToDelete?.reference || 'this payment'
-				}"? This action cannot be undone.`}
-				confirmText="Delete"
-				cancelText="Cancel"
+				title={t('payments.modals.deleteTitle')}
+				message={t('payments.modals.deleteMessage', {
+					reference: paymentToDelete?.reference || (isRtl ? 'هذه الدفعة' : 'this payment'),
+				})}
+				confirmText={t('payments.modals.delete')}
+				cancelText={t('payments.modals.cancel')}
 			/>
 		</div>
 	);

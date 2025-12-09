@@ -835,5 +835,47 @@
 			"totalDebits": "إجمالي المدين",
 			"totalCredits": "إجمالي الدائن"
 		}
+	},
+	"payments": {
+		"ar": {
+			"title": "مدفوعات المبيعات",
+			"subtitle": "استلام المدفوعات من العملاء",
+			"deleteSuccess": "تم حذف دفعة المبيعات بنجاح",
+			"emptyMessage": "لم يتم العثور على مدفوعات عملاء",
+			"customer": "العميل"
+		},
+		"ap": {
+			"title": "مدفوعات الشراء",
+			"subtitle": "إجراء المدفوعات للموردين",
+			"deleteSuccess": "تم حذف دفعة الشراء بنجاح",
+			"emptyMessage": "لم يتم العثور على مدفوعات موردين",
+			"supplier": "المورد"
+		},
+		"common": {
+			"newPayment": "دفعة جديدة",
+			"paymentDate": "تاريخ الدفع",
+			"reference": "المرجع",
+			"amount": "المبلغ",
+			"currency": "العملة",
+			"paymentMethod": "طريقة الدفع",
+			"status": "الحالة",
+			"actions": "الإجراءات",
+			"searchPlaceholder": "بحث في المدفوعات...",
+			"filterStatus": "تصفية حسب الحالة",
+			"deleteError": "فشل حذف الدفعة"
+		},
+		"status": {
+			"all": "جميع الحالات",
+			"completed": "مكتمل",
+			"pending": "قيد الانتظار",
+			"failed": "فشل",
+			"cancelled": "ملغى"
+		},
+		"modals": {
+			"deleteTitle": "حذف الدفعة",
+			"deleteMessage": "هل أنت متأكد من أنك تريد حذف الدفعة \"{{reference}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"delete": "حذف",
+			"cancel": "إلغاء"
+		}
 	}
 }
