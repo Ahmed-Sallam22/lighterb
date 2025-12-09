@@ -561,5 +561,91 @@
 			"confirm": "حذف",
 			"cancel": "إلغاء"
 		}
+	},
+	"exchangeRates": {
+		"title": "أسعار الصرف",
+		"subtitle": "إدارة أسعار صرف العملات",
+		"actions": {
+			"currencyConverter": "محول العملات",
+			"addExchangeRate": "إضافة سعر صرف",
+			"clearAll": "مسح الكل",
+			"applyFilters": "تطبيق المرشحات",
+			"cancel": "إلغاء",
+			"update": "تحديث",
+			"create": "إنشاء",
+			"delete": "حذف",
+			"close": "إغلاق",
+			"convert": "تحويل",
+			"edit": "تعديل"
+		},
+		"table": {
+			"fromCurrency": "من عملة",
+			"toCurrency": "إلى عملة",
+			"rateType": "نوع السعر",
+			"exchangeRate": "سعر الصرف",
+			"effectiveDate": "تاريخ السريان",
+			"source": "المصدر",
+			"status": "الحالة",
+			"active": "نشط",
+			"actions": "الإجراءات",
+			"emptyMessage": "لم يتم العثور على أسعار صرف"
+		},
+		"filters": {
+			"all": "الكل",
+			"fromCurrency": "من عملة",
+			"toCurrency": "إلى عملة",
+			"rateType": "نوع السعر",
+			"dateFrom": "من تاريخ",
+			"dateTo": "إلى تاريخ"
+		},
+		"form": {
+			"amount": "المبلغ",
+			"rateDate": "تاريخ السعر",
+			"placeholders": {
+				"rate": "مثال: 3.6725",
+				"source": "مثال: البنك المركزي",
+				"amount": "مثال: 100.00"
+			}
+		},
+		"modals": {
+			"addTitle": "إضافة سعر صرف",
+			"editTitle": "تعديل سعر صرف",
+			"deleteTitle": "حذف سعر صرف",
+			"converterTitle": "محول العملات",
+			"deleteMessage": "هل أنت متأكد من أنك تريد حذف سعر الصرف هذا؟ لا يمكن التراجع عن هذا الإجراء."
+		},
+		"validation": {
+			"fromCurrencyRequired": "العملة (من) مطلوبة",
+			"toCurrencyRequired": "العملة (إلى) مطلوبة",
+			"sameCurrency": "يجب أن تكون عملة التحويل مختلفة عن العملة الأصلية",
+			"rateTypeRequired": "نوع السعر مطلوب",
+			"rateRequired": "سعر الصرف مطلوب",
+			"ratePositive": "يجب أن يكون سعر الصرف رقماً موجباً",
+			"effectiveDateRequired": "تاريخ السريان مطلوب",
+			"sourceRequired": "المصدر مطلوب",
+			"amountRequired": "المبلغ مطلوب",
+			"amountPositive": "يجب أن يكون المبلغ رقماً موجباً",
+			"rateDateRequired": "تاريخ السعر مطلوب"
+		},
+		"messages": {
+			"filtersApplied": "تم تطبيق المرشحات",
+			"filtersCleared": "تم مسح المرشحات",
+			"createSuccess": "تم إنشاء سعر الصرف بنجاح",
+			"updateSuccess": "تم تحديث سعر الصرف بنجاح",
+			"deleteSuccess": "تم حذف سعر الصرف بنجاح",
+			"convertSuccess": "تم تحويل العملة بنجاح",
+			"invalidSelection": "اختيار غير صالح للعملة"
+		},
+		"rateTypes": {
+			"SPOT": "فوري",
+			"CORPORATE": "شركات",
+			"USER": "مستخدم",
+			"AVERAGE": "متوسط"
+		},
+		"converter": {
+			"resultTitle": "نتيجة التحويل",
+			"exchangeRate": "سعر الصرف",
+			"rateDate": "تاريخ السعر"
+		}
 	}
 }

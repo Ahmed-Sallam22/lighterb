@@ -561,5 +561,91 @@
 			"confirm": "Delete",
 			"cancel": "Cancel"
 		}
+	},
+	"exchangeRates": {
+		"title": "Exchange Rates",
+		"subtitle": "Manage currency exchange rates",
+		"actions": {
+			"currencyConverter": "Currency Converter",
+			"addExchangeRate": "Add Exchange Rate",
+			"clearAll": "Clear all",
+			"applyFilters": "Apply filters",
+			"cancel": "Cancel",
+			"update": "Update",
+			"create": "Create",
+			"delete": "Delete",
+			"close": "Close",
+			"convert": "Convert",
+			"edit": "Edit"
+		},
+		"table": {
+			"fromCurrency": "From Currency",
+			"toCurrency": "To Currency",
+			"rateType": "Rate Type",
+			"exchangeRate": "Exchange Rate",
+			"effectiveDate": "Effective Date",
+			"source": "Source",
+			"status": "Status",
+			"active": "Active",
+			"actions": "Actions",
+			"emptyMessage": "No exchange rates found"
+		},
+		"filters": {
+			"all": "All",
+			"fromCurrency": "From Currency",
+			"toCurrency": "To Currency",
+			"rateType": "Rate Type",
+			"dateFrom": "Date From",
+			"dateTo": "Date To"
+		},
+		"form": {
+			"amount": "Amount",
+			"rateDate": "Rate Date",
+			"placeholders": {
+				"rate": "e.g., 3.6725",
+				"source": "e.g., ECB Daily Rate",
+				"amount": "e.g., 100.00"
+			}
+		},
+		"modals": {
+			"addTitle": "Add Exchange Rate",
+			"editTitle": "Edit Exchange Rate",
+			"deleteTitle": "Delete Exchange Rate",
+			"converterTitle": "Currency Converter",
+			"deleteMessage": "Are you sure you want to delete this exchange rate? This action cannot be undone."
+		},
+		"validation": {
+			"fromCurrencyRequired": "From currency is required",
+			"toCurrencyRequired": "To currency is required",
+			"sameCurrency": "To currency must be different from From currency",
+			"rateTypeRequired": "Rate type is required",
+			"rateRequired": "Exchange rate is required",
+			"ratePositive": "Exchange rate must be a positive number",
+			"effectiveDateRequired": "Effective date is required",
+			"sourceRequired": "Source is required",
+			"amountRequired": "Amount is required",
+			"amountPositive": "Amount must be a positive number",
+			"rateDateRequired": "Rate date is required"
+		},
+		"messages": {
+			"filtersApplied": "Filters applied",
+			"filtersCleared": "Filters cleared",
+			"createSuccess": "Exchange rate created successfully",
+			"updateSuccess": "Exchange rate updated successfully",
+			"deleteSuccess": "Exchange rate deleted successfully",
+			"convertSuccess": "Currency converted successfully",
+			"invalidSelection": "Invalid currency selection"
+		},
+		"rateTypes": {
+			"SPOT": "Spot",
+			"CORPORATE": "Corporate",
+			"USER": "User",
+			"AVERAGE": "Average"
+		},
+		"converter": {
+			"resultTitle": "Conversion Result",
+			"exchangeRate": "Exchange Rate",
+			"rateDate": "Rate Date"
+		}
 	}
 }
