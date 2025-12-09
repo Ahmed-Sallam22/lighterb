@@ -236,5 +236,145 @@
 	"common": {
 		"scrollLeft": "التمرير لليسار",
 		"scrollRight": "التمرير لليمين"
+	},
+	"requisitions": {
+		"title": "طلبات الشراء",
+		"subtitle": "طلبات وموافقات الشراء",
+		"createRequisition": "إنشاء طلب شراء",
+		"view": "عرض",
+		"edit": "تعديل",
+		"submitForApproval": "إرسال للموافقة",
+		"requiredDate": "تاريخ الطلب",
+		"costCenter": "مركز التكلفة",
+		"totalAmount": "المبلغ الإجمالي",
+		"createdDate": "تاريخ الإنشاء",
+		"createNewRequisition": "إنشاء طلب شراء جديد",
+		"searchPlaceholder": "البحث برقم الطلب أو اسم مقدم الطلب...",
+		"tabs": {
+			"myPRs": "طلباتي",
+			"pendingApproval": "في انتظار موافقتي",
+			"allPRs": "جميع الطلبات"
+		},
+		"stats": {
+			"totalPRs": "إجمالي الطلبات",
+			"pendingApproval": "في انتظار الموافقة",
+			"approved": "تمت الموافقة",
+			"totalValue": "القيمة الإجمالية"
+		},
+		"newRequisition": {
+			"title": "طلب شراء جديد",
+			"requisitionDetails": "تفاصيل الطلب",
+			"assetNumber": "رقم الأصل",
+			"costCenter": "مركز التكلفة",
+			"project": "المشروع",
+			"priority": "الأولوية",
+			"prType": "نوع الطلب",
+			"businessJustification": "المبرر التجاري",
+			"description": "الوصف",
+			"checkBudget": "فحص الميزانية",
+			"lineItems": "بنود الطلب",
+			"addLine": "إضافة بند",
+			"lineItem": "بند",
+			"itemType": "نوع البند",
+			"quantity": "الكمية",
+			"uom": "وحدة القياس",
+			"estimatedUnitPrice": "السعر التقديري للوحدة",
+			"needByDate": "التاريخ المطلوب",
+			"specification": "المواصفات",
+			"lineTotal": "إجمالي البند",
+			"totalEstimatedAmount": "المبلغ التقديري الإجمالي",
+			"attachments": "المرفقات",
+			"addFile": "إضافة ملف",
+			"noFilesAttached": "لا توجد ملفات مرفقة بعد",
+			"filesLinkedOnSave": "سيتم ربط الملفات عند حفظ المستند",
+			"additionalNotes": "ملاحظات إضافية",
+			"cancel": "إلغاء",
+			"createAsset": "إنشاء الأصل",
+			"selectCostCenter": "اختر مركز التكلفة",
+			"selectProject": "اختر المشروع",
+			"selectPriority": "اختر الأولوية",
+			"selectPRType": "اختر نوع الطلب",
+			"selectItemType": "اختر نوع البند",
+			"selectUoM": "اختر وحدة القياس",
+			"enterAssetNumber": "أدخل رقم الأصل",
+			"enterQuantity": "أدخل الكمية",
+			"enterPrice": "أدخل السعر",
+			"priorities": {
+				"high": "عالية",
+				"normal": "عادية",
+				"low": "منخفضة"
+			},
+			"prTypes": {
+				"goods": "سلع",
+				"services": "خدمات",
+				"both": "كلاهما"
+			},
+			"itemTypes": {
+				"material": "مواد",
+				"service": "خدمة",
+				"asset": "أصل"
+			},
+			"uomTypes": {
+				"pieces": "قطع",
+				"kilograms": "كيلوجرام",
+				"liters": "لتر",
+				"box": "صندوق",
+				"set": "طقم"
+			}
+		},
+		"browseCatalog": {
+			"title": "تصفح الكتالوج",
+			"searchPlaceholder": "ابحث في الكتالوج بالاسم أو الرمز...",
+			"code": "الرمز",
+			"selectThisItem": "اختر هذا العنصر",
+			"noItemsFound": "لا توجد عناصر مطابقة لبحثك"
+		}
+	},
+	"assets": {
+		"title": "سجل الأصول",
+		"subtitle": "جميع الأصول",
+		"newAsset": "أصل جديد",
+		"fromAPInvoice": "من فاتورة الموردين",
+		"fromGRN": "من إشعار الاستلام",
+		"approvals": "الموافقات",
+		"transfer": "نقل",
+		"adjustments": "التعديلات",
+		"retirements": "الاستبعادات",
+		"categories": "الفئات",
+		"locations": "المواقع",
+		"depreciation": "الإهلاك",
+		"settings": "الإعدادات",
+		"stats": {
+			"totalAssets": "إجمالي الأصول",
+			"activeAssets": "الأصول النشطة",
+			"draftAssets": "الأصول المسودة",
+			"totalNetBookValue": "إجمالي صافي القيمة الدفترية"
+		},
+		"table": {
+			"assetNumber": "رقم الأصل",
+			"name": "الاسم",
+			"category": "الفئة",
+			"location": "الموقع",
+			"acquisitionCost": "تكلفة الاقتناء",
+			"netBookValue": "صافي القيمة الدفترية",
+			"status": "الحالة",
+			"actions": "الإجراءات"
+		},
+		"status": {
+			"capitalized": "مرسمل",
+			"cip": "قيد التنفيذ",
+			"draft": "مسودة",
+			"retired": "مستبعد",
+			"allStatuses": "جميع الحالات"
+		},
+		"filters": {
+			"allCategories": "جميع الفئات",
+			"office": "مكتبية",
+			"electronics": "إلكترونيات",
+			"furniture": "أثاث",
+			"itEquipment": "معدات تقنية المعلومات"
+		},
+		"searchPlaceholder": "بحث عن الأصول...",
+		"emptyMessage": "لم يتم العثور على أصول"
 	}
 }

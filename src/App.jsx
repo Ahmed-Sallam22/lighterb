@@ -28,6 +28,8 @@ import RegisterPage from "./pages/RegisterPage";
 import ForgetPasswordPage from "./pages/ForgetPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { useEffect } from "react";
+import Requisitions from "./pages/Requisitions";
+import AssetsPage from "./pages/Assets";
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -55,6 +57,7 @@ const App = () => {
 					<Route path="journal/lines" element={<JournalLinesPage />} />
 					<Route path="journal/create" element={<CreateJournalPage />} />
 					<Route path="segments" element={<SegmentsPage />} />
+					<Route path="assets" element={<AssetsPage />} />
 					<Route path="currency" element={<CurrencyPage />} />
 					<Route path="exchange-rates" element={<ExchangeRatesPage />} />
 					<Route path="tax-rates" element={<TaxRatesPage />} />
@@ -64,6 +67,7 @@ const App = () => {
 					<Route path="reports" element={<ReportsPage />} />
 					<Route path="procurement" element={<ProcurementDashboard />} />
 					<Route path="procurement/approvals" element={<ProcurementApprovals />} />
+					<Route path="requisitions" element={<Requisitions />} />
 					<Route path="procurement/approvals/:instanceId" element={<ProcurementApprovalDetail />} />
 					<Route path="procurement/catalog" element={<ProcurementCatalog />} />
 				</Route>

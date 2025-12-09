@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useId } from "react";
 import PropTypes from "prop-types";
+import { PiCirclesFourFill } from "react-icons/pi";
 
 const FloatingLabelSelect = ({
 	label,
@@ -13,6 +14,8 @@ const FloatingLabelSelect = ({
 	error = "",
 	className = "",
 	searchable = true,
+	icon = false,
+	buttonClassName = "",
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -83,6 +86,10 @@ const FloatingLabelSelect = ({
 		}
 	};
 
+	useEffect(() => {
+		console.log(hasValue);
+	}, [hasValue]);
+
 	const ArrowIcon = () => (
 		<svg
 			width="20"
@@ -137,27 +144,23 @@ const FloatingLabelSelect = ({
 						aria-describedby={errorId}
 						className={`
               w-full bg-transparent rounded-[18px] border-none
-              px-5 py-3 min-h-10 text-sm text-[#031b28] text-left
+              px-5 py-4 min-h-10 text-sm text-[#031b28] text-start
               focus:outline-none
               disabled:cursor-not-allowed
               flex items-center justify-between
+			  ${buttonClassName}
             `}
 					>
+						{icon && <span>{icon}</span>}
 						<span className={`transition-colors duration-200 ${buttonTextClasses}`}>{displayText}</span>
 						<ArrowIcon />
 					</button>
-
-					{/* Floating Label */}
 					<label
 						htmlFor={selectId}
 						className={`
-              absolute left-4 font-semibold pointer-events-none
+              absolute start-4 font-semibold pointer-events-none
               transition-all duration-200
-              ${
-					isFloating
-						? "-top-3 text-xs px-3  rounded-full bg-white text-[#0d5f7a] shadow-[0_3px_10px_rgba(3,49,67,0.08)]"
-						: "top-1/2 -translate-y-1/2 text-sm text-[#7A9098]"
-				}
+              ${isFloating ? "-top-3 text-xs px-3 text-gray-500" : "top-1/2 -translate-y-1/2 text-sm text-[#7A9098]"}
               ${hasError ? "text-red-400 bg-[#40171d]" : ""}
             `}
 					>
@@ -167,10 +170,9 @@ const FloatingLabelSelect = ({
 					{/* Dropdown Menu */}
 					{isOpen && (
 						<div
-							className="absolute top-full left-0 right-0 mt-2 bg-white rounded-[18px] shadow-2xl border border-[#48C1F0]/30 z-[9999] max-h-64 overflow-hidden"
+							className="absolute top-full start-0 end-0 mt-2 bg-white rounded-[18px] shadow-2xl border border-[#48C1F0]/30 z-9999 max-h-64 overflow-hidden"
 							role="listbox"
 						>
-							{/* Search Input */}
 							{searchable && (
 								<div className="p-3 border-b border-gray-200">
 									<input
@@ -196,7 +198,7 @@ const FloatingLabelSelect = ({
 											aria-selected={option.value === value}
 											onClick={() => handleSelect(option.value)}
 											className={`
-                        w-full px-5 py-3 text-left text-base transition-colors duration-150
+                        w-full px-5 py-3 text-start text-base transition-colors duration-150
                         hover:bg-[#48C1F0]/10 focus:bg-[#48C1F0]/10 focus:outline-none
                         ${option.value === value ? "bg-[#48C1F0]/20 text-[#031b28] font-semibold" : "text-[#031b28]"}
                       `}
@@ -204,7 +206,7 @@ const FloatingLabelSelect = ({
 											{option.label}
 											{option.value === value && (
 												<svg
-													className="inline-block ml-2"
+													className="inline-block ms-2"
 													width="16"
 													height="16"
 													viewBox="0 0 24 24"
@@ -230,7 +232,7 @@ const FloatingLabelSelect = ({
 					{hasError && (
 						<p
 							id={errorId}
-							className="absolute -bottom-6 left-1 text-sm text-red-400 flex items-center gap-1"
+							className="absolute -bottom-6 start-1 text-sm text-red-400 flex items-center gap-1"
 						>
 							<svg
 								width="16"
@@ -251,22 +253,22 @@ const FloatingLabelSelect = ({
 			</div>
 
 			{/* Custom Scrollbar Styles */}
-			<style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #48C1F0;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #3ba8d4;
-        }
-      `}</style>
+			<style jsx>{`
+				.custom-scrollbar::-webkit-scrollbar {
+					width: 6px;
+				}
+				.custom-scrollbar::-webkit-scrollbar-track {
+					background: #f1f1f1;
+					border-radius: 10px;
+				}
+				.custom-scrollbar::-webkit-scrollbar-thumb {
+					background: #48c1f0;
+					border-radius: 10px;
+				}
+				.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+					background: #3ba8d4;
+				}
+			`}</style>
 		</div>
 	);
 };

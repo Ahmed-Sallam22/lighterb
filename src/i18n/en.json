@@ -236,5 +236,145 @@
 	"common": {
 		"scrollLeft": "Scroll left",
 		"scrollRight": "Scroll right"
+	},
+	"requisitions": {
+		"title": "Requisitions",
+		"subtitle": "Purchase Requests & Approvals",
+		"createRequisition": "Create Requisitions",
+		"view": "View",
+		"edit": "Edit",
+		"submitForApproval": "Submit for Approval",
+		"requiredDate": "Required Date",
+		"costCenter": "Cost Center",
+		"totalAmount": "Total Amount",
+		"createdDate": "Created Date",
+
+		"searchPlaceholder": "Search by PR number or requester...",
+		"tabs": {
+			"myPRs": "My PRs",
+			"pendingApproval": "Pending My Approval",
+			"allPRs": "All PRs"
+		},
+		"stats": {
+			"totalPRs": "Total PRs",
+			"pendingApproval": "Pending Approval",
+			"approved": "Approved",
+			"totalValue": "Total Value"
+		},
+		"newRequisition": {
+			"title": "New Requisition",
+			"requisitionDetails": "Requisition Details",
+			"assetNumber": "Asset Number",
+			"costCenter": "Cost Center",
+			"project": "Project",
+			"priority": "Priority",
+			"prType": "PR Type",
+			"businessJustification": "Business Justification",
+			"description": "Description",
+			"checkBudget": "Check Budget",
+			"lineItems": "Line Items",
+			"addLine": "Add Line",
+			"lineItem": "Line Item",
+			"itemType": "Item Type",
+			"quantity": "Quantity",
+			"uom": "UoM",
+			"estimatedUnitPrice": "Estimated Unit Price",
+			"needByDate": "Need By Date",
+			"specification": "Specification",
+			"lineTotal": "Line Total",
+			"totalEstimatedAmount": "Total Estimated Amount",
+			"attachments": "Attachments",
+			"addFile": "Add File",
+			"noFilesAttached": "No files attached yet",
+			"filesLinkedOnSave": "Files will be linked when you save the document",
+			"additionalNotes": "Additional Notes",
+			"cancel": "Cancel",
+			"createAsset": "Create Asset",
+			"selectCostCenter": "Select Cost Center",
+			"selectProject": "Select Project",
+			"selectPriority": "Select Priority",
+			"selectPRType": "Select PR Type",
+			"selectItemType": "Select Item Type",
+			"selectUoM": "Select UoM",
+			"enterAssetNumber": "Enter asset number",
+			"enterQuantity": "Enter quantity",
+			"enterPrice": "Enter price",
+			"priorities": {
+				"high": "High",
+				"normal": "Normal",
+				"low": "Low"
+			},
+			"prTypes": {
+				"goods": "Goods",
+				"services": "Services",
+				"both": "Both"
+			},
+			"itemTypes": {
+				"material": "Material",
+				"service": "Service",
+				"asset": "Asset"
+			},
+			"uomTypes": {
+				"pieces": "Pieces",
+				"kilograms": "Kilograms",
+				"liters": "Liters",
+				"box": "Box",
+				"set": "Set"
+			}
+		},
+		"browseCatalog": {
+			"title": "Browse Catalog",
+			"searchPlaceholder": "Search catalog items by name or code...",
+			"code": "Code",
+			"selectThisItem": "Select This Item",
+			"noItemsFound": "No items found matching your search"
+		}
+	},
+	"assets": {
+		"title": "Asset Register",
+		"subtitle": "All Asset",
+		"newAsset": "New Asset",
+		"fromAPInvoice": "From AP Invoice",
+		"fromGRN": "From GRN",
+		"approvals": "Approvals",
+		"transfer": "Transfer",
+		"adjustments": "Adjustments",
+		"retirements": "Retirements",
+		"categories": "Categories",
+		"locations": "Locations",
+		"depreciation": "Depreciation",
+		"settings": "Settings",
+		"stats": {
+			"totalAssets": "Total Assets",
+			"activeAssets": "Active Assets",
+			"draftAssets": "Draft Assets",
+			"totalNetBookValue": "Total Net Book Value"
+		},
+		"table": {
+			"assetNumber": "Asset Number",
+			"name": "Name",
+			"category": "Category",
+			"location": "Location",
+			"acquisitionCost": "Acquisition Cost",
+			"netBookValue": "Net Book Value",
+			"status": "Status",
+			"actions": "Actions"
+		},
+		"status": {
+			"capitalized": "Capitalized",
+			"cip": "CIP",
+			"draft": "Draft",
+			"retired": "Retired",
+			"allStatuses": "All Statuses"
+		},
+		"filters": {
+			"allCategories": "All Categories",
+			"office": "Office",
+			"electronics": "Electronics",
+			"furniture": "Furniture",
+			"itEquipment": "IT Equipment"
+		},
+		"searchPlaceholder": "Search assets...",
+		"emptyMessage": "No assets found"
 	}
 }
