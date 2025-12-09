@@ -877,5 +877,51 @@
 			"delete": "حذف",
 			"cancel": "إلغاء"
 		}
+	},
+	"procurementApprovalDetail": {
+		"title": "الموافقة رقم {{id}}",
+		"instanceTitle": "مثيل الموافقة {{id}}",
+		"subtitle": "إدارة سير العمل",
+		"detailsSubtitle": "تفاصيل سير العمل والإجراءات",
+		"loading": "جارٍ تحميل تفاصيل الموافقة...",
+		"errorTitle": "خطأ",
+		"backToApprovals": "عودة إلى الموافقات",
+		"noStepsFound": "لم يتم العثور على خطوات موافقة لهذا المثيل.",
+		"progress": "التقدم: {{approved}} من {{total}} خطوات تمت الموافقة عليها",
+		"stepsSectionTitle": "خطوات الموافقة",
+		"step": "خطوة",
+		"noDescription": "لا يوجد وصف",
+		"approverType": "نوع المعتمد",
+		"role": "الدور",
+		"activated": "تم التفعيل",
+		"due": "مستحق",
+		"completed": "مكتمل",
+		"actionsHistory": "سجل الإجراءات",
+		"comments": "تعليقات",
+		"processing": "جارٍ المعالجة...",
+		"na": "غير متاح",
+		"user": "مستخدم",
+		"actions": {
+			"approve": "موافقة",
+			"reject": "رفض",
+			"approving": "جارٍ الموافقة...",
+			"rejecting": "جارٍ الرفض..."
+		},
+		"modals": {
+			"approveTitle": "الموافقة على الخطوة",
+			"rejectTitle": "رفض الخطوة",
+			"approveMessage": "هل أنت متأكد من أنك تريد الموافقة على هذه الخطوة؟",
+			"rejectMessage": "هل أنت متأكد من أنك تريد رفض هذه الخطوة؟",
+			"commentsLabel": "تعليقات (اختياري)",
+			"reasonLabel": "السبب (اختياري)",
+			"commentsPlaceholder": "أضف تعليقاتك...",
+			"reasonPlaceholder": "يرجى تقديم سبب الرفض..."
+		},
+		"status": {
+			"PENDING": "قيد الانتظار",
+			"APPROVED": "تمت الموافقة",
+			"REJECTED": "مرفوض",
+			"IN_PROGRESS": "قيد المعالجة"
+		}
 	}
 }

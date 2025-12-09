@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/shared/PageHeader';
 import ConfirmModal from '../components/shared/ConfirmModal';
 import { fetchApprovalSteps, approveStep, rejectStep } from '../store/approvalStepsSlice';
@@ -46,6 +47,8 @@ const statusStyles = {
 };
 
 const ProcurementApprovalDetail = () => {
+	const { t, i18n } = useTranslation();
+	const isRtl = i18n.dir() === 'rtl';
 	const navigate = useNavigate();
 	const { instanceId } = useParams();
 
@@ -67,11 +70,11 @@ const ProcurementApprovalDetail = () => {
 	}, [dispatch, instanceId]);
 
 	useEffect(() => {
-		document.title = `Approval #${instanceId} - LightERP`;
+		document.title = `${t('procurementApprovalDetail.title', { id: instanceId })} - LightERP`;
 		return () => {
 			document.title = 'LightERP';
 		};
-	}, [instanceId]);
+	}, [instanceId, t]);
 
 	const handleApprove = async () => {
 		if (!selectedStep) return;
@@ -137,10 +140,14 @@ const ProcurementApprovalDetail = () => {
 	if (loading) {
 		return (
 			<section className="min-h-screen bg-[#f2f3f5] pb-12">
-				<PageHeader icon={<HeaderIcon />} title={`Approval#${instanceId}`} subtitle="Workflow Management" />
+				<PageHeader
+					icon={<HeaderIcon />}
+					title={t('procurementApprovalDetail.title', { id: instanceId })}
+					subtitle={t('procurementApprovalDetail.subtitle')}
+				/>
 				<div className="max-w-6xl mx-auto px-6 mt-6">
 					<div className="bg-white rounded-3xl border border-gray-200 shadow-lg p-8 text-center">
-						<p className="text-gray-600">Loading approval details...</p>
+						<p className="text-gray-600">{t('procurementApprovalDetail.loading')}</p>
 					</div>
 				</div>
 			</section>
@@ -150,7 +157,11 @@ const ProcurementApprovalDetail = () => {
 	if (error) {
 		return (
 			<section className="min-h-screen bg-[#f2f3f5] pb-12">
-				<PageHeader icon={<HeaderIcon />} title="Error" subtitle="Workflow Management" />
+				<PageHeader
+					icon={<HeaderIcon />}
+					title={t('procurementApprovalDetail.errorTitle')}
+					subtitle={t('procurementApprovalDetail.subtitle')}
+				/>
 				<div className="max-w-6xl mx-auto px-6 mt-6">
 					<div className="bg-white rounded-3xl border border-gray-200 shadow-lg p-8 text-center">
 						<p className="text-red-600 mb-4">{error}</p>
@@ -165,6 +176,7 @@ const ProcurementApprovalDetail = () => {
 								viewBox="0 0 16 16"
 								fill="none"
 								xmlns="http://www.w3.org/2000/svg"
+								className={isRtl ? 'rotate-180' : ''}
 							>
 								<path
 									d="M10 12L6 8L10 4"
@@ -174,7 +186,7 @@ const ProcurementApprovalDetail = () => {
 									strokeLinejoin="round"
 								/>
 							</svg>
-							Back to Approvals
+							{t('procurementApprovalDetail.backToApprovals')}
 						</button>
 					</div>
 				</div>
@@ -185,10 +197,14 @@ const ProcurementApprovalDetail = () => {
 	if (instanceSteps.length === 0) {
 		return (
 			<section className="min-h-screen bg-[#f2f3f5] pb-12">
-				<PageHeader icon={<HeaderIcon />} title={`Approval #${instanceId}`} subtitle="Workflow Management" />
+				<PageHeader
+					icon={<HeaderIcon />}
+					title={t('procurementApprovalDetail.title', { id: instanceId })}
+					subtitle={t('procurementApprovalDetail.subtitle')}
+				/>
 				<div className="max-w-6xl mx-auto px-6 mt-6">
 					<div className="bg-white rounded-3xl border border-gray-200 shadow-lg p-8 text-center">
-						<p className="text-gray-600 mb-4">No approval steps found for this instance.</p>
+						<p className="text-gray-600 mb-4">{t('procurementApprovalDetail.noStepsFound')}</p>
 						<button
 							type="button"
 							onClick={() => navigate('/procurement/approvals')}
@@ -200,6 +216,7 @@ const ProcurementApprovalDetail = () => {
 								viewBox="0 0 16 16"
 								fill="none"
 								xmlns="http://www.w3.org/2000/svg"
+								className={isRtl ? 'rotate-180' : ''}
 							>
 								<path
 									d="M10 12L6 8L10 4"
@@ -209,7 +226,7 @@ const ProcurementApprovalDetail = () => {
 									strokeLinejoin="round"
 								/>
 							</svg>
-							Back to Approvals
+							{t('procurementApprovalDetail.backToApprovals')}
 						</button>
 					</div>
 				</div>
@@ -224,8 +241,8 @@ const ProcurementApprovalDetail = () => {
 		<section className="min-h-screen bg-[#f2f3f5] pb-12">
 			<PageHeader
 				icon={<HeaderIcon />}
-				title={`Approval Instance ${instanceId}`}
-				subtitle="Workflow Details & Actions"
+				title={t('procurementApprovalDetail.instanceTitle', { id: instanceId })}
+				subtitle={t('procurementApprovalDetail.detailsSubtitle')}
 			/>
 
 			<div className="max-w-6xl mx-auto px-6 mt-8 space-y-6">
@@ -244,6 +261,7 @@ const ProcurementApprovalDetail = () => {
 									viewBox="0 0 16 16"
 									fill="none"
 									xmlns="http://www.w3.org/2000/svg"
+									className={isRtl ? 'rotate-180' : ''}
 								>
 									<path
 										d="M10 12L6 8L10 4"
@@ -253,9 +271,11 @@ const ProcurementApprovalDetail = () => {
 										strokeLinejoin="round"
 									/>
 								</svg>
-								Back to Approvals
+								{t('procurementApprovalDetail.backToApprovals')}
 							</button>
-							<h2 className="text-2xl font-semibold text-[#1f4560]">Instance #{instanceId}</h2>
+							<h2 className="text-2xl font-semibold text-[#1f4560]">
+								{t('procurementApprovalDetail.title', { id: instanceId })}
+							</h2>
 						</div>
 					</div>
 
@@ -264,17 +284,19 @@ const ProcurementApprovalDetail = () => {
 						<span
 							className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold border ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}
 						>
-							{overallStatus}
+							{t(`procurementApprovalDetail.status.${overallStatus}`)}
 						</span>
 						<span className="text-sm text-gray-500">
-							Progress: {approvedCount}/{totalSteps} steps approved
+							{t('procurementApprovalDetail.progress', { approved: approvedCount, total: totalSteps })}
 						</span>
 					</div>
 
 					{/* Approval Steps */}
 					<div className="space-y-5">
 						<div className="bg-[#f7f8fa] rounded-2xl border border-gray-200 p-6">
-							<h3 className="text-xl font-semibold text-[#2b3a49] mb-4">Approval Steps</h3>
+							<h3 className="text-xl font-semibold text-[#2b3a49] mb-4">
+								{t('procurementApprovalDetail.stepsSectionTitle')}
+							</h3>
 							<div className="space-y-3">
 								{instanceSteps.map(step => {
 									const stepStyle = statusStyles[step.status] || statusStyles.PENDING;
@@ -316,46 +338,50 @@ const ProcurementApprovalDetail = () => {
 													</div>
 													<div className="flex-1">
 														<p className="text-base font-semibold text-[#1f4560]">
-															Step {workflowStep?.sequence}: {workflowStep?.name || 'N/A'}
+															{t('procurementApprovalDetail.step')}{' '}
+															{workflowStep?.sequence}:{' '}
+															{workflowStep?.name || t('procurementApprovalDetail.na')}
 														</p>
 														<p className="text-sm text-gray-500 mt-1">
-															{workflowStep?.description || 'No description'}
+															{workflowStep?.description ||
+																t('procurementApprovalDetail.noDescription')}
 														</p>
 														<div className="text-xs text-gray-500 mt-2 space-y-1">
 															<p>
-																Approver Type:
-																<span className="font-medium">
-																	{workflowStep?.approver_type || 'N/A'}
+																{t('procurementApprovalDetail.approverType')}:
+																<span className="font-medium mx-1">
+																	{workflowStep?.approver_type ||
+																		t('procurementApprovalDetail.na')}
 																</span>
 															</p>
 															{workflowStep?.role_name && (
 																<p>
-																	Role:
-																	<span className="font-medium">
+																	{t('procurementApprovalDetail.role')}:
+																	<span className="font-medium mx-1">
 																		{workflowStep.role_name}
 																	</span>
 																</p>
 															)}
 															{step.activated_at && (
 																<p>
-																	Activated:
-																	<span className="font-medium">
+																	{t('procurementApprovalDetail.activated')}:
+																	<span className="font-medium mx-1">
 																		{new Date(step.activated_at).toLocaleString()}
 																	</span>
 																</p>
 															)}
 															{step.due_at && (
 																<p>
-																	Due:
-																	<span className="font-medium">
+																	{t('procurementApprovalDetail.due')}:
+																	<span className="font-medium mx-1">
 																		{new Date(step.due_at).toLocaleString()}
 																	</span>
 																</p>
 															)}
 															{step.completed_at && (
 																<p>
-																	Completed:
-																	<span className="font-medium">
+																	{t('procurementApprovalDetail.completed')}:
+																	<span className="font-medium mx-1">
 																		{new Date(step.completed_at).toLocaleString()}
 																	</span>
 																</p>
@@ -367,7 +393,7 @@ const ProcurementApprovalDetail = () => {
 													<span
 														className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${stepStyle.bg} ${stepStyle.text} ${stepStyle.border}`}
 													>
-														{step.status}
+														{t(`procurementApprovalDetail.status.${step.status}`)}
 													</span>
 												</div>
 											</div>
@@ -381,7 +407,9 @@ const ProcurementApprovalDetail = () => {
 														disabled={actionLoading}
 														className="px-4 py-2 rounded-lg bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 													>
-														{actionLoading ? 'Processing...' : 'Approve'}
+														{actionLoading
+															? t('procurementApprovalDetail.actions.processing')
+															: t('procurementApprovalDetail.actions.approve')}
 													</button>
 													<button
 														type="button"
@@ -389,7 +417,9 @@ const ProcurementApprovalDetail = () => {
 														disabled={actionLoading}
 														className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 													>
-														{actionLoading ? 'Processing...' : 'Reject'}
+														{actionLoading
+															? t('procurementApprovalDetail.actions.processing')
+															: t('procurementApprovalDetail.actions.reject')}
 													</button>
 												</div>
 											)}
@@ -398,7 +428,7 @@ const ProcurementApprovalDetail = () => {
 											{step.actions && step.actions.length > 0 && (
 												<div className="mt-4 pt-4 border-t border-gray-200">
 													<h4 className="text-sm font-semibold text-[#2b3a49] mb-2">
-														Actions History
+														{t('procurementApprovalDetail.actionsHistory')}
 													</h4>
 													<div className="space-y-2">
 														{step.actions.map(action => (
@@ -409,7 +439,9 @@ const ProcurementApprovalDetail = () => {
 																<div className="flex items-center justify-between mb-1">
 																	<span className="font-semibold text-[#1f4560]">
 																		{action.user_details?.username ||
-																			`User #${action.user}`}
+																			`${t('procurementApprovalDetail.user')} #${
+																				action.user
+																			}`}
 																	</span>
 																	<span
 																		className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
@@ -418,12 +450,15 @@ const ProcurementApprovalDetail = () => {
 																				: 'bg-red-100 text-red-700'
 																		}`}
 																	>
-																		{action.action}
+																		{t(
+																			`procurementApprovalDetail.status.${action.action}`
+																		)}
 																	</span>
 																</div>
 																{action.comments && (
 																	<p className="text-gray-600 mt-1">
-																		Comments: {action.comments}
+																		{t('procurementApprovalDetail.comments')}:{' '}
+																		{action.comments}
 																	</p>
 																)}
 																<p className="text-gray-500 mt-1">
@@ -453,25 +488,30 @@ const ProcurementApprovalDetail = () => {
 						setSelectedStep(null);
 					}}
 					onConfirm={handleApprove}
-					title="Approve Step"
+					title={t('procurementApprovalDetail.modals.approveTitle')}
 					message={
 						<div>
-							<p className="mb-4">Are you sure you want to approve this step?</p>
+							<p className="mb-4">{t('procurementApprovalDetail.modals.approveMessage')}</p>
 							<div className="mb-4">
 								<label className="block text-sm font-medium text-gray-700 mb-2">
-									Comments (optional)
+									{t('procurementApprovalDetail.modals.commentsLabel')}
 								</label>
 								<textarea
 									value={comments}
 									onChange={e => setComments(e.target.value)}
-									placeholder="Add your comments..."
+									placeholder={t('procurementApprovalDetail.modals.commentsPlaceholder')}
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
 									rows="3"
 								/>
 							</div>
 						</div>
 					}
-					confirmText={actionLoading ? 'Approving...' : 'Approve'}
+					confirmText={
+						actionLoading
+							? t('procurementApprovalDetail.actions.approving')
+							: t('procurementApprovalDetail.actions.approve')
+					}
+					cancelText={t('common.cancel', 'Cancel')}
 					confirmButtonClass="bg-emerald-500 hover:bg-emerald-600"
 					disabled={actionLoading}
 				/>
@@ -487,25 +527,30 @@ const ProcurementApprovalDetail = () => {
 						setSelectedStep(null);
 					}}
 					onConfirm={handleReject}
-					title="Reject Step"
+					title={t('procurementApprovalDetail.modals.rejectTitle')}
 					message={
 						<div>
-							<p className="mb-4">Are you sure you want to reject this step?</p>
+							<p className="mb-4">{t('procurementApprovalDetail.modals.rejectMessage')}</p>
 							<div className="mb-4">
 								<label className="block text-sm font-medium text-gray-700 mb-2">
-									Reason (optional)
+									{t('procurementApprovalDetail.modals.reasonLabel')}
 								</label>
 								<textarea
 									value={reason}
 									onChange={e => setReason(e.target.value)}
-									placeholder="Please provide a reason for rejection..."
+									placeholder={t('procurementApprovalDetail.modals.reasonPlaceholder')}
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
 									rows="3"
 								/>
 							</div>
 						</div>
 					}
-					confirmText={actionLoading ? 'Rejecting...' : 'Reject'}
+					confirmText={
+						actionLoading
+							? t('procurementApprovalDetail.actions.rejecting')
+							: t('procurementApprovalDetail.actions.reject')
+					}
+					cancelText={t('common.cancel', 'Cancel')}
 					confirmButtonClass="bg-red-500 hover:bg-red-600"
 					disabled={actionLoading}
 				/>

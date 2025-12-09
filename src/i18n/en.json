@@ -877,5 +877,51 @@
 			"delete": "Delete",
 			"cancel": "Cancel"
 		}
+	},
+	"procurementApprovalDetail": {
+		"title": "Approval #{{id}}",
+		"instanceTitle": "Approval Instance {{id}}",
+		"subtitle": "Workflow Management",
+		"detailsSubtitle": "Workflow Details & Actions",
+		"loading": "Loading approval details...",
+		"errorTitle": "Error",
+		"backToApprovals": "Back to Approvals",
+		"noStepsFound": "No approval steps found for this instance.",
+		"progress": "Progress: {{approved}}/{{total}} steps approved",
+		"stepsSectionTitle": "Approval Steps",
+		"step": "Step",
+		"noDescription": "No description",
+		"approverType": "Approver Type",
+		"role": "Role",
+		"activated": "Activated",
+		"due": "Due",
+		"completed": "Completed",
+		"actionsHistory": "Actions History",
+		"comments": "Comments",
+		"processing": "Processing...",
+		"na": "N/A",
+		"user": "User",
+		"actions": {
+			"approve": "Approve",
+			"reject": "Reject",
+			"approving": "Approving...",
+			"rejecting": "Rejecting..."
+		},
+		"modals": {
+			"approveTitle": "Approve Step",
+			"rejectTitle": "Reject Step",
+			"approveMessage": "Are you sure you want to approve this step?",
+			"rejectMessage": "Are you sure you want to reject this step?",
+			"commentsLabel": "Comments (optional)",
+			"reasonLabel": "Reason (optional)",
+			"commentsPlaceholder": "Add your comments...",
+			"reasonPlaceholder": "Please provide a reason for rejection..."
+		},
+		"status": {
+			"PENDING": "PENDING",
+			"APPROVED": "APPROVED",
+			"REJECTED": "REJECTED",
+			"IN_PROGRESS": "IN PROGRESS"
+		}
 	}
 }
