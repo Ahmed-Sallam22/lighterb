@@ -1212,5 +1212,178 @@
 			"active": "نشط",
 			"inactive": "غير نشط"
 		}
+	},
+	"suppliers": {
+		"title": "إدارة الموردين",
+		"subtitle": "إدارة الموردين ومعلومات البائعين",
+		"actions": {
+			"add": "إضافة مورد جديد",
+			"edit": "تعديل المورد",
+			"delete": "حذف المورد",
+			"search": "بحث عن الموردين...",
+			"markPreferred": "تحديد كمفضل",
+			"removePreferred": "إزالة من المفضل",
+			"putOnHold": "تعليق التعامل",
+			"removeHold": "إلغاء التعليق",
+			"blacklist": "إضافة للقائمة السوداء",
+			"removeBlacklist": "إزالة من القائمة السوداء",
+			"cancel": "إلغاء",
+			"save": "حفظ",
+			"create": "إنشاء",
+			"update": "تحديث",
+			"saving": "جارٍ الحفظ..."
+		},
+		"table": {
+			"id": "الرقم",
+			"code": "الرمز",
+			"name": "الاسم",
+			"email": "البريد الإلكتروني",
+			"phone": "الهاتف",
+			"country": "الدولة",
+			"city": "المدينة",
+			"address": "العنوان",
+			"currency": "العملة",
+			"category": "الفئة",
+			"onboarding": "حالة الإعداد",
+			"status": "الحالة",
+			"preferred": "مفضل",
+			"onHold": "معلق",
+			"blacklisted": "محظور",
+			"canTransact": "يمكن التعامل",
+			"score": "الأداء",
+			"actions": "إجراءات"
+		},
+		"form": {
+			"basicInfo": "المعلومات الأساسية",
+			"financialInfo": "المعلومات المالية",
+			"addressInfo": "معلومات العنوان",
+			"bankInfo": "المعلومات البنكية",
+			"statusVerification": "الحالة والتحقق",
+			"supplierCode": "رمز المورد",
+			"supplierName": "اسم المورد",
+			"legalName": "الاسم القانوني",
+			"website": "الموقع الإلكتروني",
+			"taxId": "الرقم الضريبي",
+			"paymentTerms": "شروط الدفع",
+			"creditLimit": "الحد الائتماني",
+			"performanceScore": "نقاط الأداء",
+			"riskRating": "تصنيف المخاطر",
+			"state": "المنطقة/المحافظة",
+			"postalCode": "الرمز البريدي",
+			"addressLine1": "العنوان 1",
+			"addressLine2": "العنوان 2",
+			"bankName": "اسم البنك",
+			"accountNumber": "رقم الحساب",
+			"swiftCode": "رمز السويفت",
+			"iban": "الآيبان",
+			"routingNumber": "رقم التوجيه",
+			"activeSupplier": "مورد نشط",
+			"preferredSupplier": "مورد مفضل",
+			"complianceVerified": "تم التحقق من الامتثال",
+			"kycVerified": "تم التحقق من الهوية (KYC)",
+			"placeholders": {
+				"select": "اختر...",
+				"enterName": "أدخل الاسم",
+				"enterEmail": "أدخل البريد الإلكتروني"
+			}
+		},
+		"modals": {
+			"addTitle": "إضافة مورد جديد",
+			"editTitle": "تعديل المورد",
+			"deleteTitle": "حذف المورد",
+			"deleteMessage": "هل أنت متأكد من أنك تريد حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+		},
+		"messages": {
+			"created": "تم إنشاء المورد بنجاح",
+			"updated": "تم تحديث المورد بنجاح",
+			"deleted": "تم حذف المورد بنجاح",
+			"preferredUpdated": "تم تحديث حالة التفضيل",
+			"holdUpdated": "تم تحديث حالة التعليق",
+			"blacklistUpdated": "تم تحديث حالة الحظر",
+			"error": "حدث خطأ ما",
+			"nameRequired": "اسم المورد مطلوب"
+		},
+		"enums": {
+			"goods": "توريد سلع",
+			"services": "مزود خدمات",
+			"low": "مخاطر منخفضة",
+			"medium": "مخاطر متوسطة",
+			"high": "مخاطر عالية",
+			"active": "نشط",
+			"pending": "قيد الانتظار",
+			"completed": "مكتمل",
+			"yes": "نعم",
+			"no": "لا"
+		}
+	},
+	"taxRates": {
+		"title": "معدلات الضريبة",
+		"subtitle": "إدارة معدلات الضرائب وإعدادات ضريبة القيمة المضافة",
+		"actions": {
+			"add": "إضافة معدل ضريبة",
+			"update": "تحديث",
+			"create": "إنشاء",
+			"cancel": "إلغاء",
+			"delete": "حذف",
+			"edit": "تعديل"
+		},
+		"table": {
+			"code": "الرمز",
+			"name": "الاسم",
+			"rate": "المعدل (%)",
+			"country": "الدولة",
+			"category": "الفئة",
+			"status": "الحالة",
+			"active": "نشط",
+			"inactive": "غير نشط"
+		},
+		"form": {
+			"name": "اسم الضريبة",
+			"rate": "معدل الضريبة (%)",
+			"country": "الدولة",
+			"code": "رمز الضريبة (اختياري)",
+			"category": "الفئة (اختياري)",
+			"setActive": "تعيين كنشط",
+			"placeholders": {
+				"name": "مثال: ضريبة القيمة المضافة القياسية 5%",
+				"rate": "مثال: 5.00",
+				"code": "مثال: VAT5"
+			}
+		},
+		"options": {
+			"selectCountry": "اختر الدولة",
+			"selectCategory": "اختر الفئة",
+			"countries": {
+				"AE": "الإمارات العربية المتحدة (AE)",
+				"EG": "مصر (EG)",
+				"IN": "الهند (IN)",
+				"SA": "المملكة العربية السعودية (SA)",
+				"US": "الولايات المتحدة (US)"
+			},
+			"categories": {
+				"STANDARD": "قياسي",
+				"ZERO": "صفري",
+				"EXEMPT": "معفي"
+			}
+		},
+		"validation": {
+			"nameRequired": "اسم الضريبة مطلوب",
+			"rateRequired": "معدل الضريبة مطلوب",
+			"ratePositive": "يجب أن يكون معدل الضريبة رقماً موجباً",
+			"countryRequired": "الدولة مطلوبة"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء معدل الضريبة بنجاح!",
+			"updateSuccess": "تم تحديث معدل الضريبة بنجاح!",
+			"deleteSuccess": "تم حذف معدل الضريبة بنجاح!",
+			"saveError": "فشل حفظ معدل الضريبة",
+			"deleteError": "فشل حذف معدل الضريبة"
+		},
+		"modals": {
+			"addTitle": "إضافة معدل ضريبة",
+			"editTitle": "تعديل معدل الضريبة",
+			"deleteTitle": "حذف معدل الضريبة",
+			"deleteMessage": "هل أنت متأكد من أنك تريد حذف معدل الضريبة هذا؟ لا يمكن التراجع عن هذا الإجراء."
+		}
 	}
 }

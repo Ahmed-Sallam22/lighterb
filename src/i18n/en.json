@@ -1212,5 +1212,178 @@
 			"active": "Active",
 			"inactive": "Inactive"
 		}
+	},
+	"suppliers": {
+		"title": "Suppliers Management",
+		"subtitle": "Manage your suppliers and vendor information",
+		"actions": {
+			"add": "Add New Supplier",
+			"edit": "Edit Supplier",
+			"delete": "Delete Supplier",
+			"search": "Search suppliers...",
+			"markPreferred": "Mark as Preferred",
+			"removePreferred": "Remove Preferred",
+			"putOnHold": "Put on Hold",
+			"removeHold": "Remove Hold",
+			"blacklist": "Blacklist Supplier",
+			"removeBlacklist": "Remove from Blacklist",
+			"cancel": "Cancel",
+			"save": "Save",
+			"create": "Create",
+			"update": "Update",
+			"saving": "Saving..."
+		},
+		"table": {
+			"id": "ID",
+			"code": "Code",
+			"name": "Name",
+			"email": "Email",
+			"phone": "Phone",
+			"country": "Country",
+			"city": "City",
+			"address": "Address",
+			"currency": "Currency",
+			"category": "Category",
+			"onboarding": "Onboarding",
+			"status": "Status",
+			"preferred": "Preferred",
+			"onHold": "On Hold",
+			"blacklisted": "Blacklisted",
+			"canTransact": "Can Transact",
+			"score": "Score",
+			"actions": "Actions"
+		},
+		"form": {
+			"basicInfo": "Basic Information",
+			"financialInfo": "Financial Information",
+			"addressInfo": "Address Information",
+			"bankInfo": "Bank Information",
+			"statusVerification": "Status & Verification",
+			"supplierCode": "Supplier Code",
+			"supplierName": "Supplier Name",
+			"legalName": "Legal Name",
+			"website": "Website",
+			"taxId": "Tax ID",
+			"paymentTerms": "Payment Terms",
+			"creditLimit": "Credit Limit",
+			"performanceScore": "Performance Score",
+			"riskRating": "Risk Rating",
+			"state": "State/Province",
+			"postalCode": "Postal Code",
+			"addressLine1": "Address Line 1",
+			"addressLine2": "Address Line 2",
+			"bankName": "Bank Name",
+			"accountNumber": "Account Number",
+			"swiftCode": "SWIFT Code",
+			"iban": "IBAN",
+			"routingNumber": "Routing Number",
+			"activeSupplier": "Active Supplier",
+			"preferredSupplier": "Preferred Supplier",
+			"complianceVerified": "Compliance Verified",
+			"kycVerified": "KYC Verified",
+			"placeholders": {
+				"select": "Select...",
+				"enterName": "Enter name",
+				"enterEmail": "Enter email address"
+			}
+		},
+		"modals": {
+			"addTitle": "Add New Supplier",
+			"editTitle": "Edit Supplier",
+			"deleteTitle": "Delete Supplier",
+			"deleteMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+		},
+		"messages": {
+			"created": "Supplier created successfully",
+			"updated": "Supplier updated successfully",
+			"deleted": "Supplier deleted successfully",
+			"preferredUpdated": "Preferred status updated",
+			"holdUpdated": "Hold status updated",
+			"blacklistUpdated": "Blacklist status updated",
+			"error": "Something went wrong",
+			"nameRequired": "Supplier name is required"
+		},
+		"enums": {
+			"goods": "Goods Supplier",
+			"services": "Services Provider",
+			"low": "Low Risk",
+			"medium": "Medium Risk",
+			"high": "High Risk",
+			"active": "Active",
+			"pending": "Pending",
+			"completed": "Completed",
+			"yes": "Yes",
+			"no": "No"
+		}
+	},
+	"taxRates": {
+		"title": "Tax Rates",
+		"subtitle": "Manage tax rates and VAT configuration",
+		"actions": {
+			"add": "Add Tax Rate",
+			"update": "Update",
+			"create": "Create",
+			"cancel": "Cancel",
+			"delete": "Delete",
+			"edit": "Edit"
+		},
+		"table": {
+			"code": "Code",
+			"name": "Name",
+			"rate": "Rate (%)",
+			"country": "Country",
+			"category": "Category",
+			"status": "Status",
+			"active": "Active",
+			"inactive": "Inactive"
+		},
+		"form": {
+			"name": "Tax Name",
+			"rate": "Tax Rate (%)",
+			"country": "Country",
+			"code": "Tax Code (Optional)",
+			"category": "Category (Optional)",
+			"setActive": "Set as Active",
+			"placeholders": {
+				"name": "e.g., Standard VAT 5%",
+				"rate": "e.g., 5.00",
+				"code": "e.g., VAT5"
+			}
+		},
+		"options": {
+			"selectCountry": "Select country",
+			"selectCategory": "Select category",
+			"countries": {
+				"AE": "United Arab Emirates (AE)",
+				"EG": "Egypt (EG)",
+				"IN": "India (IN)",
+				"SA": "Saudi Arabia (SA)",
+				"US": "United States (US)"
+			},
+			"categories": {
+				"STANDARD": "Standard",
+				"ZERO": "Zero-Rated",
+				"EXEMPT": "Exempt"
+			}
+		},
+		"validation": {
+			"nameRequired": "Tax name is required",
+			"rateRequired": "Tax rate is required",
+			"ratePositive": "Tax rate must be a positive number",
+			"countryRequired": "Country is required"
+		},
+		"messages": {
+			"createSuccess": "Tax rate created successfully!",
+			"updateSuccess": "Tax rate updated successfully!",
+			"deleteSuccess": "Tax rate deleted successfully!",
+			"saveError": "Failed to save tax rate",
+			"deleteError": "Failed to delete tax rate"
+		},
+		"modals": {
+			"addTitle": "Add Tax Rate",
+			"editTitle": "Edit Tax Rate",
+			"deleteTitle": "Delete Tax Rate",
+			"deleteMessage": "Are you sure you want to delete this tax rate? This action cannot be undone."
+		}
 	}
 }
