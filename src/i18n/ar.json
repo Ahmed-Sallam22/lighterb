@@ -1060,5 +1060,50 @@
 				"description": "تصفح العناصر والأسعار"
 			}
 		}
+	},
+	"reports": {
+		"title": "التقارير المالية",
+		"subtitle": "إنشاء وعرض التقارير المالية",
+		"tabs": {
+			"trialBalance": "ميزان المراجعة",
+			"arAging": "أعمار ديون العملاء",
+			"apAging": "أعمار ديون الموردين"
+		},
+		"filters": {
+			"dateFrom": "من تاريخ",
+			"dateTo": "إلى تاريخ",
+			"asOf": "كما في تاريخ"
+		},
+		"columns": {
+			"accountCode": "رمز الحساب",
+			"accountName": "اسم الحساب",
+			"debit": "مدين",
+			"credit": "دائن",
+			"invoiceNumber": "رقم الفاتورة",
+			"customer": "العميل",
+			"supplier": "المورد",
+			"date": "التاريخ",
+			"dueDate": "تاريخ الاستحقاق",
+			"daysOverdue": "أيام التأخير",
+			"balance": "الرصيد",
+			"agingBucket": "الفترة الزمنية"
+		},
+		"sections": {
+			"totalOutstanding": "إجمالي المستحقات",
+			"invoiceDetails": "تفاصيل الفواتير"
+		},
+		"messages": {
+			"noData": "لا توجد بيانات متاحة. يرجى إنشاء التقرير.",
+			"noTrialData": "لا توجد بيانات لميزان المراجعة",
+			"noInvoices": "لم يتم العثور على فواتير",
+			"error": "خطأ: {{message}}",
+			"downloading": "جاري تحميل ملف {{format}}...",
+			"noLinks": "لا توجد روابط تحميل متاحة",
+			"linkUnavailable": "رابط تحميل {{format}} غير متاح"
+		},
+		"actions": {
+			"downloadExcel": "تحميل Excel",
+			"downloadCsv": "تحميل CSV"
+		}
 	}
 }

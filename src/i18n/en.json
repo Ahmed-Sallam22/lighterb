@@ -1060,5 +1060,50 @@
 				"description": "Browse Items & Prices"
 			}
 		}
+	},
+	"reports": {
+		"title": "Financial Reports",
+		"subtitle": "Generate and view financial reports",
+		"tabs": {
+			"trialBalance": "Trial Balance",
+			"arAging": "AR Aging",
+			"apAging": "AP Aging"
+		},
+		"filters": {
+			"dateFrom": "Date From",
+			"dateTo": "Date To",
+			"asOf": "As Of Date"
+		},
+		"columns": {
+			"accountCode": "Account Code",
+			"accountName": "Account Name",
+			"debit": "Debit",
+			"credit": "Credit",
+			"invoiceNumber": "Invoice #",
+			"customer": "Customer",
+			"supplier": "Supplier",
+			"date": "Date",
+			"dueDate": "Due Date",
+			"daysOverdue": "Days Overdue",
+			"balance": "Balance",
+			"agingBucket": "Aging Bucket"
+		},
+		"sections": {
+			"totalOutstanding": "Total Outstanding",
+			"invoiceDetails": "Invoice Details"
+		},
+		"messages": {
+			"noData": "No data available. Please generate the report.",
+			"noTrialData": "No trial balance data available",
+			"noInvoices": "No invoices found",
+			"error": "Error: {{message}}",
+			"downloading": "Downloading {{format}} file...",
+			"noLinks": "No download links available",
+			"linkUnavailable": "Download link for {{format}} is unavailable"
+		},
+		"actions": {
+			"downloadExcel": "Download Excel",
+			"downloadCsv": "Download CSV"
+		}
 	}
 }
