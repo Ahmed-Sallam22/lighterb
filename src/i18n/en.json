@@ -376,5 +376,83 @@
 		},
 		"searchPlaceholder": "Search assets...",
 		"emptyMessage": "No assets found"
+	},
+	"createJournal": {
+		"title": {
+			"new": "New Journal Entry",
+			"edit": "Edit Journal Entry"
+		},
+		"subtitle": {
+			"new": "Create a new journal entry",
+			"edit": "Update journal entry details"
+		},
+		"hero": {
+			"title": {
+				"new": "Create Manual Journal Entry",
+				"edit": "Edit Manual Journal Entry"
+			},
+			"description": {
+				"new": "Define how this invoice will post to the general ledger. Click ▼ to select segments for each line.",
+				"edit": "Update the journal entry details and lines below."
+			}
+		},
+		"form": {
+			"date": "Date",
+			"currency": "Currency",
+			"description": "Description",
+			"descriptionPlaceholder": "Add a short memo",
+			"reference": "Reference",
+			"status": "Status"
+		},
+		"validation": {
+			"dateRequired": "Date is required",
+			"currencyRequired": "Currency is required",
+			"descriptionRequired": "Description is required",
+			"debitCreditMustMatch": "Total Debit and Total Credit must be equal!"
+		},
+		"glLines": {
+			"title": "GL Distribution Lines",
+			"subtitle": "Posting",
+			"newLine": "New Line",
+			"newFirstLine": "New First Line",
+			"emptyTitle": "No GL distribution lines added yet",
+			"emptyDescription": "GL distribution lines are required to post this journal entry.",
+			"table": {
+				"account": "Account",
+				"debit": "Debit",
+				"credit": "Credit",
+				"segmentsType": "Segments Type",
+				"segmentsValue": "Segments Value",
+				"actions": "Actions"
+			},
+			"placeholders": {
+				"selectAccount": "Select Account",
+				"debit": "0.00",
+				"credit": "0.00",
+				"selectSegmentType": "Select Segment Type",
+				"selectSegmentValue": "Select Segment Value"
+			},
+			"segments": {
+				"autoAddNote": "Auto-adds when both selected",
+				"removeSegment": "Remove segment"
+			},
+			"deleteLine": "Delete line",
+			"totals": "Totals:",
+			"balanced": "Balanced",
+			"notBalanced": "Not Balanced (Diff:",
+			"difference": ")"
+		},
+		"actions": {
+			"cancel": "Cancel",
+			"create": "Create Entry",
+			"update": "Update Entry"
+		},
+		"messages": {
+			"createSuccess": "Journal entry created successfully!",
+			"updateSuccess": "Journal entry updated successfully!",
+			"createError": "Failed to save journal entry",
+			"segmentAdded": "Segment added automatically",
+			"segmentRemoved": "Segment removed"
+		}
 	}
 }

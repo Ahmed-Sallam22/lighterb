@@ -1,94 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import PageHeader from '../components/shared/PageHeader';
-import FloatingLabelInput from '../components/shared/FloatingLabelInput';
-import FloatingLabelSelect from '../components/shared/FloatingLabelSelect';
-import Card from '../components/shared/Card';
-import { createJournal, updateJournal } from '../store/journalsSlice';
-import { fetchCurrencies } from '../store/currenciesSlice';
-import { fetchAccounts } from '../store/accountsSlice';
-import { fetchSegmentTypes, fetchSegmentValues } from '../store/segmentsSlice';
-
-const HeroPattern = () => (
-	<svg
-		className="pointer-events-none absolute  "
-		width="871"
-		height="322"
-		viewBox="0 0 871 322"
-		fill="none"
-		xmlns="http://www.w3.org/2000/svg"
-	>
-		<g opacity="0.1">
-			<mask id="mask0_177_13244" maskUnits="userSpaceOnUse" x="0" y="0" width="871" height="308">
-				<rect x="0.570312" y="0.219971" width="870.316" height="306.873" rx="40" fill="#D3D3D3" />
-			</mask>
-			<g mask="url(#mask0_177_13244)">
-				<g opacity="0.5">
-					<path
-						d="M18.3834 263.045L52.9843 273.755L-16.53 296.535L18.3834 263.045Z"
-						stroke="#28819C"
-						stroke-width="3"
-					/>
-					<path
-						d="M3.95954 -27.7887L38.5604 -17.079L-30.9538 5.70101L3.95954 -27.7887Z"
-						stroke="#28819C"
-						stroke-width="3"
-					/>
-					<path
-						d="M-10.5961 206.382L27.6497 199.483L-26.3255 249.003L-10.5961 206.382Z"
-						stroke="#28819C"
-						stroke-width="3"
-					/>
-					<path
-						d="M113.076 196.198L116.141 229.722L65.3326 180.103L113.076 196.198Z"
-						stroke="#28819C"
-						stroke-width="3"
-					/>
-					<path
-						d="M-8.28617 127.401L-37.0226 167.353L-36.158 70.0641L-8.28617 127.401Z"
-						stroke="#28819C"
-						stroke-width="3"
-					/>
-					<path
-						d="M290.992 284.036L294.057 317.561L243.249 267.942L290.992 284.036Z"
-						stroke="#28819C"
-						stroke-width="3"
-					/>
-					<path
-						d="M36.124 233.656L36.125 233.656L55.6962 214.878L55.5298 259.447L20.53 248.614L36.124 233.656Z"
-						stroke="#28819C"
-						stroke-width="3"
-					/>
-					<path
-						d="M28.9447 152.099L54.1792 163.039L7.98389 176.879L8.20654 143.105L28.9447 152.099Z"
-						stroke="#28819C"
-						stroke-width="3"
-					/>
-					<path
-						d="M202.35 287.603L227.584 298.543L181.389 312.383L181.612 278.609L202.35 287.603Z"
-						stroke="#28819C"
-						stroke-width="3"
-					/>
-					<path
-						d="M138.982 252.033L166.036 244.613L141.805 283.258L117.246 257.992L138.982 252.033Z"
-						stroke="#28819C"
-						stroke-width="3"
-					/>
-					<path
-						d="M94.0883 317.309L70.3921 276.017L107.302 274.416L94.0883 317.309Z"
-						stroke="#28819C"
-						stroke-width="3"
-					/>
-				</g>
-			</g>
-		</g>
-	</svg>
-);
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next"; // ADD THIS IMPORT
+import PageHeader from "../components/shared/PageHeader";
+import FloatingLabelInput from "../components/shared/FloatingLabelInput";
+import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
+import Card from "../components/shared/Card";
+import { createJournal, updateJournal } from "../store/journalsSlice";
+import { fetchCurrencies } from "../store/currenciesSlice";
+import { fetchAccounts } from "../store/accountsSlice";
+import { fetchSegmentTypes, fetchSegmentValues } from "../store/segmentsSlice";
+import HeroPattern from "../ui/HeroPatterns";
 
 const CreateJournalPage = () => {
+	const { t } = useTranslation(); // ADD THIS LINE
 	const navigate = useNavigate();
 	const location = useLocation();
 	const dispatch = useDispatch();
@@ -109,25 +36,25 @@ const CreateJournalPage = () => {
 	// Generate account options from Redux state
 	const accountOptions = accounts.map(account => ({
 		value: account.id.toString(),
-		label: `${account.account_number || account.id} - ${account.account_name || account.name || 'Account'}`,
+		label: `${account.account_number || account.id} - ${account.account_name || account.name || "Account"}`,
 	}));
 
 	const [formData, setFormData] = useState({
-		name: '',
-		date: '',
-		reference: '',
-		description: '',
-		currency: '1', // USD is currency ID 1
-		status: 'draft',
+		name: "",
+		date: "",
+		reference: "",
+		description: "",
+		currency: "1", // USD is currency ID 1
+		status: "draft",
 	});
 
 	const [lines, setLines] = useState([]);
 	const [segmentFormState, setSegmentFormState] = useState({}); // Track segment form for each line
 
 	const [errors, setErrors] = useState({
-		date: '',
-		currency: '',
-		description: '',
+		date: "",
+		currency: "",
+		description: "",
 	});
 
 	// Fetch currencies, accounts, segment types, and segment values on component mount
@@ -142,12 +69,12 @@ const CreateJournalPage = () => {
 	useEffect(() => {
 		if (editJournal) {
 			setFormData({
-				name: editJournal.memo || '',
-				date: editJournal.date || '',
-				reference: editJournal.reference || '',
-				description: editJournal.memo || '',
-				currency: editJournal.currency || 'USD',
-				status: editJournal.is_posted ? 'posted' : 'draft',
+				name: editJournal.memo || "",
+				date: editJournal.date || "",
+				reference: editJournal.reference || "",
+				description: editJournal.memo || "",
+				currency: editJournal.currency || "USD",
+				status: editJournal.is_posted ? "posted" : "draft",
 			});
 
 			// If journal has lines, populate them
@@ -155,9 +82,9 @@ const CreateJournalPage = () => {
 				// Map API lines to form lines structure
 				const mappedLines = editJournal.lines.map((line, index) => ({
 					id: index + 1,
-					account: line.account || '',
-					debit: line.debit || '0.00',
-					credit: line.credit || '0.00',
+					account: line.account || "",
+					debit: line.debit || "0.00",
+					credit: line.credit || "0.00",
 					segments: line.segments || [],
 				}));
 				setLines(mappedLines);
@@ -169,16 +96,16 @@ const CreateJournalPage = () => {
 		setFormData(prev => ({ ...prev, [field]: value }));
 		// Clear error when user starts typing
 		if (errors[field]) {
-			setErrors(prev => ({ ...prev, [field]: '' }));
+			setErrors(prev => ({ ...prev, [field]: "" }));
 		}
 	};
 
 	const handleAddLine = () => {
 		const newLine = {
 			id: Date.now(), // Use timestamp as unique ID
-			account: '',
-			debit: '0.00',
-			credit: '0.00',
+			account: "",
+			debit: "0.00",
+			credit: "0.00",
 			segments: [],
 		};
 		setLines([...lines, newLine]);
@@ -195,13 +122,13 @@ const CreateJournalPage = () => {
 	};
 
 	const handleSegmentFormChange = (lineId, field, value) => {
-		const currentSegmentForm = segmentFormState[lineId] || { segment_type: '', segment: '' };
+		const currentSegmentForm = segmentFormState[lineId] || { segment_type: "", segment: "" };
 
 		const updatedForm = {
 			...currentSegmentForm,
 			[field]: value,
 			// Reset segment value when segment type changes
-			...(field === 'segment_type' ? { segment: '' } : {}),
+			...(field === "segment_type" ? { segment: "" } : {}),
 		};
 
 		setSegmentFormState(prev => ({
@@ -210,7 +137,7 @@ const CreateJournalPage = () => {
 		}));
 
 		// Auto-add segment when both segment_type and segment are selected
-		if (field === 'segment' && value && updatedForm.segment_type) {
+		if (field === "segment" && value && updatedForm.segment_type) {
 			// Both are now selected, auto-add the segment
 			const segmentType = segmentTypes.find(st => st.segment_id === parseInt(updatedForm.segment_type));
 			const segmentValue = segmentValues.find(sv => sv.id === parseInt(value));
@@ -240,10 +167,10 @@ const CreateJournalPage = () => {
 			// Reset segment form for this line
 			setSegmentFormState(prev => ({
 				...prev,
-				[lineId]: { segment_type: '', segment: '' },
+				[lineId]: { segment_type: "", segment: "" },
 			}));
 
-			toast.success('Segment added automatically');
+			toast.success(t("createJournal.messages.segmentAdded"));
 		}
 	};
 
@@ -259,22 +186,22 @@ const CreateJournalPage = () => {
 				return line;
 			})
 		);
-		toast.success('Segment removed');
+		toast.success(t("createJournal.messages.segmentRemoved"));
 	};
 
 	const validateForm = () => {
 		const newErrors = {};
 
 		if (!formData.date) {
-			newErrors.date = 'Date is required';
+			newErrors.date = t("createJournal.validation.dateRequired");
 		}
 
 		if (!formData.currency) {
-			newErrors.currency = 'Currency is required';
+			newErrors.currency = t("createJournal.validation.currencyRequired");
 		}
 
-		if (!formData.description || formData.description.trim() === '') {
-			newErrors.description = 'Description is required';
+		if (!formData.description || formData.description.trim() === "") {
+			newErrors.description = t("createJournal.validation.descriptionRequired");
 		}
 
 		setErrors(newErrors);
@@ -298,7 +225,7 @@ const CreateJournalPage = () => {
 		const { totalDebit, totalCredit } = calculateTotals();
 
 		if (totalDebit !== totalCredit) {
-			toast.error('Total Debit and Total Credit must be equal!');
+			toast.error(t("createJournal.validation.debitCreditMustMatch"));
 			return;
 		}
 
@@ -327,35 +254,35 @@ const CreateJournalPage = () => {
 						data: journalData,
 					})
 				).unwrap();
-				toast.success('Journal entry updated successfully!');
+				toast.success(t("createJournal.messages.updateSuccess"));
 			} else {
 				// Create new journal
 				await dispatch(createJournal(journalData)).unwrap();
-				toast.success('Journal entry created successfully!');
+				toast.success(t("createJournal.messages.createSuccess"));
 			}
 
 			// Navigate back to journal entries page
-			navigate('/journal/entries');
+			navigate("/journal/entries");
 		} catch (err) {
 			// Display detailed error message from API response
-			const errorMessage = err?.message || err?.error || err?.detail || 'Failed to save journal entry';
+			const errorMessage = err?.message || err?.error || err?.detail || t("createJournal.messages.createError");
 
 			// If there are field-specific errors, display them
-			if (err && typeof err === 'object' && !err.message && !err.error && !err.detail) {
+			if (err && typeof err === "object" && !err.message && !err.error && !err.detail) {
 				const errorMessages = [];
 				Object.keys(err).forEach(key => {
 					if (Array.isArray(err[key])) {
-						errorMessages.push(`${key}: ${err[key].join(', ')}`);
-					} else if (typeof err[key] === 'string') {
+						errorMessages.push(`${key}: ${err[key].join(", ")}`);
+					} else if (typeof err[key] === "string") {
 						errorMessages.push(`${key}: ${err[key]}`);
-					} else if (typeof err[key] === 'object') {
+					} else if (typeof err[key] === "object") {
 						// Handle nested errors (e.g., lines[0].account: ["error"])
 						errorMessages.push(`${key}: ${JSON.stringify(err[key])}`);
 					}
 				});
 
 				if (errorMessages.length > 0) {
-					toast.error(errorMessages.join(' | '), { autoClose: 5000 });
+					toast.error(errorMessages.join(" | "), { autoClose: 5000 });
 					return;
 				}
 			}
@@ -365,7 +292,7 @@ const CreateJournalPage = () => {
 	};
 
 	const handleCancel = () => {
-		navigate('/journal/entries');
+		navigate("/journal/entries");
 	};
 
 	const { totalDebit, totalCredit } = calculateTotals();
@@ -386,8 +313,8 @@ const CreateJournalPage = () => {
 			/>
 
 			<PageHeader
-				title={isEditMode ? 'Edit Journal Entry' : 'New Journal Entry'}
-				subtitle={isEditMode ? 'Update journal entry details' : 'Create a new journal entry'}
+				title={isEditMode ? t("createJournal.title.edit") : t("createJournal.title.new")}
+				subtitle={isEditMode ? t("createJournal.subtitle.edit") : t("createJournal.subtitle.new")}
 				icon={
 					<svg width="29" height="35" viewBox="0 0 29 35" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path
@@ -406,22 +333,24 @@ const CreateJournalPage = () => {
 						<div className="relative space-y-6 ">
 							<div>
 								<h2 className="text-3xl font-bold text-[#1F6F8B]">
-									{isEditMode ? 'Edit Manual Journal Entry' : 'Create Manual Journal Entry'}
+									{isEditMode
+										? t("createJournal.hero.title.edit")
+										: t("createJournal.hero.title.new")}
 								</h2>
 								<p className="mt-3 text-base text-[#2F6E8A]">
 									{isEditMode
-										? 'Update the journal entry details and lines below.'
-										: 'Define how this invoice will post to the general ledger. Click ▼ to select segments for each line.'}
+										? t("createJournal.hero.description.edit")
+										: t("createJournal.hero.description.new")}
 								</p>
 							</div>
 
 							<div className="grid gap-4 md:grid-cols-[1fr_1fr_1.2fr]">
 								<div className="text-left">
 									<FloatingLabelInput
-										label="Date"
+										label={t("createJournal.form.date")}
 										type="date"
 										value={formData.date}
-										onChange={e => handleInputChange('date', e.target.value)}
+										onChange={e => handleInputChange("date", e.target.value)}
 										required
 										error={errors.date}
 									/>
@@ -429,9 +358,9 @@ const CreateJournalPage = () => {
 
 								<div className="text-left">
 									<FloatingLabelSelect
-										label="Currency"
+										label={t("createJournal.form.currency")}
 										value={formData.currency}
-										onChange={e => handleInputChange('currency', e.target.value)}
+										onChange={e => handleInputChange("currency", e.target.value)}
 										options={currencyOptions}
 										required
 										error={errors.currency}
@@ -440,11 +369,11 @@ const CreateJournalPage = () => {
 
 								<div className="text-left">
 									<FloatingLabelInput
-										label="Description"
+										label={t("createJournal.form.description")}
 										type="text"
 										value={formData.description}
-										onChange={e => handleInputChange('description', e.target.value)}
-										placeholder="Add a short memo"
+										onChange={e => handleInputChange("description", e.target.value)}
+										placeholder={t("createJournal.form.descriptionPlaceholder")}
 										required
 										error={errors.description}
 									/>
@@ -455,30 +384,28 @@ const CreateJournalPage = () => {
 
 					{/* GL Distribution Lines */}
 					<Card
-						title="GL Distribution Lines"
-						subtitle="Posting"
+						title={t("createJournal.glLines.title")}
+						subtitle={t("createJournal.glLines.subtitle")}
 						actionSlot={
 							<button
 								type="button"
 								onClick={handleAddLine}
 								className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
 							>
-								+ New Line
+								+ {t("createJournal.glLines.newLine")}
 							</button>
 						}
 					>
 						{lines.length === 0 ? (
 							<div className="rounded-2xl border border-dashed border-[#b6c4cc] bg-[#f5f8fb] p-6 text-center text-[#567086]">
-								<p className="text-lg font-semibold mb-2">No GL distribution lines added yet</p>
-								<p className="text-sm mb-6">
-									GL distribution lines are required to post this journal entry.
-								</p>
+								<p className="text-lg font-semibold mb-2">{t("createJournal.glLines.emptyTitle")}</p>
+								<p className="text-sm mb-6">{t("createJournal.glLines.emptyDescription")}</p>
 								<button
 									type="button"
 									onClick={handleAddLine}
 									className="px-4 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform"
 								>
-									+ New First Line
+									+ {t("createJournal.glLines.newFirstLine")}
 								</button>
 							</div>
 						) : (
@@ -487,22 +414,22 @@ const CreateJournalPage = () => {
 									<thead>
 										<tr className="border-b border-gray-200 bg-gray-50">
 											<th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-												Account
+												{t("createJournal.glLines.table.account")}
 											</th>
 											<th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-												Debit
+												{t("createJournal.glLines.table.debit")}
 											</th>
 											<th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-												Credit
+												{t("createJournal.glLines.table.credit")}
 											</th>
 											<th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-												Segments Type
+												{t("createJournal.glLines.table.segmentsType")}
 											</th>
 											<th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-												Segments Value
+												{t("createJournal.glLines.table.segmentsValue")}
 											</th>
 											<th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-20">
-												Actions
+												{t("createJournal.glLines.table.actions")}
 											</th>
 										</tr>
 									</thead>
@@ -511,39 +438,44 @@ const CreateJournalPage = () => {
 											<tr key={line.id} className="hover:bg-gray-50 transition-colors">
 												<td className="px-4 py-3">
 													<FloatingLabelSelect
-														label="Account"
+														label={t("createJournal.glLines.table.account")}
 														value={line.account}
 														onChange={e =>
-															handleLineChange(line.id, 'account', e.target.value)
+															handleLineChange(line.id, "account", e.target.value)
 														}
 														options={[
-															{ value: '', label: 'Select Account' },
+															{
+																value: "",
+																label: t(
+																	"createJournal.glLines.placeholders.selectAccount"
+																),
+															},
 															...accountOptions,
 														]}
 													/>
 												</td>
 												<td className="px-4 py-3">
 													<FloatingLabelInput
-														label="Debit"
+														label={t("createJournal.glLines.table.debit")}
 														type="number"
 														step="0.01"
 														value={line.debit}
 														onChange={e =>
-															handleLineChange(line.id, 'debit', e.target.value)
+															handleLineChange(line.id, "debit", e.target.value)
 														}
-														placeholder="0.00"
+														placeholder={t("createJournal.glLines.placeholders.debit")}
 													/>
 												</td>
 												<td className="px-4 py-3">
 													<FloatingLabelInput
-														label="Credit"
+														label={t("createJournal.glLines.table.credit")}
 														type="number"
 														step="0.01"
 														value={line.credit}
 														onChange={e =>
-															handleLineChange(line.id, 'credit', e.target.value)
+															handleLineChange(line.id, "credit", e.target.value)
 														}
-														placeholder="0.00"
+														placeholder={t("createJournal.glLines.placeholders.credit")}
 													/>
 												</td>
 												<td className="px-4 py-3">
@@ -567,7 +499,9 @@ const CreateJournalPage = () => {
 																				)
 																			}
 																			className="ml-1 text-blue-600 hover:text-red-600"
-																			title="Remove segment"
+																			title={t(
+																				"createJournal.glLines.segments.removeSegment"
+																			)}
 																		>
 																			×
 																		</button>
@@ -577,17 +511,22 @@ const CreateJournalPage = () => {
 														)}
 
 														<FloatingLabelSelect
-															label="Segment Type"
-															value={segmentFormState[line.id]?.segment_type || ''}
+															label={t("createJournal.glLines.table.segmentsType")}
+															value={segmentFormState[line.id]?.segment_type || ""}
 															onChange={e =>
 																handleSegmentFormChange(
 																	line.id,
-																	'segment_type',
+																	"segment_type",
 																	e.target.value
 																)
 															}
 															options={[
-																{ value: '', label: 'Select Segment Type' },
+																{
+																	value: "",
+																	label: t(
+																		"createJournal.glLines.placeholders.selectSegmentType"
+																	),
+																},
 																...(segmentTypes?.map(type => ({
 																	value: type.segment_id.toString(),
 																	label: `${type.segment_name} (${type.segment_type})`,
@@ -597,7 +536,7 @@ const CreateJournalPage = () => {
 
 														{/* Optional manual add button (segments auto-add when both dropdowns are selected) */}
 														<div className="text-xs text-gray-500 italic mt-1">
-															Auto-adds when both selected
+															{t("createJournal.glLines.segments.autoAddNote")}
 														</div>
 													</div>
 												</td>
@@ -623,7 +562,9 @@ const CreateJournalPage = () => {
 																				)
 																			}
 																			className="ml-1 text-green-600 hover:text-red-600"
-																			title="Remove segment"
+																			title={t(
+																				"createJournal.glLines.segments.removeSegment"
+																			)}
 																		>
 																			×
 																		</button>
@@ -633,18 +574,23 @@ const CreateJournalPage = () => {
 														)}
 
 														<FloatingLabelSelect
-															label="Segment Value"
-															value={segmentFormState[line.id]?.segment || ''}
+															label={t("createJournal.glLines.table.segmentsValue")}
+															value={segmentFormState[line.id]?.segment || ""}
 															onChange={e =>
 																handleSegmentFormChange(
 																	line.id,
-																	'segment',
+																	"segment",
 																	e.target.value
 																)
 															}
 															disabled={!segmentFormState[line.id]?.segment_type}
 															options={[
-																{ value: '', label: 'Select Segment Value' },
+																{
+																	value: "",
+																	label: t(
+																		"createJournal.glLines.placeholders.selectSegmentValue"
+																	),
+																},
 																...(segmentValues
 																	?.filter(value => {
 																		const selectedTypeId =
@@ -670,10 +616,10 @@ const CreateJournalPage = () => {
 														disabled={lines.length === 1}
 														className={`p-2 rounded-lg transition-colors ${
 															lines.length === 1
-																? 'text-gray-300 cursor-not-allowed'
-																: 'text-red-600 hover:bg-red-50'
+																? "text-gray-300 cursor-not-allowed"
+																: "text-red-600 hover:bg-red-50"
 														}`}
-														title="Delete line"
+														title={t("createJournal.glLines.deleteLine")}
 													>
 														<svg
 															className="w-5 h-5"
@@ -695,7 +641,9 @@ const CreateJournalPage = () => {
 									</tbody>
 									<tfoot className="border-t-2 border-gray-300 bg-gray-50">
 										<tr className="font-semibold">
-											<td className="px-4 py-3 text-right text-gray-700">Totals:</td>
+											<td className="px-4 py-3 text-right text-gray-700">
+												{t("createJournal.glLines.totals")}
+											</td>
 											<td className="px-4 py-3 text-right text-lg text-[#28819C]">
 												{totalDebit.toFixed(2)}
 											</td>
@@ -716,7 +664,7 @@ const CreateJournalPage = () => {
 																clipRule="evenodd"
 															/>
 														</svg>
-														Balanced
+														{t("createJournal.glLines.balanced")}
 													</span>
 												) : (
 													<span className="inline-flex items-center gap-1 text-red-600 text-sm font-medium">
@@ -731,8 +679,9 @@ const CreateJournalPage = () => {
 																clipRule="evenodd"
 															/>
 														</svg>
-														Not Balanced (Diff:
-														{Math.abs(totalDebit - totalCredit).toFixed(2)})
+														{t("createJournal.glLines.notBalanced")}
+														{Math.abs(totalDebit - totalCredit).toFixed(2)}
+														{t("createJournal.glLines.difference")}
 													</span>
 												)}
 											</td>
@@ -750,18 +699,18 @@ const CreateJournalPage = () => {
 							onClick={handleCancel}
 							className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
 						>
-							Cancel
+							{t("createJournal.actions.cancel")}
 						</button>
 						<button
 							type="submit"
 							disabled={!isBalanced}
 							className={`px-6 py-2 rounded-lg font-medium transition-colors ${
 								isBalanced
-									? 'bg-[#28819C] text-white hover:bg-[#206a82]'
-									: 'bg-gray-300 text-gray-500 cursor-not-allowed'
+									? "bg-[#28819C] text-white hover:bg-[#206a82]"
+									: "bg-gray-300 text-gray-500 cursor-not-allowed"
 							}`}
 						>
-							{isEditMode ? 'Update Entry' : 'Create Entry'}
+							{isEditMode ? t("createJournal.actions.update") : t("createJournal.actions.create")}
 						</button>
 					</div>
 				</form>

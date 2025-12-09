@@ -376,5 +376,83 @@
 		},
 		"searchPlaceholder": "بحث عن الأصول...",
 		"emptyMessage": "لم يتم العثور على أصول"
+	},
+	"createJournal": {
+		"title": {
+			"new": "قيد يومية جديد",
+			"edit": "تعديل قيد اليومية"
+		},
+		"subtitle": {
+			"new": "إنشاء قيد يومية جديد",
+			"edit": "تحديث تفاصيل قيد اليومية"
+		},
+		"hero": {
+			"title": {
+				"new": "إنشاء قيد يومية يدوي",
+				"edit": "تعديل قيد يومية يدوي"
+			},
+			"description": {
+				"new": "حدد كيفية ترحيل هذه الفاتورة إلى دفتر الأستاذ العام. انقر ▼ لاختيار القطاعات لكل بند.",
+				"edit": "قم بتحديث تفاصيل وبنود قيد اليومية أدناه."
+			}
+		},
+		"form": {
+			"date": "التاريخ",
+			"currency": "العملة",
+			"description": "الوصف",
+			"descriptionPlaceholder": "أضف ملاحظة قصيرة",
+			"reference": "المرجع",
+			"status": "الحالة"
+		},
+		"validation": {
+			"dateRequired": "التاريخ مطلوب",
+			"currencyRequired": "العملة مطلوبة",
+			"descriptionRequired": "الوصف مطلوب",
+			"debitCreditMustMatch": "يجب أن يتساوى إجمالي المدين والدائن!"
+		},
+		"glLines": {
+			"title": "بنود توزيع دفتر الأستاذ",
+			"subtitle": "الترحيل",
+			"newLine": "بند جديد",
+			"newFirstLine": "أول بند جديد",
+			"emptyTitle": "لم يتم إضافة بنود توزيع دفتر الأستاذ بعد",
+			"emptyDescription": "بنود توزيع دفتر الأستاذ مطلوبة لترحيل قيد اليومية.",
+			"table": {
+				"account": "الحساب",
+				"debit": "مدين",
+				"credit": "دائن",
+				"segmentsType": "نوع القطاع",
+				"segmentsValue": "قيمة القطاع",
+				"actions": "الإجراءات"
+			},
+			"placeholders": {
+				"selectAccount": "اختر الحساب",
+				"debit": "0.00",
+				"credit": "0.00",
+				"selectSegmentType": "اختر نوع القطاع",
+				"selectSegmentValue": "اختر قيمة القطاع"
+			},
+			"segments": {
+				"autoAddNote": "يضاف تلقائيًا عند تحديد كليهما",
+				"removeSegment": "إزالة القطاع"
+			},
+			"deleteLine": "حذف البند",
+			"totals": "الإجماليات:",
+			"balanced": "متوازن",
+			"notBalanced": "غير متوازن (الفرق:",
+			"difference": ")"
+		},
+		"actions": {
+			"cancel": "إلغاء",
+			"create": "إنشاء القيد",
+			"update": "تحديث القيد"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء قيد اليومية بنجاح!",
+			"updateSuccess": "تم تحديث قيد اليومية بنجاح!",
+			"createError": "فشل حفظ قيد اليومية",
+			"segmentAdded": "تمت إضافة القطاع تلقائيًا",
+			"segmentRemoved": "تمت إزالة القطاع"
+		}
 	}
 }
