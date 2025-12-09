@@ -503,5 +503,63 @@
 			"baseSet": "{{code}} marked as base currency",
 			"baseUnset": "{{code}} unset as base currency"
 		}
+	},
+	"customers": {
+		"title": "Customers",
+		"subtitle": "Manage your customer database",
+		"pageTitle": "Customers",
+		"searchPlaceholder": "Search customers...",
+		"addCustomer": "New Customer",
+
+		"table": {
+			"id": "ID",
+			"code": "Code",
+			"name": "Customer Name",
+			"email": "Email",
+			"country": "Country",
+			"currency": "Currency",
+			"vatNumber": "VAT Number",
+			"status": "Status",
+			"active": "Active",
+			"inactive": "Inactive",
+			"empty": "No customers found"
+		},
+
+		"form": {
+			"code": "Customer Code (Optional)",
+			"name": "Customer Name",
+			"email": "Email",
+			"country": "Country",
+			"currency": "Currency",
+			"vatNumber": "VAT Number (Optional)",
+			"activeStatus": "Active Status"
+		},
+
+		"modal": {
+			"titleAdd": "New Customer",
+			"titleEdit": "Edit Customer",
+			"cancel": "Cancel",
+			"create": "Create Customer",
+			"update": "Update Customer",
+			"creating": "Creating...",
+			"updating": "Updating..."
+		},
+
+		"messages": {
+			"required": "Please fill in all required fields",
+			"invalidEmail": "Please enter a valid email address",
+			"created": "Customer created successfully",
+			"updated": "Customer updated successfully",
+			"deleted": "Customer deleted successfully",
+			"deleteError": "Failed to delete customer",
+			"saveError": "Failed to save customer"
+		},
+
+		"deleteModal": {
+			"title": "Delete Customer",
+			"message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
+		}
 	}
 }
