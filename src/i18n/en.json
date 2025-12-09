@@ -454,5 +454,54 @@
 			"segmentAdded": "Segment added automatically",
 			"segmentRemoved": "Segment removed"
 		}
+	},
+	"currency": {
+		"title": "Currency",
+		"subtitle": "Manage currencies and exchange rates",
+		"pageTitle": "Currency",
+		"addCurrency": "Add Currency",
+		"table": {
+			"code": "Code",
+			"name": "Name",
+			"symbol": "Symbol",
+			"baseCurrency": "Base Currency"
+		},
+		"modal": {
+			"titleAdd": "Add Currency",
+			"titleEdit": "Edit Currency",
+			"codeLabel": "Currency Code (ISO 4217)",
+			"codePlaceholder": "e.g., USD",
+			"nameLabel": "Currency Name",
+			"namePlaceholder": "e.g., US Dollar",
+			"symbolLabel": "Symbol",
+			"symbolPlaceholder": "e.g., $",
+			"setAsBase": "Set as Base Currency",
+			"baseDescription": "Base currency is used as the default for conversions.",
+			"cancel": "Cancel",
+			"create": "Create",
+			"update": "Update"
+		},
+		"validation": {
+			"codeRequired": "Currency code is required",
+			"codeLength": "Currency code must be 3 characters (ISO 4217)",
+			"nameRequired": "Currency name is required",
+			"symbolRequired": "Symbol is required"
+		},
+		"deleteConfirm": {
+			"title": "Delete Currency",
+			"message": "Are you sure you want to delete currency \"{{code}} - {{name}}\"? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
+		},
+		"messages": {
+			"createSuccess": "Currency created successfully!",
+			"updateSuccess": "Currency updated successfully!",
+			"deleteSuccess": "Currency deleted successfully!",
+			"createError": "Failed to save currency",
+			"deleteError": "Failed to delete currency",
+			"updateBaseError": "Failed to update base currency",
+			"baseSet": "{{code}} marked as base currency",
+			"baseUnset": "{{code}} unset as base currency"
+		}
 	}
 }

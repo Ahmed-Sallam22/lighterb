@@ -454,5 +454,54 @@
 			"segmentAdded": "تمت إضافة القطاع تلقائيًا",
 			"segmentRemoved": "تمت إزالة القطاع"
 		}
+	},
+	"currency": {
+		"title": "العملة",
+		"subtitle": "إدارة العملات وأسعار الصرف",
+		"pageTitle": "العملة",
+		"addCurrency": "إضافة عملة",
+		"table": {
+			"code": "الكود",
+			"name": "الاسم",
+			"symbol": "الرمز",
+			"baseCurrency": "العملة الأساسية"
+		},
+		"modal": {
+			"titleAdd": "إضافة عملة",
+			"titleEdit": "تعديل العملة",
+			"codeLabel": "رمز العملة (ISO 4217)",
+			"codePlaceholder": "مثال: USD",
+			"nameLabel": "اسم العملة",
+			"namePlaceholder": "مثال: دولار أمريكي",
+			"symbolLabel": "الرمز",
+			"symbolPlaceholder": "مثال: $",
+			"setAsBase": "تعيين كعملة أساسية",
+			"baseDescription": "تُستخدم العملة الأساسية كافتراضي للتحويلات.",
+			"cancel": "إلغاء",
+			"create": "إنشاء",
+			"update": "تحديث"
+		},
+		"validation": {
+			"codeRequired": "رمز العملة مطلوب",
+			"codeLength": "يجب أن يتكون رمز العملة من 3 أحرف (ISO 4217)",
+			"nameRequired": "اسم العملة مطلوب",
+			"symbolRequired": "الرمز مطلوب"
+		},
+		"deleteConfirm": {
+			"title": "حذف العملة",
+			"message": "هل أنت متأكد أنك تريد حذف العملة \"{{code}} - {{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"confirm": "حذف",
+			"cancel": "إلغاء"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء العملة بنجاح!",
+			"updateSuccess": "تم تحديث العملة بنجاح!",
+			"deleteSuccess": "تم حذف العملة بنجاح!",
+			"createError": "فشل في حفظ العملة",
+			"deleteError": "فشل في حذف العملة",
+			"updateBaseError": "فشل في تحديث العملة الأساسية",
+			"baseSet": "تم تعيين {{code}} كعملة أساسية",
+			"baseUnset": "تم إلغاء تعيين {{code}} كعملة أساسية"
+		}
 	}
 }
