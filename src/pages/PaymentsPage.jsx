@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { useTranslation } from 'react-i18next';
-import PageHeader from '../components/shared/PageHeader';
-import Toolbar from '../components/shared/Toolbar';
-import Table from '../components/shared/Table';
-import ConfirmModal from '../components/shared/ConfirmModal';
-import { fetchARPayments, deleteARPayment } from '../store/arPaymentsSlice';
-import { fetchAPPayments, deleteAPPayment } from '../store/apPaymentsSlice';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
+import PageHeader from "../components/shared/PageHeader";
+import Toolbar from "../components/shared/Toolbar";
+import Table from "../components/shared/Table";
+import ConfirmModal from "../components/shared/ConfirmModal";
+import { fetchARPayments, deleteARPayment } from "../store/arPaymentsSlice";
+import { fetchAPPayments, deleteAPPayment } from "../store/apPaymentsSlice";
+import LoadingSpan from "../components/shared/LoadingSpan";
 
 const ARPaymentIcon = () => (
 	<svg width="28" height="25" viewBox="0 0 28 25" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -37,13 +38,13 @@ const APPaymentIcon = () => (
 
 const PaymentsPage = () => {
 	const { t, i18n } = useTranslation();
-	const isRtl = i18n.dir() === 'rtl';
+	const isRtl = i18n.dir() === "rtl";
 	const { type } = useParams(); // 'ar' or 'ap'
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
 	// Determine content based on type
-	const isAR = type?.toLowerCase() === 'ar';
+	const isAR = type?.toLowerCase() === "ar";
 
 	// Get data from Redux based on type
 	const { payments: arPayments, loading: arLoading } = useSelector(state => state.arPayments);
@@ -54,15 +55,15 @@ const PaymentsPage = () => {
 
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [paymentToDelete, setPaymentToDelete] = useState(null);
-	const [searchTerm, setSearchTerm] = useState('');
-	const [filterStatus, setFilterStatus] = useState('');
+	const [searchTerm, setSearchTerm] = useState("");
+	const [filterStatus, setFilterStatus] = useState("");
 
 	// Localized Text
-	const title = t(isAR ? 'payments.ar.title' : 'payments.ap.title');
-	const subtitle = t(isAR ? 'payments.ar.subtitle' : 'payments.ap.subtitle');
+	const title = t(isAR ? "payments.ar.title" : "payments.ap.title");
+	const subtitle = t(isAR ? "payments.ar.subtitle" : "payments.ap.subtitle");
 	const icon = isAR ? <ARPaymentIcon /> : <APPaymentIcon />;
-	const buttonText = t('payments.common.newPayment');
-	const quickActionPath = isAR ? '/quick-actions/receive-payment' : '/quick-actions/make-payment';
+	const buttonText = t("payments.common.newPayment");
+	const quickActionPath = isAR ? "/quick-actions/receive-payment" : "/quick-actions/make-payment";
 
 	// Fetch payments on mount
 	useEffect(() => {
@@ -77,7 +78,7 @@ const PaymentsPage = () => {
 	useEffect(() => {
 		document.title = `${title} - LightERP`;
 		return () => {
-			document.title = 'LightERP';
+			document.title = "LightERP";
 		};
 	}, [title]);
 
@@ -97,61 +98,61 @@ const PaymentsPage = () => {
 	// Table columns configuration
 	const columns = [
 		{
-			header: t('payments.common.paymentDate'),
-			accessor: 'date',
+			header: t("payments.common.paymentDate"),
+			accessor: "date",
 			sortable: true,
-			render: value => value || '-',
+			render: value => value || "-",
 		},
 		{
-			header: t(isAR ? 'payments.ar.customer' : 'payments.ap.supplier'),
-			accessor: isAR ? 'customer_name' : 'supplier_name',
+			header: t(isAR ? "payments.ar.customer" : "payments.ap.supplier"),
+			accessor: isAR ? "customer_name" : "supplier_name",
 			sortable: true,
-			render: value => value || '-',
+			render: value => value || "-",
 		},
 		{
-			header: t('payments.common.reference'),
-			accessor: 'reference',
+			header: t("payments.common.reference"),
+			accessor: "reference",
 			sortable: true,
-			render: value => value || '-',
+			render: value => value || "-",
 		},
 		{
-			header: t('payments.common.amount'),
-			accessor: isAR ? 'total_amount' : 'amount',
+			header: t("payments.common.amount"),
+			accessor: isAR ? "total_amount" : "amount",
 			sortable: true,
 			render: value => <span className="font-semibold">{parseFloat(value || 0).toFixed(2)}</span>,
 		},
 		{
-			header: t('payments.common.currency'),
-			accessor: 'currency_code',
-			render: value => value || '-',
+			header: t("payments.common.currency"),
+			accessor: "currency_code",
+			render: value => value || "-",
 		},
 		{
-			header: t('payments.common.paymentMethod'),
-			accessor: 'payment_method',
+			header: t("payments.common.paymentMethod"),
+			accessor: "payment_method",
 			render: value => {
-				if (!value) return '-';
+				if (!value) return "-";
 				// You might want to add specific translations for payment methods in the JSON
-				return value.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+				return value.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
 			},
 		},
 		{
-			header: t('payments.common.status'),
-			accessor: 'status',
+			header: t("payments.common.status"),
+			accessor: "status",
 			render: value => {
 				const statusColors = {
-					COMPLETED: 'bg-green-100 text-green-800',
-					PENDING: 'bg-yellow-100 text-yellow-800',
-					FAILED: 'bg-red-100 text-red-800',
-					CANCELLED: 'bg-gray-100 text-gray-800',
+					COMPLETED: "bg-green-100 text-green-800",
+					PENDING: "bg-yellow-100 text-yellow-800",
+					FAILED: "bg-red-100 text-red-800",
+					CANCELLED: "bg-gray-100 text-gray-800",
 				};
 				return (
 					<span
 						className={`px-3 py-1 rounded-full text-xs font-semibold ${
-							statusColors[value] || 'bg-gray-100 text-gray-800'
+							statusColors[value] || "bg-gray-100 text-gray-800"
 						}`}
 					>
 						{/* Translate status, fallback to uppercase English */}
-						{t(`payments.status.${value?.toLowerCase()}`, value || 'PENDING')}
+						{t(`payments.status.${value?.toLowerCase()}`, value || "PENDING")}
 					</span>
 				);
 			},
@@ -160,11 +161,11 @@ const PaymentsPage = () => {
 
 	// Filter options for toolbar
 	const filterOptions = [
-		{ value: '', label: t('payments.status.all') },
-		{ value: 'completed', label: t('payments.status.completed') },
-		{ value: 'pending', label: t('payments.status.pending') },
-		{ value: 'failed', label: t('payments.status.failed') },
-		{ value: 'cancelled', label: t('payments.status.cancelled') },
+		{ value: "", label: t("payments.status.all") },
+		{ value: "completed", label: t("payments.status.completed") },
+		{ value: "pending", label: t("payments.status.pending") },
+		{ value: "failed", label: t("payments.status.failed") },
+		{ value: "cancelled", label: t("payments.status.cancelled") },
 	];
 
 	// Handlers
@@ -196,15 +197,15 @@ const PaymentsPage = () => {
 		try {
 			if (isAR) {
 				await dispatch(deleteARPayment(paymentToDelete.id)).unwrap();
-				toast.success(t('payments.ar.deleteSuccess'));
+				toast.success(t("payments.ar.deleteSuccess"));
 			} else {
 				await dispatch(deleteAPPayment(paymentToDelete.id)).unwrap();
-				toast.success(t('payments.ap.deleteSuccess'));
+				toast.success(t("payments.ap.deleteSuccess"));
 			}
 			setIsDeleteModalOpen(false);
 			setPaymentToDelete(null);
 		} catch (error) {
-			toast.error(error || t('payments.common.deleteError'));
+			toast.error(error || t("payments.common.deleteError"));
 		}
 	};
 
@@ -221,10 +222,10 @@ const PaymentsPage = () => {
 			{/* Toolbar */}
 			<div className="px-6 mt-6">
 				<Toolbar
-					searchPlaceholder={t('payments.common.searchPlaceholder')}
+					searchPlaceholder={t("payments.common.searchPlaceholder")}
 					onSearchChange={handleSearch}
 					filterOptions={filterOptions}
-					filterLabel={t('payments.common.filterStatus')}
+					filterLabel={t("payments.common.filterStatus")}
 					onFilterChange={handleFilter}
 					createButtonText={buttonText}
 					onCreateClick={handleCreate}
@@ -234,16 +235,14 @@ const PaymentsPage = () => {
 			{/* Table */}
 			<div className="px-6 mt-6 pb-6">
 				{loading ? (
-					<div className="flex justify-center items-center py-12">
-						<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0d5f7a]"></div>
-					</div>
+					<LoadingSpan />
 				) : (
 					<Table
 						columns={columns}
 						data={filteredPayments}
 						onEdit={handleEdit}
 						onDelete={handleDeleteClick}
-						emptyMessage={t(isAR ? 'payments.ar.emptyMessage' : 'payments.ap.emptyMessage')}
+						emptyMessage={t(isAR ? "payments.ar.emptyMessage" : "payments.ap.emptyMessage")}
 					/>
 				)}
 			</div>
@@ -253,12 +252,12 @@ const PaymentsPage = () => {
 				isOpen={isDeleteModalOpen}
 				onClose={handleCancelDelete}
 				onConfirm={handleConfirmDelete}
-				title={t('payments.modals.deleteTitle')}
-				message={t('payments.modals.deleteMessage', {
-					reference: paymentToDelete?.reference || (isRtl ? 'هذه الدفعة' : 'this payment'),
+				title={t("payments.modals.deleteTitle")}
+				message={t("payments.modals.deleteMessage", {
+					reference: paymentToDelete?.reference || (isRtl ? "هذه الدفعة" : "this payment"),
 				})}
-				confirmText={t('payments.modals.delete')}
-				cancelText={t('payments.modals.cancel')}
+				confirmText={t("payments.modals.delete")}
+				cancelText={t("payments.modals.cancel")}
 			/>
 		</div>
 	);

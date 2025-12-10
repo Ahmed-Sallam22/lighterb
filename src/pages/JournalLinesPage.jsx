@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { useTranslation } from 'react-i18next';
-import PageHeader from '../components/shared/PageHeader';
-import FloatingLabelInput from '../components/shared/FloatingLabelInput';
-import FloatingLabelSelect from '../components/shared/FloatingLabelSelect';
-import Table from '../components/shared/Table';
-import SlideUpModal from '../components/shared/SlideUpModal';
-import { fetchJournalLines } from '../store/journalLinesSlice';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
+import PageHeader from "../components/shared/PageHeader";
+import FloatingLabelInput from "../components/shared/FloatingLabelInput";
+import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
+import Table from "../components/shared/Table";
+import SlideUpModal from "../components/shared/SlideUpModal";
+import { fetchJournalLines } from "../store/journalLinesSlice";
+import LoadingSpan from "../components/shared/LoadingSpan";
 
 const StatPattern = () => (
 	<svg
@@ -155,11 +156,11 @@ const JournalLinesPage = () => {
 	const { lines, loading, error, statistics } = useSelector(state => state.journalLines);
 
 	const [filters, setFilters] = useState({
-		code: '',
-		name: '',
-		dateFrom: '',
-		dateTo: '',
-		status: '',
+		code: "",
+		name: "",
+		dateFrom: "",
+		dateTo: "",
+		status: "",
 	});
 
 	const [selectedLine, setSelectedLine] = useState(null);
@@ -181,20 +182,20 @@ const JournalLinesPage = () => {
 	const journalLines = lines.map(line => {
 		const isDebit = Number(line.debit) > 0;
 		// Map backend values to translation keys for logic
-		const typeKey = isDebit ? 'debit' : 'credit';
-		const statusKey = line.entry?.posted ? 'posted' : 'draft';
+		const typeKey = isDebit ? "debit" : "credit";
+		const statusKey = line.entry?.posted ? "posted" : "draft";
 
 		return {
 			id: line.id,
-			account: line.account?.name || '-',
-			code: line.account?.code || '-',
-			memo: line.entry?.memo || '-',
-			date: line.entry?.date || '-',
-			entry: line.entry?.id || '-',
+			account: line.account?.name || "-",
+			code: line.account?.code || "-",
+			memo: line.entry?.memo || "-",
+			date: line.entry?.date || "-",
+			entry: line.entry?.id || "-",
 			type: t(`journalLines.type.${typeKey}`),
 			rawType: typeKey, // Keep for logic/colors
-			debit: Number(line.debit) > 0 ? `$${Number(line.debit).toFixed(2)}` : '-',
-			credit: Number(line.credit) > 0 ? `$${Number(line.credit).toFixed(2)}` : '-',
+			debit: Number(line.debit) > 0 ? `$${Number(line.debit).toFixed(2)}` : "-",
+			credit: Number(line.credit) > 0 ? `$${Number(line.credit).toFixed(2)}` : "-",
 			status: t(`journalLines.status.${statusKey}`),
 			rawStatus: statusKey, // Keep for logic/colors
 			rawData: line, // Keep original data for modal
@@ -203,63 +204,63 @@ const JournalLinesPage = () => {
 
 	const columns = [
 		{
-			header: t('journalLines.table.account'),
-			accessor: 'account',
+			header: t("journalLines.table.account"),
+			accessor: "account",
 		},
 		{
-			header: t('journalLines.table.id'),
-			accessor: 'id',
-			width: '120px',
+			header: t("journalLines.table.id"),
+			accessor: "id",
+			width: "120px",
 		},
 		{
-			header: t('journalLines.table.date'),
-			accessor: 'date',
-			width: '130px',
+			header: t("journalLines.table.date"),
+			accessor: "date",
+			width: "130px",
 		},
 		{
-			header: t('journalLines.table.entry'),
-			accessor: 'entry',
-			width: '130px',
+			header: t("journalLines.table.entry"),
+			accessor: "entry",
+			width: "130px",
 		},
 		{
-			header: t('journalLines.table.type'),
-			accessor: 'type',
-			width: '100px',
+			header: t("journalLines.table.type"),
+			accessor: "type",
+			width: "100px",
 			render: (value, row) => {
 				const typeColors = {
-					debit: 'text-red-600 font-semibold',
-					credit: 'text-green-600 font-semibold',
+					debit: "text-red-600 font-semibold",
+					credit: "text-green-600 font-semibold",
 				};
 				// Use rawType for color mapping
-				return <span className={typeColors[row.rawType] || ''}>{value}</span>;
+				return <span className={typeColors[row.rawType] || ""}>{value}</span>;
 			},
 		},
 		{
-			header: t('journalLines.table.debit'),
-			accessor: 'debit',
-			width: '130px',
+			header: t("journalLines.table.debit"),
+			accessor: "debit",
+			width: "130px",
 			render: value => <span className="font-semibold">{value}</span>,
 		},
 		{
-			header: t('journalLines.table.credit'),
-			accessor: 'credit',
-			width: '130px',
+			header: t("journalLines.table.credit"),
+			accessor: "credit",
+			width: "130px",
 			render: value => <span className="font-semibold">{value}</span>,
 		},
 		{
-			header: t('journalLines.table.status'),
-			accessor: 'status',
-			width: '120px',
+			header: t("journalLines.table.status"),
+			accessor: "status",
+			width: "120px",
 			render: (value, row) => {
 				const statusColors = {
-					posted: 'bg-green-100 text-green-800',
-					draft: 'bg-gray-100 text-gray-800',
+					posted: "bg-green-100 text-green-800",
+					draft: "bg-gray-100 text-gray-800",
 				};
 				// Use rawStatus for color mapping
 				return (
 					<span
 						className={`px-3 py-1 rounded-full text-xs font-semibold ${
-							statusColors[row.rawStatus] || 'bg-gray-100 text-gray-800'
+							statusColors[row.rawStatus] || "bg-gray-100 text-gray-800"
 						}`}
 					>
 						{value}
@@ -270,62 +271,62 @@ const JournalLinesPage = () => {
 	];
 
 	const statusOptions = [
-		{ value: '', label: t('journalLines.filters.allStatuses') },
-		{ value: 'posted', label: t('journalLines.filters.posted') },
-		{ value: 'draft', label: t('journalLines.filters.draft') },
+		{ value: "", label: t("journalLines.filters.allStatuses") },
+		{ value: "posted", label: t("journalLines.filters.posted") },
+		{ value: "draft", label: t("journalLines.filters.draft") },
 	];
 
 	const formatDisplayDate = value => {
-		if (!value) return t('journalLines.modal.na');
+		if (!value) return t("journalLines.modal.na");
 		const date = new Date(value);
 		if (Number.isNaN(date.getTime())) {
 			return value;
 		}
 		// Use i18n language for date formatting
 		return date.toLocaleDateString(i18n.language, {
-			month: 'short',
-			day: '2-digit',
-			year: 'numeric',
+			month: "short",
+			day: "2-digit",
+			year: "numeric",
 		});
 	};
 
-	const normalizedAmount = amount => (amount && amount !== '-' ? amount : '$0.00');
+	const normalizedAmount = amount => (amount && amount !== "-" ? amount : "$0.00");
 
 	const statCards = [
 		{
-			title: t('journalLines.stats.totalLines'),
+			title: t("journalLines.stats.totalLines"),
 			value: statistics?.totalLines || 0,
 			icon: <TotalLinesIcon />,
-			iconBg: 'bg-[#E1F5FE]',
-			valueColor: 'text-gray-900',
+			iconBg: "bg-[#E1F5FE]",
+			valueColor: "text-gray-900",
 		},
 		{
-			title: t('journalLines.stats.totalDebits'),
+			title: t("journalLines.stats.totalDebits"),
 			value: `$${(statistics?.totalDebits || 0).toFixed(2)}`,
 			icon: <TotalDebitsIcon />,
-			iconBg: 'bg-red-50',
-			valueColor: 'text-red-600',
+			iconBg: "bg-red-50",
+			valueColor: "text-red-600",
 		},
 		{
-			title: t('journalLines.stats.totalCredits'),
+			title: t("journalLines.stats.totalCredits"),
 			value: `$${(statistics?.totalCredits || 0).toFixed(2)}`,
 			icon: <TotalCreditsIcon />,
-			iconBg: 'bg-green-50',
-			valueColor: 'text-green-600',
+			iconBg: "bg-green-50",
+			valueColor: "text-green-600",
 		},
 		{
-			title: t('journalLines.stats.posted'),
+			title: t("journalLines.stats.posted"),
 			value: statistics?.postedLines || 0,
 			icon: <PostedIcon />,
-			iconBg: 'bg-green-50',
-			valueColor: 'text-gray-900',
+			iconBg: "bg-green-50",
+			valueColor: "text-gray-900",
 		},
 		{
-			title: t('journalLines.stats.draft'),
+			title: t("journalLines.stats.draft"),
 			value: statistics?.draftLines || 0,
 			icon: <DraftIcon />,
-			iconBg: 'bg-gray-50',
-			valueColor: 'text-gray-900',
+			iconBg: "bg-gray-50",
+			valueColor: "text-gray-900",
 		},
 	];
 
@@ -342,18 +343,18 @@ const JournalLinesPage = () => {
 			account_name: filters.name,
 			date_from: filters.dateFrom,
 			date_to: filters.dateTo,
-			posted: filters.status === 'posted' ? 'true' : filters.status === 'draft' ? 'false' : '',
+			posted: filters.status === "posted" ? "true" : filters.status === "draft" ? "false" : "",
 		};
 		dispatch(fetchJournalLines(filterParams));
 	};
 
 	const handleClearFilters = () => {
 		setFilters({
-			code: '',
-			name: '',
-			dateFrom: '',
-			dateTo: '',
-			status: '',
+			code: "",
+			name: "",
+			dateFrom: "",
+			dateTo: "",
+			status: "",
 		});
 		// Fetch all lines without filters
 		dispatch(fetchJournalLines());
@@ -368,8 +369,8 @@ const JournalLinesPage = () => {
 		<div className="min-h-screen bg-gray-50">
 			{/* Header */}
 			<PageHeader
-				title={t('journalLines.title')}
-				subtitle={t('journalLines.subtitle')}
+				title={t("journalLines.title")}
+				subtitle={t("journalLines.subtitle")}
 				icon={
 					<svg width="29" height="27" viewBox="0 0 29 27" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<g opacity="0.5" clipPath="url(#clip0_188_15408)">
@@ -402,7 +403,7 @@ const JournalLinesPage = () => {
 									<p className="text-[#28819C] text-lg font-medium">{card.title}</p>
 								</div>
 								<div className="text-right">
-									<p className={`text-xl font-semibold ${card.valueColor || 'text-gray-900'}`}>
+									<p className={`text-xl font-semibold ${card.valueColor || "text-gray-900"}`}>
 										{card.value}
 									</p>
 									{card.subLabel && <p className="text-xs text-gray-500 mt-1">{card.subLabel}</p>}
@@ -414,51 +415,51 @@ const JournalLinesPage = () => {
 
 				{/* Filters Section */}
 				<div className=" rounded-xl  p-6">
-					<h3 className="text-lg font-semibold text-gray-900 mb-6">{t('journalLines.filters.title')}</h3>
+					<h3 className="text-lg font-semibold text-gray-900 mb-6">{t("journalLines.filters.title")}</h3>
 
 					<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-6">
 						{/* Code Filter */}
 						<FloatingLabelInput
 							id="code"
-							label={t('journalLines.filters.code')}
+							label={t("journalLines.filters.code")}
 							value={filters.code}
-							onChange={e => handleFilterChange('code', e.target.value)}
-							placeholder={t('journalLines.filters.codePlaceholder')}
+							onChange={e => handleFilterChange("code", e.target.value)}
+							placeholder={t("journalLines.filters.codePlaceholder")}
 						/>
 
 						{/* Name Filter */}
 						<FloatingLabelInput
 							id="name"
-							label={t('journalLines.filters.name')}
+							label={t("journalLines.filters.name")}
 							value={filters.name}
-							onChange={e => handleFilterChange('name', e.target.value)}
-							placeholder={t('journalLines.filters.namePlaceholder')}
+							onChange={e => handleFilterChange("name", e.target.value)}
+							placeholder={t("journalLines.filters.namePlaceholder")}
 						/>
 
 						{/* Date From */}
 						<FloatingLabelInput
 							id="dateFrom"
-							label={t('journalLines.filters.dateFrom')}
+							label={t("journalLines.filters.dateFrom")}
 							type="date"
 							value={filters.dateFrom}
-							onChange={e => handleFilterChange('dateFrom', e.target.value)}
+							onChange={e => handleFilterChange("dateFrom", e.target.value)}
 						/>
 
 						{/* Date To */}
 						<FloatingLabelInput
 							id="dateTo"
-							label={t('journalLines.filters.dateTo')}
+							label={t("journalLines.filters.dateTo")}
 							type="date"
 							value={filters.dateTo}
-							onChange={e => handleFilterChange('dateTo', e.target.value)}
+							onChange={e => handleFilterChange("dateTo", e.target.value)}
 						/>
 
 						{/* Status Filter */}
 						<FloatingLabelSelect
 							id="status"
-							label={t('journalLines.filters.status')}
+							label={t("journalLines.filters.status")}
 							value={filters.status}
-							onChange={e => handleFilterChange('status', e.target.value)}
+							onChange={e => handleFilterChange("status", e.target.value)}
 							options={statusOptions}
 						/>
 					</div>
@@ -469,22 +470,20 @@ const JournalLinesPage = () => {
 							onClick={handleClearFilters}
 							className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
 						>
-							{t('journalLines.filters.clearAll')}
+							{t("journalLines.filters.clearAll")}
 						</button>
 						<button
 							onClick={handleApplyFilters}
 							className="px-6 py-2.5 bg-[#28819C] text-white rounded-lg hover:bg-[#206b82] font-medium transition-colors"
 						>
-							{t('journalLines.filters.applyFilters')}
+							{t("journalLines.filters.applyFilters")}
 						</button>
 					</div>
 				</div>
 
 				{/* Table Section */}
 				{loading ? (
-					<div className="flex justify-center items-center py-12">
-						<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#28819C]"></div>
-					</div>
+					<LoadingSpan />
 				) : (
 					<Table
 						columns={columns}
@@ -492,7 +491,7 @@ const JournalLinesPage = () => {
 						onEdit={handleView}
 						editIcon="view"
 						className="mb-8"
-						emptyMessage={t('journalLines.table.emptyMessage')}
+						emptyMessage={t("journalLines.table.emptyMessage")}
 					/>
 				)}
 			</div>
@@ -501,16 +500,16 @@ const JournalLinesPage = () => {
 			<SlideUpModal
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
-				title={t('journalLines.modal.title')}
+				title={t("journalLines.modal.title")}
 			>
 				{selectedLine && (
 					<div className="space-y-2 text-gray-900">
 						<div className="relative overflow-hidden rounded-3xl border border-[#D7EEF6] bg-linear-to-br from-white via-white to-[#F3FBFE] p-4">
 							<p className="text-2xl font-bold text-[#147A9C]">
-								{t('journalLines.modal.lineTitle')} {selectedLine?.id}
+								{t("journalLines.modal.lineTitle")} {selectedLine?.id}
 							</p>
 							<p className="mt-1 text-sm text-[#5E7F8C]">
-								{t('journalLines.modal.partOf')} {selectedLine.entry}
+								{t("journalLines.modal.partOf")} {selectedLine.entry}
 							</p>
 						</div>
 
@@ -519,30 +518,30 @@ const JournalLinesPage = () => {
 								<div className="flex flex-wrap items-start justify-between gap-4">
 									<div>
 										<p className="text-lg font-semibold text-gray-900">
-											{t('journalLines.modal.entryDetails')}
+											{t("journalLines.modal.entryDetails")}
 										</p>
 										<p className="text-sm text-gray-500">
-											{t('journalLines.modal.entryId')} : {selectedLine.entry}
+											{t("journalLines.modal.entryId")} : {selectedLine.entry}
 										</p>
 									</div>
 									<p className="text-sm font-semibold text-gray-800">
-										{t('journalLines.table.date')} : {formatDisplayDate(selectedLine.date)}
+										{t("journalLines.table.date")} : {formatDisplayDate(selectedLine.date)}
 									</p>
 								</div>
 								<div className="mt-5 space-y-3 text-sm text-[#526875]">
 									<div>
-										<p className="font-semibold text-gray-600">{t('journalLines.modal.memo')}</p>
-										<p>{selectedLine.memo || t('journalLines.modal.na')}</p>
+										<p className="font-semibold text-gray-600">{t("journalLines.modal.memo")}</p>
+										<p>{selectedLine.memo || t("journalLines.modal.na")}</p>
 									</div>
 									<div className="flex flex-wrap items-center gap-2 text-sm">
 										<span className="font-semibold text-gray-600">
-											{t('journalLines.table.status')} :
+											{t("journalLines.table.status")} :
 										</span>
 										<span
 											className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
-												selectedLine.rawStatus === 'posted'
-													? 'bg-green-50 text-green-700 border border-green-200'
-													: 'bg-gray-50 text-gray-700 border border-gray-200'
+												selectedLine.rawStatus === "posted"
+													? "bg-green-50 text-green-700 border border-green-200"
+													: "bg-gray-50 text-gray-700 border border-gray-200"
 											}`}
 										>
 											{selectedLine.status}
@@ -553,19 +552,19 @@ const JournalLinesPage = () => {
 
 							<section className="rounded-2xl border border-[#DCE8EE] bg-white p-5 shadow-sm">
 								<p className="text-lg font-semibold text-gray-900 mb-4">
-									{t('journalLines.modal.accountDetails')}
+									{t("journalLines.modal.accountDetails")}
 								</p>
 								<div className="grid gap-3 text-sm text-[#526875] sm:grid-cols-2">
 									<div>
-										<p className="font-semibold text-gray-600">{t('journalLines.modal.code')}</p>
-										<p>{selectedLine.code || t('journalLines.modal.na')}</p>
+										<p className="font-semibold text-gray-600">{t("journalLines.modal.code")}</p>
+										<p>{selectedLine.code || t("journalLines.modal.na")}</p>
 									</div>
 									<div>
-										<p className="font-semibold text-gray-600">{t('journalLines.modal.name')}</p>
+										<p className="font-semibold text-gray-600">{t("journalLines.modal.name")}</p>
 										<p>{selectedLine.account}</p>
 									</div>
 									<div>
-										<p className="font-semibold text-gray-600">{t('journalLines.modal.type')}</p>
+										<p className="font-semibold text-gray-600">{t("journalLines.modal.type")}</p>
 										<p className="capitalize">{selectedLine.type}</p>
 									</div>
 								</div>
@@ -576,7 +575,7 @@ const JournalLinesPage = () => {
 							<div className="rounded-2xl border border-[#CDE5EE] bg-white p-5 text-center shadow-sm">
 								<div className="flex items-center justify-center gap-2 text-[#1A8CB3] text-lg font-semibold">
 									<TrendUpIcon />
-									{t('journalLines.modal.totalDebits')}
+									{t("journalLines.modal.totalDebits")}
 								</div>
 								<p className="mt-3 text-3xl font-bold text-gray-900">
 									{normalizedAmount(selectedLine.debit)}
@@ -585,7 +584,7 @@ const JournalLinesPage = () => {
 							<div className="rounded-2xl border border-[#CDE5EE] bg-white p-5 text-center shadow-sm">
 								<div className="flex items-center justify-center gap-2 text-[#1A8CB3] text-lg font-semibold">
 									<TrendDownIcon />
-									{t('journalLines.modal.totalCredits')}
+									{t("journalLines.modal.totalCredits")}
 								</div>
 								<p className="mt-3 text-3xl font-bold text-gray-900">
 									{normalizedAmount(selectedLine.credit)}

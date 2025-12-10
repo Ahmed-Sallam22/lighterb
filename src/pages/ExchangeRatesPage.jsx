@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import { useTranslation } from "react-i18next";
@@ -17,6 +17,37 @@ import {
 	convertCurrency,
 	clearConversionResult,
 } from "../store/exchangeRatesSlice";
+import { IoCloseCircleOutline } from "react-icons/io5";
+import { TbCaretUpDownFilled } from "react-icons/tb";
+import Button from "../components/shared/Button";
+import { BiPlusCircle } from "react-icons/bi";
+import ExchangeRateForm from "../components/forms/ExchangeRateForm";
+import CurrencyConverterForm from "../components/forms/CurrencyConverterForm";
+import LoadingSpan from "../components/shared/LoadingSpan";
+
+const INITIAL_FORM_STATE = {
+	fromCurrency: "",
+	toCurrency: "",
+	rateType: "SPOT",
+	rate: "",
+	effectiveDate: "",
+	source: "",
+};
+
+const INITIAL_CONVERTER_STATE = {
+	amount: "",
+	fromCurrency: "",
+	toCurrency: "",
+	rateDate: new Date().toISOString().split("T")[0],
+};
+
+const INITIAL_FILTERS_STATE = {
+	fromCurrency: "",
+	toCurrency: "",
+	rateType: "",
+	dateFrom: "",
+	dateTo: "",
+};
 
 const ExchangeRatesPage = () => {
 	const { t, i18n } = useTranslation();
@@ -31,32 +62,14 @@ const ExchangeRatesPage = () => {
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [selectedRate, setSelectedRate] = useState(null);
 
-	const [formData, setFormData] = useState({
-		fromCurrency: "",
-		toCurrency: "",
-		rateType: "SPOT",
-		rate: "",
-		effectiveDate: "",
-		source: "",
-	});
+	const [formData, setFormData] = useState(INITIAL_FORM_STATE);
 	const [errors, setErrors] = useState({});
 
 	// Filter states
-	const [filters, setFilters] = useState({
-		fromCurrency: "",
-		toCurrency: "",
-		rateType: "",
-		dateFrom: "",
-		dateTo: "",
-	});
+	const [filters, setFilters] = useState(INITIAL_FILTERS_STATE);
 
 	// Converter states
-	const [converterData, setConverterData] = useState({
-		amount: "",
-		fromCurrency: "",
-		toCurrency: "",
-		rateDate: new Date().toISOString().split("T")[0],
-	});
+	const [converterData, setConverterData] = useState(INITIAL_CONVERTER_STATE);
 	const [converterErrors, setConverterErrors] = useState({});
 
 	// Fetch rates and currencies on mount
@@ -136,25 +149,50 @@ const ExchangeRatesPage = () => {
 	];
 
 	// Currency options from Redux
-	const currencyCodeOptions = currencies.map(currency => ({
-		value: currency.code,
-		label: `${currency.code} - ${currency.name}`,
-	}));
+	// const currencyCodeOptions = currencies.map(currency => ({
+	// 	value: currency.code,
+	// 	label: `${currency.code} - ${currency.name}`,
+	// }));
+	const currencyCodeOptions = useMemo(() => {
+		return currencies
+			.filter(currency => currency.code)
+			.map(currency => ({
+				value: currency.code,
+				label: `${currency.code} - ${currency.name}`,
+			}));
+	}, [currencies]);
 
-	const currencyIdOptions = currencies
-		.filter(currency => currency.id !== undefined && currency.id !== null)
-		.map(currency => ({
-			value: currency.id.toString(),
-			label: `${currency.code} - ${currency.name}`,
-		}));
+	// const currencyIdOptions = currencies
+	// 	.filter(currency => currency.id !== undefined && currency.id !== null)
+	// 	.map(currency => ({
+	// 		value: currency.id.toString(),
+	// 		label: `${currency.code} - ${currency.name}`,
+	// 	}));
+	const currencyIdOptions = useMemo(() => {
+		return currencies
+			.filter(currency => currency.id !== undefined && currency.id !== null)
+			.map(currency => ({
+				value: currency.id.toString(),
+				label: `${currency.code} - ${currency.name}`,
+			}));
+	}, [currencies]);
 
 	// Rate type options
-	const rateTypeOptions = [
-		{ value: "SPOT", label: t("exchangeRates.rateTypes.SPOT") },
-		{ value: "CORPORATE", label: t("exchangeRates.rateTypes.CORPORATE") },
-		{ value: "USER", label: t("exchangeRates.rateTypes.USER") },
-		{ value: "AVERAGE", label: t("exchangeRates.rateTypes.AVERAGE") },
-	];
+	// const rateTypeOptions = [
+	// 	{ value: "SPOT", label: t("exchangeRates.rateTypes.SPOT") },
+	// 	{ value: "CORPORATE", label: t("exchangeRates.rateTypes.CORPORATE") },
+	// 	{ value: "USER", label: t("exchangeRates.rateTypes.USER") },
+	// 	{ value: "AVERAGE", label: t("exchangeRates.rateTypes.AVERAGE") },
+	// ];
+	const rateTypeOptions = useMemo(
+		() => [
+			{ value: "SPOT", label: t("exchangeRates.rateTypes.SPOT") },
+			{ value: "CORPORATE", label: t("exchangeRates.rateTypes.CORPORATE") },
+			{ value: "USER", label: t("exchangeRates.rateTypes.USER") },
+			{ value: "AVERAGE", label: t("exchangeRates.rateTypes.AVERAGE") },
+		],
+		[t]
+	);
 
 	const handleInputChange = (field, value) => {
 		setFormData(prev => ({ ...prev, [field]: value }));
@@ -180,13 +218,7 @@ const ExchangeRatesPage = () => {
 	};
 
 	const handleClearFilters = () => {
-		setFilters({
-			fromCurrency: "",
-			toCurrency: "",
-			rateType: "",
-			dateFrom: "",
-			dateTo: "",
-		});
+		setFilters(INITIAL_FILTERS_STATE);
 		dispatch(fetchExchangeRates());
 		toast.info(t("exchangeRates.messages.filtersCleared"));
 	};
@@ -265,14 +297,7 @@ const ExchangeRatesPage = () => {
 		setIsModalOpen(false);
 		setIsEditMode(false);
 		setSelectedRate(null);
-		setFormData({
-			fromCurrency: "",
-			toCurrency: "",
-			rateType: "SPOT",
-			rate: "",
-			effectiveDate: "",
-			source: "",
-		});
+		setFormData(INITIAL_FORM_STATE);
 		setErrors({});
 	};
 
@@ -359,12 +384,7 @@ const ExchangeRatesPage = () => {
 
 	const handleCloseConverter = () => {
 		setIsConverterOpen(false);
-		setConverterData({
-			amount: "",
-			fromCurrency: "",
-			toCurrency: "",
-			rateDate: new Date().toISOString().split("T")[0],
-		});
+		setConverterData(INITIAL_CONVERTER_STATE);
 		setConverterErrors({});
 		dispatch(clearConversionResult());
 	};
@@ -374,15 +394,7 @@ const ExchangeRatesPage = () => {
 			<PageHeader
 				title={t("exchangeRates.title")}
 				subtitle={t("exchangeRates.subtitle")}
-				icon={
-					<svg width="29" height="35" viewBox="0 0 29 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path
-							d="M14.5 0C6.49 0 0 6.49 0 14.5C0 22.51 6.49 29 14.5 29C22.51 29 29 22.51 29 14.5C29 6.49 22.51 0 14.5 0ZM14.5 26.5C7.87 26.5 2.5 21.13 2.5 14.5C2.5 7.87 7.87 2.5 14.5 2.5C21.13 2.5 26.5 7.87 26.5 14.5C26.5 21.13 21.13 26.5 14.5 26.5Z"
-							fill="#28819C"
-						/>
-						<path d="M19 10L14.5 14.5L10 10M10 19L14.5 14.5L19 19" stroke="#28819C" strokeWidth="2" />
-					</svg>
-				}
+				icon={<IoCloseCircleOutline size={35} color="#28819C" />}
 			/>
 
 			<div className="mx-auto px-6 py-8">
@@ -390,42 +402,22 @@ const ExchangeRatesPage = () => {
 				<div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
 					<h2 className="text-2xl font-bold text-gray-900">{t("exchangeRates.title")}</h2>
 					<div className="flex gap-3">
-						<button
+						<Button
 							onClick={() => setIsConverterOpen(true)}
-							className="flex items-center gap-2 px-4 py-2 bg-white border border-[#28819C] text-[#28819C] rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
-						>
-							<svg
-								width="20"
-								height="20"
-								viewBox="0 0 20 20"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM14 11L10 15L6 11H14ZM6 9L10 5L14 9H6Z"
-									fill="#28819C"
-								/>
-							</svg>
-							{t("exchangeRates.actions.currencyConverter")}
-						</button>
-						<button
+							title={t("exchangeRates.actions.currencyConverter")}
+							icon={
+								<div className="flex items-center justify-center bg-[#28819C] rounded-full p-1">
+									<TbCaretUpDownFilled color="white" size={20} />
+								</div>
+							}
+							className="bg-white border border-[#28819C] text-[#28819C] hover:bg-gray-50"
+						/>
+
+						<Button
 							onClick={() => setIsModalOpen(true)}
-							className="flex items-center gap-2 px-4 py-2 bg-[#28819C] text-white rounded-lg hover:bg-[#206b85] transition-colors duration-200 font-medium"
-						>
-							<svg
-								width="20"
-								height="20"
-								viewBox="0 0 20 20"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM15 11H11V15H9V11H5V9H9V5H11V9H15V11Z"
-									fill="white"
-								/>
-							</svg>
-							{t("exchangeRates.actions.addExchangeRate")}
-						</button>
+							title={t("exchangeRates.actions.addExchangeRate")}
+							icon={<BiPlusCircle size={24} />}
+						/>
 					</div>
 				</div>
 
@@ -480,26 +472,18 @@ const ExchangeRatesPage = () => {
 
 					{/* Filter Buttons */}
 					<div className="flex justify-end gap-4">
-						<button
+						<Button
 							onClick={handleClearFilters}
-							className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
-						>
-							{t("exchangeRates.actions.clearAll")}
-						</button>
-						<button
-							onClick={handleApplyFilters}
-							className="px-6 py-2.5 bg-[#28819C] text-white rounded-lg hover:bg-[#206b82] font-medium transition-colors"
-						>
-							{t("exchangeRates.actions.applyFilters")}
-						</button>
+							title={t("exchangeRates.actions.clearAll")}
+							className="bg-white hover:bg-gray-100 text-gray-700 border border-gray-300"
+						/>
+						<Button onClick={handleApplyFilters} title={t("exchangeRates.actions.applyFilters")} />
 					</div>
 				</div>
 
 				{/* Table */}
 				{loading ? (
-					<div className="flex justify-center items-center py-12">
-						<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#28819C]"></div>
-					</div>
+					<LoadingSpan />
 				) : (
 					<Table
 						columns={columns}
@@ -519,91 +503,17 @@ const ExchangeRatesPage = () => {
 				title={isEditMode ? t("exchangeRates.modals.editTitle") : t("exchangeRates.modals.addTitle")}
 				maxWidth="550px"
 			>
-				<div className="space-y-6">
-					{/* From Currency */}
-					<FloatingLabelSelect
-						label={t("exchangeRates.table.fromCurrency")}
-						name="fromCurrency"
-						value={formData.fromCurrency}
-						onChange={e => handleInputChange("fromCurrency", e.target.value)}
-						error={errors.fromCurrency}
-						options={currencyIdOptions}
-						required
-					/>
-
-					{/* To Currency */}
-					<FloatingLabelSelect
-						label={t("exchangeRates.table.toCurrency")}
-						name="toCurrency"
-						value={formData.toCurrency}
-						onChange={e => handleInputChange("toCurrency", e.target.value)}
-						error={errors.toCurrency}
-						options={currencyIdOptions}
-						required
-					/>
-
-					{/* Rate Type */}
-					<FloatingLabelSelect
-						label={t("exchangeRates.table.rateType")}
-						name="rateType"
-						value={formData.rateType}
-						onChange={e => handleInputChange("rateType", e.target.value)}
-						error={errors.rateType}
-						options={rateTypeOptions}
-						required
-					/>
-
-					{/* Exchange Rate */}
-					<FloatingLabelInput
-						label={t("exchangeRates.table.exchangeRate")}
-						name="rate"
-						type="number"
-						step="0.0001"
-						value={formData.rate}
-						onChange={e => handleInputChange("rate", e.target.value)}
-						error={errors.rate}
-						required
-						placeholder={t("exchangeRates.form.placeholders.rate")}
-					/>
-
-					{/* Effective Date */}
-					<FloatingLabelInput
-						label={t("exchangeRates.table.effectiveDate")}
-						name="effectiveDate"
-						type="date"
-						value={formData.effectiveDate}
-						onChange={e => handleInputChange("effectiveDate", e.target.value)}
-						error={errors.effectiveDate}
-						required
-					/>
-
-					{/* Source */}
-					<FloatingLabelInput
-						label={t("exchangeRates.table.source")}
-						name="source"
-						value={formData.source}
-						onChange={e => handleInputChange("source", e.target.value)}
-						error={errors.source}
-						required
-						placeholder={t("exchangeRates.form.placeholders.source")}
-					/>
-
-					{/* Action Buttons */}
-					<div className="flex gap-3 pt-4">
-						<button
-							onClick={handleCloseModal}
-							className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
-						>
-							{t("exchangeRates.actions.cancel")}
-						</button>
-						<button
-							onClick={handleAddExchangeRate}
-							className="flex-1 px-4 py-2 bg-[#28819C] text-white rounded-lg hover:bg-[#206b85] transition-colors duration-200 font-medium"
-						>
-							{isEditMode ? t("exchangeRates.actions.update") : t("exchangeRates.actions.create")}
-						</button>
-					</div>
-				</div>
+				<ExchangeRateForm
+					t={t}
+					formData={formData}
+					errors={errors}
+					onChange={handleInputChange}
+					onSubmit={handleAddExchangeRate}
+					onCancel={handleCloseModal}
+					currencyOptions={currencyIdOptions}
+					rateTypeOptions={rateTypeOptions}
+					isEditMode={isEditMode}
+				/>
 			</SlideUpModal>
 
 			{/* Delete Confirmation Modal */}
@@ -621,112 +531,29 @@ const ExchangeRatesPage = () => {
 			/>
 
 			{/* Currency Converter Modal */}
+
 			<SlideUpModal
 				isOpen={isConverterOpen}
 				onClose={handleCloseConverter}
 				title={t("exchangeRates.modals.converterTitle")}
 				maxWidth="550px"
 			>
-				<div className="space-y-6">
-					{/* Amount */}
-					<FloatingLabelInput
-						label={t("exchangeRates.form.amount")}
-						name="amount"
-						type="number"
-						step="0.01"
-						value={converterData.amount}
-						onChange={e => setConverterData(prev => ({ ...prev, amount: e.target.value }))}
-						error={converterErrors.amount}
-						required
-						placeholder={t("exchangeRates.form.placeholders.amount")}
-					/>
+				<CurrencyConverterForm
+					t={t}
+					data={converterData}
+					errors={converterErrors}
+					result={conversionResult}
+					onChange={(field, value) => {
+						setConverterData(prev => ({ ...prev, [field]: value }));
 
-					{/* From Currency */}
-					<FloatingLabelSelect
-						label={t("exchangeRates.table.fromCurrency")}
-						name="fromCurrency"
-						value={converterData.fromCurrency}
-						onChange={e => {
-							setConverterData(prev => ({ ...prev, fromCurrency: e.target.value }));
-							if (converterErrors.fromCurrency) {
-								setConverterErrors(prev => ({ ...prev, fromCurrency: "" }));
-							}
-						}}
-						error={converterErrors.fromCurrency}
-						options={currencyCodeOptions}
-						required
-					/>
-
-					{/* To Currency */}
-					<FloatingLabelSelect
-						label={t("exchangeRates.table.toCurrency")}
-						name="toCurrency"
-						value={converterData.toCurrency}
-						onChange={e => {
-							setConverterData(prev => ({ ...prev, toCurrency: e.target.value }));
-							if (converterErrors.toCurrency) {
-								setConverterErrors(prev => ({ ...prev, toCurrency: "" }));
-							}
-						}}
-						error={converterErrors.toCurrency}
-						options={currencyCodeOptions}
-						required
-					/>
-
-					{/* Rate Date */}
-					<FloatingLabelInput
-						label={t("exchangeRates.form.rateDate")}
-						name="rateDate"
-						type="date"
-						value={converterData.rateDate}
-						onChange={e => {
-							setConverterData(prev => ({ ...prev, rateDate: e.target.value }));
-							if (converterErrors.rateDate) {
-								setConverterErrors(prev => ({ ...prev, rateDate: "" }));
-							}
-						}}
-						error={converterErrors.rateDate}
-						required
-					/>
-
-					{/* Conversion Result */}
-					{conversionResult && (
-						<div className="bg-green-50 border border-green-200 rounded-lg p-4">
-							<p className="text-sm text-green-800 mb-2">{t("exchangeRates.converter.resultTitle")}:</p>
-							<div className="space-y-1">
-								<p className="text-lg font-semibold text-green-900" dir="ltr">
-									{converterData.amount} {converterData.fromCurrency} ={" "}
-									{conversionResult.converted_amount} {converterData.toCurrency}
-								</p>
-								<div className="flex gap-4">
-									<p className="text-sm text-green-700">
-										{t("exchangeRates.converter.exchangeRate")}: {conversionResult.rate}
-									</p>
-									<p className="text-sm text-green-600">
-										{t("exchangeRates.converter.rateDate")}:{" "}
-										{conversionResult.rate_date || converterData.rateDate}
-									</p>
-								</div>
-							</div>
-						</div>
-					)}
-
-					{/* Action Buttons */}
-					<div className="flex gap-3 pt-4">
-						<button
-							onClick={handleCloseConverter}
-							className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
-						>
-							{t("exchangeRates.actions.close")}
-						</button>
-						<button
-							onClick={handleConvert}
-							className="flex-1 px-4 py-2 bg-[#28819C] text-white rounded-lg hover:bg-[#206b85] transition-colors duration-200 font-medium"
-						>
-							{t("exchangeRates.actions.convert")}
-						</button>
-					</div>
-				</div>
+						if (converterErrors[field]) {
+							setConverterErrors(prev => ({ ...prev, [field]: "" }));
+						}
+					}}
+					onClose={handleCloseConverter}
+					onConvert={handleConvert}
+					currencyOptions={currencyCodeOptions}
+				/>
 			</SlideUpModal>
 
 			{/* Toast Container */}
