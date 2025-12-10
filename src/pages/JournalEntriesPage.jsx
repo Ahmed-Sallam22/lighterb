@@ -19,7 +19,7 @@ import TotalEntriesIcon from "../assets/icons/TotalEntriesIcon";
 import PostedIcon from "../assets/icons/PostedIcons";
 import DraftIcon from "../assets/icons/DraftIcon";
 
-const JournalEntriesPage = () => {
+const JournalEntriesPage = () =>~ {
 	const { t, i18n } = useTranslation();
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
