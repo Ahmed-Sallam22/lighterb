@@ -664,6 +664,7 @@
 			"createApproval": "إنشاء اعتماد",
 			"searchPlaceholder": "بحث...",
 			"filterAllTypes": "جميع الأنواع",
+			"filterByType": "تصفية حسب النوع",
 			"apInvoice": "فاتورة مشتريات",
 			"arInvoice": "فاتورة مبيعات",
 			"approve": "اعتماد",

@@ -16,6 +16,7 @@ import SearchInput from "../components/shared/SearchInput";
 import RequisitionCard from "../components/RequisitionCard";
 import BrowseCatalog from "../components/BrowseCatalog";
 import Button from "../components/shared/Button";
+import Tabs from "../components/shared/Tabs";
 import { requisitionsData } from "../dummyData/requisitionsData";
 import LoadingSpan from "../components/shared/LoadingSpan";
 
@@ -279,21 +280,8 @@ const RequisitionsPage = () => {
 						))}
 					</div>
 
-					{/* Tabs Section */}
-					<div className="flex items-center gap-0 bg-white rounded-full p-1 w-fit">
-						{tabs.map(tab => (
-							<Button
-								key={tab.id}
-								onClick={() => handleTabChange(tab.id)}
-								title={tab.label}
-								className={`relative px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-									activeTab === tab.id
-										? "bg-[#EEEEEE] shadow-sm text-black"
-										: "bg-transparent text-gray-600 hover:text-[#28819C] shadow-none"
-								}`}
-							/>
-						))}
-					</div>
+					{/* Tabs Section - Now using Tabs component */}
+					<Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />
 
 					{/* Filters Section */}
 					<div className="flex justify-end">

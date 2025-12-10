@@ -660,9 +660,10 @@
 		"title": "Invoice Approvals",
 		"subtitle": "Review and approve pending invoices",
 		"actions": {
-			"createApproval": "+ Create Approval",
+			"createApproval": "Create Approval",
 			"searchPlaceholder": "Search...",
 			"filterAllTypes": "All Types",
+			"filterByType": "Filter by Type",
 			"apInvoice": "AP Invoice",
 			"arInvoice": "AR Invoice",
 			"approve": "Approve",
