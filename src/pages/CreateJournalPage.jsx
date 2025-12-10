@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useTranslation } from "react-i18next"; // ADD THIS IMPORT
+import { useTranslation } from "react-i18next";
+import { FaCheckCircle, FaTimesCircle, FaTrash } from "react-icons/fa";
 import PageHeader from "../components/shared/PageHeader";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
@@ -13,6 +14,7 @@ import { fetchCurrencies } from "../store/currenciesSlice";
 import { fetchAccounts } from "../store/accountsSlice";
 import { fetchSegmentTypes, fetchSegmentValues } from "../store/segmentsSlice";
 import HeroPattern from "../ui/HeroPatterns";
+import CreateJournalHeaderIcon from "../assets/icons/CreateJournalHeaderIcon";
 
 const CreateJournalPage = () => {
 	const { t } = useTranslation(); // ADD THIS LINE
@@ -315,14 +317,7 @@ const CreateJournalPage = () => {
 			<PageHeader
 				title={isEditMode ? t("createJournal.title.edit") : t("createJournal.title.new")}
 				subtitle={isEditMode ? t("createJournal.subtitle.edit") : t("createJournal.subtitle.new")}
-				icon={
-					<svg width="29" height="35" viewBox="0 0 29 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path
-							d="M16.25 2.5C16.25 2.16848 16.1183 1.85054 15.8839 1.61612C15.6495 1.3817 15.3315 1.25 15 1.25H2.5C2.16848 1.25 1.85054 1.3817 1.61612 1.61612C1.3817 1.85054 1.25 2.16848 1.25 2.5V10.625C1.24854 11.8715 1.58661 13.0948 2.2279 14.1637C2.86919 15.2325 3.7895 16.1066 4.89 16.6919L8.125 18.4169V17L5.47875 15.5887C4.57853 15.1096 3.82568 14.3945 3.30093 13.52C2.77618 12.6456 2.49931 11.6448 2.5 10.625V2.5H15V8.125H16.25V2.5Z"
-							fill="#28819C"
-						/>
-					</svg>
-				}
+				icon={<CreateJournalHeaderIcon />}
 			/>
 
 			<div className=" mx-auto py-6">
@@ -621,19 +616,7 @@ const CreateJournalPage = () => {
 														}`}
 														title={t("createJournal.glLines.deleteLine")}
 													>
-														<svg
-															className="w-5 h-5"
-															fill="none"
-															stroke="currentColor"
-															viewBox="0 0 24 24"
-														>
-															<path
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																strokeWidth={2}
-																d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-															/>
-														</svg>
+														<FaTrash className="w-5 h-5" />
 													</button>
 												</td>
 											</tr>
@@ -653,32 +636,12 @@ const CreateJournalPage = () => {
 											<td colSpan="2" className="px-4 py-3">
 												{isBalanced ? (
 													<span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
-														<svg
-															className="w-5 h-5"
-															fill="currentColor"
-															viewBox="0 0 20 20"
-														>
-															<path
-																fillRule="evenodd"
-																d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-																clipRule="evenodd"
-															/>
-														</svg>
+														<FaCheckCircle className="w-5 h-5" />
 														{t("createJournal.glLines.balanced")}
 													</span>
 												) : (
 													<span className="inline-flex items-center gap-1 text-red-600 text-sm font-medium">
-														<svg
-															className="w-5 h-5"
-															fill="currentColor"
-															viewBox="0 0 20 20"
-														>
-															<path
-																fillRule="evenodd"
-																d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-																clipRule="evenodd"
-															/>
-														</svg>
+														<FaTimesCircle className="w-5 h-5" />
 														{t("createJournal.glLines.notBalanced")}
 														{Math.abs(totalDebit - totalCredit).toFixed(2)}
 														{t("createJournal.glLines.difference")}
