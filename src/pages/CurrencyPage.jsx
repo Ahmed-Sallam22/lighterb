@@ -2,14 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useTranslation } from "react-i18next"; // ADD THIS IMPORT
+import { useTranslation } from "react-i18next";
 import PageHeader from "../components/shared/PageHeader";
 import Table from "../components/shared/Table";
 import SlideUpModal from "../components/shared/SlideUpModal";
-import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import Toggle from "../components/shared/Toggle";
 import { fetchCurrencies, createCurrency, updateCurrency, deleteCurrency } from "../store/currenciesSlice";
+import Button from "../components/shared/Button";
+import { BiPlus } from "react-icons/bi";
+import CurrencyHeaderIcon from "../assets/icons/CurrencyHeaderIcon";
+import CurrencyForm from "../components/forms/CurrencyForm";
 
 const CurrencyPage = () => {
 	const { t } = useTranslation(); // ADD THIS LINE
@@ -261,42 +264,21 @@ const CurrencyPage = () => {
 				pauseOnHover
 			/>
 
-			<PageHeader
-				title={t("currency.title")}
-				subtitle={t("currency.subtitle")}
-				icon={
-					<svg width="29" height="35" viewBox="0 0 29 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path
-							d="M14.5 0C6.49 0 0 6.49 0 14.5C0 22.51 6.49 29 14.5 29C22.51 29 29 22.51 29 14.5C29 6.49 22.51 0 14.5 0ZM14.5 26.5C7.87 26.5 2.5 21.13 2.5 14.5C2.5 7.87 7.87 2.5 14.5 2.5C21.13 2.5 26.5 7.87 26.5 14.5C26.5 21.13 21.13 26.5 14.5 26.5Z"
-							fill="#28819C"
-						/>
-						<path
-							d="M15.75 7.5H13.25V13.25H7.5V15.75H13.25V21.5H15.75V15.75H21.5V13.25H15.75V7.5Z"
-							fill="#28819C"
-						/>
-					</svg>
-				}
-			/>
+			<PageHeader title={t("currency.title")} subtitle={t("currency.subtitle")} icon={<CurrencyHeaderIcon />} />
 
 			<div className="w-[95%] mx-auto px-6 py-8">
 				{/* Header with Title and Button */}
 				<div className="flex items-center justify-between mb-6">
 					<h2 className="text-2xl font-bold text-gray-900">{t("currency.pageTitle")}</h2>
-					<button
+
+					<Button
 						onClick={() => setIsModalOpen(true)}
-						className="flex items-center gap-2 px-4 py-2 bg-[#28819C] text-white rounded-lg hover:bg-[#206b85] transition-colors duration-200 font-medium"
-					>
-						<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path
-								d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM15 11H11V15H9V11H5V9H9V5H11V9H15V11Z"
-								fill="white"
-							/>
-						</svg>
-						{t("currency.addCurrency")}
-					</button>
+						title={t("currency.addCurrency")}
+						className="bg-[#28819C] hover:bg-[#206b85] text-white"
+						icon={<BiPlus className="text-xl" />}
+					/>
 				</div>
 
-				{/* Table */}
 				<Table
 					columns={columns}
 					data={currencies}
@@ -313,70 +295,16 @@ const CurrencyPage = () => {
 				title={editingCurrency ? t("currency.modal.titleEdit") : t("currency.modal.titleAdd")}
 				maxWidth="550px"
 			>
-				<div className="space-y-6">
-					{/* Currency Code */}
-					<FloatingLabelInput
-						label={t("currency.modal.codeLabel")}
-						name="code"
-						value={formData.code}
-						onChange={e => handleInputChange("code", e.target.value)}
-						error={errors.code}
-						required
-						placeholder={t("currency.modal.codePlaceholder")}
-						maxLength={3}
-						disabled={!!editingCurrency}
-					/>
-
-					{/* Currency Name */}
-					<FloatingLabelInput
-						label={t("currency.modal.nameLabel")}
-						name="name"
-						value={formData.name}
-						onChange={e => handleInputChange("name", e.target.value)}
-						error={errors.name}
-						required
-						placeholder={t("currency.modal.namePlaceholder")}
-					/>
-
-					{/* Symbol */}
-					<FloatingLabelInput
-						label={t("currency.modal.symbolLabel")}
-						name="symbol"
-						value={formData.symbol}
-						onChange={e => handleInputChange("symbol", e.target.value)}
-						error={errors.symbol}
-						required
-						placeholder={t("currency.modal.symbolPlaceholder")}
-					/>
-
-					{/* Base Currency Toggle */}
-					<div className="flex items-center gap-3">
-						<Toggle
-							checked={formData.isBaseCurrency}
-							onChange={checked => setFormData(prev => ({ ...prev, isBaseCurrency: checked }))}
-						/>
-						<div>
-							<p className="text-sm font-semibold text-gray-700">{t("currency.modal.setAsBase")}</p>
-							<p className="text-xs text-gray-500">{t("currency.modal.baseDescription")}</p>
-						</div>
-					</div>
-
-					{/* Action Buttons */}
-					<div className="flex gap-3 pt-4">
-						<button
-							onClick={handleCloseModal}
-							className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
-						>
-							{t("currency.modal.cancel")}
-						</button>
-						<button
-							onClick={handleAddCurrency}
-							className="flex-1 px-4 py-2 bg-[#28819C] text-white rounded-lg hover:bg-[#206b85] transition-colors duration-200 font-medium"
-						>
-							{editingCurrency ? t("currency.modal.update") : t("currency.modal.create")}
-						</button>
-					</div>
-				</div>
+				<CurrencyForm
+					t={t}
+					formData={formData}
+					errors={errors}
+					onChange={handleInputChange}
+					onToggleBase={checked => setFormData(prev => ({ ...prev, isBaseCurrency: checked }))}
+					onCancel={handleCloseModal}
+					onSubmit={handleAddCurrency}
+					isEditing={!!editingCurrency}
+				/>
 			</SlideUpModal>
 
 			{/* Delete Confirmation Modal */}
