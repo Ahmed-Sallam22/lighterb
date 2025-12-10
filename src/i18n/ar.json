@@ -250,6 +250,14 @@
 		"createdDate": "تاريخ الإنشاء",
 		"createNewRequisition": "إنشاء طلب شراء جديد",
 		"searchPlaceholder": "البحث برقم الطلب أو اسم مقدم الطلب...",
+		"noRequisitionsFound": "لم يتم العثور على طلبات شراء",
+		"filters": {
+			"allStatuses": "جميع الحالات",
+			"posted": "تم الإرسال",
+			"draft": "مسودة",
+			"pending": "قيد الانتظار",
+			"approved": "تمت الموافقة"
+		},
 		"tabs": {
 			"myPRs": "طلباتي",
 			"pendingApproval": "في انتظار موافقتي",

@@ -248,8 +248,15 @@
 		"costCenter": "Cost Center",
 		"totalAmount": "Total Amount",
 		"createdDate": "Created Date",
-
 		"searchPlaceholder": "Search by PR number or requester...",
+		"noRequisitionsFound": "No requisitions found matching your criteria",
+		"filters": {
+			"allStatuses": "All Statuses",
+			"posted": "Posted",
+			"draft": "Draft",
+			"pending": "Pending",
+			"approved": "Approved"
+		},
 		"tabs": {
 			"myPRs": "My PRs",
 			"pendingApproval": "Pending My Approval",
