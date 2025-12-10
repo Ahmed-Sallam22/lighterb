@@ -1,5 +1,5 @@
 // src/pages/Customers.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,21 +16,17 @@ import ConfirmModal from "../components/shared/ConfirmModal";
 
 import { fetchCustomers, createCustomer, updateCustomer, deleteCustomer } from "../store/customersSlice";
 import { fetchCurrencies } from "../store/currenciesSlice";
-
-const CustomerIcon = () => (
-	<svg width="28" height="27" viewBox="0 0 28 27" fill="none" xmlns="http://www.w3.org/2000/svg">
-		<g opacity="0.5">
-			<path
-				d="M14 13.5C17.3137 13.5 20 10.8137 20 7.5C20 4.18629 17.3137 1.5 14 1.5C10.6863 1.5 8 4.18629 8 7.5C8 10.8137 10.6863 13.5 14 13.5Z"
-				fill="#D3D3D3"
-			/>
-			<path
-				d="M2 25.5C2 19.9772 6.47715 15.5 12 15.5H16C21.5228 15.5 26 19.9772 26 25.5V26.5H2V25.5Z"
-				fill="#D3D3D3"
-			/>
-		</g>
-	</svg>
-);
+import { MdPerson } from "react-icons/md";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+const FROM_INITIAL_STATE = {
+	code: "",
+	name: "",
+	email: "",
+	country: "",
+	currency: "",
+	vat_number: "",
+	is_active: true,
+};
 
 const CustomersPage = () => {
 	const { t } = useTranslation();
@@ -44,40 +40,40 @@ const CustomersPage = () => {
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [customerToDelete, setCustomerToDelete] = useState(null);
 
-	const [formData, setFormData] = useState({
-		code: "",
-		name: "",
-		email: "",
-		country: "",
-		currency: "",
-		vat_number: "",
-		is_active: true,
-	});
+	const [formData, setFormData] = useState(FROM_INITIAL_STATE);
 
 	const [searchTerm, setSearchTerm] = useState("");
 
 	const title = t("customers.title");
 	const subtitle = t("customers.subtitle");
-	const icon = <CustomerIcon />;
 
-	// Country options (labels left in English/ISO but you can localize if you want)
-	const countryOptions = [
-		{ value: "", label: t("customers.form.selectCountry") || "Select Country" },
-		{ value: "AE", label: "United Arab Emirates (AE)" },
-		{ value: "EG", label: "Egypt (EG)" },
-		{ value: "IN", label: "India (IN)" },
-		{ value: "SA", label: "Saudi Arabia (SA)" },
-		{ value: "US", label: "United States (US)" },
-	];
+	const countryOptions = useMemo(() => {
+		const countries = [
+			{ value: "AE", label: "United Arab Emirates (AE)" },
+			{ value: "EG", label: "Egypt (EG)" },
+			{ value: "IN", label: "India (IN)" },
+			{ value: "SA", label: "Saudi Arabia (SA)" },
+			{ value: "US", label: "United States (US)" },
+		];
+		return [{ value: "", label: t("customers.form.selectCountry") || "Select Country" }, ...countries];
+	}, [t]);
 
-	// Generate currency options from Redux state
-	const currencyOptions = [
-		{ value: "", label: t("customers.form.selectCurrency") || "Select Currency" },
-		...currencies.map(currency => ({
-			value: currency.id?.toString() ?? currency.code ?? "",
-			label: `${currency.code} - ${currency.name}`,
-		})),
-	];
+	// const currencyOptions = [
+	// 	{ value: "", label: t("customers.form.selectCurrency") || "Select Currency" },
+	// 	...currencies.map(currency => ({
+	// 		value: currency.id?.toString() ?? currency.code ?? "",
+	// 		label: `${currency.code} - ${currency.name}`,
+	// 	})),
+	// ];
+	const currencyOptions = useMemo(() => {
+		return [
+			{ value: "", label: t("customers.form.selectCurrency") || "Select Currency" },
+			...currencies.map(currency => ({
+				value: currency.id?.toString() ?? currency.code ?? "",
+				label: `${currency.code} - ${currency.name}`,
+			})),
+		];
+	}, [currencies, t]);
 
 	// Fetch customers and currencies on mount
 	useEffect(() => {
@@ -179,15 +175,7 @@ const CustomersPage = () => {
 	// Handlers
 	const handleCreate = () => {
 		setEditingCustomer(null);
-		setFormData({
-			code: "",
-			name: "",
-			email: "",
-			country: "",
-			currency: "",
-			vat_number: "",
-			is_active: true,
-		});
+		setFormData(FROM_INITIAL_STATE);
 		setIsModalOpen(true);
 	};
 
@@ -257,15 +245,7 @@ const CustomersPage = () => {
 				toast.success(t("customers.messages.created"));
 			}
 			setIsModalOpen(false);
-			setFormData({
-				code: "",
-				name: "",
-				email: "",
-				country: "",
-				currency: "",
-				vat_number: "",
-				is_active: true,
-			});
+			setFormData(FROM_INITIAL_STATE);
 			setEditingCustomer(null);
 		} catch (err) {
 			toast.error(err?.message || t("customers.messages.saveError"));
@@ -286,7 +266,7 @@ const CustomersPage = () => {
 			<ToastContainer position="top-right" />
 
 			{/* Page Header */}
-			<PageHeader icon={icon} title={title} subtitle={subtitle} />
+			<PageHeader icon={<MdPerson size={30} color="#D3D3D3" />} title={title} subtitle={subtitle} />
 
 			{/* Toolbar */}
 			<div className="px-6 mt-6">
@@ -316,15 +296,7 @@ const CustomersPage = () => {
 				onClose={() => {
 					setIsModalOpen(false);
 					setEditingCustomer(null);
-					setFormData({
-						code: "",
-						name: "",
-						email: "",
-						country: "",
-						currency: "",
-						vat_number: "",
-						is_active: true,
-					});
+					setFormData(FROM_INITIAL_STATE);
 				}}
 				title={editingCustomer ? t("customers.modal.titleEdit") : t("customers.modal.titleAdd")}
 				maxWidth="1000px"
@@ -408,15 +380,7 @@ const CustomersPage = () => {
 							onClick={() => {
 								setIsModalOpen(false);
 								setEditingCustomer(null);
-								setFormData({
-									code: "",
-									name: "",
-									email: "",
-									country: "",
-									currency: "",
-									vat_number: "",
-									is_active: true,
-								});
+								setFormData(FROM_INITIAL_STATE);
 							}}
 							className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
 							disabled={loading}
@@ -431,26 +395,7 @@ const CustomersPage = () => {
 						>
 							{loading ? (
 								<span className="flex items-center justify-center gap-2">
-									<svg
-										className="animate-spin h-5 w-5"
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-									>
-										<circle
-											className="opacity-25"
-											cx="12"
-											cy="12"
-											r="10"
-											stroke="currentColor"
-											strokeWidth="4"
-										></circle>
-										<path
-											className="opacity-75"
-											fill="currentColor"
-											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-										></path>
-									</svg>
+									<AiOutlineLoading3Quarters size={24} />
 									{editingCustomer ? t("customers.modal.updating") : t("customers.modal.creating")}
 								</span>
 							) : editingCustomer ? (

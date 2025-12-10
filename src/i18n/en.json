@@ -539,7 +539,8 @@
 			"country": "Country",
 			"currency": "Currency",
 			"vatNumber": "VAT Number (Optional)",
-			"activeStatus": "Active Status"
+			"activeStatus": "Active Status",
+			"selectCountry": "Select Country"
 		},
 
 		"modal": {

@@ -540,7 +540,8 @@
 			"country": "الدولة",
 			"currency": "العملة",
 			"vatNumber": "الرقم الضريبي (اختياري)",
-			"activeStatus": "الحالة نشطة"
+			"activeStatus": "الحالة نشطة",
+			"selectCountry": "اختر الدولة"
 		},
 
 		"modal": {
