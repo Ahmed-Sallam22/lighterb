@@ -1,24 +1,24 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { FiPlus, FiSearch, FiEye, FiEdit } from 'react-icons/fi';
-import PageHeader from '../../components/shared/PageHeader';
-import FloatingLabelSelect from '../../components/shared/FloatingLabelSelect';
-import RequisitionsHeadIcon from '../../ui/icons/RequisitionsHeadIcon';
+import PageHeader from '../components/shared/PageHeader';
+import FloatingLabelSelect from '../components/shared/FloatingLabelSelect';
+import RequisitionsHeadIcon from '../ui/icons/RequisitionsHeadIcon';
 import { IoDocumentTextOutline, IoLocationOutline, IoSettingsOutline } from 'react-icons/io5';
 import { useTranslation } from 'react-i18next';
-import DoneIcon from '../../ui/icons/DoneIcon';
+import DoneIcon from '../ui/icons/DoneIcon';
 import { HiOutlineSwitchHorizontal } from 'react-icons/hi';
 import { IoIosTrendingDown } from 'react-icons/io';
 import { PiGearFineBold } from 'react-icons/pi';
-import BoxIcon from '../../ui/icons/BoxIcon';
-import DirectoriesIcon from '../../ui/icons/DirectoriesIcon';
+import BoxIcon from '../ui/icons/BoxIcon';
+import DirectoriesIcon from '../ui/icons/DirectoriesIcon';
 import { PiCirclesFourFill } from 'react-icons/pi';
-import Table from '../../components/shared/Table';
-import BoxesIcon from '../../ui/icons/BoxesIcon';
-import Button from '../../components/shared/Button';
-import StatisticsCard from '../../components/shared/StatisticsCard';
-import SearchInput from '../../components/shared/SearchInput';
-import { sampleData } from '../../dummyData/assetsData';
+import Table from '../components/shared/Table';
+import BoxesIcon from '../ui/icons/BoxesIcon';
+import Button from '../components/shared/Button';
+import StatisticsCard from '../components/shared/StatisticsCard';
+import SearchInput from '../components/shared/SearchInput';
+import { sampleData } from '../dummyData/assetsData';
 
 const AssetsPage = () => {
 	const { t } = useTranslation();

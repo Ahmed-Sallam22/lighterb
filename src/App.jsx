@@ -1,9 +1,9 @@
-import { BrowserRouter, Routes, Route } from "react-router";
-import { useTranslation } from "react-i18next";
-import { lazy, Suspense, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from 'react-router';
+import { useTranslation } from 'react-i18next';
+import { lazy, Suspense, useEffect } from 'react';
 
-import MainLayout from "./layouts/MainLayout";
-import ScrollToTop from "./components/ScrollToTop";
+import MainLayout from './layouts/MainLayout';
+import ScrollToTop from './components/ScrollToTop';
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
@@ -16,38 +16,38 @@ const PageLoader = () => (
 );
 
 // Lazy load all pages for better performance
-const Home = lazy(() => import("./pages/Home"));
-const QuickActionDetail = lazy(() => import("./pages/QuickActionDetail"));
-const PaymentsPage = lazy(() => import("./pages/PaymentsPage"));
-const ARInvoicesPage = lazy(() => import("./pages/ARInvoicesPage"));
-const APInvoicesPage = lazy(() => import("./pages/APInvoicesPage"));
-const JournalEntriesPage = lazy(() => import("./pages/JournalEntriesPage"));
-const JournalLinesPage = lazy(() => import("./pages/JournalLinesPage"));
-const CreateJournalPage = lazy(() => import("./pages/CreateJournalPage"));
-const SegmentsPage = lazy(() => import("./pages/SegmentsPage"));
-const CurrencyPage = lazy(() => import("./pages/CurrencyPage"));
-const ExchangeRatesPage = lazy(() => import("./pages/ExchangeRatesPage"));
-const TaxRatesPage = lazy(() => import("./pages/TaxRatesPage"));
-const InvoiceApprovalsPage = lazy(() => import("./pages/InvoiceApprovalsPage"));
-const CustomersPage = lazy(() => import("./pages/CustomersPage"));
-const SuppliersPage = lazy(() => import("./pages/SuppliersPage"));
-const ReportsPage = lazy(() => import("./pages/ReportsPage"));
-const ProcurementDashboard = lazy(() => import("./pages/ProcurementDashboard"));
-const ProcurementApprovals = lazy(() => import("./pages/ProcurementApprovals"));
-const ProcurementApprovalDetail = lazy(() => import("./pages/ProcurementApprovalDetail"));
-const ProcurementCatalog = lazy(() => import("./pages/ProcurementCatalog"));
-const LoginPage = lazy(() => import("./pages/LoginPage"));
-const RegisterPage = lazy(() => import("./pages/RegisterPage"));
-const ForgetPasswordPage = lazy(() => import("./pages/ForgetPasswordPage"));
-const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
-const Requisitions = lazy(() => import("./pages/Requisitions"));
-const AssetsPage = lazy(() => import("./pages/Assets"));
+const Home = lazy(() => import('./pages/Home'));
+const QuickActionDetail = lazy(() => import('./pages/QuickActionDetail'));
+const PaymentsPage = lazy(() => import('./pages/PaymentsPage'));
+const ARInvoicesPage = lazy(() => import('./pages/ARInvoicesPage'));
+const APInvoicesPage = lazy(() => import('./pages/APInvoicesPage'));
+const JournalEntriesPage = lazy(() => import('./pages/JournalEntriesPage'));
+const JournalLinesPage = lazy(() => import('./pages/JournalLinesPage'));
+const CreateJournalPage = lazy(() => import('./pages/CreateJournalPage'));
+const SegmentsPage = lazy(() => import('./pages/SegmentsPage'));
+const CurrencyPage = lazy(() => import('./pages/CurrencyPage'));
+const ExchangeRatesPage = lazy(() => import('./pages/ExchangeRatesPage'));
+const TaxRatesPage = lazy(() => import('./pages/TaxRatesPage'));
+const InvoiceApprovalsPage = lazy(() => import('./pages/InvoiceApprovalsPage'));
+const CustomersPage = lazy(() => import('./pages/CustomersPage'));
+const SuppliersPage = lazy(() => import('./pages/SuppliersPage'));
+const ReportsPage = lazy(() => import('./pages/ReportsPage'));
+const ProcurementDashboard = lazy(() => import('./pages/ProcurementDashboard'));
+const ProcurementApprovals = lazy(() => import('./pages/ProcurementApprovals'));
+const ProcurementApprovalDetail = lazy(() => import('./pages/ProcurementApprovalDetail'));
+const ProcurementCatalog = lazy(() => import('./pages/ProcurementCatalog'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const ForgetPasswordPage = lazy(() => import('./pages/ForgetPasswordPage'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
+const Requisitions = lazy(() => import('./pages/Requisitions'));
+const AssetsPage = lazy(() => import('./pages/Assets'));
 
 const App = () => {
 	const { i18n } = useTranslation();
 
 	useEffect(() => {
-		document.documentElement.dir = i18n.language === "ar" ? "rtl" : "ltr";
+		document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
 	}, [i18n.language]);
 
 	return (
