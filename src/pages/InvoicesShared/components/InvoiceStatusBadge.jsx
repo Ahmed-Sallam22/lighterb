@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 const STATUS_COLORS = {
 	posting: {
@@ -19,9 +20,17 @@ const STATUS_COLORS = {
 };
 
 const InvoiceStatusBadge = ({ type, value }) => {
+	const { t } = useTranslation();
+
 	const colorClass = STATUS_COLORS[type]?.[value] || "bg-gray-100 text-gray-800";
 
-	return <span className={`px-3 py-1 rounded-full text-xs font-semibold ${colorClass}`}>{value}</span>;
+	// Map status values to translation keys
+	const getTranslatedValue = () => {
+		const statusKey = value.toLowerCase();
+		return t(`apInvoices.status.${type}.${statusKey}`);
+	};
+
+	return <span className={`px-3 py-1 rounded-full text-xs font-semibold ${colorClass}`}>{getTranslatedValue()}</span>;
 };
 
 export default InvoiceStatusBadge;

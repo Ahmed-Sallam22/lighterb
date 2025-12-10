@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../../components/shared/PageHeader";
 import { useARInvoices } from "./hooks/useARInvoices";
 import { buildInvoiceTableColumns } from "../InvoicesShared/utils/buildTableColumns";
@@ -14,6 +15,7 @@ import { useInvoiceHandlers } from "../InvoicesShared/handlers/useInvoiceHandler
 
 const ARInvoicesPage = () => {
 	const navigate = useNavigate();
+	const { t } = useTranslation();
 
 	// Custom hook for invoice data and operations
 	const {
@@ -41,15 +43,15 @@ const ARInvoicesPage = () => {
 
 	// Update browser title
 	useEffect(() => {
-		document.title = `${PAGE_CONFIG.title} - LightERP`;
+		document.title = `${t("arInvoices.title")} - LightERP`;
 		return () => {
 			document.title = "LightERP";
 		};
-	}, []);
+	}, [t]);
 
 	// Prepare table data and columns
 	const tableData = buildInvoiceTableData(invoices, "AR");
-	const tableColumns = buildInvoiceTableColumns("Customer");
+	const tableColumns = buildInvoiceTableColumns(t("arInvoices.table.customer"), t);
 
 	// Event handlers
 	const {
@@ -78,7 +80,7 @@ const ARInvoicesPage = () => {
 	return (
 		<div className="min-h-screen bg-gray-50">
 			{/* Page Header */}
-			<PageHeader icon={PAGE_CONFIG.icon} title={PAGE_CONFIG.title} subtitle={PAGE_CONFIG.subtitle} />
+			<PageHeader icon={PAGE_CONFIG.icon} title={t("arInvoices.title")} subtitle={t("arInvoices.subtitle")} />
 
 			{/* Toolbar */}
 			<div className="px-6 mt-6">
@@ -86,7 +88,7 @@ const ARInvoicesPage = () => {
 					onSearch={handleSearch}
 					onFilter={handleFilter}
 					onCreateClick={handleCreate}
-					createButtonText="New AR Invoice"
+					createButtonText={t("arInvoices.toolbar.newInvoice")}
 				/>
 			</div>
 
@@ -100,7 +102,7 @@ const ARInvoicesPage = () => {
 					onDelete={handleDelete}
 					onSubmitForApproval={handleSubmitForApproval}
 					onPostToGL={handlePostToGL}
-					emptyMessage="No AR invoices found"
+					emptyMessage={t("arInvoices.table.emptyMessage")}
 					showActionsCondition={row => {
 						const approvalStatus = row.rawData?.approval_status;
 						return approvalStatus !== "APPROVED";

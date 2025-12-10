@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
 import PageHeader from "../../components/shared/PageHeader";
 import APInvoiceIcon from "../../ui/icons/APInvoiceIcon";
 import { useAPInvoices } from "./hooks/useAPInvoices";
@@ -15,6 +16,7 @@ import { useInvoiceHandlers } from "../InvoicesShared/handlers/useInvoiceHandler
 
 const APInvoicesPage = () => {
 	const navigate = useNavigate();
+	const { t } = useTranslation();
 
 	// Custom hook for invoice data and operations
 	const {
@@ -45,15 +47,15 @@ const APInvoicesPage = () => {
 
 	// Update browser title
 	useEffect(() => {
-		document.title = `${PAGE_CONFIG.title} - LightERP`;
+		document.title = `${t("apInvoices.title")} - LightERP`;
 		return () => {
 			document.title = "LightERP";
 		};
-	}, []);
+	}, [t]);
 
 	// Prepare table data and columns
 	const tableData = buildInvoiceTableData(invoices, "AP");
-	const tableColumns = buildInvoiceTableColumns("Supplier");
+	const tableColumns = buildInvoiceTableColumns(t("apInvoices.table.supplier"), t);
 
 	// Event handlers
 	const {
@@ -84,7 +86,7 @@ const APInvoicesPage = () => {
 	return (
 		<div className="min-h-screen bg-gray-50">
 			{/* Page Header */}
-			<PageHeader icon={PAGE_CONFIG.icon} title={PAGE_CONFIG.title} subtitle={PAGE_CONFIG.subtitle} />
+			<PageHeader icon={PAGE_CONFIG.icon} title={t("apInvoices.title")} subtitle={t("apInvoices.subtitle")} />
 
 			{/* Toolbar */}
 			<div className="px-6 mt-6">
@@ -92,7 +94,7 @@ const APInvoicesPage = () => {
 					onSearch={handleSearch}
 					onFilter={handleFilter}
 					onCreateClick={handleCreate}
-					createButtonText="New AP Invoice"
+					createButtonText={t("apInvoices.toolbar.newInvoice")}
 				/>
 			</div>
 
@@ -107,7 +109,7 @@ const APInvoicesPage = () => {
 					onThreeWayMatch={handleThreeWayMatch}
 					onSubmitForApproval={handleSubmitForApproval}
 					onPostToGL={handlePostToGL}
-					emptyMessage="No AP invoices found"
+					emptyMessage={t("apInvoices.table.emptyMessage")}
 					showActionsCondition={row => row.rawData?.approval_status === "DRAFT"}
 				/>
 			</div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import Table from "../../../components/shared/Table";
 
 const InvoiceTable = ({
@@ -14,10 +15,12 @@ const InvoiceTable = ({
 	showActionsCondition,
 	showDeleteCondition,
 }) => {
+	const { t } = useTranslation();
+
 	if (loading) {
 		return (
 			<div className="flex justify-center items-center py-12">
-				<div className="text-gray-500">Loading invoices...</div>
+				<div className="text-gray-500">{t("apInvoices.table.loading")}</div>
 			</div>
 		);
 	}
@@ -25,7 +28,7 @@ const InvoiceTable = ({
 	const actions = [
 		// Three-Way Match (AP only)
 		onThreeWayMatch && {
-			label: "Three-Way Match",
+			label: t("apInvoices.actions.threeWayMatch"),
 			onClick: onThreeWayMatch,
 			condition: row =>
 				row.rawData?.po_header_id &&
@@ -34,12 +37,12 @@ const InvoiceTable = ({
 				!row.rawData?.is_posted,
 		},
 		{
-			label: "Submit for Approval",
+			label: t("apInvoices.actions.submitForApproval"),
 			onClick: onSubmitForApproval,
 			condition: row => row.rawData?.approval_status === "DRAFT" && !row.rawData?.is_posted,
 		},
 		{
-			label: "Post to GL",
+			label: t("apInvoices.actions.postToGL"),
 			onClick: onPostToGL,
 			condition: row => row.rawData?.approval_status === "APPROVED" && !row.rawData?.is_posted,
 		},

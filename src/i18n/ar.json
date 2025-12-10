@@ -233,6 +233,133 @@
 		"apPayments": "مدفوعات الشراء",
 		"reports": "التقارير"
 	},
+	"apInvoices": {
+		"title": "فواتير الشراء",
+		"subtitle": "فواتير الموردين - الدائنون",
+		"toolbar": {
+			"searchPlaceholder": "البحث في الفواتير...",
+			"newInvoice": "فاتورة شراء جديدة",
+			"filterLabel": "تصفية حسب حالة الدفع",
+			"filterAll": "جميع الحالات",
+			"filterPaid": "مدفوعة",
+			"filterUnpaid": "غير مدفوعة",
+			"filterPartial": "مدفوعة جزئياً"
+		},
+		"table": {
+			"invoice": "الفاتورة",
+			"supplier": "المورد",
+			"date": "التاريخ",
+			"dueDate": "تاريخ الاستحقاق",
+			"currency": "العملة",
+			"total": "الإجمالي",
+			"rate": "السعر",
+			"baseTotal": "الإجمالي الأساسي",
+			"balance": "الرصيد",
+			"postingStatus": "حالة الترحيل",
+			"paymentStatus": "حالة الدفع",
+			"approvalStatus": "حالة الاعتماد",
+			"loading": "جارٍ تحميل الفواتير...",
+			"emptyMessage": "لم يتم العثور على فواتير شراء"
+		},
+		"actions": {
+			"threeWayMatch": "المطابقة الثلاثية",
+			"submitForApproval": "إرسال للاعتماد",
+			"postToGL": "ترحيل لدفتر الأستاذ"
+		},
+		"status": {
+			"posting": {
+				"posted": "مرحّل",
+				"draft": "مسودة"
+			},
+			"payment": {
+				"paid": "مدفوعة",
+				"unpaid": "غير مدفوعة",
+				"partial": "مدفوعة جزئياً"
+			},
+			"approval": {
+				"approved": "معتمد",
+				"pending": "قيد الانتظار",
+				"rejected": "مرفوض",
+				"draft": "مسودة"
+			}
+		},
+		"modals": {
+			"deleteTitle": "حذف الفاتورة",
+			"deleteMessage": "هل أنت متأكد من حذف الفاتورة {{invoiceNumber}}؟ لا يمكن التراجع عن هذا الإجراء.",
+			"reverseTitle": "عكس الفاتورة",
+			"reverseMessage": "هل أنت متأكد من عكس الفاتورة {{invoiceNumber}}؟ سيتم إنشاء قيد عكسي.",
+			"postTitle": "ترحيل الفاتورة لدفتر الأستاذ",
+			"postMessage": "هل أنت متأكد من ترحيل الفاتورة {{invoiceNumber}} إلى دفتر الأستاذ العام؟",
+			"confirmText": {
+				"delete": "حذف",
+				"reverse": "عكس",
+				"post": "ترحيل"
+			}
+		}
+	},
+	"arInvoices": {
+		"title": "فواتير المبيعات",
+		"subtitle": "فواتير العملاء - المدينون",
+		"toolbar": {
+			"searchPlaceholder": "البحث في الفواتير...",
+			"newInvoice": "فاتورة مبيعات جديدة",
+			"filterLabel": "تصفية حسب حالة الدفع",
+			"filterAll": "جميع الحالات",
+			"filterPaid": "مدفوعة",
+			"filterUnpaid": "غير مدفوعة",
+			"filterPartial": "مدفوعة جزئياً"
+		},
+		"table": {
+			"invoice": "الفاتورة",
+			"customer": "العميل",
+			"date": "التاريخ",
+			"dueDate": "تاريخ الاستحقاق",
+			"currency": "العملة",
+			"total": "الإجمالي",
+			"rate": "السعر",
+			"baseTotal": "الإجمالي الأساسي",
+			"balance": "الرصيد",
+			"postingStatus": "حالة الترحيل",
+			"paymentStatus": "حالة الدفع",
+			"approvalStatus": "حالة الاعتماد",
+			"loading": "جارٍ تحميل الفواتير...",
+			"emptyMessage": "لم يتم العثور على فواتير مبيعات"
+		},
+		"actions": {
+			"submitForApproval": "إرسال للاعتماد",
+			"postToGL": "ترحيل لدفتر الأستاذ"
+		},
+		"status": {
+			"posting": {
+				"posted": "مرحّل",
+				"draft": "مسودة"
+			},
+			"payment": {
+				"paid": "مدفوعة",
+				"unpaid": "غير مدفوعة",
+				"partial": "مدفوعة جزئياً"
+			},
+			"approval": {
+				"approved": "معتمد",
+				"pending": "قيد الانتظار",
+				"rejected": "مرفوض",
+				"draft": "مسودة"
+			}
+		},
+		"modals": {
+			"deleteTitle": "حذف الفاتورة",
+			"deleteMessage": "هل أنت متأكد من حذف الفاتورة {{invoiceNumber}}؟ لا يمكن التراجع عن هذا الإجراء.",
+			"reverseTitle": "عكس الفاتورة",
+			"reverseMessage": "هل أنت متأكد من عكس الفاتورة {{invoiceNumber}}؟ سيتم إنشاء قيد عكسي.",
+			"postTitle": "ترحيل الفاتورة لدفتر الأستاذ",
+			"postMessage": "هل أنت متأكد من ترحيل الفاتورة {{invoiceNumber}} إلى دفتر الأستاذ العام؟",
+			"confirmText": {
+				"delete": "حذف",
+				"reverse": "عكس",
+				"post": "ترحيل"
+			}
+		}
+	},
 	"common": {
 		"scrollLeft": "التمرير لليسار",
 		"scrollRight": "التمرير لليمين"

@@ -233,6 +233,133 @@
 		"apPayments": "AP Payments",
 		"reports": "Reports"
 	},
+	"apInvoices": {
+		"title": "AP Invoices",
+		"subtitle": "Accounts Payable Invoices - Supplier Bills",
+		"toolbar": {
+			"searchPlaceholder": "Search invoices...",
+			"newInvoice": "New AP Invoice",
+			"filterLabel": "Filter by Payment Status",
+			"filterAll": "All Status",
+			"filterPaid": "Paid",
+			"filterUnpaid": "Unpaid",
+			"filterPartial": "Partial"
+		},
+		"table": {
+			"invoice": "Invoice",
+			"supplier": "Supplier",
+			"date": "Date",
+			"dueDate": "Due Date",
+			"currency": "Currency",
+			"total": "Total",
+			"rate": "Rate",
+			"baseTotal": "Base Total",
+			"balance": "Balance",
+			"postingStatus": "Posting Status",
+			"paymentStatus": "Payment Status",
+			"approvalStatus": "Approval Status",
+			"loading": "Loading invoices...",
+			"emptyMessage": "No AP invoices found"
+		},
+		"actions": {
+			"threeWayMatch": "Three-Way Match",
+			"submitForApproval": "Submit for Approval",
+			"postToGL": "Post to GL"
+		},
+		"status": {
+			"posting": {
+				"posted": "Posted",
+				"draft": "Draft"
+			},
+			"payment": {
+				"paid": "Paid",
+				"unpaid": "Unpaid",
+				"partial": "Partial"
+			},
+			"approval": {
+				"approved": "Approved",
+				"pending": "Pending",
+				"rejected": "Rejected",
+				"draft": "Draft"
+			}
+		},
+		"modals": {
+			"deleteTitle": "Delete Invoice",
+			"deleteMessage": "Are you sure you want to delete invoice {{invoiceNumber}}? This action cannot be undone.",
+			"reverseTitle": "Reverse Invoice",
+			"reverseMessage": "Are you sure you want to reverse invoice {{invoiceNumber}}? This will create a reversal entry.",
+			"postTitle": "Post Invoice to GL",
+			"postMessage": "Are you sure you want to post invoice {{invoiceNumber}} to the General Ledger?",
+			"confirmText": {
+				"delete": "Delete",
+				"reverse": "Reverse",
+				"post": "Post"
+			}
+		}
+	},
+	"arInvoices": {
+		"title": "AR Invoices",
+		"subtitle": "Accounts Receivable Invoices - Customer Invoices",
+		"toolbar": {
+			"searchPlaceholder": "Search invoices...",
+			"newInvoice": "New AR Invoice",
+			"filterLabel": "Filter by Payment Status",
+			"filterAll": "All Status",
+			"filterPaid": "Paid",
+			"filterUnpaid": "Unpaid",
+			"filterPartial": "Partial"
+		},
+		"table": {
+			"invoice": "Invoice",
+			"customer": "Customer",
+			"date": "Date",
+			"dueDate": "Due Date",
+			"currency": "Currency",
+			"total": "Total",
+			"rate": "Rate",
+			"baseTotal": "Base Total",
+			"balance": "Balance",
+			"postingStatus": "Posting Status",
+			"paymentStatus": "Payment Status",
+			"approvalStatus": "Approval Status",
+			"loading": "Loading invoices...",
+			"emptyMessage": "No AR invoices found"
+		},
+		"actions": {
+			"submitForApproval": "Submit for Approval",
+			"postToGL": "Post to GL"
+		},
+		"status": {
+			"posting": {
+				"posted": "Posted",
+				"draft": "Draft"
+			},
+			"payment": {
+				"paid": "Paid",
+				"unpaid": "Unpaid",
+				"partial": "Partial"
+			},
+			"approval": {
+				"approved": "Approved",
+				"pending": "Pending",
+				"rejected": "Rejected",
+				"draft": "Draft"
+			}
+		},
+		"modals": {
+			"deleteTitle": "Delete Invoice",
+			"deleteMessage": "Are you sure you want to delete invoice {{invoiceNumber}}? This action cannot be undone.",
+			"reverseTitle": "Reverse Invoice",
+			"reverseMessage": "Are you sure you want to reverse invoice {{invoiceNumber}}? This will create a reversal entry.",
+			"postTitle": "Post Invoice to GL",
+			"postMessage": "Are you sure you want to post invoice {{invoiceNumber}} to the General Ledger?",
+			"confirmText": {
+				"delete": "Delete",
+				"reverse": "Reverse",
+				"post": "Post"
+			}
+		}
+	},
 	"common": {
 		"scrollLeft": "Scroll left",
 		"scrollRight": "Scroll right"
