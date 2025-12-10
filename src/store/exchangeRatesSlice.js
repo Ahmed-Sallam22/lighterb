@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Fetch exchange rates with filters
 export const fetchExchangeRates = createAsyncThunk(
@@ -17,7 +15,7 @@ export const fetchExchangeRates = createAsyncThunk(
       if (filters.date_from) params.append('date_from', filters.date_from);
       if (filters.date_to) params.append('date_to', filters.date_to);
       
-      const response = await axios.get(`${BASE_URL}/fx/rates/?${params.toString()}`);
+      const response = await api.get(`/fx/rates/?${params.toString()}`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -35,7 +33,7 @@ export const fetchCurrencies = createAsyncThunk(
   'exchangeRates/fetchCurrencies',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/currencies/`);
+      const response = await api.get('/currencies/');
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -53,7 +51,7 @@ export const createExchangeRate = createAsyncThunk(
   'exchangeRates/create',
   async (rateData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/fx/rates/`, rateData);
+      const response = await api.post('/fx/rates/', rateData);
       return response.data;
     } catch (error) {
       // Enhanced error handling for field-specific errors
@@ -85,7 +83,7 @@ export const createExchangeRateByCode = createAsyncThunk(
   'exchangeRates/createByCode',
   async (rateData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/fx/create-rate/`, rateData);
+      const response = await api.post('/fx/create-rate/', rateData);
       return response.data;
     } catch (error) {
       // Enhanced error handling for field-specific errors
@@ -117,7 +115,7 @@ export const updateExchangeRate = createAsyncThunk(
   'exchangeRates/update',
   async ({ id, rateData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${BASE_URL}/fx/rates/${id}/`, rateData);
+      const response = await api.put(`/fx/rates/${id}/`, rateData);
       return response.data;
     } catch (error) {
       // Enhanced error handling for field-specific errors
@@ -149,7 +147,7 @@ export const deleteExchangeRate = createAsyncThunk(
   'exchangeRates/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${BASE_URL}/fx/rates/${id}/`);
+      await api.delete(`/fx/rates/${id}/`);
       return id;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -167,7 +165,7 @@ export const convertCurrency = createAsyncThunk(
   'exchangeRates/convert',
   async (conversionData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/fx/convert/`, conversionData);
+      const response = await api.post('/fx/convert/', conversionData);
       return response.data;
     } catch (error) {
       // Enhanced error handling for field-specific errors

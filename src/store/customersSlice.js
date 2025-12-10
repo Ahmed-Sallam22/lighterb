@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Fetch all customers
 export const fetchCustomers = createAsyncThunk(
   'customers/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/customers/`);
+      const response = await api.get('/customers/');
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -26,7 +24,7 @@ export const createCustomer = createAsyncThunk(
   'customers/create',
   async (customerData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/customers/`, customerData);
+      const response = await api.post('/customers/', customerData);
       return response.data;
     } catch (error) {
       if (error.response?.data) {
@@ -56,7 +54,7 @@ export const updateCustomer = createAsyncThunk(
   'customers/update',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${BASE_URL}/customers/${id}/`, data);
+      const response = await api.put(`/customers/${id}/`, data);
       return response.data;
     } catch (error) {
       if (error.response?.data) {
@@ -86,7 +84,7 @@ export const deleteCustomer = createAsyncThunk(
   'customers/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${BASE_URL}/customers/${id}/`);
+      await api.delete(`/customers/${id}/`);
       return id;
     } catch (error) {
       const errorMessage = error.response?.data?.message 

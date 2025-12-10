@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Fetch all currencies
 export const fetchCurrencies = createAsyncThunk(
   'currencies/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/currencies/`);
+      const response = await api.get('/currencies/');
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to fetch currencies' });
@@ -21,12 +19,9 @@ export const createCurrency = createAsyncThunk(
   'currencies/create',
   async (currencyData, { rejectWithValue }) => {
     try {
-      console.log('Creating currency with data:', currencyData);
-      const response = await axios.post(`${BASE_URL}/currencies/`, currencyData);
-      console.log('Currency created successfully:', response.data);
+      const response = await api.post('/currencies/', currencyData);
       return response.data;
     } catch (error) {
-      console.error('Error creating currency:', error.response?.data || error.message);
       const errorData = error.response?.data;
       
       // Handle field-specific errors
@@ -44,12 +39,9 @@ export const updateCurrency = createAsyncThunk(
   'currencies/update',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      console.log('Updating currency:', id, data);
-      const response = await axios.put(`${BASE_URL}/currencies/${id}/`, data);
-      console.log('Currency updated successfully:', response.data);
+      const response = await api.put(`/currencies/${id}/`, data);
       return response.data;
     } catch (error) {
-      console.error('Error updating currency:', error.response?.data || error.message);
       const errorData = error.response?.data;
       
       // Handle field-specific errors
@@ -67,12 +59,9 @@ export const deleteCurrency = createAsyncThunk(
   'currencies/delete',
   async (id, { rejectWithValue }) => {
     try {
-      console.log('Deleting currency:', id);
-      await axios.delete(`${BASE_URL}/currencies/${id}/`);
-      console.log('Currency deleted successfully');
+      await api.delete(`/currencies/${id}/`);
       return id;
     } catch (error) {
-      console.error('Error deleting currency:', error.response?.data || error.message);
       const errorData = error.response?.data;
       
       // Handle field-specific errors

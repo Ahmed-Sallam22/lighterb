@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const API_BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Fetch all invoice approvals
 export const fetchInvoiceApprovals = createAsyncThunk(
   'invoiceApprovals/fetchInvoiceApprovals',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/invoice-approvals/`);
+      const response = await api.get('/invoice-approvals/');
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch invoice approvals');
@@ -21,7 +19,7 @@ export const createInvoiceApproval = createAsyncThunk(
   'invoiceApprovals/createInvoiceApproval',
   async (approvalData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/invoice-approvals/`, approvalData);
+      const response = await api.post('/invoice-approvals/', approvalData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to create invoice approval');
@@ -34,7 +32,7 @@ export const updateInvoiceApproval = createAsyncThunk(
   'invoiceApprovals/updateInvoiceApproval',
   async ({ id, approvalData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_BASE_URL}/invoice-approvals/${id}/`, approvalData);
+      const response = await api.put(`/invoice-approvals/${id}/`, approvalData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to update invoice approval');
@@ -47,7 +45,7 @@ export const deleteInvoiceApproval = createAsyncThunk(
   'invoiceApprovals/deleteInvoiceApproval',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${API_BASE_URL}/invoice-approvals/${id}/`);
+      await api.delete(`/invoice-approvals/${id}/`);
       return id;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to delete invoice approval');
@@ -60,7 +58,7 @@ export const approveInvoice = createAsyncThunk(
   'invoiceApprovals/approveInvoice',
   async ({ id, approvalData }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/invoice-approvals/${id}/approve/`, approvalData);
+      const response = await api.post(`/invoice-approvals/${id}/approve/`, approvalData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to approve invoice');
@@ -73,7 +71,7 @@ export const rejectInvoice = createAsyncThunk(
   'invoiceApprovals/rejectInvoice',
   async ({ id, approvalData }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/invoice-approvals/${id}/reject/`, approvalData);
+      const response = await api.post(`/invoice-approvals/${id}/reject/`, approvalData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to reject invoice');

@@ -1,35 +1,47 @@
 import { BrowserRouter, Routes, Route } from "react-router";
 import { useTranslation } from "react-i18next";
+import { lazy, Suspense, useEffect } from "react";
 
 import MainLayout from "./layouts/MainLayout";
-import Home from "./pages/Home";
-import QuickActionDetail from "./pages/QuickActionDetail";
-import PaymentsPage from "./pages/PaymentsPage";
-import ARInvoicesPage from "./pages/ARInvoicesPage";
-import APInvoicesPage from "./pages/APInvoicesPage";
-import JournalEntriesPage from "./pages/JournalEntriesPage";
-import JournalLinesPage from "./pages/JournalLinesPage";
-import CreateJournalPage from "./pages/CreateJournalPage";
-import SegmentsPage from "./pages/SegmentsPage";
-import CurrencyPage from "./pages/CurrencyPage";
-import ExchangeRatesPage from "./pages/ExchangeRatesPage";
-import TaxRatesPage from "./pages/TaxRatesPage";
-import InvoiceApprovalsPage from "./pages/InvoiceApprovalsPage";
-import CustomersPage from "./pages/CustomersPage";
-import SuppliersPage from "./pages/SuppliersPage";
-import ReportsPage from "./pages/ReportsPage";
 import ScrollToTop from "./components/ScrollToTop";
-import ProcurementDashboard from "./pages/ProcurementDashboard";
-import ProcurementApprovals from "./pages/ProcurementApprovals";
-import ProcurementApprovalDetail from "./pages/ProcurementApprovalDetail";
-import ProcurementCatalog from "./pages/ProcurementCatalog";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import ForgetPasswordPage from "./pages/ForgetPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import { useEffect } from "react";
-import Requisitions from "./pages/Requisitions";
-import AssetsPage from "./pages/Assets";
+
+// Loading component for Suspense fallback
+const PageLoader = () => (
+	<div className="min-h-screen flex items-center justify-center bg-[#031b28]">
+		<div className="flex flex-col items-center gap-4">
+			<div className="w-12 h-12 border-4 border-[#48C1F0] border-t-transparent rounded-full animate-spin"></div>
+			<p className="text-white text-sm">Loading...</p>
+		</div>
+	</div>
+);
+
+// Lazy load all pages for better performance
+const Home = lazy(() => import("./pages/Home"));
+const QuickActionDetail = lazy(() => import("./pages/QuickActionDetail"));
+const PaymentsPage = lazy(() => import("./pages/PaymentsPage"));
+const ARInvoicesPage = lazy(() => import("./pages/ARInvoicesPage"));
+const APInvoicesPage = lazy(() => import("./pages/APInvoicesPage"));
+const JournalEntriesPage = lazy(() => import("./pages/JournalEntriesPage"));
+const JournalLinesPage = lazy(() => import("./pages/JournalLinesPage"));
+const CreateJournalPage = lazy(() => import("./pages/CreateJournalPage"));
+const SegmentsPage = lazy(() => import("./pages/SegmentsPage"));
+const CurrencyPage = lazy(() => import("./pages/CurrencyPage"));
+const ExchangeRatesPage = lazy(() => import("./pages/ExchangeRatesPage"));
+const TaxRatesPage = lazy(() => import("./pages/TaxRatesPage"));
+const InvoiceApprovalsPage = lazy(() => import("./pages/InvoiceApprovalsPage"));
+const CustomersPage = lazy(() => import("./pages/CustomersPage"));
+const SuppliersPage = lazy(() => import("./pages/SuppliersPage"));
+const ReportsPage = lazy(() => import("./pages/ReportsPage"));
+const ProcurementDashboard = lazy(() => import("./pages/ProcurementDashboard"));
+const ProcurementApprovals = lazy(() => import("./pages/ProcurementApprovals"));
+const ProcurementApprovalDetail = lazy(() => import("./pages/ProcurementApprovalDetail"));
+const ProcurementCatalog = lazy(() => import("./pages/ProcurementCatalog"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/RegisterPage"));
+const ForgetPasswordPage = lazy(() => import("./pages/ForgetPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const Requisitions = lazy(() => import("./pages/Requisitions"));
+const AssetsPage = lazy(() => import("./pages/Assets"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -41,37 +53,39 @@ const App = () => {
 	return (
 		<BrowserRouter>
 			<ScrollToTop />
-			<Routes>
-				<Route path="/auth/login" element={<LoginPage />} />
-				<Route path="/auth/register" element={<RegisterPage />} />
-				<Route path="/auth/forgot-password" element={<ForgetPasswordPage />} />
-				<Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-				<Route path="/" element={<MainLayout />}>
-					<Route index element={<Home />} />
-					<Route path="dashboard" element={<Home />} />
-					<Route path="quick-actions/:actionId" element={<QuickActionDetail />} />
-					<Route path="payments/:type" element={<PaymentsPage />} />
-					<Route path="ar-invoices" element={<ARInvoicesPage />} />
-					<Route path="ap-invoices" element={<APInvoicesPage />} />
-					<Route path="journal/entries" element={<JournalEntriesPage />} />
-					<Route path="journal/lines" element={<JournalLinesPage />} />
-					<Route path="journal/create" element={<CreateJournalPage />} />
-					<Route path="segments" element={<SegmentsPage />} />
-					<Route path="assets" element={<AssetsPage />} />
-					<Route path="currency" element={<CurrencyPage />} />
-					<Route path="exchange-rates" element={<ExchangeRatesPage />} />
-					<Route path="tax-rates" element={<TaxRatesPage />} />
-					<Route path="invoice-approvals" element={<InvoiceApprovalsPage />} />
-					<Route path="customers" element={<CustomersPage />} />
-					<Route path="suppliers" element={<SuppliersPage />} />
-					<Route path="reports" element={<ReportsPage />} />
-					<Route path="procurement" element={<ProcurementDashboard />} />
-					<Route path="procurement/approvals" element={<ProcurementApprovals />} />
-					<Route path="requisitions" element={<Requisitions />} />
-					<Route path="procurement/approvals/:instanceId" element={<ProcurementApprovalDetail />} />
-					<Route path="procurement/catalog" element={<ProcurementCatalog />} />
-				</Route>
-			</Routes>
+			<Suspense fallback={<PageLoader />}>
+				<Routes>
+					<Route path="/auth/login" element={<LoginPage />} />
+					<Route path="/auth/register" element={<RegisterPage />} />
+					<Route path="/auth/forgot-password" element={<ForgetPasswordPage />} />
+					<Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+					<Route path="/" element={<MainLayout />}>
+						<Route index element={<Home />} />
+						<Route path="dashboard" element={<Home />} />
+						<Route path="quick-actions/:actionId" element={<QuickActionDetail />} />
+						<Route path="payments/:type" element={<PaymentsPage />} />
+						<Route path="ar-invoices" element={<ARInvoicesPage />} />
+						<Route path="ap-invoices" element={<APInvoicesPage />} />
+						<Route path="journal/entries" element={<JournalEntriesPage />} />
+						<Route path="journal/lines" element={<JournalLinesPage />} />
+						<Route path="journal/create" element={<CreateJournalPage />} />
+						<Route path="segments" element={<SegmentsPage />} />
+						<Route path="assets" element={<AssetsPage />} />
+						<Route path="currency" element={<CurrencyPage />} />
+						<Route path="exchange-rates" element={<ExchangeRatesPage />} />
+						<Route path="tax-rates" element={<TaxRatesPage />} />
+						<Route path="invoice-approvals" element={<InvoiceApprovalsPage />} />
+						<Route path="customers" element={<CustomersPage />} />
+						<Route path="suppliers" element={<SuppliersPage />} />
+						<Route path="reports" element={<ReportsPage />} />
+						<Route path="procurement" element={<ProcurementDashboard />} />
+						<Route path="procurement/approvals" element={<ProcurementApprovals />} />
+						<Route path="requisitions" element={<Requisitions />} />
+						<Route path="procurement/approvals/:instanceId" element={<ProcurementApprovalDetail />} />
+						<Route path="procurement/catalog" element={<ProcurementCatalog />} />
+					</Route>
+				</Routes>
+			</Suspense>
 		</BrowserRouter>
 	);
 };

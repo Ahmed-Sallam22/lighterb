@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Async thunks for Journal Entries
 export const fetchJournals = createAsyncThunk(
   'journals/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/journals/`);
+      const response = await api.get('/journals/');
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch journals');
@@ -20,7 +18,7 @@ export const createJournal = createAsyncThunk(
   'journals/create',
   async (journalData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/journals/`, journalData);
+      const response = await api.post('/journals/', journalData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to create journal');
@@ -32,7 +30,7 @@ export const updateJournal = createAsyncThunk(
   'journals/update',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await axios.patch(`${BASE_URL}/journals/${id}/`, data);
+      const response = await api.patch(`/journals/${id}/`, data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to update journal');
@@ -44,7 +42,7 @@ export const deleteJournal = createAsyncThunk(
   'journals/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${BASE_URL}/journals/${id}/`);
+      await api.delete(`/journals/${id}/`);
       return id;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to delete journal');
@@ -56,7 +54,7 @@ export const postJournal = createAsyncThunk(
   'journals/post',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/journals/${id}/post/`);
+      const response = await api.post(`/journals/${id}/post/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to post journal');
@@ -68,7 +66,7 @@ export const reverseJournal = createAsyncThunk(
   'journals/reverse',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/journals/${id}/reverse/`);
+      const response = await api.post(`/journals/${id}/reverse/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to reverse journal');

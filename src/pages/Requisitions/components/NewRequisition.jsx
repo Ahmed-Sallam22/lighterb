@@ -94,8 +94,7 @@ function NewRequisition() {
 	};
 
 	const handleCheckBudget = () => {
-		console.log("Check budget", formData);
-		// Add budget check logic here
+		// TODO: Add budget check logic here
 	};
 
 	const handleAddLineItem = () => {

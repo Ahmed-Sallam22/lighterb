@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Fetch journal lines with filters
 export const fetchJournalLines = createAsyncThunk(
@@ -18,7 +16,7 @@ export const fetchJournalLines = createAsyncThunk(
       if (filters.posted !== undefined && filters.posted !== '') params.append('posted', filters.posted);
       if (filters.entry_id) params.append('entry_id', filters.entry_id);
       
-      const response = await axios.get(`${BASE_URL}/journal-lines/?${params.toString()}`);
+      const response = await api.get(`/journal-lines/?${params.toString()}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to fetch journal lines' });

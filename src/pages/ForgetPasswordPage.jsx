@@ -14,7 +14,6 @@ const ForgetPasswordPage = () => {
 	const handleSubmit = e => {
 		e.preventDefault();
 		// Add your password reset logic here
-		console.log('Password reset request for:', email);
 		// After sending email, simulate navigation to reset password page
 		// In real app, user would click link in email to navigate to /auth/reset-password?token=xyz
 		// For demo, you can navigate directly:

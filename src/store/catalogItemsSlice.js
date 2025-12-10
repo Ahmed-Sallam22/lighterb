@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 export const fetchCatalogItems = createAsyncThunk(
   'catalogItems/fetch',
@@ -12,7 +10,7 @@ export const fetchCatalogItems = createAsyncThunk(
       params.append('supplier', supplier);
       params.append('active', active);
 
-      const response = await axios.get(`${BASE_URL}/procurement/catalog/items/?${params.toString()}`);
+      const response = await api.get(`/procurement/catalog/items/?${params.toString()}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to fetch catalog items' });
@@ -24,7 +22,7 @@ export const createCatalogItem = createAsyncThunk(
   'catalogItems/create',
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/procurement/catalog/items/`, payload);
+      const response = await api.post('/procurement/catalog/items/', payload);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to create catalog item' });
@@ -36,7 +34,7 @@ export const updateCatalogItem = createAsyncThunk(
   'catalogItems/update',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${BASE_URL}/procurement/catalog/items/${id}/`, data);
+      const response = await api.put(`/procurement/catalog/items/${id}/`, data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to update catalog item' });

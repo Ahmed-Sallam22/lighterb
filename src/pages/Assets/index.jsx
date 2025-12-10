@@ -137,8 +137,8 @@ const AssetsPage = () => {
 
 
 
-	const handleView = row => {
-		console.log("View asset:", row);
+	const handleView = (_row) => {
+		// TODO: Implement view asset functionality
 	};
 
 	const columns = [
@@ -217,7 +217,7 @@ const AssetsPage = () => {
 					<h1 className="text-3xl font-semibold text-[#28819C]">{t("assets.title")}</h1>
 					<div className="flex items-center gap-4">
 						<button
-							onClick={() => console.log("Create Requisition")}
+							onClick={() => {/* TODO: Create Asset */}}
 							className="flex items-center gap-2 px-4 py-2 bg-[#28819C] text-white rounded-[10px] hover:bg-[#206b82] font-medium transition-colors shadow-md hover:shadow-lg"
 						>
 							<FiPlus className="text-xl" />
@@ -225,14 +225,14 @@ const AssetsPage = () => {
 						</button>
 
 						<button
-							onClick={() => console.log("")}
+							onClick={() => {/* TODO: From AP Invoice */}}
 							className="flex items-center gap-2 px-4 py-2 bg-[#00A63E] text-white rounded-[10px] hover:bg-[#206b82] font-medium transition-colors shadow-md hover:shadow-lg"
 						>
 							<IoDocumentTextOutline className="text-xl" />
 							{t("assets.fromAPInvoice")}
 						</button>
 						<button
-							onClick={() => console.log("")}
+							onClick={() => {/* TODO: From GRN */}}
 							className="flex items-center gap-2 px-4 py-2 bg-[#00A63E] text-white rounded-[10px] hover:bg-[#206b82] font-medium transition-colors shadow-md hover:shadow-lg"
 						>
 							<BoxIcon />

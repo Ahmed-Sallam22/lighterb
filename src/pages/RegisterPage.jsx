@@ -34,7 +34,6 @@ const RegisterPage = () => {
 		e.preventDefault();
 
 		// Add your registration logic here
-		console.log('Registration attempt:', formData);
 		// navigate('/login') or navigate('/') after successful registration
 	};
 

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { memo } from "react";
 import PropTypes from "prop-types";
 
-const DeleteIcon = () => (
+// Memoized icon components
+const DeleteIcon = memo(() => (
 	<svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path
 			d="M12.3329 8.6191C12.4813 8.19853 12.7565 7.83434 13.1206 7.57673C13.4846 7.31912 13.9196 7.18079 14.3656 7.18079C14.8116 7.18079 15.2466 7.31912 15.6107 7.57673C15.9748 7.83434 16.25 8.19853 16.3983 8.6191M20.471 10.0557H8.26025M19.2736 11.8514L18.9432 16.8075C18.8161 18.7138 18.7529 19.6669 18.1316 20.248C17.5102 20.8291 16.5542 20.8298 14.6436 20.8298H14.0876C12.177 20.8298 11.221 20.8298 10.5997 20.248C9.97838 19.6669 9.91445 18.7138 9.78803 16.8075L9.45762 11.8514M12.5699 13.6471L12.9291 17.2384M16.1613 13.6471L15.8022 17.2384"
@@ -10,9 +11,10 @@ const DeleteIcon = () => (
 			strokeLinecap="round"
 		/>
 	</svg>
-);
+));
+DeleteIcon.displayName = 'DeleteIcon';
 
-const EditIcon = () => (
+const EditIcon = memo(() => (
 	<svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<g clipPath="url(#clip0_121_403)">
 			<path
@@ -30,18 +32,81 @@ const EditIcon = () => (
 			</clipPath>
 		</defs>
 	</svg>
-);
+));
+EditIcon.displayName = 'EditIcon';
 
-const ViewIcon = () => (
+const ViewIcon = memo(() => (
 	<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path
 			d="M12 5C7 5 2.73 8.11 1 12.5C2.73 16.89 7 20 12 20C17 20 21.27 16.89 23 12.5C21.27 8.11 17 5 12 5ZM12 17.5C9.24 17.5 7 15.26 7 12.5C7 9.74 9.24 7.5 12 7.5C14.76 7.5 17 9.74 17 12.5C17 15.26 14.76 17.5 12 17.5ZM12 9.5C10.34 9.5 9 10.84 9 12.5C9 14.16 10.34 15.5 12 15.5C13.66 15.5 15 14.16 15 12.5C15 10.84 13.66 9.5 12 9.5Z"
 			fill="#28819C"
 		/>
 	</svg>
-);
+));
+ViewIcon.displayName = 'ViewIcon';
 
-const Table = ({
+// Memoized table row component
+const TableRow = memo(({ row, rowIndex, columns, onEdit, onDelete, editIcon, showActions, showDeleteButton }) => (
+	<tr className="hover:bg-gray-50 transition-colors duration-150">
+		{columns.map((column, colIndex) => (
+			<td
+				key={colIndex}
+				className="px-6 py-4 text-sm text-gray-900"
+				style={{
+					textAlign: "center",
+					...(column.width ? { width: column.width, minWidth: column.width } : {}),
+				}}
+			>
+				<div
+					style={{
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+						width: "100%",
+					}}
+				>
+					{column.render
+						? column.render(row[column.accessor], row, rowIndex)
+						: row[column.accessor]}
+				</div>
+			</td>
+		))}
+
+		{(onEdit || onDelete) && (
+			<td className="px-6 py-4" style={{ textAlign: "center" }}>
+				{!showActions || showActions(row) ? (
+					<div className="flex items-center justify-center gap-3">
+						{onEdit && (
+							<button
+								onClick={() => onEdit(row, rowIndex)}
+								className="hover:scale-110 transition-transform duration-200"
+								title={editIcon === "view" ? "View" : "Edit"}
+							>
+								{editIcon === "view" ? <ViewIcon /> : <EditIcon />}
+							</button>
+						)}
+						{onDelete && (!showDeleteButton || showDeleteButton(row)) && (
+							<button
+								onClick={() => onDelete(row, rowIndex)}
+								className="hover:scale-110 transition-transform duration-200"
+								title="Delete"
+							>
+								<DeleteIcon />
+							</button>
+						)}
+					</div>
+				) : (
+					<div className="flex items-center justify-center">
+						<span className="text-gray-400 text-xs">N/A</span>
+					</div>
+				)}
+			</td>
+		)}
+	</tr>
+));
+TableRow.displayName = 'TableRow';
+
+const Table = memo(({
 	columns = [],
 	data = [],
 	onEdit,
@@ -94,64 +159,17 @@ const Table = ({
 							</tr>
 						) : (
 							data.map((row, rowIndex) => (
-								<tr key={rowIndex} className="hover:bg-gray-50 transition-colors duration-150">
-									{columns.map((column, colIndex) => (
-										<td
-											key={colIndex}
-											className="px-6 py-4 text-sm text-gray-900"
-											style={{
-												textAlign: "center",
-												...(column.width
-													? { width: column.width, minWidth: column.width }
-													: {}),
-											}}
-										>
-											<div
-												style={{
-													display: "flex",
-													justifyContent: "center",
-													alignItems: "center",
-													width: "100%",
-												}}
-											>
-												{column.render
-													? column.render(row[column.accessor], row, rowIndex)
-													: row[column.accessor]}
-											</div>
-										</td>
-									))}
-
-									{(onEdit || onDelete) && (
-										<td className="px-6 py-4" style={{ textAlign: "center" }}>
-											{!showActions || showActions(row) ? (
-												<div className="flex items-center justify-center gap-3">
-													{onEdit && (
-														<button
-															onClick={() => onEdit(row, rowIndex)}
-															className="hover:scale-110 transition-transform duration-200"
-															title={editIcon === "view" ? "View" : "Edit"}
-														>
-															{editIcon === "view" ? <ViewIcon /> : <EditIcon />}
-														</button>
-													)}
-													{onDelete && (!showDeleteButton || showDeleteButton(row)) && (
-														<button
-															onClick={() => onDelete(row, rowIndex)}
-															className="hover:scale-110 transition-transform duration-200"
-															title="Delete"
-														>
-															<DeleteIcon />
-														</button>
-													)}
-												</div>
-											) : (
-												<div className="flex items-center justify-center">
-													<span className="text-gray-400 text-xs">N/A</span>
-												</div>
-											)}
-										</td>
-									)}
-								</tr>
+								<TableRow
+									key={rowIndex}
+									row={row}
+									rowIndex={rowIndex}
+									columns={columns}
+									onEdit={onEdit}
+									onDelete={onDelete}
+									editIcon={editIcon}
+									showActions={showActions}
+									showDeleteButton={showDeleteButton}
+								/>
 							))
 						)}
 					</tbody>
@@ -159,7 +177,8 @@ const Table = ({
 			</div>
 		</div>
 	);
-};
+});
+Table.displayName = 'Table';
 
 Table.propTypes = {
 	columns: PropTypes.arrayOf(

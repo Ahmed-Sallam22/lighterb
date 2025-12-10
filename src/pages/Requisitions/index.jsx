@@ -234,19 +234,16 @@ const RequisitionsPage = () => {
 		}));
 	};
 
-	const handleViewRequisition = requisition => {
-		console.log("View requisition:", requisition);
-		// Add your view logic here
+	const handleViewRequisition = (_requisition) => {
+		// TODO: Add your view logic here
 	};
 
-	const handleEditRequisition = requisition => {
-		console.log("Edit requisition:", requisition);
-		// Add your edit logic here
+	const handleEditRequisition = (_requisition) => {
+		// TODO: Add your edit logic here
 	};
 
-	const handleSubmitRequisition = requisition => {
-		console.log("Submit requisition:", requisition);
-		// Add your submit logic here
+	const handleSubmitRequisition = (_requisition) => {
+		// TODO: Add your submit logic here
 	};
 
 	return (

@@ -141,31 +141,25 @@ const CurrencyPage = () => {
 			is_base: formData.isBaseCurrency,
 		};
 
-		console.log("Submitting currency data:", currencyData);
-
 		try {
 			if (editingCurrency) {
 				// Update existing currency
-				const result = await dispatch(
+				await dispatch(
 					updateCurrency({
 						id: editingCurrency.id,
 						data: currencyData,
 					})
 				).unwrap();
-				console.log("Currency updated:", result);
 				toast.success(t("currency.messages.updateSuccess"));
 			} else {
 				// Create new currency
-				const result = await dispatch(createCurrency(currencyData)).unwrap();
-				console.log("Currency created:", result);
+				await dispatch(createCurrency(currencyData)).unwrap();
 				toast.success(t("currency.messages.createSuccess"));
 			}
 			// Refresh the currencies list
 			await dispatch(fetchCurrencies());
 			handleCloseModal();
 		} catch (err) {
-			console.error("Error saving currency:", err);
-
 			// Display detailed error message from API response
 			const errorMessage = err?.message || err?.error || err?.detail || t("currency.messages.createError");
 

@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Async thunks for Segment Types
 export const fetchSegmentTypes = createAsyncThunk(
   'segments/fetchTypes',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/segment/types/`);
+      const response = await api.get('/segment/types/');
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch segment types');
@@ -20,7 +18,7 @@ export const createSegmentType = createAsyncThunk(
   'segments/createType',
   async (typeData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/segment/types/`, typeData);
+      const response = await api.post('/segment/types/', typeData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to create segment type');
@@ -32,7 +30,7 @@ export const updateSegmentType = createAsyncThunk(
   'segments/updateType',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${BASE_URL}/segment/types/${id}/`, data);
+      const response = await api.put(`/segment/types/${id}/`, data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to update segment type');
@@ -44,7 +42,7 @@ export const deleteSegmentType = createAsyncThunk(
   'segments/deleteType',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${BASE_URL}/segment/types/${id}/`);
+      await api.delete(`/segment/types/${id}/`);
       return id;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to delete segment type');
@@ -62,7 +60,7 @@ export const fetchSegmentValues = createAsyncThunk(
       if (node_type) params.append('node_type', node_type);
       if (is_active !== '') params.append('is_active', is_active);
       
-      const response = await axios.get(`${BASE_URL}/segment/values/?${params.toString()}`);
+      const response = await api.get(`/segment/values/?${params.toString()}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch segment values');
@@ -74,7 +72,7 @@ export const createSegmentValue = createAsyncThunk(
   'segments/createValue',
   async (valueData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/segment/values/`, valueData);
+      const response = await api.post('/segment/values/', valueData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to create segment value');
@@ -86,7 +84,7 @@ export const updateSegmentValue = createAsyncThunk(
   'segments/updateValue',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${BASE_URL}/segment/values/${id}/`, data);
+      const response = await api.put(`/segment/values/${id}/`, data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to update segment value');
@@ -98,7 +96,7 @@ export const deleteSegmentValue = createAsyncThunk(
   'segments/deleteValue',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${BASE_URL}/segment/values/${id}/`);
+      await api.delete(`/segment/values/${id}/`);
       return id;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to delete segment value');

@@ -51,7 +51,6 @@ const ResetPasswordPage = () => {
 		}
 
 		// Add your password reset logic here
-		console.log('Reset password with token:', token, formData);
 		// After successful reset, redirect to login
 		alert(t('auth.resetPassword.resetSuccess'));
 		navigate('/auth/login');

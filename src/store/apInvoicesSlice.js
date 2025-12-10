@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Fetch AP invoices
 export const fetchAPInvoices = createAsyncThunk(
   'apInvoices/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/ap/invoices/`);
+      const response = await api.get('/ap/invoices/');
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -26,7 +24,7 @@ export const createAPInvoice = createAsyncThunk(
   'apInvoices/create',
   async (invoiceData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/invoices/`, invoiceData);
+      const response = await api.post('/ap/invoices/', invoiceData);
       return response.data;
     } catch (error) {
       if (error.response?.data) {
@@ -56,7 +54,7 @@ export const updateAPInvoice = createAsyncThunk(
   'apInvoices/update',
   async ({ id, invoiceData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${BASE_URL}/ap/invoices/${id}/`, invoiceData);
+      const response = await api.put(`/ap/invoices/${id}/`, invoiceData);
       return response.data;
     } catch (error) {
       if (error.response?.data) {
@@ -86,7 +84,7 @@ export const deleteAPInvoice = createAsyncThunk(
   'apInvoices/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${BASE_URL}/ap/invoices/${id}/`);
+      await api.delete(`/ap/invoices/${id}/`);
       return id;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -104,7 +102,7 @@ export const submitAPInvoiceForApproval = createAsyncThunk(
   'apInvoices/submitForApproval',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/invoices/${id}/submit-for-approval/`);
+      const response = await api.post(`/ap/invoices/${id}/submit-for-approval/`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -122,7 +120,7 @@ export const reverseAPInvoice = createAsyncThunk(
   'apInvoices/reverse',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/invoices/${id}/reverse/`);
+      const response = await api.post(`/ap/invoices/${id}/reverse/`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -140,7 +138,7 @@ export const postAPInvoiceToGL = createAsyncThunk(
   'apInvoices/postGL',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/invoices/${id}/post-gl/`);
+      const response = await api.post(`/ap/invoices/${id}/post-gl/`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -158,7 +156,7 @@ export const threeWayMatchAPInvoice = createAsyncThunk(
   'apInvoices/threeWayMatch',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/invoices/${id}/three-way-match/`);
+      const response = await api.post(`/ap/invoices/${id}/three-way-match/`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 

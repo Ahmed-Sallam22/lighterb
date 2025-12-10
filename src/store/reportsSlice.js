@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Fetch Trial Balance Report
 export const fetchTrialBalance = createAsyncThunk(
@@ -13,7 +11,7 @@ export const fetchTrialBalance = createAsyncThunk(
       if (dateTo) params.append('date_to', dateTo);
       if (fileType) params.append('file_type', fileType);
 
-      const response = await axios.get(`${BASE_URL}/reports/trial-balance/?${params.toString()}`);
+      const response = await api.get(`/reports/trial-balance/?${params.toString()}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch trial balance');
@@ -30,7 +28,7 @@ export const fetchARAgingReport = createAsyncThunk(
       if (asOf) params.append('as_of', asOf);
       if (fileType) params.append('file_type', fileType);
 
-      const response = await axios.get(`${BASE_URL}/reports/ar-aging/?${params.toString()}`);
+      const response = await api.get(`/reports/ar-aging/?${params.toString()}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch AR aging report');
@@ -47,7 +45,7 @@ export const fetchAPAgingReport = createAsyncThunk(
       if (asOf) params.append('as_of', asOf);
       if (fileType) params.append('file_type', fileType);
 
-      const response = await axios.get(`${BASE_URL}/reports/ap-aging/?${params.toString()}`);
+      const response = await api.get(`/reports/ap-aging/?${params.toString()}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch AP aging report');

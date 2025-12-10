@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Fetch approval steps
 export const fetchApprovalSteps = createAsyncThunk(
   'approvalSteps/fetchApprovalSteps',
   async (params, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/procurement/approvals/steps`, { params });
+      const response = await api.get('/procurement/approvals/steps', { params });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Failed to fetch approval steps' });
@@ -21,8 +19,8 @@ export const approveStep = createAsyncThunk(
   'approvalSteps/approveStep',
   async ({ id, comments }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${BASE_URL}/procurement/approvals/steps/${id}/approve/`,
+      const response = await api.post(
+        `/procurement/approvals/steps/${id}/approve/`,
         { comments: comments || '' }
       );
       return response.data;
@@ -37,8 +35,8 @@ export const rejectStep = createAsyncThunk(
   'approvalSteps/rejectStep',
   async ({ id, reason }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${BASE_URL}/procurement/approvals/steps/${id}/reject/`,
+      const response = await api.post(
+        `/procurement/approvals/steps/${id}/reject/`,
         { reason: reason || '' }
       );
       return response.data;

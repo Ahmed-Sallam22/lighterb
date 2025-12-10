@@ -17,7 +17,6 @@ const LoginPage = () => {
 	const handleSubmit = e => {
 		e.preventDefault();
 		// Add your login logic here
-		console.log('Login attempt:', { username, password, rememberMe });
 		// navigate to home or dashboard after successful login
 		// navigate('/');
 	};

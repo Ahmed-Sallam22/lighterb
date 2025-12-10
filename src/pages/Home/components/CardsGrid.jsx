@@ -25,9 +25,9 @@ const CardsGrid = ({ cards, activeRoute, isAnimating, onCardClick }) => {
 
 						{/* Title and Description */}
 						<div className="flex-1">
-							<h3 className="text-white font-semibold text-lg mb-1 transition-colors duration-300">
+							<h2 className="text-white font-semibold text-lg mb-1 transition-colors duration-300">
 								{card.title}
-							</h3>
+							</h2>
 							<p className="text-white/80 text-sm leading-relaxed">{card.description}</p>
 						</div>
 					</div>

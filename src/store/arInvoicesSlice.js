@@ -1,22 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Fetch AR invoices
 export const fetchARInvoices = createAsyncThunk(
   'arInvoices/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/ar/invoices/`);
+      const response = await api.get('/ar/invoices/');
       return response.data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message 
-        || error.response?.data?.error 
-        || error.response?.data?.detail
-        || error.message 
-        || 'Failed to fetch AR invoices';
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.message || 'Failed to fetch AR invoices');
     }
   }
 );
@@ -26,7 +19,7 @@ export const createARInvoice = createAsyncThunk(
   'arInvoices/create',
   async (invoiceData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ar/invoices/`, invoiceData);
+      const response = await api.post('/ar/invoices/', invoiceData);
       return response.data;
     } catch (error) {
       if (error.response?.data) {
@@ -56,26 +49,9 @@ export const updateARInvoice = createAsyncThunk(
   'arInvoices/update',
   async ({ id, invoiceData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${BASE_URL}/ar/invoices/${id}/`, invoiceData);
+      const response = await api.put(`/ar/invoices/${id}/`, invoiceData);
       return response.data;
     } catch (error) {
-      if (error.response?.data) {
-        const errorData = error.response.data;
-        let errorMessage = '';
-
-        if (typeof errorData === 'object' && !errorData.message && !errorData.error && !errorData.detail) {
-          const fieldErrors = Object.entries(errorData)
-            .map(([field, messages]) => {
-              const messageText = Array.isArray(messages) ? messages.join(', ') : messages;
-              return `${field}: ${messageText}`;
-            })
-            .join(' | ');
-          errorMessage = fieldErrors;
-        } else {
-          errorMessage = errorData.message || errorData.error || errorData.detail || 'Failed to update AR invoice';
-        }
-        return rejectWithValue(errorMessage);
-      }
       return rejectWithValue(error.message || 'Failed to update AR invoice');
     }
   }
@@ -86,15 +62,10 @@ export const deleteARInvoice = createAsyncThunk(
   'arInvoices/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${BASE_URL}/ar/invoices/${id}/`);
+      await api.delete(`/ar/invoices/${id}/`);
       return id;
     } catch (error) {
-      const errorMessage = error.response?.data?.message 
-        || error.response?.data?.error 
-        || error.response?.data?.detail
-        || error.message 
-        || 'Failed to delete AR invoice';
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.message || 'Failed to delete AR invoice');
     }
   }
 );
@@ -104,15 +75,10 @@ export const submitARInvoiceForApproval = createAsyncThunk(
   'arInvoices/submitForApproval',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ar/invoices/${id}/submit-for-approval/`);
+      const response = await api.post(`/ar/invoices/${id}/submit-for-approval/`);
       return response.data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message 
-        || error.response?.data?.error 
-        || error.response?.data?.detail
-        || error.message 
-        || 'Failed to submit AR invoice for approval';
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.message || 'Failed to submit AR invoice for approval');
     }
   }
 );
@@ -122,15 +88,10 @@ export const reverseARInvoice = createAsyncThunk(
   'arInvoices/reverse',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ar/invoices/${id}/reverse/`);
+      const response = await api.post(`/ar/invoices/${id}/reverse/`);
       return response.data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message 
-        || error.response?.data?.error 
-        || error.response?.data?.detail
-        || error.message 
-        || 'Failed to reverse AR invoice';
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.message || 'Failed to reverse AR invoice');
     }
   }
 );
@@ -140,15 +101,10 @@ export const postARInvoiceToGL = createAsyncThunk(
   'arInvoices/postGL',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ar/invoices/${id}/post-gl/`);
+      const response = await api.post(`/ar/invoices/${id}/post-gl/`);
       return response.data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message 
-        || error.response?.data?.error 
-        || error.response?.data?.detail
-        || error.message 
-        || 'Failed to post AR invoice to GL';
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.message || 'Failed to post AR invoice to GL');
     }
   }
 );

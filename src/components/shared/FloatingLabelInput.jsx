@@ -1,7 +1,7 @@
-import React, { useId, useState } from "react";
+import React, { useId, useState, memo } from "react";
 import PropTypes from "prop-types";
 
-const FloatingLabelInput = ({
+const FloatingLabelInput = memo(({
 	label,
 	type = "text",
 	value,
@@ -214,7 +214,9 @@ const FloatingLabelInput = ({
 			</div>
 		</div>
 	);
-};
+});
+
+FloatingLabelInput.displayName = 'FloatingLabelInput';
 
 FloatingLabelInput.propTypes = {
 	label: PropTypes.string.isRequired,

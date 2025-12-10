@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect, useId } from "react";
+import React, { useState, useRef, useEffect, useId, memo } from "react";
 import PropTypes from "prop-types";
 import { PiCirclesFourFill } from "react-icons/pi";
 
-const FloatingLabelSelect = ({
+const FloatingLabelSelect = memo(({
 	label,
 	value,
 	onChange,
@@ -85,10 +85,6 @@ const FloatingLabelSelect = ({
 			setIsFocused(false);
 		}
 	};
-
-	useEffect(() => {
-		console.log(hasValue);
-	}, [hasValue]);
 
 	const ArrowIcon = () => (
 		<svg
@@ -271,7 +267,9 @@ const FloatingLabelSelect = ({
 			`}</style>
 		</div>
 	);
-};
+});
+
+FloatingLabelSelect.displayName = 'FloatingLabelSelect';
 
 FloatingLabelSelect.propTypes = {
 	label: PropTypes.string.isRequired,

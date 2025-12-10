@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Async thunk to fetch accounts
 export const fetchAccounts = createAsyncThunk(
   'accounts/fetchAccounts',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/segment/accounts/`);
+      const response = await api.get('/segment/accounts/');
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch accounts');

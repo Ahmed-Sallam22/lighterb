@@ -9,8 +9,10 @@ const SearchButton = () => {
 			<button
 				onClick={() => setIsSearchOpen(!isSearchOpen)}
 				className="focus:outline-none hover:opacity-80 transition-opacity"
+				aria-label="Search"
+				aria-expanded={isSearchOpen}
 			>
-				<IoSearchOutline className="text-white w-6 h-6" />
+				<IoSearchOutline className="text-white w-6 h-6" aria-hidden="true" />
 			</button>
 
 			{isSearchOpen && (

@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Fetch all suppliers/vendors
 export const fetchSuppliers = createAsyncThunk(
@@ -11,7 +9,7 @@ export const fetchSuppliers = createAsyncThunk(
       const params = new URLSearchParams();
       if (isActive !== '') params.append('is_active', isActive);
       
-      const response = await axios.get(`${BASE_URL}/ap/vendors/?${params.toString()}`);
+      const response = await api.get(`/ap/vendors/?${params.toString()}`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -29,7 +27,7 @@ export const createSupplier = createAsyncThunk(
   'suppliers/create',
   async (supplierData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/vendors/`, supplierData);
+      const response = await api.post('/ap/vendors/', supplierData);
       return response.data;
     } catch (error) {
       if (error.response?.data) {
@@ -59,7 +57,7 @@ export const updateSupplier = createAsyncThunk(
   'suppliers/update',
   async ({ id, supplierData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${BASE_URL}/ap/vendors/${id}/`, supplierData);
+      const response = await api.put(`/ap/vendors/${id}/`, supplierData);
       return response.data;
     } catch (error) {
       if (error.response?.data) {
@@ -89,7 +87,7 @@ export const deleteSupplier = createAsyncThunk(
   'suppliers/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${BASE_URL}/ap/vendors/${id}/`);
+      await api.delete(`/ap/vendors/${id}/`);
       return id;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -107,7 +105,7 @@ export const markPreferred = createAsyncThunk(
   'suppliers/markPreferred',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/vendors/${id}/mark_preferred/`);
+      const response = await api.post(`/ap/vendors/${id}/mark_preferred/`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -125,7 +123,7 @@ export const removePreferred = createAsyncThunk(
   'suppliers/removePreferred',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/vendors/${id}/remove_preferred/`);
+      const response = await api.post(`/ap/vendors/${id}/remove_preferred/`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -143,7 +141,7 @@ export const putOnHold = createAsyncThunk(
   'suppliers/putOnHold',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/vendors/${id}/put_on_hold/`);
+      const response = await api.post(`/ap/vendors/${id}/put_on_hold/`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -161,7 +159,7 @@ export const removeHold = createAsyncThunk(
   'suppliers/removeHold',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/vendors/${id}/remove_hold/`);
+      const response = await api.post(`/ap/vendors/${id}/remove_hold/`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -179,7 +177,7 @@ export const blacklistSupplier = createAsyncThunk(
   'suppliers/blacklist',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/vendors/${id}/blacklist/`);
+      const response = await api.post(`/ap/vendors/${id}/blacklist/`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -197,7 +195,7 @@ export const removeBlacklist = createAsyncThunk(
   'suppliers/removeBlacklist',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/vendors/${id}/remove_blacklist/`);
+      const response = await api.post(`/ap/vendors/${id}/remove_blacklist/`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -215,7 +213,7 @@ export const updatePerformance = createAsyncThunk(
   'suppliers/updatePerformance',
   async ({ id, score }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ap/vendors/${id}/update_performance/`, { performance_score: score });
+      const response = await api.post(`/ap/vendors/${id}/update_performance/`, { performance_score: score });
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 

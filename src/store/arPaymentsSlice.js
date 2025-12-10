@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Fetch AR payments
 export const fetchARPayments = createAsyncThunk(
   'arPayments/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/ar/payments/`);
+      const response = await api.get('/ar/payments/');
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -26,7 +24,7 @@ export const createARPayment = createAsyncThunk(
   'arPayments/create',
   async (paymentData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ar/payments/`, paymentData);
+      const response = await api.post('/ar/payments/', paymentData);
       return response.data;
     } catch (error) {
       if (error.response?.data) {
@@ -56,7 +54,7 @@ export const postARPayment = createAsyncThunk(
   'arPayments/post',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/ar/payments/${id}/post/`);
+      const response = await api.post(`/ar/payments/${id}/post/`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 
@@ -74,7 +72,7 @@ export const updateARPayment = createAsyncThunk(
   'arPayments/update',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${BASE_URL}/ar/payments/${id}/`, data);
+      const response = await api.put(`/ar/payments/${id}/`, data);
       return response.data;
     } catch (error) {
       if (error.response?.data) {
@@ -104,7 +102,7 @@ export const deleteARPayment = createAsyncThunk(
   'arPayments/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${BASE_URL}/ar/payments/${id}/`);
+      await api.delete(`/ar/payments/${id}/`);
       return id;
     } catch (error) {
       const errorMessage = error.response?.data?.message 

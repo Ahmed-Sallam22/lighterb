@@ -1,0 +1,10 @@
+# robots.txt for LightERP
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /auth/
+
+# Sitemap location (update with your actual domain)
+# Sitemap: https://yourdomain.com/sitemap.xml

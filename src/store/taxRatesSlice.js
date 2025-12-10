@@ -1,14 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const BASE_URL = 'https://lightidea.org:8007/api';
+import api from '../api/axios';
 
 // Async thunks for Tax Rates
 export const fetchTaxRates = createAsyncThunk(
   'taxRates/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/tax/rates/`);
+      const response = await api.get('/tax/rates/');
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch tax rates');
@@ -20,7 +18,7 @@ export const createTaxRate = createAsyncThunk(
   'taxRates/create',
   async (taxRateData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/tax/rates/`, taxRateData);
+      const response = await api.post('/tax/rates/', taxRateData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to create tax rate');
@@ -32,7 +30,7 @@ export const updateTaxRate = createAsyncThunk(
   'taxRates/update',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${BASE_URL}/tax/rates/${id}/`, data);
+      const response = await api.put(`/tax/rates/${id}/`, data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to update tax rate');
@@ -44,7 +42,7 @@ export const deleteTaxRate = createAsyncThunk(
   'taxRates/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${BASE_URL}/tax/rates/${id}/`);
+      await api.delete(`/tax/rates/${id}/`);
       return id;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to delete tax rate');
@@ -57,7 +55,7 @@ export const seedTaxPresets = createAsyncThunk(
   'taxRates/seedPresets',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/tax/seed-presets/`);
+      const response = await api.post('/tax/seed-presets/');
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to seed tax presets');
@@ -70,7 +68,7 @@ export const fetchCorporateAccrual = createAsyncThunk(
   'taxRates/corporateAccrual',
   async ({ country, date_from, date_to }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/tax/corporate-accrual/`, {
+      const response = await api.post('/tax/corporate-accrual/', {
         country,
         date_from,
         date_to,
@@ -90,7 +88,7 @@ export const fetchCorporateBreakdown = createAsyncThunk(
       if (date_from) params.append('date_from', date_from);
       if (date_to) params.append('date_to', date_to);
       
-      const response = await axios.get(`${BASE_URL}/tax/corporate-breakdown/?${params.toString()}`);
+      const response = await api.get(`/tax/corporate-breakdown/?${params.toString()}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch corporate breakdown');
@@ -102,7 +100,7 @@ export const corporateFiling = createAsyncThunk(
   'taxRates/corporateFiling',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/tax/corporate-filing/${id}/`);
+      const response = await api.post(`/tax/corporate-filing/${id}/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to file corporate tax');
@@ -114,7 +112,7 @@ export const corporateFile = createAsyncThunk(
   'taxRates/corporateFile',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/tax/corporate-file/${id}/`);
+      const response = await api.post(`/tax/corporate-file/${id}/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to file corporate tax');
@@ -126,7 +124,7 @@ export const corporateReverse = createAsyncThunk(
   'taxRates/corporateReverse',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/tax/corporate-reverse/${id}/`);
+      const response = await api.post(`/tax/corporate-reverse/${id}/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to reverse corporate tax');

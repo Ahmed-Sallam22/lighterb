@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-const Card = ({ title, subtitle, actionSlot, children }) => (
+const Card = memo(({ title, subtitle, actionSlot, children }) => (
   <section className="rounded-4xl bg-[#ffffff] shadow-xl border border-white/60 p-8 relative overflow-visible">
     {(title || actionSlot) && (
       <header className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -13,6 +13,8 @@ const Card = ({ title, subtitle, actionSlot, children }) => (
     )}
     {children}
   </section>
-);
+));
+
+Card.displayName = 'Card';
 
 export default Card;
