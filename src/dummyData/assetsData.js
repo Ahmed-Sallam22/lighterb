@@ -1,0 +1,38 @@
+export const sampleData = [
+	{
+		assetNumber: 'FA-2024-001',
+		name: 'Dell Laptop XPS 15',
+		category: 'IT Equipment',
+		location: 'Head Office',
+		acquisitionCost: '$1,500.00',
+		netBookValue: '$1,200.00',
+		status: 'Capitalized',
+	},
+	{
+		assetNumber: 'FA-2024-002',
+		name: 'Dell Laptop XPS 15',
+		category: 'IT Equipment',
+		location: 'Head Office',
+		acquisitionCost: '$1,500.00',
+		netBookValue: '$1,200.00',
+		status: 'CIP',
+	},
+	{
+		assetNumber: 'FA-2024-003',
+		name: 'Dell Laptop XPS 15',
+		category: 'IT Equipment',
+		location: 'Head Office',
+		acquisitionCost: '$1,500.00',
+		netBookValue: '$1,200.00',
+		status: 'Capitalized',
+	},
+	{
+		assetNumber: 'FA-2024-004',
+		name: 'Dell Laptop XPS 15',
+		category: 'IT Equipment',
+		location: 'Head Office',
+		acquisitionCost: '$1,500.00',
+		netBookValue: '$1,200.00',
+		status: 'Capitalized',
+	},
+];
