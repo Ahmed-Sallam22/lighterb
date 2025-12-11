@@ -5,7 +5,7 @@ import Button from "../shared/Button";
 
 const CurrencyForm = ({ t, formData, errors, onChange, onToggleBase, onCancel, onSubmit, isEditing }) => {
 	return (
-		<div className="space-y-6">
+		<div className="flex flex-col gap-6 py-2">
 			{/* Currency Code */}
 			<FloatingLabelInput
 				label={t("currency.modal.codeLabel")}
@@ -41,12 +41,25 @@ const CurrencyForm = ({ t, formData, errors, onChange, onToggleBase, onCancel, o
 				placeholder={t("currency.modal.symbolPlaceholder")}
 			/>
 
-			{/* Base Currency Toggle */}
+			{/* Exchange Rate to Base */}
+			<FloatingLabelInput
+				label={t("currency.modal.exchangeRateLabel")}
+				name="exchangeRateToBase"
+				type="number"
+				step="0.0001"
+				value={formData.exchangeRateToBase}
+				onChange={e => onChange("exchangeRateToBase", e.target.value)}
+				error={errors.exchangeRateToBase}
+				required
+				placeholder={t("currency.modal.exchangeRatePlaceholder")}
+			/>
+
+			{/* Active Toggle */}
 			<div className="flex items-center gap-3">
-				<Toggle checked={formData.isBaseCurrency} onChange={onToggleBase} />
+				<Toggle checked={formData.isActive} onChange={onToggleBase} />
 				<div>
-					<p className="text-sm font-semibold text-gray-700">{t("currency.modal.setAsBase")}</p>
-					<p className="text-xs text-gray-500">{t("currency.modal.baseDescription")}</p>
+					<p className="text-sm font-semibold text-gray-700">{t("currency.modal.setAsActive")}</p>
+					<p className="text-xs text-gray-500">{t("currency.modal.activeDescription")}</p>
 				</div>
 			</div>
 

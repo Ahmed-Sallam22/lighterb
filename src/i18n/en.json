@@ -598,7 +598,12 @@
 			"code": "Code",
 			"name": "Name",
 			"symbol": "Symbol",
-			"baseCurrency": "Base Currency"
+			"baseCurrency": "Base Currency",
+			"active": "Active",
+			"actions": "Actions",
+			"exchangeRateToBase": "Exchange Rate to Base",
+			"converter": "Converter",
+			"noCurrencies": "No currencies found"
 		},
 		"modal": {
 			"titleAdd": "Add Currency",
@@ -613,7 +618,21 @@
 			"baseDescription": "Base currency is used as the default for conversions.",
 			"cancel": "Cancel",
 			"create": "Create",
-			"update": "Update"
+			"update": "Update",
+			"setAsActive": "Set as Active",
+			"activeDescription": "Active currencies can be used in transactions.",
+			"exchangeRateLabel": "Exchange Rate to Base",
+			"exchangeRatePlaceholder": "e.g., 1.0"
+		},
+		"convert": "Convert",
+		"converter": {
+			"title": "Currency Converter",
+			"from": "From Currency",
+			"rate": "Exchange Rate",
+			"amount": "Amount",
+			"amountPlaceholder": "Enter amount to convert",
+			"convert": "Convert",
+			"result": "Conversion Result"
 		},
 		"validation": {
 			"codeRequired": "Currency code is required",
@@ -634,8 +653,14 @@
 			"createError": "Failed to save currency",
 			"deleteError": "Failed to delete currency",
 			"updateBaseError": "Failed to update base currency",
+			"updateActiveError": "Failed to toggle active status",
 			"baseSet": "{{code}} marked as base currency",
-			"baseUnset": "{{code}} unset as base currency"
+			"baseUnset": "{{code}} unset as base currency",
+			"activated": "{{code}} activated successfully",
+			"deactivated": "{{code}} deactivated successfully",
+			"invalidAmount": "Please enter a valid amount greater than 0",
+			"convertSuccess": "Currency converted successfully",
+			"convertError": "Failed to convert currency"
 		}
 	},
 	"customers": {

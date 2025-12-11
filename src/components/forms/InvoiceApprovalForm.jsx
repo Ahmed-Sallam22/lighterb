@@ -14,7 +14,7 @@ const InvoiceApprovalForm = ({
 	availableInvoices = [],
 }) => {
 	return (
-		<div className="space-y-4">
+		<div className="flex flex-col gap-6 py-2">
 			{/* Invoice Type */}
 			<FloatingLabelSelect
 				label={t("invoiceApprovals.form.invoiceType")}

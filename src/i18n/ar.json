@@ -599,7 +599,12 @@
 			"code": "الكود",
 			"name": "الاسم",
 			"symbol": "الرمز",
-			"baseCurrency": "العملة الأساسية"
+			"baseCurrency": "العملة الأساسية",
+			"active": "نشط",
+			"actions": "الإجراءات",
+			"exchangeRateToBase": "سعر الصرف إلى العملة الأساسية",
+			"converter": "محول العملات",
+			"noCurrencies": "لم يتم العثور على عملات"
 		},
 		"modal": {
 			"titleAdd": "إضافة عملة",
@@ -614,7 +619,21 @@
 			"baseDescription": "تُستخدم العملة الأساسية كافتراضي للتحويلات.",
 			"cancel": "إلغاء",
 			"create": "إنشاء",
-			"update": "تحديث"
+			"update": "تحديث",
+			"setAsActive": "تعيين كعملة نشطة",
+			"activeDescription": "العملات النشطة متاحة للاستخدام في المعاملات.",
+			"exchangeRateLabel": "سعر الصرف إلى العملة الأساسية",
+			"exchangeRatePlaceholder": "مثال: 1.0"
+		},
+		"convert": "تحويل",
+		"converter": {
+			"title": "محول العملات",
+			"from": "من العملة",
+			"rate": "سعر الصرف",
+			"amount": "المبلغ",
+			"amountPlaceholder": "أدخل المبلغ للتحويل",
+			"convert": "تحويل",
+			"result": "نتيجة التحويل"
 		},
 		"validation": {
 			"codeRequired": "رمز العملة مطلوب",
@@ -635,8 +654,14 @@
 			"createError": "فشل في حفظ العملة",
 			"deleteError": "فشل في حذف العملة",
 			"updateBaseError": "فشل في تحديث العملة الأساسية",
+			"updateActiveError": "فشل في تبديل حالة التفعيل",
 			"baseSet": "تم تعيين {{code}} كعملة أساسية",
-			"baseUnset": "تم إلغاء تعيين {{code}} كعملة أساسية"
+			"baseUnset": "تم إلغاء تعيين {{code}} كعملة أساسية",
+			"activated": "تم تفعيل {{code}} بنجاح",
+			"deactivated": "تم إلغاء تفعيل {{code}} بنجاح",
+			"invalidAmount": "الرجاء إدخال مبلغ صحيح أكبر من 0",
+			"convertSuccess": "تم تحويل العملة بنجاح",
+			"convertError": "فشل في تحويل العملة"
 		}
 	},
 	"customers": {

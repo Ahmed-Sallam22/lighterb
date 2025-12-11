@@ -19,7 +19,7 @@ const ExchangeRateForm = ({
 	};
 
 	return (
-		<div className="space-y-6">
+		<div className="flex flex-col gap-6 py-2">
 			{/* From Currency */}
 			<FloatingLabelSelect
 				label={t("exchangeRates.table.fromCurrency")}

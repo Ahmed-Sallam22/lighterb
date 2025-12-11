@@ -8,27 +8,37 @@ import Table from "../components/shared/Table";
 import SlideUpModal from "../components/shared/SlideUpModal";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import Toggle from "../components/shared/Toggle";
-import { fetchCurrencies, createCurrency, updateCurrency, deleteCurrency } from "../store/currenciesSlice";
+import {
+	fetchCurrencies,
+	createCurrency,
+	updateCurrency,
+	deleteCurrency,
+	convertToBaseCurrency,
+	toggleCurrencyActive,
+} from "../store/currenciesSlice";
 import Button from "../components/shared/Button";
 import { BiPlus } from "react-icons/bi";
 import CurrencyHeaderIcon from "../assets/icons/CurrencyHeaderIcon";
 import CurrencyForm from "../components/forms/CurrencyForm";
+import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 
 const CurrencyPage = () => {
-	const { t } = useTranslation(); // ADD THIS LINE
+	const { t } = useTranslation();
 	const dispatch = useDispatch();
 	const { currencies } = useSelector(state => state.currencies);
-
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingCurrency, setEditingCurrency] = useState(null);
 	const [confirmDelete, setConfirmDelete] = useState(false);
 	const [currencyToDelete, setCurrencyToDelete] = useState(null);
+	const [converterModal, setConverterModal] = useState({ isOpen: false, currency: null });
+	const [conversionAmount, setConversionAmount] = useState("100");
 
 	const [formData, setFormData] = useState({
 		code: "",
 		name: "",
 		symbol: "",
-		isBaseCurrency: false,
+		exchangeRateToBase: "1.0",
+		isActive: true,
 	});
 	const [errors, setErrors] = useState({});
 
@@ -37,23 +47,16 @@ const CurrencyPage = () => {
 		dispatch(fetchCurrencies());
 	}, [dispatch]);
 
-	const handleToggleBaseCurrency = async (currency, newValue) => {
-		const payload = {
-			code: currency.code,
-			name: currency.name,
-			symbol: currency.symbol,
-			is_base: newValue,
-		};
-
+	const handleToggleActive = async (currency, newValue) => {
 		try {
-			await dispatch(updateCurrency({ id: currency.id, data: payload })).unwrap();
+			await dispatch(toggleCurrencyActive(currency.id)).unwrap();
 			toast.success(
 				newValue
-					? t("currency.messages.baseSet", { code: currency.code })
-					: t("currency.messages.baseUnset", { code: currency.code })
+					? t("currency.messages.activated", { code: currency.code })
+					: t("currency.messages.deactivated", { code: currency.code })
 			);
 		} catch (err) {
-			const errorMessage = err?.message || err?.error || t("currency.messages.updateBaseError");
+			const errorMessage = err?.message || err?.error || t("currency.messages.updateActiveError");
 
 			if (err && typeof err === "object" && !err.message && !err.error) {
 				const errorMessages = [];
@@ -94,13 +97,38 @@ const CurrencyPage = () => {
 			width: "120px",
 			render: value => <span className="font-semibold text-gray-700">{value}</span>,
 		},
+
 		{
-			header: t("currency.table.baseCurrency"),
-			accessor: "is_base",
+			header: t("currency.table.exchangeRateToBase"),
+			accessor: "exchange_rate_to_base_currency",
+			width: "200px",
+			render: value => (
+				<span className="text-gray-900">{value !== null && value !== undefined ? value : "1.0"}</span>
+			),
+		},
+		{
+			header: t("currency.table.converter"),
+			accessor: "id",
+			width: "120px",
+			render: (value, row) => (
+				<button
+					onClick={() => {
+						setConverterModal({ isOpen: true, currency: row });
+						setConversionAmount("100");
+					}}
+					className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
+				>
+					{t("currency.convert")}
+				</button>
+			),
+		},
+		{
+			header: t("currency.table.active"),
+			accessor: "is_active",
 			width: "160px",
 			render: (value, row) => (
 				<div className="flex items-center gap-3">
-					<Toggle checked={!!value} onChange={checked => handleToggleBaseCurrency(row, checked)} />
+					<Toggle checked={!!value} onChange={checked => handleToggleActive(row, checked)} />
 				</div>
 			),
 		},
@@ -141,7 +169,8 @@ const CurrencyPage = () => {
 			code: formData.code.toUpperCase().trim(),
 			name: formData.name.trim(),
 			symbol: formData.symbol.trim(),
-			is_base: formData.isBaseCurrency,
+			exchange_rate_to_base_currency: formData.exchangeRateToBase,
+			is_active: formData.isActive,
 		};
 
 		try {
@@ -194,7 +223,8 @@ const CurrencyPage = () => {
 			code: "",
 			name: "",
 			symbol: "",
-			isBaseCurrency: false,
+			exchangeRateToBase: "1.0",
+			isActive: true,
 		});
 		setErrors({});
 	};
@@ -207,7 +237,8 @@ const CurrencyPage = () => {
 			code: currency.code || "",
 			name: currency.name || "",
 			symbol: currency.symbol || "",
-			isBaseCurrency: !!currency.is_base,
+			exchangeRateToBase: currency.exchange_rate_to_base_currency || "1.0",
+			isActive: currency.is_active !== undefined ? currency.is_active : true,
 		});
 		setIsModalOpen(true);
 	};
@@ -246,6 +277,28 @@ const CurrencyPage = () => {
 				}
 			}
 
+			toast.error(errorMessage);
+		}
+	};
+
+	const handleConvert = async () => {
+		if (!conversionAmount || parseFloat(conversionAmount) <= 0) {
+			toast.error(t("currency.messages.invalidAmount"));
+			return;
+		}
+
+		try {
+			await dispatch(
+				convertToBaseCurrency({
+					id: converterModal.currency.id,
+					amount: parseFloat(conversionAmount),
+				})
+			).unwrap();
+			setConverterModal({ isOpen: false, currency: null });
+			setConversionAmount("100");
+			toast.success(t("currency.messages.convertSuccess"));
+		} catch (err) {
+			const errorMessage = err?.message || err?.error || t("currency.messages.convertError");
 			toast.error(errorMessage);
 		}
 	};
@@ -300,11 +353,60 @@ const CurrencyPage = () => {
 					formData={formData}
 					errors={errors}
 					onChange={handleInputChange}
-					onToggleBase={checked => setFormData(prev => ({ ...prev, isBaseCurrency: checked }))}
+					onToggleBase={checked => setFormData(prev => ({ ...prev, isActive: checked }))}
 					onCancel={handleCloseModal}
 					onSubmit={handleAddCurrency}
 					isEditing={!!editingCurrency}
 				/>
+			</SlideUpModal>
+
+			{/* Currency Converter Modal */}
+			<SlideUpModal
+				isOpen={converterModal.isOpen}
+				onClose={() => {
+					setConverterModal({ isOpen: false, currency: null });
+					setConversionAmount("100");
+				}}
+				title={t("currency.converter.title")}
+				maxWidth="500px"
+			>
+				<div className="space-y-4">
+					<div className="bg-gray-50 p-4 rounded-lg">
+						<p className="text-sm text-gray-600">{t("currency.converter.from")}</p>
+						<p className="text-lg font-semibold text-gray-900">
+							{converterModal.currency?.code} - {converterModal.currency?.name}
+						</p>
+						<p className="text-sm text-gray-500">
+							{t("currency.converter.rate")}:{" "}
+							{converterModal.currency?.exchange_rate_to_base_currency || "1.0"}
+						</p>
+					</div>
+
+					<div>
+						<FloatingLabelInput
+							label={t("currency.converter.amount")}
+							name="conversionAmount"
+							type="number"
+							step="0.01"
+							min="0"
+							value={conversionAmount}
+							onChange={e => setConversionAmount(e.target.value)}
+							placeholder={t("currency.converter.amountPlaceholder")}
+						/>
+					</div>
+
+					<div className="flex gap-3 pt-4">
+						<Button
+							onClick={() => {
+								setConverterModal({ isOpen: false, currency: null });
+								setConversionAmount("100");
+							}}
+							title={t("currency.modal.cancel")}
+							className="bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 flex-1"
+						/>
+						<Button onClick={handleConvert} title={t("currency.converter.convert")} className="flex-1" />
+					</div>
+				</div>
 			</SlideUpModal>
 
 			{/* Delete Confirmation Modal */}

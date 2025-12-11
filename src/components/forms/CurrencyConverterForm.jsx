@@ -17,7 +17,7 @@ const CurrencyConverterForm = ({
 	};
 
 	return (
-		<div className="space-y-6">
+		<div className="flex flex-col gap-6">
 			{/* Amount */}
 			<FloatingLabelInput
 				label={t("exchangeRates.form.amount")}
