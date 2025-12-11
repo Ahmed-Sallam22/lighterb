@@ -13,7 +13,6 @@ import SegmentTypeCard from "./SegmentTypeCard";
 
 const INITIAL_SEGMENT_FORM = {
 	segment_name: "",
-	segment_type: "",
 	length: "",
 	display_order: "",
 	description: "",
@@ -49,10 +48,6 @@ const SegmentTypes = ({ types, loading }) => {
 			newErrors.segment_name = t("segments.validation.nameRequired");
 		}
 
-		if (!formData.segment_type.trim()) {
-			newErrors.segment_type = t("segments.validation.techTypeRequired");
-		}
-
 		if (!formData.length) {
 			newErrors.length = t("segments.validation.lengthRequired");
 		}
@@ -72,7 +67,6 @@ const SegmentTypes = ({ types, loading }) => {
 
 		const segmentData = {
 			segment_name: formData.segment_name,
-			segment_type: formData.segment_type,
 			length: parseInt(formData.length),
 			display_order: parseInt(formData.display_order),
 			description: formData.description || null,
@@ -107,12 +101,11 @@ const SegmentTypes = ({ types, loading }) => {
 
 	const handleEditSegment = segment => {
 		setIsEditMode(true);
-		setCurrentSegmentId(segment.segment_id);
+		setCurrentSegmentId(segment.id);
 		setFormData({
 			segment_name: segment.segment_name,
-			segment_type: segment.segment_type,
-			length: segment.length.toString(),
-			display_order: segment.display_order.toString(),
+			length: segment.length?.toString() || "",
+			display_order: segment.display_order?.toString() || "",
 			description: segment.description || "",
 			is_required: segment.is_required,
 			has_hierarchy: segment.has_hierarchy,
@@ -129,7 +122,7 @@ const SegmentTypes = ({ types, loading }) => {
 	const handleConfirmDelete = async () => {
 		if (itemToDelete) {
 			try {
-				await dispatch(deleteSegmentType(itemToDelete.segment_id)).unwrap();
+				await dispatch(deleteSegmentType(itemToDelete.id)).unwrap();
 				toast.success(t("segments.messages.typeDeleted"));
 				setShowDeleteModal(false);
 				setItemToDelete(null);
@@ -145,7 +138,7 @@ const SegmentTypes = ({ types, loading }) => {
 		try {
 			await dispatch(
 				updateSegmentType({
-					id: segment.segment_id,
+					id: segment.id,
 					data: { ...segment, is_required: !segment.is_required },
 				})
 			).unwrap();
@@ -161,7 +154,7 @@ const SegmentTypes = ({ types, loading }) => {
 		try {
 			await dispatch(
 				updateSegmentType({
-					id: segment.segment_id,
+					id: segment.id,
 					data: { ...segment, has_hierarchy: !segment.has_hierarchy },
 				})
 			).unwrap();
@@ -193,7 +186,7 @@ const SegmentTypes = ({ types, loading }) => {
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					{types.map(segment => (
 						<SegmentTypeCard
-							key={segment.segment_id}
+							key={segment.id}
 							segment={segment}
 							isRtl={isRtl}
 							onEdit={handleEditSegment}

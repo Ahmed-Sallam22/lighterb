@@ -9,37 +9,44 @@ const SegmentTypeCard = ({ segment, onEdit, onDelete, onToggleRequired, onToggle
 
 	return (
 		<div
-			key={segment.segment_id}
+			key={segment.id}
 			className="bg-white rounded-3xl shadow-[0_10px_35px_rgba(15,55,80,0.08)] border border-gray-100 p-6 transition-all duration-300 hover:shadow-[0_18px_45px_rgba(15,55,80,0.12)]"
 		>
 			<div className="flex items-start justify-between gap-4">
 				<div>
 					<h3 className="text-xl font-semibold text-gray-900">{segment.segment_name}</h3>
-					<p className="text-sm text-gray-500 mt-1">{segment.segment_type}</p>
 				</div>
 
 				<div className="flex items-center gap-1 text-[#1A7A99]">
-					{/* <button
+					<button
 						type="button"
 						onClick={() => onEdit(segment)}
 						className="rounded-full hover:bg-[#E7F3F6] transition-colors"
 						title={t("segments.actions.edit")}
 					>
 						<EditIcon width={32} height={32} />
-					</button> */}
-					<Button
+					</button>
+					{/* <Button
 						onClick={() => onEdit(segment)}
 						className="bg-white hover:bg-[#E7F3F6] transition-colors"
 						title={t("segments.actions.edit")}
 						icon={<EditIcon width={24} height={24} />}
-					/>
+					/> */}
+					<button
+						type="button"
+						onClick={() => onDelete(segment)}
+						className="rounded-full hover:bg-[#FEEAEA] transition-colors"
+						title={t("segments.actions.delete")}
+					>
+						<DeleteIcon width={32} height={32} />
+					</button>
 
-					<Button
+					{/* <Button
 						onClick={() => onDelete(segment)}
 						className="bg-white hover:bg-red-50 transition-colors"
 						title={t("segments.actions.delete")}
 						icon={<DeleteIcon width={24} height={24} />}
-					/>
+					/> */}
 				</div>
 			</div>
 

@@ -20,15 +20,6 @@ const SegmentTypeForm = ({ formData, errors, loading, isEditMode, onInputChange,
 				/>
 
 				<FloatingLabelInput
-					label={t("segments.form.technicalType")}
-					value={formData.segment_type}
-					onChange={e => onInputChange("segment_type", e.target.value)}
-					required
-					error={errors.segment_type}
-					className="bg-white rounded-2xl"
-				/>
-
-				<FloatingLabelInput
 					label={t("segments.form.fixedLength")}
 					type="number"
 					value={formData.length}
@@ -48,26 +39,15 @@ const SegmentTypeForm = ({ formData, errors, loading, isEditMode, onInputChange,
 					className="bg-white rounded-2xl"
 				/>
 
-				<div className="relative rounded-2xl bg-white border border-[#E0EAED] shadow-sm">
-					{/* <textarea
-						value={formData.description}
-						onChange={e => onInputChange("description", e.target.value)}
-						placeholder={t("segments.form.placeholders.description")}
-						rows="4"
-						className="w-full bg-transparent px-5 pt-5 pb-3 text-gray-900 focus:outline-none"
-					/> */}
-					<FloatingLabelTextarea
-						label={t("segments.form.description")}
-						value={formData.description}
-						onChange={e => onInputChange("description", e.target.value)}
-						placeholder={t("segments.form.placeholders.description")}
-						rows={4}
-						className="bg-white rounded-2xl"
-					/>
-					{errors.description && (
-						<p className="absolute text-red-400 text-xs mt-1 px-5">{errors.description}</p>
-					)}
-				</div>
+				<FloatingLabelTextarea
+					label={t("segments.form.description")}
+					value={formData.description}
+					onChange={e => onInputChange("description", e.target.value)}
+					placeholder={t("segments.form.placeholders.description")}
+					rows={4}
+					error={errors.description}
+					className="bg-white rounded-2xl"
+				/>
 
 				<Toggle
 					label={t("segments.form.mandatory")}

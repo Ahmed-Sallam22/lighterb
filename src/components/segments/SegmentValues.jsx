@@ -42,7 +42,7 @@ const SegmentValues = ({ types, values, loading, selectedSegmentType, onSegmentT
 
 		// When segment type is selected, get its length
 		if (field === "segment_type") {
-			const selectedType = types.find(type => type.segment_id.toString() === value);
+			const selectedType = types.find(type => type.id.toString() === value);
 			if (selectedType) {
 				setSelectedSegmentTypeLength(selectedType.length);
 			} else {
@@ -130,7 +130,7 @@ const SegmentValues = ({ types, values, loading, selectedSegmentType, onSegmentT
 		setCurrentValueId(row.id);
 
 		// Find the segment type and set its length
-		const selectedType = types.find(type => type.segment_id === row.segment_type);
+		const selectedType = types.find(type => type.id === row.segment_type);
 		if (selectedType) {
 			setSelectedSegmentTypeLength(selectedType.length);
 		}
@@ -244,7 +244,7 @@ const SegmentValues = ({ types, values, loading, selectedSegmentType, onSegmentT
 
 	// Segment type options for dropdown
 	const segmentTypeOptions = types.map(type => ({
-		value: type.segment_id.toString(),
+		value: type.id.toString(),
 		label: type.segment_name,
 	}));
 
