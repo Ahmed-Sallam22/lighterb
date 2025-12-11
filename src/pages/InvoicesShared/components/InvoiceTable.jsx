@@ -6,7 +6,7 @@ const InvoiceTable = ({
 	columns,
 	data,
 	loading,
-	onEdit,
+	onView,
 	onDelete,
 	onThreeWayMatch, // Optional - only for AP
 	onSubmitForApproval,
@@ -52,7 +52,7 @@ const InvoiceTable = ({
 		<Table
 			columns={columns}
 			data={data}
-			onEdit={onEdit}
+			onView={onView}
 			onDelete={onDelete}
 			emptyMessage={emptyMessage}
 			showActions={showActionsCondition}

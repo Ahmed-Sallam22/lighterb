@@ -46,76 +46,77 @@ const ViewIcon = memo(() => (
 ViewIcon.displayName = 'ViewIcon';
 
 // Memoized table row component
-const TableRow = memo(({ row, rowIndex, columns, onEdit, onDelete, editIcon, showActions, showDeleteButton }) => (
-	<tr className="hover:bg-gray-50 transition-colors duration-150">
-		{columns.map((column, colIndex) => (
-			<td
-				key={colIndex}
-				className="px-6 py-4 text-sm text-gray-900"
-				style={{
-					textAlign: "center",
-					...(column.width ? { width: column.width, minWidth: column.width } : {}),
-				}}
-			>
-				<div
+const TableRow = memo(
+	({ row, rowIndex, columns, onView, onDelete, showActions, showDeleteButton, showViewButton }) => (
+		<tr className="hover:bg-gray-50 transition-colors duration-150">
+			{columns.map((column, colIndex) => (
+				<td
+					key={colIndex}
+					className="px-6 py-4 text-sm text-gray-900"
 					style={{
-						display: "flex",
-						justifyContent: "center",
-						alignItems: "center",
-						width: "100%",
+						textAlign: "center",
+						...(column.width ? { width: column.width, minWidth: column.width } : {}),
 					}}
 				>
-					{column.render
-						? column.render(row[column.accessor], row, rowIndex)
-						: row[column.accessor]}
-				</div>
-			</td>
-		))}
+					<div
+						style={{
+							display: "flex",
+							justifyContent: "center",
+							alignItems: "center",
+							width: "100%",
+						}}
+					>
+						{column.render
+							? column.render(row[column.accessor], row, rowIndex)
+							: row[column.accessor]}
+					</div>
+				</td>
+			))}
 
-		{(onEdit || onDelete) && (
-			<td className="px-6 py-4" style={{ textAlign: "center" }}>
-				{!showActions || showActions(row) ? (
-					<div className="flex items-center justify-center gap-3">
-						{onEdit && (
-							<button
-								onClick={() => onEdit(row, rowIndex)}
-								className="hover:scale-110 transition-transform duration-200"
-								title={editIcon === "view" ? "View" : "Edit"}
-							>
-								{editIcon === "view" ? <ViewIcon /> : <EditIcon />}
-							</button>
-						)}
-						{onDelete && (!showDeleteButton || showDeleteButton(row)) && (
-							<button
-								onClick={() => onDelete(row, rowIndex)}
-								className="hover:scale-110 transition-transform duration-200"
-								title="Delete"
-							>
-								<DeleteIcon />
-							</button>
-						)}
-					</div>
-				) : (
-					<div className="flex items-center justify-center">
-						<span className="text-gray-400 text-xs">N/A</span>
-					</div>
-				)}
-			</td>
-		)}
-	</tr>
-));
+			{(onView || onDelete) && (
+				<td className="px-6 py-4" style={{ textAlign: "center" }}>
+					{!showActions || showActions(row) || (onView && (!showViewButton || showViewButton(row))) ? (
+						<div className="flex items-center justify-center gap-3">
+							{onView && (!showViewButton || showViewButton(row)) && (
+								<button
+									onClick={() => onView(row, rowIndex)}
+									className="hover:scale-110 transition-transform duration-200"
+									title="View"
+								>
+									<ViewIcon />
+								</button>
+							)}
+							{(!showActions || showActions(row)) && onDelete && (!showDeleteButton || showDeleteButton(row)) && (
+								<button
+									onClick={() => onDelete(row, rowIndex)}
+									className="hover:scale-110 transition-transform duration-200"
+									title="Delete"
+								>
+									<DeleteIcon />
+								</button>
+							)}
+						</div>
+					) : (
+						<div className="flex items-center justify-center">
+							<span className="text-gray-400 text-xs">N/A</span>
+						</div>
+					)}
+				</td>
+			)}
+		</tr>
+	));
 TableRow.displayName = 'TableRow';
 
 const Table = memo(({
 	columns = [],
 	data = [],
-	onEdit,
+	onView,
 	onDelete,
 	className = "",
 	emptyMessage = "No data available",
-	editIcon = "edit",
 	showActions,
 	showDeleteButton,
+	showViewButton,
 }) => {
 	return (
 		<div className={`bg-white rounded-2xl shadow-lg overflow-hidden ${className}`}>
@@ -135,7 +136,7 @@ const Table = memo(({
 									{column.header}
 								</th>
 							))}
-							{(onEdit || onDelete) && (
+							{(onView || onDelete) && (
 								<th
 									className="px-6 py-4 text-sm font-semibold text-[#000000]"
 									style={{ textAlign: "center" }}
@@ -150,7 +151,7 @@ const Table = memo(({
 						{data.length === 0 ? (
 							<tr>
 								<td
-									colSpan={columns.length + (onEdit || onDelete ? 1 : 0)}
+									colSpan={columns.length + (onView || onEdit || onDelete ? 1 : 0)}
 									className="px-6 py-12 text-gray-500"
 									style={{ textAlign: "center" }}
 								>
@@ -164,11 +165,11 @@ const Table = memo(({
 									row={row}
 									rowIndex={rowIndex}
 									columns={columns}
-									onEdit={onEdit}
+									onView={onView}
 									onDelete={onDelete}
-									editIcon={editIcon}
 									showActions={showActions}
 									showDeleteButton={showDeleteButton}
+									showViewButton={showViewButton}
 								/>
 							))
 						)}
@@ -190,13 +191,13 @@ Table.propTypes = {
 		})
 	).isRequired,
 	data: PropTypes.array.isRequired,
-	onEdit: PropTypes.func,
+	onView: PropTypes.func,
 	onDelete: PropTypes.func,
 	className: PropTypes.string,
 	emptyMessage: PropTypes.string,
-	editIcon: PropTypes.string,
 	showActions: PropTypes.func,
 	showDeleteButton: PropTypes.func,
+	showViewButton: PropTypes.func,
 };
 
 export default Table;

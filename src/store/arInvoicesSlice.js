@@ -6,8 +6,8 @@ export const fetchARInvoices = createAsyncThunk(
   'arInvoices/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/ar/invoices/');
-      return response.data;
+      const response = await api.get('/finance/invoice/ar/');
+      return response.data?.data?.results ?? response.data?.results ?? response.data;
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to fetch AR invoices');
     }
@@ -19,23 +19,48 @@ export const createARInvoice = createAsyncThunk(
   'arInvoices/create',
   async (invoiceData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/ar/invoices/', invoiceData);
-      return response.data;
+      console.log('Creating AR invoice:', invoiceData);
+      const response = await api.post('/finance/invoice/ar/', invoiceData);
+      console.log('AR invoice response:', response.data);
+      return response.data?.data ?? response.data;
     } catch (error) {
+      console.error('AR invoice creation error:', error);
+      console.error('Error response:', error.response?.data);
+      
       if (error.response?.data) {
         const errorData = error.response.data;
         let errorMessage = '';
 
-        if (typeof errorData === 'object' && !errorData.message && !errorData.error && !errorData.detail) {
+        // Check if error is wrapped in data object
+        if (errorData.data && typeof errorData.data === 'object') {
+          const nestedErrors = errorData.data;
+          if (nestedErrors.message) {
+            errorMessage = nestedErrors.message;
+          } else {
+            const fieldErrors = Object.entries(nestedErrors)
+              .map(([field, messages]) => {
+                const messageText = Array.isArray(messages) ? messages.join(', ') : String(messages);
+                return `${field}: ${messageText}`;
+              })
+              .join(' | ');
+            errorMessage = fieldErrors || 'Failed to create AR invoice';
+          }
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (errorData.error) {
+          errorMessage = errorData.error;
+        } else if (errorData.detail) {
+          errorMessage = errorData.detail;
+        } else if (typeof errorData === 'object') {
           const fieldErrors = Object.entries(errorData)
             .map(([field, messages]) => {
-              const messageText = Array.isArray(messages) ? messages.join(', ') : messages;
+              const messageText = Array.isArray(messages) ? messages.join(', ') : String(messages);
               return `${field}: ${messageText}`;
             })
             .join(' | ');
-          errorMessage = fieldErrors;
+          errorMessage = fieldErrors || 'Failed to create AR invoice';
         } else {
-          errorMessage = errorData.message || errorData.error || errorData.detail || 'Failed to create AR invoice';
+          errorMessage = String(errorData) || 'Failed to create AR invoice';
         }
         return rejectWithValue(errorMessage);
       }
@@ -49,7 +74,7 @@ export const updateARInvoice = createAsyncThunk(
   'arInvoices/update',
   async ({ id, invoiceData }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/ar/invoices/${id}/`, invoiceData);
+      const response = await api.put(`/finance/invoice/ar/${id}/`, invoiceData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to update AR invoice');
@@ -62,7 +87,7 @@ export const deleteARInvoice = createAsyncThunk(
   'arInvoices/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await api.delete(`/ar/invoices/${id}/`);
+      await api.delete(`/finance/invoice/ar/${id}/`);
       return id;
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to delete AR invoice');
@@ -75,7 +100,7 @@ export const submitARInvoiceForApproval = createAsyncThunk(
   'arInvoices/submitForApproval',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/ar/invoices/${id}/submit-for-approval/`);
+      const response = await api.post(`/finance/invoice/ar/${id}/submit-for-approval/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to submit AR invoice for approval');
@@ -88,7 +113,7 @@ export const reverseARInvoice = createAsyncThunk(
   'arInvoices/reverse',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/ar/invoices/${id}/reverse/`);
+      const response = await api.post(`/finance/invoice/ar/${id}/reverse/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to reverse AR invoice');
@@ -101,7 +126,7 @@ export const postARInvoiceToGL = createAsyncThunk(
   'arInvoices/postGL',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/ar/invoices/${id}/post-gl/`);
+      const response = await api.post(`/finance/invoice/ar/${id}/post-gl/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to post AR invoice to GL');
@@ -122,6 +147,9 @@ const arInvoicesSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    const getId = (inv) => inv?.invoice_id ?? inv?.id;
+    const findIndexById = (state, payload) => state.invoices.findIndex((invoice) => getId(invoice) === getId(payload));
+
     builder
       // Fetch AR invoices
       .addCase(fetchARInvoices.pending, (state) => {
@@ -130,7 +158,7 @@ const arInvoicesSlice = createSlice({
       })
       .addCase(fetchARInvoices.fulfilled, (state, action) => {
         state.loading = false;
-        state.invoices = action.payload;
+        state.invoices = action.payload || [];
       })
       .addCase(fetchARInvoices.rejected, (state, action) => {
         state.loading = false;
@@ -156,7 +184,7 @@ const arInvoicesSlice = createSlice({
       })
       .addCase(updateARInvoice.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.invoices.findIndex((invoice) => invoice.id === action.payload.id);
+        const index = findIndexById(state, action.payload);
         if (index !== -1) {
           state.invoices[index] = action.payload;
         }
@@ -185,7 +213,7 @@ const arInvoicesSlice = createSlice({
       })
       .addCase(submitARInvoiceForApproval.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.invoices.findIndex((invoice) => invoice.id === action.payload.id);
+        const index = findIndexById(state, action.payload);
         if (index !== -1) {
           state.invoices[index] = action.payload;
         }
@@ -201,7 +229,7 @@ const arInvoicesSlice = createSlice({
       })
       .addCase(reverseARInvoice.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.invoices.findIndex((invoice) => invoice.id === action.payload.id);
+        const index = findIndexById(state, action.payload);
         if (index !== -1) {
           state.invoices[index] = action.payload;
         }
@@ -217,7 +245,7 @@ const arInvoicesSlice = createSlice({
       })
       .addCase(postARInvoiceToGL.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.invoices.findIndex((invoice) => invoice.id === action.payload.id);
+        const index = findIndexById(state, action.payload);
         if (index !== -1) {
           state.invoices[index] = action.payload;
         }

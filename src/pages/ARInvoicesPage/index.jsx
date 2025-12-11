@@ -9,6 +9,7 @@ import { buildInvoiceTableColumns } from "../InvoicesShared/utils/buildTableColu
 import { buildInvoiceTableData } from "../InvoicesShared/utils/buildTableData";
 import InvoiceTable from "../InvoicesShared/components/InvoiceTable";
 import InvoiceModal from "../InvoicesShared/components/InvoiceModal";
+import InvoiceDetailsModal from "../InvoicesShared/components/InvoiceDetailsModal";
 import InvoiceToolbarFilters from "../InvoicesShared/components/InvoiceToolbarFilters";
 import { PAGE_CONFIG } from "./constants/pageConfig";
 import { useInvoiceHandlers } from "../InvoicesShared/handlers/useInvoiceHandlers";
@@ -33,6 +34,8 @@ const ARInvoicesPage = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedInvoice, setSelectedInvoice] = useState(null);
 	const [actionType, setActionType] = useState(null); // 'delete', 'reverse', 'post'
+	const [isDetailOpen, setIsDetailOpen] = useState(false);
+	const [detailInvoiceId, setDetailInvoiceId] = useState(null);
 
 	// Show error toast when error occurs
 	useEffect(() => {
@@ -77,6 +80,14 @@ const ARInvoicesPage = () => {
 		postInvoiceToGL,
 	});
 
+	const handleView = row => {
+		const invoice = row.rawData || row;
+		const id = invoice.invoice_id || invoice.id;
+		if (!id) return;
+		setDetailInvoiceId(id);
+		setIsDetailOpen(true);
+	};
+
 	return (
 		<div className="min-h-screen bg-gray-50">
 			{/* Page Header */}
@@ -98,7 +109,8 @@ const ARInvoicesPage = () => {
 					columns={tableColumns}
 					data={tableData}
 					loading={loading}
-					onEdit={handleEdit}
+					onView={handleView}
+					onEdit={null}
 					onDelete={handleDelete}
 					onSubmitForApproval={handleSubmitForApproval}
 					onPostToGL={handlePostToGL}
@@ -121,6 +133,16 @@ const ARInvoicesPage = () => {
 				invoice={selectedInvoice}
 				onClose={handleCloseModal}
 				onConfirm={() => handleConfirmAction(actionType, selectedInvoice)}
+			/>
+
+			<InvoiceDetailsModal
+				isOpen={isDetailOpen}
+				invoiceId={detailInvoiceId}
+				type="AR"
+				onClose={() => {
+					setIsDetailOpen(false);
+					setDetailInvoiceId(null);
+				}}
 			/>
 
 			{/* Toast Container */}

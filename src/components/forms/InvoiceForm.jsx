@@ -13,11 +13,12 @@ import { fetchSuppliers } from '../../store/suppliersSlice';
 import { fetchTaxRates } from '../../store/taxRatesSlice';
 import { fetchSegmentTypes, fetchSegmentValues } from '../../store/segmentsSlice';
 
+// Static country options with ids expected by backend
 const countries = [
-  { value: 'AE', label: 'United Arab Emirates (AE)' },
-  { value: 'US', label: 'United States (US)' },
-  { value: 'GB', label: 'United Kingdom (GB)' },
-  { value: 'SA', label: 'Saudi Arabia (SA)' },
+  { value: 1, code: 'AE', label: 'United Arab Emirates (AE)' },
+  { value: 2, code: 'US', label: 'United States (US)' },
+  { value: 3, code: 'GB', label: 'United Kingdom (GB)' },
+  { value: 4, code: 'SA', label: 'Saudi Arabia (SA)' },
 ];
 
 const paymentTermsOptions = [
@@ -42,7 +43,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
   const { suppliers } = useSelector((state) => state.suppliers);
   const { taxRates } = useSelector((state) => state.taxRates);
   const { types: segmentTypes = [], values: segmentValues = [] } = useSelector((state) => state.segments);
-  const { loading: invoiceLoading } = useSelector((state) => 
+  const { loading: invoiceLoading } = useSelector((state) =>
     isAPInvoice ? state.apInvoices : state.arInvoices
   );
 
@@ -53,7 +54,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
     date: '',
     due_date: '',
     currency: '',
-    country: 'AE',
+    country: 1, // backend expects country_id
     memo: '',
     payment_terms: 'NET30',
     po_reference: '',
@@ -72,11 +73,10 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
     dispatch(fetchCustomers());
     dispatch(fetchSuppliers());
     dispatch(fetchTaxRates());
-    if (!isAPInvoice) {
-      dispatch(fetchSegmentTypes());
-      dispatch(fetchSegmentValues());
-    }
-  }, [dispatch, isAPInvoice]);
+    // Always fetch segments so we can build GL entries for AP/AR
+    dispatch(fetchSegmentTypes());
+    dispatch(fetchSegmentValues());
+  }, [dispatch]);
 
   // Tax Rate options from Redux
   const taxRateOptions = (taxRates || []).map((tax) => ({
@@ -193,14 +193,14 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
   };
 
   const handleGLLineChange = (lineId, field, value) => {
-    setGLLines((prev) => prev.map((line) => 
+    setGLLines((prev) => prev.map((line) =>
       line.id === lineId ? { ...line, [field]: value } : line
     ));
   };
 
   const handleSegmentFormChange = (lineId, field, value) => {
     const currentSegmentForm = segmentFormState[lineId] || { segment_type: '', segment: '' };
-    
+
     const updatedForm = {
       ...currentSegmentForm,
       [field]: value,
@@ -225,6 +225,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
         // Store display names for UI
         segment_type_name: segmentType?.segment_name || segmentType?.segment_type || `Type ${updatedForm.segment_type}`,
         segment_value_name: segmentValue?.alias || segmentValue?.name || `Value ${value}`,
+        segment_code: segmentValue?.code,
       };
 
       setGLLines(prev => prev.map(line => {
@@ -269,127 +270,158 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
     navigate(-1);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    console.log('Submit clicked', { invoiceForm, items, glLines });
+
     // Validate required fields
     const entityField = isAPInvoice ? 'supplier' : 'customer';
-    if (!invoiceForm[entityField] || !invoiceForm.date || !invoiceForm.due_date || 
-        !invoiceForm.currency || !invoiceForm.country) {
+    if (!invoiceForm[entityField] || !invoiceForm.date || !invoiceForm.currency || !invoiceForm.country) {
       toast.error('Please fill all required fields');
+      console.log('Validation failed: missing required fields');
       return;
     }
 
     if (items.length === 0) {
       toast.error('Please add at least one item');
+      console.log('Validation failed: no items');
       return;
     }
 
-    // For AR invoices, validate GL lines
-    if (!isAPInvoice) {
-      if (glLines.length === 0) {
-        toast.error('Please add at least one GL distribution line for AR invoices');
-        return;
-      }
-
-      // Calculate GL lines totals
-      const totalDebit = glLines
-        .filter(line => line.line_type === 'DEBIT')
-        .reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
-      const totalCredit = glLines
-        .filter(line => line.line_type === 'CREDIT')
-        .reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
-
-      // Check if debits and credits are balanced
-      if (Math.abs(totalDebit - totalCredit) >= 0.01) {
-        toast.error('GL distribution lines are not balanced. Debits must equal Credits.');
-        return;
-      }
-
-      // Validate that GL total matches invoice total
-      const invoiceTotal = invoiceTotalAmount;
-      const glTotal = totalDebit; // or totalCredit, they should be equal
-
-      if (Math.abs(invoiceTotal - glTotal) >= 0.01) {
-        toast.error(
-          `Invoice total (${formatCurrency(invoiceTotal)}) must match GL distribution total (${formatCurrency(glTotal)})`
-        );
-        return;
-      }
+    // Validate GL lines for both AP and AR (backend serializers require balanced journal entries)
+    if (glLines.length === 0) {
+      toast.error('Please add at least one GL distribution line');
+      console.log('Validation failed: no GL lines');
+      return;
     }
 
-    // Prepare items for API (remove temporary fields)
-    const formattedItems = items.map(item => {
-      const itemData = {
-        description: item.description,
-        quantity: parseFloat(item.quantity) || 0,
-        unit_price: parseFloat(item.unit_price).toFixed(2),
+    const totalDebit = glLines
+      .filter(line => line.line_type === 'DEBIT')
+      .reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
+    const totalCredit = glLines
+      .filter(line => line.line_type === 'CREDIT')
+      .reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
+
+    if (Math.abs(totalDebit - totalCredit) >= 0.01) {
+      toast.error('GL distribution lines are not balanced. Debits must equal Credits.');
+      console.log('Validation failed: GL not balanced', { totalDebit, totalCredit });
+      return;
+    }
+
+    const invoiceTotal = invoiceTotalAmount;
+    const glTotal = totalDebit;
+
+    if (Math.abs(invoiceTotal - glTotal) >= 0.01) {
+      toast.error(
+        `Invoice total (${formatCurrency(invoiceTotal)}) must match GL distribution total (${formatCurrency(glTotal)})`
+      );
+      console.log('Validation failed: totals mismatch', { invoiceTotal, glTotal });
+      return;
+    }
+
+    // helper to find segment code
+    const getSegmentCode = id => segmentValues.find(v => v.id === parseInt(id))?.code;
+
+    // Prepare items for API
+    const formattedItems = items.map((item, idx) => {
+      const quantity = parseFloat(item.quantity) || 0;
+      const unitPrice = parseFloat(item.unit_price) || 0;
+      const name = item.name || item.description || `Item ${idx + 1}`;
+      return {
+        name,
+        description: item.description || name,
+        quantity,
+        unit_price: unitPrice.toFixed(2),
       };
-
-      // Handle tax fields for AR invoices
-      if (!isAPInvoice) {
-        if (item.tax_rate === null || item.tax_category === 'EXEMPT') {
-          // Tax exempt case
-          itemData.tax_rate = null;
-        } else {
-          itemData.tax_rate = item.tax_rate;
-        }
-        itemData.tax_country = item.tax_country || invoiceForm.country;
-        itemData.tax_category = item.tax_category || 'STANDARD';
-      } else {
-        // For AP invoices, include tax_rate if present
-        if (item.tax_rate !== null && item.tax_rate !== undefined) {
-          itemData.tax_rate = item.tax_rate;
-        }
-      }
-
-      return itemData;
     });
+
+    // Journal entry payload
+    const journalEntry = {
+      date: invoiceForm.date,
+      currency_id: parseInt(invoiceForm.currency),
+      memo: invoiceForm.memo || '',
+      lines: glLines.map(line => ({
+        amount: parseFloat(line.amount).toFixed(2),
+        type: line.line_type,
+        segments: (line.segments || []).map(seg => ({
+          segment_type_id: seg.segment_type,
+          segment_code: seg.segment_code || getSegmentCode(seg.segment),
+        })),
+      })),
+    };
 
     // Prepare invoice data according to API structure
     const invoiceData = {
-      [entityField]: parseInt(invoiceForm[entityField]),
-      number: invoiceForm.number || undefined,
       date: invoiceForm.date,
-      due_date: invoiceForm.due_date,
-      currency: parseInt(invoiceForm.currency),
-      country: invoiceForm.country,
+      currency_id: parseInt(invoiceForm.currency),
+      country_id: parseInt(invoiceForm.country) || null,
+      subtotal: invoiceSubtotal.toFixed(2),
+      tax_amount: invoiceTaxAmount.toFixed(2),
+      total: invoiceTotalAmount.toFixed(2),
       items: formattedItems,
+      journal_entry: journalEntry,
     };
 
-    // Add AP-specific fields
     if (isAPInvoice) {
-      invoiceData.subtotal = invoiceSubtotal.toFixed(2);
-      invoiceData.tax_amount = invoiceTaxAmount.toFixed(2);
-      invoiceData.total_amount = invoiceTotalAmount.toFixed(2);
-      invoiceData.memo = invoiceForm.memo || undefined;
-      invoiceData.payment_terms = invoiceForm.payment_terms || undefined;
-      invoiceData.po_reference = invoiceForm.po_reference || undefined;
-      invoiceData.vendor_invoice_number = invoiceForm.vendor_invoice_number || undefined;
+      invoiceData.supplier_id = parseInt(invoiceForm.supplier);
+      invoiceData.approval_status = 'DRAFT';
+      invoiceData.payment_status = 'UNPAID';
+      // Optional fields
+      invoiceData.memo = invoiceForm.memo || '';
+      invoiceData.po_reference = invoiceForm.po_reference || '';
+      invoiceData.vendor_invoice_number = invoiceForm.vendor_invoice_number || '';
     } else {
-      // Add AR-specific fields (GL lines)
-      if (glLines.length > 0) {
-        invoiceData.gl_lines = glLines.map(line => ({
-          line_type: line.line_type,
-          amount: parseFloat(line.amount).toFixed(2),
-          description: line.description,
-          segments: (line.segments || []).map(seg => ({
-            segment_type: seg.segment_type,
-            segment: seg.segment,
-          })),
-        }));
-      }
+      invoiceData.customer_id = parseInt(invoiceForm.customer);
+      invoiceData.approval_status = 'DRAFT';
+      invoiceData.payment_status = 'UNPAID';
     }
 
     try {
+      console.log('Submitting invoice data:', invoiceData);
+      let result;
       if (isAPInvoice) {
-        await dispatch(createAPInvoice(invoiceData)).unwrap();
+        result = await dispatch(createAPInvoice(invoiceData)).unwrap();
+        console.log('AP Invoice created:', result);
         toast.success('AP Invoice created successfully');
       } else {
-        await dispatch(createARInvoice(invoiceData)).unwrap();
+        result = await dispatch(createARInvoice(invoiceData)).unwrap();
+        console.log('AR Invoice created:', result);
         toast.success('AR Invoice created successfully');
       }
       navigate(-1);
     } catch (error) {
-      toast.error(error || 'Failed to create invoice');
+      console.error('Create invoice error:', error);
+      let message = 'Failed to create invoice';
+
+      if (typeof error === 'string') {
+        message = error;
+      } else if (error?.message) {
+        message = error.message;
+      } else if (error?.response?.data) {
+        const errorData = error.response.data;
+        if (errorData.message) {
+          message = errorData.message;
+        } else if (errorData.error) {
+          message = errorData.error;
+        } else if (errorData.detail) {
+          message = errorData.detail;
+        } else if (typeof errorData === 'object') {
+          // Handle field errors
+          const fieldErrors = Object.entries(errorData)
+            .map(([field, messages]) => {
+              const messageText = Array.isArray(messages) ? messages.join(', ') : String(messages);
+              return `${field}: ${messageText}`;
+            })
+            .join(' | ');
+          message = fieldErrors || message;
+        }
+      }
+
+      toast.error(message);
     }
   };
 
@@ -565,7 +597,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
                       Tax Rate
                     </th>
                   )}
-           
+
                   <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-20">
                     Actions
                   </th>
@@ -618,7 +650,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
                           />
                         </td>
                       )}
-                
+
                       <td className="px-4 py-3 text-center">
                         <button
                           type="button"
@@ -645,307 +677,308 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
                   );
                 })}
               </tbody>
-          
+
             </table>
           </div>
         )}
       </Card>
 
-      {/* GL Distribution Lines (AR Invoice Only) */}
-      {!isAPInvoice && (
-        <Card
-          title="GL Distribution Lines"
-          subtitle="Posting"
-          actionSlot={
+      {/* GL Distribution Lines (required for AP/AR) */}
+      <Card
+        title="GL Distribution Lines"
+        subtitle="Debits and credits must balance and match the invoice total"
+        actionSlot={
+          <button
+            type="button"
+            onClick={handleAddGLLine}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
+          >
+            + New Line
+          </button>
+        }
+      >
+        {glLines.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-[#b6c4cc] bg-[#f5f8fb] p-6 text-center text-[#567086]">
+            <p className="text-lg font-semibold mb-2">No GL distribution lines added yet</p>
+            <p className="text-sm mb-6">GL distribution lines are required to create this invoice. Debits and credits must balance.</p>
             <button
               type="button"
               onClick={handleAddGLLine}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
+              className="px-4 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform"
             >
-              + New Line
+              + Add First Line
             </button>
-          }
-        >
-          {glLines.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[#b6c4cc] bg-[#f5f8fb] p-6 text-center text-[#567086]">
-              <p className="text-lg font-semibold mb-2">No GL distribution lines added yet</p>
-              <p className="text-sm mb-6">GL distribution lines are required to post this AR invoice. Debits and credits must balance.</p>
-              <button
-                type="button"
-                onClick={handleAddGLLine}
-                className="px-4 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform"
-              >
-                + Add First Line
-              </button>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Line Type
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Description
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Segments Type
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Segments Value
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-20">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {glLines.map((line) => (
-                    <tr key={line.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3">
-                        <FloatingLabelSelect
-                          label="Line Type"
-                          value={line.line_type}
-                          onChange={(e) => handleGLLineChange(line.id, 'line_type', e.target.value)}
-                          options={[
-                            { value: 'DEBIT', label: 'DEBIT' },
-                            { value: 'CREDIT', label: 'CREDIT' }
-                          ]}
-                        />
-                      </td>
-                      <td className="px-4 py-3">
-                        <FloatingLabelInput
-                          label="Description"
-                          type="text"
-                          value={line.description}
-                          onChange={(e) => handleGLLineChange(line.id, 'description', e.target.value)}
-                          placeholder="Line description"
-                        />
-                      </td>
-                      <td className="px-4 py-3">
-                        <FloatingLabelInput
-                          label="Amount"
-                          type="number"
-                          step="0.01"
-                          value={line.amount}
-                          onChange={(e) => handleGLLineChange(line.id, 'amount', e.target.value)}
-                          placeholder="0.00"
-                        />
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-col gap-2">
-                          {/* Display existing segments */}
-                          {line.segments && line.segments.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mb-2">
-                              {line.segments.map((segment) => (
-                                <span
-                                  key={segment.id}
-                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 group relative"
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Line Type
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Description
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Segments Type
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Segments Value
+                  </th>
+                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-20">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {glLines.map((line) => (
+                  <tr key={line.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3">
+                      <FloatingLabelSelect
+                        label="Line Type"
+                        value={line.line_type}
+                        onChange={(e) => handleGLLineChange(line.id, 'line_type', e.target.value)}
+                        options={[
+                          { value: 'DEBIT', label: 'DEBIT' },
+                          { value: 'CREDIT', label: 'CREDIT' }
+                        ]}
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <FloatingLabelInput
+                        label="Description"
+                        type="text"
+                        value={line.description}
+                        onChange={(e) => handleGLLineChange(line.id, 'description', e.target.value)}
+                        placeholder="Line description"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <FloatingLabelInput
+                        label="Amount"
+                        type="number"
+                        step="0.01"
+                        value={line.amount}
+                        onChange={(e) => handleGLLineChange(line.id, 'amount', e.target.value)}
+                        placeholder="0.00"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-2">
+                        {/* Display existing segments */}
+                        {line.segments && line.segments.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            {line.segments.map((segment) => (
+                              <span
+                                key={segment.id}
+                                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 group relative"
+                              >
+                                {segment.segment_type_name || segment.segment_type}
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveSegmentFromLine(line.id, segment.id)}
+                                  className="ml-1 text-blue-600 hover:text-red-600"
+                                  title="Remove segment"
                                 >
-                                  {segment.segment_type_name || segment.segment_type}
-                                  <button
-                                    type="button"
-                                    onClick={() => handleRemoveSegmentFromLine(line.id, segment.id)}
-                                    className="ml-1 text-blue-600 hover:text-red-600"
-                                    title="Remove segment"
-                                  >
-                                    ×
-                                  </button>
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                          
-                          <FloatingLabelSelect
-                            label="Segment Type"
-                            value={segmentFormState[line.id]?.segment_type || ''}
-                            onChange={(e) => handleSegmentFormChange(line.id, 'segment_type', e.target.value)}
-                            options={[
-                              { value: '', label: 'Select Segment Type' },
-                              ...(segmentTypes?.map((type) => ({
-                                value: type.segment_id.toString(),
+                                  ×
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <FloatingLabelSelect
+                          label="Segment Type"
+                          value={segmentFormState[line.id]?.segment_type || ''}
+                          onChange={(e) => handleSegmentFormChange(line.id, 'segment_type', e.target.value)}
+                          options={[
+                            { value: '', label: 'Select Segment Type' },
+                            ...(segmentTypes
+                              ?.filter(type => type && type.segment_id !== undefined && type.segment_id !== null)
+                              .map((type) => ({
+                                value: String(type.segment_id),
                                 label: `${type.segment_name} (${type.segment_type})`
                               })) || [])
-                            ]}
-                          />
-                          
-                          <div className="text-xs text-gray-500 italic mt-1">
-                            Auto-adds when both selected
-                          </div>
+                          ]}
+                        />
+
+                        <div className="text-xs text-gray-500 italic mt-1">
+                          Auto-adds when both selected
                         </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-col gap-2">
-                          {/* Display existing segment values */}
-                          {line.segments && line.segments.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mb-2">
-                              {line.segments.map((segment) => (
-                                <span
-                                  key={segment.id}
-                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 group relative"
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-2">
+                        {/* Display existing segment values */}
+                        {line.segments && line.segments.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            {line.segments.map((segment) => (
+                              <span
+                                key={segment.id}
+                                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 group relative"
+                              >
+                                {segment.segment_value_name || segment.alias || segment.name}
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveSegmentFromLine(line.id, segment.id)}
+                                  className="ml-1 text-green-600 hover:text-red-600"
+                                  title="Remove segment"
                                 >
-                                  {segment.segment_value_name || segment.alias || segment.name}
-                                  <button
-                                    type="button"
-                                    onClick={() => handleRemoveSegmentFromLine(line.id, segment.id)}
-                                    className="ml-1 text-green-600 hover:text-red-600"
-                                    title="Remove segment"
-                                  >
-                                    ×
-                                  </button>
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                          
-                          <FloatingLabelSelect
-                            label="Segment Value"
-                            value={segmentFormState[line.id]?.segment || ''}
-                            onChange={(e) => handleSegmentFormChange(line.id, 'segment', e.target.value)}
-                            disabled={!segmentFormState[line.id]?.segment_type}
-                            options={[
-                              { value: '', label: 'Select Segment Value' },
-                              ...(segmentValues
-                                ?.filter((value) => {
-                                  const selectedTypeId = segmentFormState[line.id]?.segment_type;
-                                  if (!selectedTypeId) return false;
-                                  return value.segment_type === parseInt(selectedTypeId);
-                                })
-                                .map((value) => ({
-                                  value: value.id.toString(),
-                                  label: `${value.alias} (${value.code})`
-                                })) || [])
-                            ]}
-                          />
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveGLLine(line.id)}
-                          className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                          title="Delete line"
+                                  ×
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <FloatingLabelSelect
+                          label="Segment Value"
+                          value={segmentFormState[line.id]?.segment || ''}
+                          onChange={(e) => handleSegmentFormChange(line.id, 'segment', e.target.value)}
+                          disabled={!segmentFormState[line.id]?.segment_type}
+                          options={[
+                            { value: '', label: 'Select Segment Value' },
+                            ...(segmentValues
+                              ?.filter((value) => {
+                                const selectedTypeId = segmentFormState[line.id]?.segment_type;
+                                if (!selectedTypeId) return false;
+                                return value.segment_type === parseInt(selectedTypeId);
+                              })
+                              .filter(value => value && value.id !== undefined && value.id !== null)
+                              .map((value) => ({
+                                value: String(value.id),
+                                label: `${value.alias} (${value.code})`
+                              })) || [])
+                          ]}
+                        />
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveGLLine(line.id)}
+                        className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                        title="Delete line"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
                         >
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot className="border-t-2 border-gray-300 bg-gray-50">
+                <tr className="font-semibold">
+                  <td colSpan="2" className="px-4 py-3 text-right text-gray-700">Total Debits:</td>
+                  <td className="px-4 py-3 text-right text-lg text-red-700">
+                    {formatCurrency(
+                      glLines
+                        .filter(line => line.line_type === 'DEBIT')
+                        .reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0)
+                    )}
+                  </td>
+                  <td colSpan="3"></td>
+                </tr>
+                <tr className="font-semibold">
+                  <td colSpan="2" className="px-4 py-3 text-right text-gray-700">Total Credits:</td>
+                  <td className="px-4 py-3 text-right text-lg text-green-700">
+                    {formatCurrency(
+                      glLines
+                        .filter(line => line.line_type === 'CREDIT')
+                        .reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0)
+                    )}
+                  </td>
+                  <td colSpan="3"></td>
+                </tr>
+                <tr className="font-semibold border-t-2 border-[#0d5f7a]">
+                  <td colSpan="2" className="px-4 py-3 text-right text-[#0d5f7a] text-lg">Balance:</td>
+                  <td colSpan="4" className="px-4 py-3">
+                    {(() => {
+                      const totalDebit = glLines.filter(line => line.line_type === 'DEBIT').reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
+                      const totalCredit = glLines.filter(line => line.line_type === 'CREDIT').reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
+                      const isBalanced = Math.abs(totalDebit - totalCredit) < 0.01;
+                      return isBalanced ? (
+                        <span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
                             />
                           </svg>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot className="border-t-2 border-gray-300 bg-gray-50">
-                  <tr className="font-semibold">
-                    <td colSpan="2" className="px-4 py-3 text-right text-gray-700">Total Debits:</td>
-                    <td className="px-4 py-3 text-right text-lg text-red-700">
-                      {formatCurrency(
-                        glLines
-                          .filter(line => line.line_type === 'DEBIT')
-                          .reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0)
-                      )}
-                    </td>
-                    <td colSpan="3"></td>
-                  </tr>
-                  <tr className="font-semibold">
-                    <td colSpan="2" className="px-4 py-3 text-right text-gray-700">Total Credits:</td>
-                    <td className="px-4 py-3 text-right text-lg text-green-700">
-                      {formatCurrency(
-                        glLines
-                          .filter(line => line.line_type === 'CREDIT')
-                          .reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0)
-                      )}
-                    </td>
-                    <td colSpan="3"></td>
-                  </tr>
-                  <tr className="font-semibold border-t-2 border-[#0d5f7a]">
-                    <td colSpan="2" className="px-4 py-3 text-right text-[#0d5f7a] text-lg">Balance:</td>
-                    <td colSpan="4" className="px-4 py-3">
-                      {(() => {
-                        const totalDebit = glLines.filter(line => line.line_type === 'DEBIT').reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
-                        const totalCredit = glLines.filter(line => line.line_type === 'CREDIT').reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
-                        const isBalanced = Math.abs(totalDebit - totalCredit) < 0.01;
-                        return isBalanced ? (
-                          <span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            Balanced
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-red-600 text-sm font-medium">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            Not Balanced (Diff: {formatCurrency(Math.abs(totalDebit - totalCredit))})
-                          </span>
-                        );
-                      })()}
-                    </td>
-                  </tr>
-                  <tr className="font-semibold border-t border-gray-300">
-                    <td colSpan="2" className="px-4 py-3 text-right text-gray-700">Invoice Total:</td>
-                    <td className="px-4 py-3 text-right text-lg text-[#0d5f7a]">
-                      {formatCurrency(invoiceTotalAmount)}
-                    </td>
-                    <td colSpan="3" className="px-4 py-3">
-                      {(() => {
-                        const totalDebit = glLines.filter(line => line.line_type === 'DEBIT').reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
-                        const glTotal = totalDebit;
-                        const isMatching = Math.abs(invoiceTotalAmount - glTotal) < 0.01;
-                        return isMatching ? (
-                          <span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            Matches GL Total
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-red-600 text-sm font-medium">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            Mismatch (Diff: {formatCurrency(Math.abs(invoiceTotalAmount - glTotal))})
-                          </span>
-                        );
-                      })()}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-          )}
-        </Card>
-      )}
+                          Balanced
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-red-600 text-sm font-medium">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Not Balanced (Diff: {formatCurrency(Math.abs(totalDebit - totalCredit))})
+                        </span>
+                      );
+                    })()}
+                  </td>
+                </tr>
+                <tr className="font-semibold border-t border-gray-300">
+                  <td colSpan="2" className="px-4 py-3 text-right text-gray-700">Invoice Total:</td>
+                  <td className="px-4 py-3 text-right text-lg text-[#0d5f7a]">
+                    {formatCurrency(invoiceTotalAmount)}
+                  </td>
+                  <td colSpan="3" className="px-4 py-3">
+                    {(() => {
+                      const totalDebit = glLines.filter(line => line.line_type === 'DEBIT').reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
+                      const glTotal = totalDebit;
+                      const isMatching = Math.abs(invoiceTotalAmount - glTotal) < 0.01;
+                      return isMatching ? (
+                        <span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Matches GL Total
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-red-600 text-sm font-medium">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Mismatch (Diff: {formatCurrency(Math.abs(invoiceTotalAmount - glTotal))})
+                        </span>
+                      );
+                    })()}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        )}
+      </Card>
 
       {/* Action Buttons */}
       <div className="mt-6 flex flex-wrap justify-end gap-3">

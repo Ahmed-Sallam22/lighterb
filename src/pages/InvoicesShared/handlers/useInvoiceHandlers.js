@@ -52,8 +52,9 @@ export const useInvoiceHandlers = ({
 	// Approval handler
 	const handleSubmitForApproval = async row => {
 		const invoice = row.rawData || row;
+		const invoiceId = invoice.invoice_id ?? invoice.id;
 		try {
-			await submitForApproval(invoice.id);
+			await submitForApproval(invoiceId);
 			toast.success("Invoice submitted for approval successfully");
 			refreshInvoices();
 		} catch (error) {
@@ -64,6 +65,7 @@ export const useInvoiceHandlers = ({
 	// Post to GL handler
 	const handlePostToGL = row => {
 		const invoice = row.rawData || row;
+		if (!invoice) return;
 		setSelectedInvoice(invoice);
 		setActionType("post");
 		setIsModalOpen(true);
@@ -73,8 +75,9 @@ export const useInvoiceHandlers = ({
 	const handleThreeWayMatch = performThreeWayMatch
 		? async row => {
 				const invoice = row.rawData || row;
+				const invoiceId = invoice.invoice_id ?? invoice.id;
 				try {
-					await performThreeWayMatch(invoice.id);
+					await performThreeWayMatch(invoiceId);
 					toast.success("Three-way match completed successfully");
 					refreshInvoices();
 				} catch (error) {
@@ -86,14 +89,18 @@ export const useInvoiceHandlers = ({
 	// Modal handlers
 	const handleConfirmAction = async (actionType, selectedInvoice) => {
 		try {
+			const invoiceId = selectedInvoice?.invoice_id ?? selectedInvoice?.id;
+			if (!invoiceId) {
+				throw new Error("Missing invoice id");
+			}
 			if (actionType === "delete") {
-				await deleteInvoice(selectedInvoice.id);
+				await deleteInvoice(invoiceId);
 				toast.success("Invoice deleted successfully");
 			} else if (actionType === "reverse") {
-				await reverseInvoice(selectedInvoice.id);
+				await reverseInvoice(invoiceId);
 				toast.success("Invoice reversed successfully");
 			} else if (actionType === "post") {
-				await postInvoiceToGL(selectedInvoice.id);
+				await postInvoiceToGL(invoiceId);
 				toast.success("Invoice posted to GL successfully");
 			}
 

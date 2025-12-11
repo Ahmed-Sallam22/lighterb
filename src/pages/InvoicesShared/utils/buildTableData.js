@@ -5,33 +5,32 @@
  * @returns {Array} Transformed data for table
  */
 export const buildInvoiceTableData = (invoices, type = "AP") => {
-	const customerField = type === "AR" ? "customer_name" : "supplier_name";
+	const isAR = type === "AR";
+	const partyField = isAR ? "customer_name" : "supplier_name";
+	const partyIdField = isAR ? "customer_id" : "supplier_id";
+
+	const formatStatus = value => {
+		if (!value) return "-";
+		const normalized = value.toString().trim().toLowerCase();
+		if (["paid", "paid_in_full"].includes(normalized)) return "Paid";
+		if (["partially_paid", "partial"].includes(normalized)) return "Partial";
+		if (["unpaid", "open"].includes(normalized)) return "Unpaid";
+		if (["approved"].includes(normalized)) return "Approved";
+		if (["pending", "pending_approval"].includes(normalized)) return "Pending";
+		if (["rejected"].includes(normalized)) return "Rejected";
+		return value;
+	};
 
 	return invoices.map(invoice => ({
-		invoice: invoice.invoice_number || invoice.number || "-",
-		customer: invoice[customerField] || "-",
+		id: invoice.invoice_id || invoice.id || invoice.number,
+		invoice: invoice.invoice_id || invoice.id || invoice.number || "-",
+		entityId: invoice[partyIdField] || null,
+		customer: invoice[partyField] || "-",
 		date: invoice.date || invoice.invoice_date || "-",
-		dueDate: invoice.due_date || "-",
-		currency: invoice.currency_code || "-",
-		total: invoice.total || "0.00",
-		rate: invoice.exchange_rate || "1.00",
-		baseTotal: invoice.base_currency_total || invoice.total || "0.00",
-		balance: invoice.balance || "0.00",
-		postingStatus: invoice.is_posted ? "Posted" : "Draft",
-		paymentStatus:
-			invoice.payment_status === "PAID"
-				? "Paid"
-				: invoice.payment_status === "PARTIALLY_PAID"
-				? "Partial"
-				: "Unpaid",
-		approvalStatus:
-			invoice.approval_status === "APPROVED"
-				? "Approved"
-				: invoice.approval_status === "PENDING_APPROVAL" || invoice.approval_status === "PENDING"
-				? "Pending"
-				: invoice.approval_status === "REJECTED"
-				? "Rejected"
-				: "Draft",
+		currency: invoice.currency_code || invoice.currency || "-",
+		total: invoice.total ?? invoice.total_amount ?? "0.00",
+		approvalStatus: formatStatus(invoice.approval_status),
+		paymentStatus: formatStatus(invoice.payment_status),
 		rawData: invoice,
 	}));
 };
