@@ -676,6 +676,7 @@
 			"code": "الكود",
 			"name": "اسم العميل",
 			"email": "البريد الإلكتروني",
+			"phone": "الهاتف",
 			"country": "الدولة",
 			"currency": "العملة",
 			"vatNumber": "الرقم الضريبي",
@@ -685,11 +686,34 @@
 			"empty": "لا يوجد عملاء"
 		},
 
+		"filters": {
+			"status": "الحالة",
+			"country": "الدولة",
+			"countryCode": "رمز الدولة",
+			"name": "الاسم",
+			"namePlaceholder": "تصفية حسب الاسم",
+			"email": "البريد الإلكتروني",
+			"emailPlaceholder": "تصفية حسب البريد الإلكتروني",
+			"phone": "الهاتف",
+			"phonePlaceholder": "تصفية حسب الهاتف",
+			"all": "الكل"
+		},
+
+		"actions": {
+			"clearAll": "مسح الكل",
+			"applyFilters": "تطبيق المرشحات"
+		},
+
 		"form": {
 			"code": "كود العميل (اختياري)",
 			"name": "اسم العميل",
+			"namePlaceholder": "أدخل اسم العميل",
 			"email": "البريد الإلكتروني",
+			"phone": "الهاتف",
 			"country": "الدولة",
+			"address": "العنوان",
+			"addressDetails": "تفاصيل العنوان",
+			"notes": "ملاحظات",
 			"currency": "العملة",
 			"vatNumber": "الرقم الضريبي (اختياري)",
 			"activeStatus": "الحالة نشطة",
@@ -713,7 +737,10 @@
 			"updated": "تم تحديث العميل بنجاح",
 			"deleted": "تم حذف العميل بنجاح",
 			"deleteError": "فشل في حذف العميل",
-			"saveError": "فشل في حفظ العميل"
+			"saveError": "فشل في حفظ العميل",
+			"fetchError": "فشل في جلب بيانات العميل",
+			"filtersApplied": "تم تطبيق المرشحات",
+			"filtersCleared": "تم مسح المرشحات"
 		},
 
 		"deleteModal": {

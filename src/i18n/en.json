@@ -675,6 +675,7 @@
 			"code": "Code",
 			"name": "Customer Name",
 			"email": "Email",
+			"phone": "Phone",
 			"country": "Country",
 			"currency": "Currency",
 			"vatNumber": "VAT Number",
@@ -684,11 +685,34 @@
 			"empty": "No customers found"
 		},
 
+		"filters": {
+			"status": "Status",
+			"country": "Country",
+			"countryCode": "Country Code",
+			"name": "Name",
+			"namePlaceholder": "Filter by name",
+			"email": "Email",
+			"emailPlaceholder": "Filter by email",
+			"phone": "Phone",
+			"phonePlaceholder": "Filter by phone",
+			"all": "All"
+		},
+
+		"actions": {
+			"clearAll": "Clear All",
+			"applyFilters": "Apply Filters"
+		},
+
 		"form": {
 			"code": "Customer Code (Optional)",
 			"name": "Customer Name",
+			"namePlaceholder": "Enter customer name",
 			"email": "Email",
+			"phone": "Phone",
 			"country": "Country",
+			"address": "Address",
+			"addressDetails": "Address Details",
+			"notes": "Notes",
 			"currency": "Currency",
 			"vatNumber": "VAT Number (Optional)",
 			"activeStatus": "Active Status",
@@ -712,7 +736,10 @@
 			"updated": "Customer updated successfully",
 			"deleted": "Customer deleted successfully",
 			"deleteError": "Failed to delete customer",
-			"saveError": "Failed to save customer"
+			"saveError": "Failed to save customer",
+			"fetchError": "Failed to fetch customer details",
+			"filtersApplied": "Filters applied",
+			"filtersCleared": "Filters cleared"
 		},
 
 		"deleteModal": {

@@ -8,24 +8,40 @@ import { useTranslation } from "react-i18next";
 import PageHeader from "../components/shared/PageHeader";
 import Toolbar from "../components/shared/Toolbar";
 import Table from "../components/shared/Table";
+import Button from "../components/shared/Button";
 import SlideUpModal from "../components/shared/SlideUpModal";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import Toggle from "../components/shared/Toggle";
 import ConfirmModal from "../components/shared/ConfirmModal";
 
-import { fetchCustomers, createCustomer, updateCustomer, deleteCustomer } from "../store/customersSlice";
-import { fetchCurrencies } from "../store/currenciesSlice";
+import {
+	fetchCustomers,
+	fetchCustomerById,
+	createCustomer,
+	updateCustomer,
+	deleteCustomer,
+} from "../store/customersSlice";
 import { MdPerson } from "react-icons/md";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 const FROM_INITIAL_STATE = {
-	code: "",
 	name: "",
 	email: "",
+	phone: "",
 	country: "",
-	currency: "",
-	vat_number: "",
+	address: "",
+	notes: "",
 	is_active: true,
+	address_in_details: "",
+};
+
+const INITIAL_FILTERS_STATE = {
+	is_active: "",
+	country: "",
+	country_code: "",
+	name: "",
+	email: "",
+	phone: "",
 };
 
 const CustomersPage = () => {
@@ -33,7 +49,6 @@ const CustomersPage = () => {
 	const dispatch = useDispatch();
 
 	const { customers = [], loading, error } = useSelector(state => state.customers || {});
-	const { currencies = [] } = useSelector(state => state.currencies || {});
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingCustomer, setEditingCustomer] = useState(null);
@@ -41,21 +56,55 @@ const CustomersPage = () => {
 	const [customerToDelete, setCustomerToDelete] = useState(null);
 
 	const [formData, setFormData] = useState(FROM_INITIAL_STATE);
+	const [filters, setFilters] = useState(INITIAL_FILTERS_STATE);
 
 	const [searchTerm, setSearchTerm] = useState("");
 
 	const title = t("customers.title");
 	const subtitle = t("customers.subtitle");
 
+	// use countires from backend
 	const countryOptions = useMemo(() => {
 		const countries = [
-			{ value: "AE", label: "United Arab Emirates (AE)" },
-			{ value: "EG", label: "Egypt (EG)" },
-			{ value: "IN", label: "India (IN)" },
-			{ value: "SA", label: "Saudi Arabia (SA)" },
-			{ value: "US", label: "United States (US)" },
+			{ id: 1, code: "AE", name: "United Arab Emirates" },
+			{ id: 2, code: "EG", name: "Egypt" },
+			{ id: 3, code: "IN", name: "India" },
+			{ id: 4, code: "SA", name: "Saudi Arabia" },
+			{ id: 5, code: "US", name: "United States" },
 		];
-		return [{ value: "", label: t("customers.form.selectCountry") || "Select Country" }, ...countries];
+		return [
+			{ value: "", label: t("customers.form.selectCountry") || "Select Country" },
+			...countries.map(country => ({
+				value: country.id.toString(),
+				label: `${country.name} (${country.code})`,
+			})),
+		];
+	}, [t]);
+
+	const statusOptions = useMemo(
+		() => [
+			{ value: "", label: t("customers.filters.all") || "All" },
+			{ value: "true", label: t("customers.table.active") || "Active" },
+			{ value: "false", label: t("customers.table.inactive") || "Inactive" },
+		],
+		[t]
+	);
+
+	const countryCodeOptions = useMemo(() => {
+		const countries = [
+			{ id: 1, code: "AE", name: "United Arab Emirates" },
+			{ id: 2, code: "EG", name: "Egypt" },
+			{ id: 3, code: "IN", name: "India" },
+			{ id: 4, code: "SA", name: "Saudi Arabia" },
+			{ id: 5, code: "US", name: "United States" },
+		];
+		return [
+			{ value: "", label: t("customers.filters.all") || "All" },
+			...countries.map(country => ({
+				value: country.code,
+				label: `${country.name} (${country.code})`,
+			})),
+		];
 	}, [t]);
 
 	// const currencyOptions = [
@@ -65,20 +114,19 @@ const CustomersPage = () => {
 	// 		label: `${currency.code} - ${currency.name}`,
 	// 	})),
 	// ];
-	const currencyOptions = useMemo(() => {
-		return [
-			{ value: "", label: t("customers.form.selectCurrency") || "Select Currency" },
-			...currencies.map(currency => ({
-				value: currency.id?.toString() ?? currency.code ?? "",
-				label: `${currency.code} - ${currency.name}`,
-			})),
-		];
-	}, [currencies, t]);
+	// const currencyOptions = useMemo(() => {
+	// 	return [
+	// 		{ value: "", label: t("customers.form.selectCurrency") || "Select Currency" },
+	// 		...currencies.map(currency => ({
+	// 			value: currency.id?.toString() ?? currency.code ?? "",
+	// 			label: `${currency.code} - ${currency.name}`,
+	// 		})),
+	// 	];
+	// }, [currencies, t]);
 
-	// Fetch customers and currencies on mount
+	// Fetch customers on mount
 	useEffect(() => {
 		dispatch(fetchCustomers());
-		dispatch(fetchCurrencies());
 	}, [dispatch]);
 
 	// Show error toast if any
@@ -104,19 +152,17 @@ const CustomersPage = () => {
 			return (
 				customer.name?.toLowerCase().includes(search) ||
 				customer.email?.toLowerCase().includes(search) ||
-				customer.code?.toLowerCase().includes(search) ||
-				(customer.country?.toLowerCase && customer.country?.toLowerCase().includes(search)) ||
-				customer.vat_number?.toLowerCase().includes(search)
+				customer.phone?.toLowerCase().includes(search) ||
+				(customer.country_name?.toLowerCase && customer.country_name?.toLowerCase().includes(search)) ||
+				(customer.country_code?.toLowerCase && customer.country_code?.toLowerCase().includes(search))
 			);
 		})
 		.map(customer => ({
 			id: customer.id,
-			code: customer.code || "-",
 			name: customer.name || "-",
 			email: customer.email || "-",
-			country: customer.country || "-",
-			currencyName: customer.currency_name || customer.currency || "-",
-			vatNumber: customer.vat_number || "-",
+			phone: customer.phone || "-",
+			country: customer.country_name || customer.country_code || "-",
 			isActive: customer.is_active,
 			rawData: customer,
 		}));
@@ -129,11 +175,6 @@ const CustomersPage = () => {
 			render: value => <span className="text-gray-500 font-medium">#{value}</span>,
 		},
 		{
-			header: t("customers.table.code"),
-			accessor: "code",
-			render: value => value || "-",
-		},
-		{
 			header: t("customers.table.name"),
 			accessor: "name",
 			render: value => <span className="font-semibold text-[#0d5f7a]">{value}</span>,
@@ -143,18 +184,12 @@ const CustomersPage = () => {
 			accessor: "email",
 		},
 		{
+			header: t("customers.table.phone"),
+			accessor: "phone",
+		},
+		{
 			header: t("customers.table.country"),
 			accessor: "country",
-			render: value => value || "-",
-		},
-		{
-			header: t("customers.table.currency"),
-			accessor: "currencyName",
-			render: value => value || "-",
-		},
-		{
-			header: t("customers.table.vatNumber"),
-			accessor: "vatNumber",
 			render: value => value || "-",
 		},
 		{
@@ -173,24 +208,53 @@ const CustomersPage = () => {
 	];
 
 	// Handlers
+	const handleFilterChange = (field, value) => {
+		setFilters(prev => ({ ...prev, [field]: value }));
+	};
+
+	const handleApplyFilters = () => {
+		const filterParams = {
+			is_active: filters.is_active,
+			country: filters.country,
+			country_code: filters.country_code,
+			name: filters.name,
+			email: filters.email,
+			phone: filters.phone,
+		};
+		dispatch(fetchCustomers(filterParams));
+		toast.info(t("customers.messages.filtersApplied"));
+	};
+
+	const handleClearFilters = () => {
+		setFilters(INITIAL_FILTERS_STATE);
+		dispatch(fetchCustomers());
+		toast.info(t("customers.messages.filtersCleared"));
+	};
+
 	const handleCreate = () => {
 		setEditingCustomer(null);
 		setFormData(FROM_INITIAL_STATE);
 		setIsModalOpen(true);
 	};
 
-	const handleEdit = row => {
-		setEditingCustomer(row.rawData);
-		setFormData({
-			code: row.rawData.code || "",
-			name: row.rawData.name || "",
-			email: row.rawData.email || "",
-			country: row.rawData.country || "",
-			currency: row.rawData.currency?.toString() || "",
-			vat_number: row.rawData.vat_number || "",
-			is_active: row.rawData.is_active !== undefined ? row.rawData.is_active : true,
-		});
-		setIsModalOpen(true);
+	const handleEdit = async row => {
+		try {
+			const customerDetails = await dispatch(fetchCustomerById(row.rawData.id)).unwrap();
+			setEditingCustomer(customerDetails);
+			setFormData({
+				name: customerDetails.name || "",
+				email: customerDetails.email || "",
+				phone: customerDetails.phone || "",
+				country: customerDetails.country?.toString() || "",
+				address: customerDetails.address || "",
+				notes: customerDetails.notes || "",
+				is_active: customerDetails.is_active !== undefined ? customerDetails.is_active : true,
+				address_in_details: customerDetails.address_in_details || "",
+			});
+			setIsModalOpen(true);
+		} catch (err) {
+			toast.error(err?.message || t("customers.messages.fetchError"));
+		}
 	};
 
 	const handleDelete = row => {
@@ -208,12 +272,15 @@ const CustomersPage = () => {
 			setCustomerToDelete(null);
 		} catch (err) {
 			toast.error(err?.message || t("customers.messages.deleteError"));
+		} finally {
+			setIsDeleteModalOpen(false);
+			setCustomerToDelete(null);
 		}
 	};
 
 	const handleSubmit = async () => {
 		// Validation
-		if (!formData.name || !formData.email || !formData.country || !formData.currency) {
+		if (!formData.name || !formData.email || !formData.country) {
 			toast.error(t("customers.messages.required"));
 			return;
 		}
@@ -227,13 +294,14 @@ const CustomersPage = () => {
 
 		// Prepare data for API
 		const customerData = {
-			code: formData.code || null,
 			name: formData.name,
 			email: formData.email,
-			country: formData.country,
-			currency: parseInt(formData.currency),
-			vat_number: formData.vat_number || null,
+			phone: formData.phone || "",
+			country: parseInt(formData.country),
+			address: formData.address || "",
+			notes: formData.notes || "",
 			is_active: formData.is_active,
+			address_in_details: formData.address_in_details || "",
 		};
 
 		try {
@@ -278,6 +346,83 @@ const CustomersPage = () => {
 				/>
 			</div>
 
+			{/* Filter Section */}
+			<div className="px-6 mt-6">
+				<div className="rounded-lg pt-3 pb-6">
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+						{/* Status Filter */}
+						<FloatingLabelSelect
+							label={t("customers.filters.status")}
+							name="filterIsActive"
+							value={filters.is_active}
+							onChange={e => handleFilterChange("is_active", e.target.value)}
+							options={statusOptions}
+						/>
+
+						{/* Country ID Filter */}
+						<FloatingLabelSelect
+							label={t("customers.filters.country")}
+							name="filterCountry"
+							value={filters.country}
+							onChange={e => handleFilterChange("country", e.target.value)}
+							options={[
+								{ value: "", label: t("customers.filters.all") },
+								...countryOptions.slice(1).map(opt => ({ value: opt.value, label: opt.label })),
+							]}
+						/>
+
+						{/* Country Code Filter */}
+						<FloatingLabelSelect
+							label={t("customers.filters.countryCode")}
+							name="filterCountryCode"
+							value={filters.country_code}
+							onChange={e => handleFilterChange("country_code", e.target.value)}
+							options={countryCodeOptions}
+						/>
+
+						{/* Name Filter */}
+						<FloatingLabelInput
+							label={t("customers.filters.name")}
+							name="filterName"
+							type="text"
+							value={filters.name}
+							onChange={e => handleFilterChange("name", e.target.value)}
+							placeholder={t("customers.filters.namePlaceholder")}
+						/>
+
+						{/* Email Filter */}
+						<FloatingLabelInput
+							label={t("customers.filters.email")}
+							name="filterEmail"
+							type="email"
+							value={filters.email}
+							onChange={e => handleFilterChange("email", e.target.value)}
+							placeholder={t("customers.filters.emailPlaceholder")}
+						/>
+
+						{/* Phone Filter */}
+						<FloatingLabelInput
+							label={t("customers.filters.phone")}
+							name="filterPhone"
+							type="tel"
+							value={filters.phone}
+							onChange={e => handleFilterChange("phone", e.target.value)}
+							placeholder={t("customers.filters.phonePlaceholder")}
+						/>
+					</div>
+
+					{/* Filter Buttons */}
+					<div className="flex justify-end gap-4">
+						<Button
+							onClick={handleClearFilters}
+							title={t("customers.actions.clearAll")}
+							className="bg-white hover:bg-gray-100 text-gray-700 border border-gray-300"
+						/>
+						<Button onClick={handleApplyFilters} title={t("customers.actions.applyFilters")} />
+					</div>
+				</div>
+			</div>
+
 			{/* Table */}
 			<div className="px-6 mt-6 pb-6">
 				<Table
@@ -302,16 +447,6 @@ const CustomersPage = () => {
 				maxWidth="1000px"
 			>
 				<div className="space-y-6">
-					{/* Customer Code */}
-					<FloatingLabelInput
-						label={t("customers.form.code")}
-						name="code"
-						type="text"
-						value={formData.code}
-						onChange={handleInputChange}
-						placeholder="e.g., CUST-UAE-001"
-					/>
-
 					{/* Customer Name */}
 					<FloatingLabelInput
 						label={t("customers.form.name")}
@@ -320,7 +455,7 @@ const CustomersPage = () => {
 						value={formData.name}
 						onChange={handleInputChange}
 						required
-						placeholder={t("customers.form.name")}
+						placeholder={t("customers.form.namePlaceholder")}
 					/>
 
 					{/* Email */}
@@ -334,6 +469,16 @@ const CustomersPage = () => {
 						placeholder="customer@example.com"
 					/>
 
+					{/* Phone */}
+					<FloatingLabelInput
+						label={t("customers.form.phone")}
+						name="phone"
+						type="tel"
+						value={formData.phone}
+						onChange={handleInputChange}
+						placeholder="+1-555-1234"
+					/>
+
 					{/* Country */}
 					<FloatingLabelSelect
 						label={t("customers.form.country")}
@@ -344,24 +489,34 @@ const CustomersPage = () => {
 						required
 					/>
 
-					{/* Currency */}
-					<FloatingLabelSelect
-						label={t("customers.form.currency")}
-						name="currency"
-						value={formData.currency}
+					{/* Address */}
+					<FloatingLabelInput
+						label={t("customers.form.address")}
+						name="address"
+						type="text"
+						value={formData.address}
 						onChange={handleInputChange}
-						options={currencyOptions}
-						required
+						placeholder="123 Main Street, New York, NY 10001"
 					/>
 
-					{/* VAT Number */}
+					{/* Address Details */}
 					<FloatingLabelInput
-						label={t("customers.form.vatNumber")}
-						name="vat_number"
+						label={t("customers.form.addressDetails")}
+						name="address_in_details"
 						type="text"
-						value={formData.vat_number}
+						value={formData.address_in_details}
 						onChange={handleInputChange}
-						placeholder="e.g., AE100200300400001"
+						placeholder="Suite 500, Building A, Floor 5"
+					/>
+
+					{/* Notes */}
+					<FloatingLabelInput
+						label={t("customers.form.notes")}
+						name="notes"
+						type="text"
+						value={formData.notes}
+						onChange={handleInputChange}
+						placeholder="Important client - handle with priority"
 					/>
 
 					{/* Active Status Toggle */}
