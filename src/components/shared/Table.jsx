@@ -12,7 +12,7 @@ const DeleteIcon = memo(() => (
 		/>
 	</svg>
 ));
-DeleteIcon.displayName = 'DeleteIcon';
+DeleteIcon.displayName = "DeleteIcon";
 
 const EditIcon = memo(() => (
 	<svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -33,7 +33,7 @@ const EditIcon = memo(() => (
 		</defs>
 	</svg>
 ));
-EditIcon.displayName = 'EditIcon';
+EditIcon.displayName = "EditIcon";
 
 const ViewIcon = memo(() => (
 	<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -43,11 +43,22 @@ const ViewIcon = memo(() => (
 		/>
 	</svg>
 ));
-ViewIcon.displayName = 'ViewIcon';
+ViewIcon.displayName = "ViewIcon";
 
 // Memoized table row component
 const TableRow = memo(
-	({ row, rowIndex, columns, onView, onDelete, showActions, showDeleteButton, showViewButton }) => (
+	({
+		row,
+		rowIndex,
+		columns,
+		onView,
+		onEdit,
+		onDelete,
+		showActions,
+		showDeleteButton,
+		showViewButton,
+		showEditButton,
+	}) => (
 		<tr className="hover:bg-gray-50 transition-colors duration-150">
 			{columns.map((column, colIndex) => (
 				<td
@@ -66,16 +77,17 @@ const TableRow = memo(
 							width: "100%",
 						}}
 					>
-						{column.render
-							? column.render(row[column.accessor], row, rowIndex)
-							: row[column.accessor]}
+						{column.render ? column.render(row[column.accessor], row, rowIndex) : row[column.accessor]}
 					</div>
 				</td>
 			))}
 
-			{(onView || onDelete) && (
+			{(onView || onEdit || onDelete) && (
 				<td className="px-6 py-4" style={{ textAlign: "center" }}>
-					{!showActions || showActions(row) || (onView && (!showViewButton || showViewButton(row))) ? (
+					{!showActions ||
+					showActions(row) ||
+					(onView && (!showViewButton || showViewButton(row))) ||
+					(onEdit && (!showEditButton || showEditButton(row))) ? (
 						<div className="flex items-center justify-center gap-3">
 							{onView && (!showViewButton || showViewButton(row)) && (
 								<button
@@ -86,15 +98,26 @@ const TableRow = memo(
 									<ViewIcon />
 								</button>
 							)}
-							{(!showActions || showActions(row)) && onDelete && (!showDeleteButton || showDeleteButton(row)) && (
+							{onEdit && (!showEditButton || showEditButton(row)) && (
 								<button
-									onClick={() => onDelete(row, rowIndex)}
+									onClick={() => onEdit(row, rowIndex)}
 									className="hover:scale-110 transition-transform duration-200"
-									title="Delete"
+									title="Edit"
 								>
-									<DeleteIcon />
+									<EditIcon />
 								</button>
 							)}
+							{(!showActions || showActions(row)) &&
+								onDelete &&
+								(!showDeleteButton || showDeleteButton(row)) && (
+									<button
+										onClick={() => onDelete(row, rowIndex)}
+										className="hover:scale-110 transition-transform duration-200"
+										title="Delete"
+									>
+										<DeleteIcon />
+									</button>
+								)}
 						</div>
 					) : (
 						<div className="flex items-center justify-center">
@@ -104,82 +127,89 @@ const TableRow = memo(
 				</td>
 			)}
 		</tr>
-	));
-TableRow.displayName = 'TableRow';
+	)
+);
+TableRow.displayName = "TableRow";
 
-const Table = memo(({
-	columns = [],
-	data = [],
-	onView,
-	onDelete,
-	className = "",
-	emptyMessage = "No data available",
-	showActions,
-	showDeleteButton,
-	showViewButton,
-}) => {
-	return (
-		<div className={`bg-white rounded-2xl shadow-lg overflow-hidden ${className}`}>
-			<div className="overflow-x-auto">
-				<table className="w-full" style={{ textAlign: "center" }}>
-					<thead className="bg-[#ececec] border-b-2 border-gray-200">
-						<tr>
-							{columns.map((column, index) => (
-								<th
-									key={index}
-									className="px-6 py-4 text-sm font-semibold text-[#000000] border-r border-gray-300 last:border-r-0"
-									style={{
-										textAlign: "center",
-										...(column.width ? { width: column.width, minWidth: column.width } : {}),
-									}}
-								>
-									{column.header}
-								</th>
-							))}
-							{(onView || onDelete) && (
-								<th
-									className="px-6 py-4 text-sm font-semibold text-[#000000]"
-									style={{ textAlign: "center" }}
-								>
-									Actions
-								</th>
-							)}
-						</tr>
-					</thead>
-
-					<tbody className="bg-white divide-y divide-gray-200">
-						{data.length === 0 ? (
+const Table = memo(
+	({
+		columns = [],
+		data = [],
+		onView,
+		onEdit,
+		onDelete,
+		className = "",
+		emptyMessage = "No data available",
+		showActions,
+		showDeleteButton,
+		showViewButton,
+		showEditButton,
+	}) => {
+		return (
+			<div className={`bg-white rounded-2xl shadow-lg overflow-hidden ${className}`}>
+				<div className="overflow-x-auto">
+					<table className="w-full" style={{ textAlign: "center" }}>
+						<thead className="bg-[#ececec] border-b-2 border-gray-200">
 							<tr>
-								<td
-									colSpan={columns.length + (onView || onEdit || onDelete ? 1 : 0)}
-									className="px-6 py-12 text-gray-500"
-									style={{ textAlign: "center" }}
-								>
-									{emptyMessage}
-								</td>
+								{columns.map((column, index) => (
+									<th
+										key={index}
+										className="px-6 py-4 text-sm font-semibold text-[#000000] border-r border-gray-300 last:border-r-0"
+										style={{
+											textAlign: "center",
+											...(column.width ? { width: column.width, minWidth: column.width } : {}),
+										}}
+									>
+										{column.header}
+									</th>
+								))}
+								{(onView || onEdit || onDelete) && (
+									<th
+										className="px-6 py-4 text-sm font-semibold text-[#000000]"
+										style={{ textAlign: "center" }}
+									>
+										Actions
+									</th>
+								)}
 							</tr>
-						) : (
-							data.map((row, rowIndex) => (
-								<TableRow
-									key={rowIndex}
-									row={row}
-									rowIndex={rowIndex}
-									columns={columns}
-									onView={onView}
-									onDelete={onDelete}
-									showActions={showActions}
-									showDeleteButton={showDeleteButton}
-									showViewButton={showViewButton}
-								/>
-							))
-						)}
-					</tbody>
-				</table>
+						</thead>
+
+						<tbody className="bg-white divide-y divide-gray-200">
+							{data.length === 0 ? (
+								<tr>
+									<td
+										colSpan={columns.length + (onView || onEdit || onDelete ? 1 : 0)}
+										className="px-6 py-12 text-gray-500"
+										style={{ textAlign: "center" }}
+									>
+										{emptyMessage}
+									</td>
+								</tr>
+							) : (
+								data.map((row, rowIndex) => (
+									<TableRow
+										key={rowIndex}
+										row={row}
+										rowIndex={rowIndex}
+										columns={columns}
+										onView={onView}
+										onEdit={onEdit}
+										onDelete={onDelete}
+										showActions={showActions}
+										showDeleteButton={showDeleteButton}
+										showViewButton={showViewButton}
+										showEditButton={showEditButton}
+									/>
+								))
+							)}
+						</tbody>
+					</table>
+				</div>
 			</div>
-		</div>
-	);
-});
-Table.displayName = 'Table';
+		);
+	}
+);
+Table.displayName = "Table";
 
 Table.propTypes = {
 	columns: PropTypes.arrayOf(
@@ -192,12 +222,14 @@ Table.propTypes = {
 	).isRequired,
 	data: PropTypes.array.isRequired,
 	onView: PropTypes.func,
+	onEdit: PropTypes.func,
 	onDelete: PropTypes.func,
 	className: PropTypes.string,
 	emptyMessage: PropTypes.string,
 	showActions: PropTypes.func,
 	showDeleteButton: PropTypes.func,
 	showViewButton: PropTypes.func,
+	showEditButton: PropTypes.func,
 };
 
 export default Table;
