@@ -42,6 +42,7 @@ const ForgetPasswordPage = lazy(() => import('./pages/ForgetPasswordPage'));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
 const Requisitions = lazy(() => import('./pages/Requisitions'));
 const AssetsPage = lazy(() => import('./pages/Assets'));
+const JobRolesPage = lazy(() => import('./pages/JobRolesPage'));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -83,6 +84,7 @@ const App = () => {
 						<Route path="requisitions" element={<Requisitions />} />
 						<Route path="procurement/approvals/:instanceId" element={<ProcurementApprovalDetail />} />
 						<Route path="procurement/catalog" element={<ProcurementCatalog />} />
+						<Route path="job-roles" element={<JobRolesPage />} />
 					</Route>
 				</Routes>
 			</Suspense>
