@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
-import { useDispatch, useSelector } from 'react-redux';
-import { useTranslation } from 'react-i18next';
-import PageHeader from '../components/shared/PageHeader';
-import ConfirmModal from '../components/shared/ConfirmModal';
-import { fetchApprovalSteps, approveStep, rejectStep } from '../store/approvalStepsSlice';
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+import PageHeader from "../components/shared/PageHeader";
+import ConfirmModal from "../components/shared/ConfirmModal";
+import { fetchApprovalSteps, approveStep, rejectStep } from "../store/approvalStepsSlice";
 
 const HeaderIcon = () => (
 	<div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/30 flex items-center justify-center shadow-lg">
@@ -25,47 +25,47 @@ const HeaderIcon = () => (
 
 const statusStyles = {
 	PENDING: {
-		bg: 'bg-amber-100',
-		text: 'text-amber-700',
-		border: 'border-amber-200',
+		bg: "bg-amber-100",
+		text: "text-amber-700",
+		border: "border-amber-200",
 	},
 	APPROVED: {
-		bg: 'bg-emerald-100',
-		text: 'text-emerald-700',
-		border: 'border-emerald-200',
+		bg: "bg-emerald-100",
+		text: "text-emerald-700",
+		border: "border-emerald-200",
 	},
 	REJECTED: {
-		bg: 'bg-red-100',
-		text: 'text-red-700',
-		border: 'border-red-200',
+		bg: "bg-red-100",
+		text: "text-red-700",
+		border: "border-red-200",
 	},
 	IN_PROGRESS: {
-		bg: 'bg-blue-100',
-		text: 'text-blue-700',
-		border: 'border-blue-200',
+		bg: "bg-blue-100",
+		text: "text-blue-700",
+		border: "border-blue-200",
 	},
 };
 
 const ProcurementApprovals = () => {
 	const { t, i18n } = useTranslation();
-	const isRtl = i18n.dir() === 'rtl';
+	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
 	const { steps, loading, error, actionLoading } = useSelector(state => state.approvalSteps);
 
 	// Use IDs for tabs to maintain logic across languages
-	const [activeTab, setActiveTab] = useState('pending');
+	const [activeTab, setActiveTab] = useState("pending");
 	const [showApproveModal, setShowApproveModal] = useState(false);
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [selectedStep, setSelectedStep] = useState(null);
-	const [comments, setComments] = useState('');
-	const [reason, setReason] = useState('');
+	const [comments, setComments] = useState("");
+	const [reason, setReason] = useState("");
 
 	const tabOptions = [
-		{ id: 'pending', label: t('procurementApprovals.tabs.pending') },
-		{ id: 'manage', label: t('procurementApprovals.tabs.manage') },
-		{ id: 'all', label: t('procurementApprovals.tabs.all') },
+		{ id: "pending", label: t("procurementApprovals.tabs.pending") },
+		{ id: "manage", label: t("procurementApprovals.tabs.manage") },
+		{ id: "all", label: t("procurementApprovals.tabs.all") },
 	];
 
 	// Fetch approval steps on mount
@@ -74,9 +74,9 @@ const ProcurementApprovals = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		document.title = t('procurementApprovals.metaTitle');
+		document.title = t("procurementApprovals.metaTitle");
 		return () => {
-			document.title = 'LightERP';
+			document.title = "LightERP";
 		};
 	}, [t]);
 
@@ -96,16 +96,16 @@ const ProcurementApprovals = () => {
 	// Convert grouped steps to workflow format
 	const workflows = useMemo(() => {
 		return Object.entries(groupedSteps).map(([instanceId, instanceSteps]) => {
-			const approvedCount = instanceSteps.filter(s => s.status === 'APPROVED').length;
+			const approvedCount = instanceSteps.filter(s => s.status === "APPROVED").length;
 			const totalSteps = instanceSteps.length;
-			const hasRejected = instanceSteps.some(s => s.status === 'REJECTED');
-			const hasPending = instanceSteps.some(s => s.status === 'PENDING');
+			const hasRejected = instanceSteps.some(s => s.status === "REJECTED");
+			const hasPending = instanceSteps.some(s => s.status === "PENDING");
 
-			let overallStatus = 'APPROVED';
+			let overallStatus = "APPROVED";
 			if (hasRejected) {
-				overallStatus = 'REJECTED';
+				overallStatus = "REJECTED";
 			} else if (hasPending) {
-				overallStatus = 'PENDING';
+				overallStatus = "PENDING";
 			}
 
 			// Get the first step for display
@@ -116,20 +116,20 @@ const ProcurementApprovals = () => {
 				instance: parseInt(instanceId),
 				status: overallStatus,
 				workflow: workflowDetails?.workflow
-					? t('procurementApprovals.card.workflow', { name: `#${workflowDetails.workflow}` })
-					: t('procurementApprovals.card.unknownWorkflow'),
+					? t("procurementApprovals.card.workflow", { name: `#${workflowDetails.workflow}` })
+					: t("procurementApprovals.card.unknownWorkflow"),
 				submittedDate: firstStep?.activated_at
 					? new Date(firstStep.activated_at).toLocaleDateString(i18n.language)
-					: t('procurementApprovals.card.na'),
-				progress: t('procurementApprovals.card.progress', { approved: approvedCount, total: totalSteps }),
+					: t("procurementApprovals.card.na"),
+				progress: t("procurementApprovals.card.progress", { approved: approvedCount, total: totalSteps }),
 				steps: instanceSteps,
 			};
 		});
 	}, [groupedSteps, t, i18n.language]);
 
 	const filteredWorkflows = useMemo(() => {
-		if (activeTab === 'pending') {
-			return workflows.filter(wf => wf.status === 'PENDING');
+		if (activeTab === "pending") {
+			return workflows.filter(wf => wf.status === "PENDING");
 		}
 		return workflows;
 	}, [activeTab, workflows]);
@@ -142,11 +142,11 @@ const ProcurementApprovals = () => {
 			// Refresh data
 			await dispatch(fetchApprovalSteps()).unwrap();
 			setShowApproveModal(false);
-			setComments('');
+			setComments("");
 			setSelectedStep(null);
 		} catch (err) {
-			console.error('Error approving step:', err);
-			alert(err.message || 'Failed to approve step');
+			console.error("Error approving step:", err);
+			alert(err.message || "Failed to approve step");
 		}
 	};
 
@@ -158,23 +158,23 @@ const ProcurementApprovals = () => {
 			// Refresh data
 			await dispatch(fetchApprovalSteps()).unwrap();
 			setShowRejectModal(false);
-			setReason('');
+			setReason("");
 			setSelectedStep(null);
 		} catch (err) {
-			console.error('Error rejecting step:', err);
-			alert(err.message || 'Failed to reject step');
+			console.error("Error rejecting step:", err);
+			alert(err.message || "Failed to reject step");
 		}
 	};
 
 	const openApproveModal = step => {
 		setSelectedStep(step);
-		setComments('');
+		setComments("");
 		setShowApproveModal(true);
 	};
 
 	const openRejectModal = step => {
 		setSelectedStep(step);
-		setReason('');
+		setReason("");
 		setShowRejectModal(true);
 	};
 
@@ -186,8 +186,8 @@ const ProcurementApprovals = () => {
 		<section className="min-h-screen bg-[#f2f3f5] pb-12">
 			<PageHeader
 				icon={<HeaderIcon />}
-				title={t('procurementApprovals.title')}
-				subtitle={t('procurementApprovals.subtitle')}
+				title={t("procurementApprovals.title")}
+				subtitle={t("procurementApprovals.subtitle")}
 			/>
 
 			<div className="max-w-6xl mx-auto px-6 mt-8 space-y-6">
@@ -195,7 +195,7 @@ const ProcurementApprovals = () => {
 					<div className="flex flex-col gap-4">
 						<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 							<h2 className="text-2xl font-semibold text-[#1f4560]">
-								{t('procurementApprovals.sectionTitle')}
+								{t("procurementApprovals.sectionTitle")}
 							</h2>
 							<div className="flex flex-wrap gap-2">
 								{tabOptions.map(tab => (
@@ -205,8 +205,8 @@ const ProcurementApprovals = () => {
 										onClick={() => setActiveTab(tab.id)}
 										className={`px-4 py-2 rounded-xl border text-sm font-semibold transition-colors ${
 											activeTab === tab.id
-												? 'border-[#48C1F0] bg-[#e5f6ff] text-[#0c2a3c]'
-												: 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+												? "border-[#48C1F0] bg-[#e5f6ff] text-[#0c2a3c]"
+												: "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
 										}`}
 									>
 										{tab.label}
@@ -218,25 +218,25 @@ const ProcurementApprovals = () => {
 						<div className="space-y-4">
 							{loading ? (
 								<div className="text-center py-8 text-gray-500">
-									{t('procurementApprovals.loading')}
+									{t("procurementApprovals.loading")}
 								</div>
 							) : error ? (
 								<div className="text-center py-8 text-red-600">
-									{t('procurementApprovals.error', { message: error })}
+									{t("procurementApprovals.error", { message: error })}
 								</div>
 							) : filteredWorkflows.length === 0 ? (
 								<div className="text-center py-8 text-gray-500">
-									{t('procurementApprovals.noWorkflows')}
+									{t("procurementApprovals.noWorkflows")}
 								</div>
 							) : (
 								filteredWorkflows.map(wf => {
 									const wfStyle = statusStyles[wf.status] || statusStyles.PENDING;
 									// Find first pending step
-									const pendingStep = wf.steps.find(s => s.status === 'PENDING');
+									const pendingStep = wf.steps.find(s => s.status === "PENDING");
 									const displayStep = pendingStep || wf.steps[0];
 
 									// Normalize status keys for style lookup (handle Mixed Case if API returns it)
-									const stepStatusKey = displayStep?.status?.toUpperCase() || 'PENDING';
+									const stepStatusKey = displayStep?.status?.toUpperCase() || "PENDING";
 									const stepStyle = statusStyles[stepStatusKey] || statusStyles.PENDING;
 
 									const workflowStepDetails = displayStep?.workflow_step_details;
@@ -250,7 +250,7 @@ const ProcurementApprovals = () => {
 												<div>
 													<div className="flex items-center gap-3">
 														<p className="text-sm font-semibold text-[#0d2438]">
-															{t('procurementApprovals.card.instance', {
+															{t("procurementApprovals.card.instance", {
 																id: wf.instance,
 															})}
 														</p>
@@ -261,10 +261,10 @@ const ProcurementApprovals = () => {
 														</span>
 													</div>
 													<p className="text-sm text-gray-600 mt-1">
-														{wf.workflow} •{' '}
-														{t('procurementApprovals.card.submitted', {
+														{wf.workflow} •
+														{t("procurementApprovals.card.submitted", {
 															date: wf.submittedDate,
-														})}{' '}
+														})}
 														• {wf.progress}
 													</p>
 												</div>
@@ -279,7 +279,7 @@ const ProcurementApprovals = () => {
 														viewBox="0 0 18 18"
 														fill="none"
 														xmlns="http://www.w3.org/2000/svg"
-														className={isRtl ? 'rotate-180' : ''}
+														className={isRtl ? "rotate-180" : ""}
 													>
 														<path
 															d="M1.5 9C1.5 9 4.5 3 9 3C13.5 3 16.5 9 16.5 9C16.5 9 13.5 15 9 15C4.5 15 1.5 9 1.5 9Z"
@@ -296,7 +296,7 @@ const ProcurementApprovals = () => {
 															strokeWidth="1.5"
 														/>
 													</svg>
-													{t('procurementApprovals.card.viewDetails')}
+													{t("procurementApprovals.card.viewDetails")}
 												</button>
 											</div>
 
@@ -332,18 +332,18 @@ const ProcurementApprovals = () => {
 													</div>
 													<div>
 														<p className="text-base font-semibold text-[#1f4560]">
-															{t('procurementApprovals.card.step', {
+															{t("procurementApprovals.card.step", {
 																sequence: workflowStepDetails?.sequence,
 																name:
 																	workflowStepDetails?.name ||
-																	t('procurementApprovals.card.na'),
+																	t("procurementApprovals.card.na"),
 															})}
 														</p>
 														<p className="text-sm text-gray-500">
 															{workflowStepDetails?.description ||
-																t('procurementApprovals.card.noDescription')}{' '}
-															•{' '}
-															{t('procurementApprovals.card.status', {
+																t("procurementApprovals.card.noDescription")}
+															•
+															{t("procurementApprovals.card.status", {
 																status: t(
 																	`procurementApprovals.status.${stepStatusKey}`
 																),
@@ -360,8 +360,8 @@ const ProcurementApprovals = () => {
 															className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 														>
 															{actionLoading
-																? t('procurementApprovals.actions.processing')
-																: t('procurementApprovals.actions.approve')}
+																? t("procurementApprovals.actions.processing")
+																: t("procurementApprovals.actions.approve")}
 														</button>
 														<button
 															type="button"
@@ -370,21 +370,21 @@ const ProcurementApprovals = () => {
 															className="px-4 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 														>
 															{actionLoading
-																? t('procurementApprovals.actions.processing')
-																: t('procurementApprovals.actions.reject')}
+																? t("procurementApprovals.actions.processing")
+																: t("procurementApprovals.actions.reject")}
 														</button>
 													</div>
 												)}
 											</div>
 
-											{wf.status === 'APPROVED' && (
+											{wf.status === "APPROVED" && (
 												<p className="mt-3 text-sm font-semibold text-emerald-600">
-													{t('procurementApprovals.card.allCompleted')}
+													{t("procurementApprovals.card.allCompleted")}
 												</p>
 											)}
-											{wf.status === 'REJECTED' && (
+											{wf.status === "REJECTED" && (
 												<p className="mt-3 text-sm font-semibold text-red-600">
-													{t('procurementApprovals.card.workflowRejected')}
+													{t("procurementApprovals.card.workflowRejected")}
 												</p>
 											)}
 										</div>
@@ -402,22 +402,22 @@ const ProcurementApprovals = () => {
 					isOpen={showApproveModal}
 					onClose={() => {
 						setShowApproveModal(false);
-						setComments('');
+						setComments("");
 						setSelectedStep(null);
 					}}
 					onConfirm={handleApprove}
-					title={t('procurementApprovals.modals.approveTitle')}
+					title={t("procurementApprovals.modals.approveTitle")}
 					message={
 						<div>
-							<p className="mb-4">{t('procurementApprovals.modals.approveMessage')}</p>
+							<p className="mb-4">{t("procurementApprovals.modals.approveMessage")}</p>
 							<div className="mb-4">
 								<label className="block text-sm font-medium text-gray-700 mb-2">
-									{t('procurementApprovals.modals.commentsLabel')}
+									{t("procurementApprovals.modals.commentsLabel")}
 								</label>
 								<textarea
 									value={comments}
 									onChange={e => setComments(e.target.value)}
-									placeholder={t('procurementApprovals.modals.commentsPlaceholder')}
+									placeholder={t("procurementApprovals.modals.commentsPlaceholder")}
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
 									rows="3"
 								/>
@@ -426,10 +426,10 @@ const ProcurementApprovals = () => {
 					}
 					confirmText={
 						actionLoading
-							? t('procurementApprovals.modals.approving')
-							: t('procurementApprovals.actions.approve')
+							? t("procurementApprovals.modals.approving")
+							: t("procurementApprovals.actions.approve")
 					}
-					cancelText={t('common.cancel', 'Cancel')}
+					cancelText={t("common.cancel", "Cancel")}
 					confirmButtonClass="bg-emerald-500 hover:bg-emerald-600"
 					disabled={actionLoading}
 				/>
@@ -441,22 +441,22 @@ const ProcurementApprovals = () => {
 					isOpen={showRejectModal}
 					onClose={() => {
 						setShowRejectModal(false);
-						setReason('');
+						setReason("");
 						setSelectedStep(null);
 					}}
 					onConfirm={handleReject}
-					title={t('procurementApprovals.modals.rejectTitle')}
+					title={t("procurementApprovals.modals.rejectTitle")}
 					message={
 						<div>
-							<p className="mb-4">{t('procurementApprovals.modals.rejectMessage')}</p>
+							<p className="mb-4">{t("procurementApprovals.modals.rejectMessage")}</p>
 							<div className="mb-4">
 								<label className="block text-sm font-medium text-gray-700 mb-2">
-									{t('procurementApprovals.modals.reasonLabel')}
+									{t("procurementApprovals.modals.reasonLabel")}
 								</label>
 								<textarea
 									value={reason}
 									onChange={e => setReason(e.target.value)}
-									placeholder={t('procurementApprovals.modals.reasonPlaceholder')}
+									placeholder={t("procurementApprovals.modals.reasonPlaceholder")}
 									className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
 									rows="3"
 								/>
@@ -465,10 +465,10 @@ const ProcurementApprovals = () => {
 					}
 					confirmText={
 						actionLoading
-							? t('procurementApprovals.modals.rejecting')
-							: t('procurementApprovals.actions.reject')
+							? t("procurementApprovals.modals.rejecting")
+							: t("procurementApprovals.actions.reject")
 					}
-					cancelText={t('common.cancel', 'Cancel')}
+					cancelText={t("common.cancel", "Cancel")}
 					confirmButtonClass="bg-red-500 hover:bg-red-600"
 					disabled={actionLoading}
 				/>
