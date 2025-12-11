@@ -16,6 +16,7 @@ import taxRatesReducer from './taxRatesSlice';
 import invoiceApprovalsReducer from './invoiceApprovalsSlice';
 import approvalStepsReducer from './approvalStepsSlice';
 import catalogItemsReducer from './catalogItemsSlice';
+import jobRolesReducer from './jobRolesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -36,6 +37,7 @@ export const store = configureStore({
     invoiceApprovals: invoiceApprovalsReducer,
     approvalSteps: approvalStepsReducer,
     catalogItems: catalogItemsReducer,
+    jobRoles: jobRolesReducer,
   },
 });
 
