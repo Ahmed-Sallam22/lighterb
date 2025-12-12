@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// Base API URL
-const BASE_URL = "http://127.0.0.1:8000";
+// Base API URL - use proxy in development, direct URL in production
+const BASE_URL = import.meta.env.DEV ? "/api" : "https://lightidea.org:8007";
 
 // Create axios instance with default config
 const api = axios.create({
