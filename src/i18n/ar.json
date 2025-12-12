@@ -362,7 +362,45 @@
 	},
 	"common": {
 		"scrollLeft": "التمرير لليسار",
-		"scrollRight": "التمرير لليمين"
+		"scrollRight": "التمرير لليمين",
+		"yes": "نعم",
+		"no": "لا"
+	},
+	"glLines": {
+		"title": "خطوط دفتر الأستاذ",
+		"subtitle": "الترحيل",
+		"lines": "خطوط دفتر الأستاذ",
+		"type": "النوع",
+		"amount": "المبلغ",
+		"account": "الحساب",
+		"department": "القسم",
+		"actions": "الإجراءات",
+		"addLine": "إضافة سطر",
+		"deleteLine": "حذف السطر",
+		"selectType": "اختر النوع",
+		"selectAccount": "اختر الحساب",
+		"selectSegment": "اختر",
+		"selectFirst": "اختر",
+		"debit": "مدين",
+		"credit": "دائن",
+		"noLines": "لم يتم إضافة أي أسطر بعد",
+		"glEntryDetails": "تفاصيل القيد المحاسبي",
+		"date": "التاريخ",
+		"currency": "العملة",
+		"selectCurrency": "اختر العملة",
+		"memo": "الملاحظات",
+		"memoPlaceholder": "أدخل الملاحظات/الوصف...",
+		"allocations": "تخصيصات الفواتير",
+		"allocationsSubtitle": "تخصيص مبالغ الدفع للفواتير",
+		"invoice": "الفاتورة",
+		"selectInvoice": "اختر الفاتورة",
+		"amountAllocated": "المبلغ المخصص",
+		"addAllocation": "إضافة تخصيص",
+		"addFirstAllocation": "إضافة أول تخصيص",
+		"deleteAllocation": "حذف التخصيص",
+		"noAllocations": "لم تتم إضافة أي تخصيصات بعد",
+		"noAllocationsDesc": "أضف تخصيصات الفواتير لتحديد كيفية تطبيق هذه الدفعة.",
+		"totalAllocated": "إجمالي المخصص"
 	},
 	"requisitions": {
 		"title": "طلبات الشراء",
@@ -1029,6 +1067,8 @@
 		"ar": {
 			"title": "مدفوعات المبيعات",
 			"subtitle": "استلام المدفوعات من العملاء",
+			"createPayment": "استلام دفعة",
+			"editPayment": "تعديل الدفعة",
 			"deleteSuccess": "تم حذف دفعة المبيعات بنجاح",
 			"emptyMessage": "لم يتم العثور على مدفوعات عملاء",
 			"customer": "العميل"
@@ -1036,6 +1076,8 @@
 		"ap": {
 			"title": "مدفوعات الشراء",
 			"subtitle": "إجراء المدفوعات للموردين",
+			"createPayment": "إجراء دفعة",
+			"editPayment": "تعديل الدفعة",
 			"deleteSuccess": "تم حذف دفعة الشراء بنجاح",
 			"emptyMessage": "لم يتم العثور على مدفوعات موردين",
 			"supplier": "المورد"
@@ -1053,18 +1095,117 @@
 			"filterStatus": "تصفية حسب الحالة",
 			"deleteError": "فشل حذف الدفعة"
 		},
+		"table": {
+			"id": "المعرف",
+			"date": "التاريخ",
+			"exchangeRate": "سعر الصرف",
+			"approvalStatus": "حالة الموافقة",
+			"allocations": "التخصيصات",
+			"totalAllocated": "إجمالي المخصص",
+			"posted": "مرحّل",
+			"createdAt": "تاريخ الإنشاء",
+			"glEntry": "قيد دفتر الأستاذ"
+		},
 		"status": {
 			"all": "جميع الحالات",
-			"completed": "مكتمل",
+			"draft": "مسودة",
 			"pending": "قيد الانتظار",
+			"approved": "موافق عليه",
+			"rejected": "مرفوض",
+			"completed": "مكتمل",
 			"failed": "فشل",
 			"cancelled": "ملغى"
+		},
+		"actions": {
+			"submitForApproval": "إرسال للموافقة",
+			"postToGL": "ترحيل إلى دفتر الأستاذ"
+		},
+		"messages": {
+			"submitSuccess": "تم إرسال الدفعة للموافقة بنجاح",
+			"submitError": "فشل إرسال الدفعة للموافقة",
+			"postToGLSuccess": "تم ترحيل الدفعة إلى دفتر الأستاذ بنجاح",
+			"postToGLError": "فشل ترحيل الدفعة إلى دفتر الأستاذ"
+		},
+		"filters": {
+			"title": "الفلاتر",
+			"clear": "مسح الفلاتر",
+			"reset": "إعادة تعيين",
+			"applyFilters": "تطبيق الفلاتر",
+			"status": "حالة الموافقة",
+			"customer": "العميل",
+			"supplier": "المورد",
+			"businessPartner": "شريك الأعمال",
+			"currency": "العملة",
+			"dateFrom": "من تاريخ",
+			"dateTo": "إلى تاريخ",
+			"hasAllocations": "لديه تخصيصات",
+			"selectAllocations": "اختر",
+			"glEntryPosted": "قيد دفتر الأستاذ مرحّل",
+			"selectGLPosted": "اختر",
+			"allocations": "التخصيصات",
+			"allCustomers": "جميع العملاء",
+			"allSuppliers": "جميع الموردين",
+			"allCurrencies": "اختر العملة",
+			"allAllocations": "الكل",
+			"withAllocations": "مع تخصيصات",
+			"withoutAllocations": "بدون تخصيصات"
 		},
 		"modals": {
 			"deleteTitle": "حذف الدفعة",
 			"deleteMessage": "هل أنت متأكد من أنك تريد حذف الدفعة \"{{reference}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
 			"delete": "حذف",
 			"cancel": "إلغاء"
+		}
+	},
+	"paymentDetails": {
+		"title": "تفاصيل الدفعة",
+		"loading": "جارٍ تحميل تفاصيل الدفعة...",
+		"errors": {
+			"loadFailed": "تعذر تحميل تفاصيل الدفعة"
+		},
+		"sections": {
+			"paymentInfo": "معلومات الدفعة",
+			"amounts": "المبالغ",
+			"status": "الحالة",
+			"allocations": "تخصيصات الفواتير",
+			"glEntry": "قيد دفتر الأستاذ",
+			"timeline": "الجدول الزمني للموافقة"
+		},
+		"fields": {
+			"date": "التاريخ",
+			"currency": "العملة",
+			"exchangeRate": "سعر الصرف",
+			"totalAllocated": "إجمالي المخصص",
+			"allocatedInvoices": "الفواتير المخصصة",
+			"createdAt": "تاريخ الإنشاء",
+			"updatedAt": "تاريخ التحديث",
+			"approvalStatus": "حالة الموافقة",
+			"glEntry": "قيد دفتر الأستاذ",
+			"glPosted": "تم الترحيل",
+			"rejectionReason": "سبب الرفض",
+			"memo": "ملاحظة",
+			"posted": "مرحّل",
+			"notPosted": "غير مرحّل"
+		},
+		"allocations": {
+			"invoiceId": "رقم الفاتورة",
+			"invoiceDate": "تاريخ الفاتورة",
+			"invoiceTotal": "إجمالي الفاتورة",
+			"paidAmount": "المبلغ المدفوع",
+			"allocated": "المخصص",
+			"paymentStatus": "حالة الدفع"
+		},
+		"glLines": {
+			"type": "النوع",
+			"amount": "المبلغ",
+			"segments": "المقاطع",
+			"noSegments": "لا توجد مقاطع",
+			"noLines": "لا توجد سطور قيود"
+		},
+		"timeline": {
+			"submitted": "تم التقديم للموافقة",
+			"approved": "تمت الموافقة",
+			"rejected": "تم الرفض"
 		}
 	},
 	"procurementApprovalDetail": {
@@ -1555,5 +1696,32 @@
 		"lastPage": "الصفحة الأخيرة",
 		"page": "صفحة",
 		"of": "من"
+	},
+	"paymentForm": {
+		"paymentDetails": "تفاصيل الدفع",
+		"supplier": "المورد",
+		"customer": "العميل",
+		"selectSupplier": "اختر المورد",
+		"selectCustomer": "اختر العميل",
+		"date": "التاريخ",
+		"currency": "العملة",
+		"selectCurrency": "اختر العملة",
+		"exchangeRate": "سعر الصرف",
+		"allocations": "تخصيصات الفواتير",
+		"allocationsSubtitle": "تخصيص مبالغ الدفع للفواتير",
+		"addAllocation": "إضافة تخصيص",
+		"noAllocations": "لم تتم إضافة تخصيصات بعد",
+		"noAllocationsDesc": "أضف تخصيصات الفواتير لتحديد كيفية تطبيق هذه الدفعة.",
+		"addFirstAllocation": "إضافة التخصيص الأول",
+		"invoice": "الفاتورة",
+		"selectInvoice": "اختر الفاتورة",
+		"amountAllocated": "المبلغ المخصص",
+		"deleteAllocation": "حذف التخصيص",
+		"totalAllocated": "إجمالي المخصص",
+		"makePayment": "إجراء الدفع",
+		"receivePayment": "استلام الدفع",
+		"updatePayment": "تحديث الدفع",
+		"cancel": "إلغاء",
+		"processing": "جاري المعالجة..."
 	}
 }

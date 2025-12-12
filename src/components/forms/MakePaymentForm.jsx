@@ -1,484 +1,412 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import Card from '../shared/Card';
-import FloatingLabelInput from '../shared/FloatingLabelInput';
-import FloatingLabelSelect from '../shared/FloatingLabelSelect';
-import { fetchCurrencies } from '../../store/currenciesSlice';
-import { fetchSuppliers } from '../../store/suppliersSlice';
-import { createAPPayment, updateAPPayment } from '../../store/apPaymentsSlice';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
+import Card from "../shared/Card";
+import FloatingLabelInput from "../shared/FloatingLabelInput";
+import FloatingLabelSelect from "../shared/FloatingLabelSelect";
+import GLLinesSection from "../shared/GLLinesSection";
+import { fetchCurrencies } from "../../store/currenciesSlice";
+import { fetchSuppliers } from "../../store/suppliersSlice";
+import { fetchAPInvoices } from "../../store/apInvoicesSlice";
+import { createAPPayment, updateAPPayment } from "../../store/apPaymentsSlice";
+import { FaTrash, FaPlus, FaChevronDown } from "react-icons/fa";
 
-const BASE_URL = 'https://lightidea.org:8007/api';
+const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
+	const { t } = useTranslation();
+	const navigate = useNavigate();
+	const location = useLocation();
+	const dispatch = useDispatch();
+	const { currencies } = useSelector(state => state.currencies);
+	const { suppliers } = useSelector(state => state.suppliers);
+	const { invoices: apInvoices } = useSelector(state => state.apInvoices);
+	const { loading } = useSelector(state => state.apPayments);
 
-const bankAccounts = [
-  { value: 1, label: 'Main Account - AED' },
-  { value: 2, label: 'USD Account' },
-  { value: 3, label: 'EUR Account' },
-];
+	// Check if we're in edit mode - support both route state and prop
+	const editPayment = editPaymentData || location.state?.payment;
+	const paymentId = editPaymentData?.id || location.state?.paymentId;
+	const isEditMode = !!editPayment;
 
-const paymentMethods = [
-  { value: 'BANK_TRANSFER', label: 'Bank Transfer' },
-  { value: 'CHECK', label: 'Check' },
-  { value: 'CASH', label: 'Cash' },
-  { value: 'WIRE', label: 'Wire Transfer' },
-  { value: 'CREDIT_CARD', label: 'Credit Card' },
-];
+	console.log("payments: ", apInvoices);
 
-const MakePaymentForm = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const dispatch = useDispatch();
-  const { currencies } = useSelector((state) => state.currencies);
-  const { suppliers } = useSelector((state) => state.suppliers);
-  const { loading } = useSelector((state) => state.apPayments);
+	// Payment form state - matching API structure
+	const [paymentForm, setPaymentForm] = useState({
+		date: "",
+		business_partner_id: "",
+		currency_id: "",
+		exchange_rate: "1.0000",
+	});
 
-  // Check if we're in edit mode
-  const editPayment = location.state?.payment;
-  const paymentId = location.state?.paymentId;
-  const isEditMode = !!editPayment;
+	// Allocations state - matching API structure: { invoice_id, amount_allocated }
+	const [allocations, setAllocations] = useState([{ id: Date.now(), invoice_id: "", amount_allocated: "" }]);
 
-  const [paymentForm, setPaymentForm] = useState({
-    supplier: '',
-    number: '',
-    date: '',
-    amount: '',
-    currency: '',
-    bankAccount: '',
-    payment_method: 'BANK_TRANSFER',
-    reference: '',
-    memo: '',
-  });
-  const [allocations, setAllocations] = useState([]);
-  const [outstandingBills, setOutstandingBills] = useState([]);
-  const [billsLoading, setBillsLoading] = useState(false);
-  const [billsError, setBillsError] = useState(null);
+	// GL Entry state
+	const [glEntry, setGlEntry] = useState({
+		date: "",
+		currency_id: "",
+		memo: "",
+	});
 
-  // Fetch currencies and suppliers on mount
-  useEffect(() => {
-    dispatch(fetchCurrencies());
-    dispatch(fetchSuppliers());
-  }, [dispatch]);
+	const [glLines, setGlLines] = useState([{ id: Date.now(), type: "", amount: "", segments: [] }]);
 
-  // Pre-fill form if in edit mode
-  useEffect(() => {
-    if (editPayment) {
-      setPaymentForm({
-        supplier: editPayment.supplier || '',
-        number: editPayment.number || '',
-        date: editPayment.date || '',
-        amount: editPayment.amount || '',
-        currency: editPayment.currency || '',
-        bankAccount: editPayment.bank_account || '',
-        payment_method: editPayment.payment_method || 'BANK_TRANSFER',
-        reference: editPayment.reference || '',
-        memo: editPayment.memo || '',
-      });
+	// Fetch currencies, suppliers, and invoices on mount
+	useEffect(() => {
+		dispatch(fetchCurrencies({ page_size: 100 }));
+		dispatch(fetchSuppliers({ page_size: 100 }));
+		dispatch(fetchAPInvoices({ page_size: 100 }));
+	}, [dispatch]);
 
-      // Pre-fill allocations if they exist
-      if (editPayment.allocations && Array.isArray(editPayment.allocations)) {
-        setAllocations(editPayment.allocations);
-      }
-    }
-  }, [editPayment]);
+	// Pre-fill form if in edit mode
+	useEffect(() => {
+		if (editPayment) {
+			setPaymentForm({
+				date: editPayment.date || "",
+				business_partner_id: editPayment.business_partner_id || editPayment.supplier || "",
+				currency_id: editPayment.currency_id || editPayment.currency || "",
+				exchange_rate: editPayment.exchange_rate || "1.0000",
+			});
 
-  // Fetch outstanding bills when supplier changes
-  useEffect(() => {
-    const fetchOutstandingBills = async () => {
-      if (!paymentForm.supplier) {
-        setOutstandingBills([]);
-        setBillsError(null);
-        setBillsLoading(false);
-        return;
-      }
+			// Pre-fill allocations if they exist
+			if (editPayment.allocations && Array.isArray(editPayment.allocations)) {
+				setAllocations(
+					editPayment.allocations.map((a, idx) => ({
+						id: idx + 1,
+						invoice_id: a.invoice_id || a.invoice || "",
+						amount_allocated: a.amount_allocated || a.amount || "",
+					}))
+				);
+			}
 
-      setBillsLoading(true);
-      setBillsError(null);
+			// Pre-fill GL entry if exists
+			if (editPayment.gl_entry) {
+				setGlEntry({
+					date: editPayment.gl_entry.date || editPayment.date || "",
+					currency_id: editPayment.gl_entry.currency_id || editPayment.currency_id || "",
+					memo: editPayment.gl_entry.memo || "",
+				});
+				if (editPayment.gl_entry.lines) {
+					setGlLines(
+						editPayment.gl_entry.lines.map((line, idx) => ({
+							id: idx + 1,
+							type: line.type || "",
+							amount: line.amount || "",
+							segments: line.segments || [],
+						}))
+					);
+				}
+			}
+		}
+	}, [editPayment]);
 
-      try {
-        const response = await axios.get(`${BASE_URL}/outstanding-invoices/`, {
-          params: { supplier: paymentForm.supplier },
-        });
+	// Sync GL entry date and currency with payment form
+	useEffect(() => {
+		setGlEntry(prev => ({
+			...prev,
+			date: paymentForm.date,
+			currency_id: paymentForm.currency_id,
+		}));
+	}, [paymentForm.date, paymentForm.currency_id]);
 
-        const billsData = Array.isArray(response.data)
-          ? response.data
-          : response.data?.results || response.data?.data || [];
+	// Currency options from Redux - filter active currencies only
+	const currencyOptions = (currencies || [])
+		.filter(currency => currency.is_active)
+		.map(currency => ({
+			value: currency.id,
+			label: `${currency.code} - ${currency.name}`,
+		}));
 
-        setOutstandingBills(billsData);
-      } catch (error) {
-        const errorMessage =
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          error.response?.data?.detail ||
-          error.message ||
-          'Failed to load outstanding bills';
-        setBillsError(errorMessage);
-      } finally {
-        setBillsLoading(false);
-      }
-    };
+	// Supplier options from Redux
+	const supplierOptions = (suppliers || []).map(supplier => ({
+		value: supplier.id,
+		label: supplier.name || supplier.company_name || `Supplier ${supplier.id}`,
+	}));
 
-    fetchOutstandingBills();
-  }, [paymentForm.supplier]);
+	// Invoice options for allocations - filter by selected supplier if any
+	const invoiceOptions = (apInvoices || [])
+		.filter(
+			inv => !paymentForm.business_partner_id || inv.supplier_id === parseInt(paymentForm.business_partner_id)
+		)
+		.map(invoice => ({
+			value: invoice.invoice_id,
+			label: `#${invoice.invoice_id} - ${invoice.supplier_name || "N/A"} (${invoice.total || 0} ${
+				invoice.currency_code || ""
+			})`,
+			total_amount: invoice.total || 0,
+		}));
 
-  // Currency options from Redux
-  const currencyOptions = currencies.map((currency) => ({
-    value: currency.id,
-    label: `${currency.code} - ${currency.name}`,
-  }));
+	const handleChange = e => {
+		const { name, value } = e.target;
+		setPaymentForm(prev => ({ ...prev, [name]: value }));
+	};
 
-  // Supplier options from Redux
-  const supplierOptions = suppliers.map((supplier) => ({
-    value: supplier.id,
-    label: supplier.name || `Supplier ${supplier.id}`,
-  }));
+	// Allocation handlers
+	const handleAddAllocation = () => {
+		setAllocations(prev => [...prev, { id: Date.now(), invoice_id: "", amount_allocated: "" }]);
+	};
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setPaymentForm((prev) => ({ ...prev, [name]: value }));
-  };
+	const handleRemoveAllocation = allocationId => {
+		if (allocations.length > 1) {
+			setAllocations(prev => prev.filter(a => a.id !== allocationId));
+		}
+	};
 
-  const handleAllocationChange = (invoiceId, field, value) => {
-    setAllocations((prev) => {
-      const existing = prev.find((a) => a.invoice === invoiceId);
-      if (existing) {
-        return prev.map((a) =>
-          a.invoice === invoiceId ? { ...a, [field]: value } : a
-        );
-      } else {
-        return [...prev, { invoice: invoiceId, [field]: value }];
-      }
-    });
-  };
+	const handleAllocationChange = (allocationId, field, value) => {
+		setAllocations(prev => prev.map(a => (a.id === allocationId ? { ...a, [field]: value } : a)));
+	};
 
-  const handleToggleAllocation = (bill) => {
-    setAllocations((prev) => {
-      const existing = prev.find((a) => a.invoice === bill.id);
-      if (existing) {
-        // Remove allocation
-        return prev.filter((a) => a.invoice !== bill.id);
-      } else {
-        // Add allocation with outstanding amount
-        return [
-          ...prev,
-          {
-            invoice: bill.id,
-            amount: parseFloat(bill.outstanding).toFixed(2),
-            memo: `Payment for Invoice ${bill.number || bill.id}`,
-          },
-        ];
-      }
-    });
-  };
+	const getTotalAllocated = () => {
+		return allocations.reduce((sum, a) => sum + parseFloat(a.amount_allocated || 0), 0);
+	};
 
-  const isAllocated = (invoiceId) => {
-    return allocations.some((a) => a.invoice === invoiceId);
-  };
+	const handleCancel = () => {
+		if (onCancel) {
+			onCancel();
+		} else {
+			navigate(-1);
+		}
+	};
 
-  const getAllocatedAmount = (invoiceId) => {
-    const allocation = allocations.find((a) => a.invoice === invoiceId);
-    return allocation?.amount || '';
-  };
+	const handleMakePayment = async () => {
+		// Validate required fields
+		if (!paymentForm.business_partner_id || !paymentForm.date || !paymentForm.currency_id) {
+			toast.error("Please fill all required fields (Supplier, Date, Currency)");
+			return;
+		}
 
-  const getTotalAllocated = () => {
-    return allocations.reduce((sum, a) => sum + parseFloat(a.amount || 0), 0);
-  };
+		// Validate allocations - at least one should have invoice and amount
+		const validAllocations = allocations.filter(a => a.invoice_id && a.amount_allocated);
+		if (validAllocations.length === 0) {
+			toast.error("Please add at least one invoice allocation");
+			return;
+		}
 
-  const handleCancel = () => {
-    navigate(-1);
-  };
+		// Prepare GL entry lines (filter out empty lines)
+		const validGlLines = glLines
+			.filter(line => line.type && line.amount)
+			.map(line => ({
+				amount: line.amount,
+				type: line.type,
+				segments: (line.segments || [])
+					.filter(seg => seg.segment_code)
+					.map(seg => ({
+						segment_type_id: seg.segment_type_id,
+						segment_code: seg.segment_code,
+					})),
+			}));
 
-  const handleMakePayment = async () => {
-    // Validate required fields
-    if (!paymentForm.supplier || !paymentForm.date || !paymentForm.amount || !paymentForm.currency) {
-      toast.error('Please fill all required fields');
-      return;
-    }
+		// Prepare payment data according to API structure
+		const paymentData = {
+			date: paymentForm.date,
+			business_partner_id: parseInt(paymentForm.business_partner_id),
+			currency_id: parseInt(paymentForm.currency_id),
+			exchange_rate: paymentForm.exchange_rate || "1.0000",
+			allocations: validAllocations.map(a => ({
+				invoice_id: parseInt(a.invoice_id),
+				amount_allocated: parseFloat(a.amount_allocated).toFixed(2),
+			})),
+			gl_entry: {
+				date: glEntry.date || paymentForm.date,
+				currency_id: parseInt(glEntry.currency_id || paymentForm.currency_id),
+				memo: glEntry.memo || `Payment to supplier`,
+				lines: validGlLines,
+			},
+		};
 
-    // Prepare payment data according to API structure
-    const paymentData = {
-      supplier: parseInt(paymentForm.supplier),
-      number: paymentForm.number || undefined,
-      date: paymentForm.date,
-      amount: parseFloat(paymentForm.amount).toFixed(2),
-      currency: parseInt(paymentForm.currency),
-      bank_account: paymentForm.bankAccount ? parseInt(paymentForm.bankAccount) : undefined,
-      payment_method: paymentForm.payment_method || 'BANK_TRANSFER',
-      reference: paymentForm.reference || '',
-      memo: paymentForm.memo || '',
-      allocations: allocations.length > 0 ? allocations : undefined,
-    };
+		try {
+			if (isEditMode && paymentId) {
+				await dispatch(updateAPPayment({ id: paymentId, data: paymentData })).unwrap();
+				toast.success("AP Payment updated successfully");
+			} else {
+				await dispatch(createAPPayment(paymentData)).unwrap();
+				toast.success("AP Payment created successfully");
+			}
+			if (onSuccess) {
+				onSuccess();
+			} else {
+				navigate(-1);
+			}
+		} catch (error) {
+			toast.error(error || `Failed to ${isEditMode ? "update" : "create"} payment`);
+		}
+	};
 
-    try {
-      if (isEditMode && paymentId) {
-        await dispatch(updateAPPayment({ id: paymentId, data: paymentData })).unwrap();
-        toast.success('AP Payment updated successfully');
-      } else {
-        await dispatch(createAPPayment(paymentData)).unwrap();
-        toast.success('AP Payment created successfully');
-      }
-      navigate(-1);
-    } catch (error) {
-      toast.error(error || `Failed to ${isEditMode ? 'update' : 'create'} payment`);
-    }
-  };
+	const formatCurrency = value => {
+		const numericValue = Number(value ?? 0);
+		if (Number.isNaN(numericValue)) {
+			return "0.00";
+		}
+		return numericValue.toLocaleString("en-US", {
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		});
+	};
 
-  const formatCurrency = (value) => {
-    const numericValue = Number(value ?? 0);
-    if (Number.isNaN(numericValue)) {
-      return '0.00';
-    }
-    return numericValue.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  };
+	return (
+		<div className="max-w-4xl mx-auto mt-5 pb-10 space-y-5">
+			{/* Payment Details */}
+			<Card title={t("paymentForm.paymentDetails") || "Payment Details"}>
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+					<FloatingLabelSelect
+						label={t("paymentForm.supplier") || "Supplier"}
+						name="business_partner_id"
+						value={paymentForm.business_partner_id}
+						onChange={handleChange}
+						options={supplierOptions}
+						required
+						placeholder={t("paymentForm.selectSupplier") || "Select supplier"}
+					/>
 
-  const formatDate = (value) => {
-    if (!value) return '-';
-    const parsed = new Date(value);
-    return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString();
-  };
+					<FloatingLabelInput
+						label={t("paymentForm.date") || "Date"}
+						name="date"
+						type="date"
+						value={paymentForm.date}
+						onChange={handleChange}
+						required
+						placeholder="dd/mm/yyyy"
+					/>
 
-  return (
-    <div className="max-w-4xl mx-auto mt-5 pb-10 space-y-5">
-      {/* Payment Details */}
-      <Card title="Payment Details">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <FloatingLabelSelect
-            label="Supplier"
-            name="supplier"
-            value={paymentForm.supplier}
-            onChange={handleChange}
-            options={supplierOptions}
-            required
-            placeholder="Select supplier"
-          />
+					<FloatingLabelSelect
+						label={t("paymentForm.currency") || "Currency"}
+						name="currency_id"
+						value={paymentForm.currency_id}
+						onChange={handleChange}
+						options={currencyOptions}
+						required
+						placeholder={t("paymentForm.selectCurrency") || "Select Currency"}
+					/>
 
-          <FloatingLabelInput
-            label="Payment Number"
-            name="number"
-            type="text"
-            value={paymentForm.number}
-            onChange={handleChange}
-            placeholder="e.g., AP-PAY-2025-001 (auto-generated if empty)"
-          />
+					<FloatingLabelInput
+						label={t("paymentForm.exchangeRate") || "Exchange Rate"}
+						name="exchange_rate"
+						type="number"
+						step="0.0001"
+						value={paymentForm.exchange_rate}
+						onChange={handleChange}
+						placeholder="1.0000"
+					/>
+				</div>
+			</Card>
 
-          <FloatingLabelInput
-            label="Payment Date"
-            name="date"
-            type="date"
-            value={paymentForm.date}
-            onChange={handleChange}
-            required
-            placeholder="dd/mm/yyyy"
-          />
+			{/* Invoice Allocations */}
+			<Card
+				title={t("paymentForm.allocations") || "Invoice Allocations"}
+				subtitle={t("paymentForm.allocationsSubtitle") || "Allocate payment amounts to invoices"}
+				actionSlot={
+					<button
+						type="button"
+						onClick={handleAddAllocation}
+						className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
+					>
+						<FaPlus className="w-3 h-3" />
+						{t("paymentForm.addAllocation") || "Add Allocation"}
+					</button>
+				}
+			>
+				{allocations.length === 0 ? (
+					<div className="rounded-2xl border border-dashed border-[#b6c4cc] bg-[#f5f8fb] p-6 text-center text-[#567086]">
+						<p className="text-lg font-semibold mb-2">
+							{t("paymentForm.noAllocations") || "No allocations added yet"}
+						</p>
+						<p className="text-sm mb-6">
+							{t("paymentForm.noAllocationsDesc") ||
+								"Add invoice allocations to specify how this payment should be applied."}
+						</p>
+						<button
+							type="button"
+							onClick={handleAddAllocation}
+							className="px-4 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform"
+						>
+							<FaPlus className="inline w-3 h-3 mr-2" />
+							{t("paymentForm.addFirstAllocation") || "Add First Allocation"}
+						</button>
+					</div>
+				) : (
+					<div className="space-y-4">
+						{/* Allocations List */}
+						<div className="space-y-3">
+							{allocations.map((allocation, index) => (
+								<div
+									key={allocation.id}
+									className="flex flex-wrap items-end gap-4 p-4 rounded-xl border border-[#e1edf5] bg-[#f5f8fb]"
+								>
+									<div className="flex-1 min-w-[200px]">
+										<label className="block text-xs font-medium text-[#567086] mb-1">
+											{t("paymentForm.invoice") || "Invoice"} #{index + 1}
+										</label>
+										<div className="relative">
+											<select
+												value={allocation.invoice_id}
+												onChange={e =>
+													handleAllocationChange(allocation.id, "invoice_id", e.target.value)
+												}
+												className="w-full h-11 px-3 pr-10 rounded-lg border border-[#d7e3ec] bg-white text-[#1e3a4f] focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent appearance-none"
+											>
+												<option value="">
+													{t("paymentForm.selectInvoice") || "Select Invoice"}
+												</option>
+												{invoiceOptions.map(opt => (
+													<option key={opt.value} value={opt.value}>
+														{opt.label}
+													</option>
+												))}
+											</select>
+											<FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#567086] pointer-events-none" />
+										</div>
+									</div>
 
-          <FloatingLabelInput
-            label="Amount"
-            name="amount"
-            type="number"
-            step="0.01"
-            value={paymentForm.amount}
-            onChange={handleChange}
-            required
-            placeholder="0.00"
-          />
+									<div className="w-40">
+										<label className="block text-xs font-medium text-[#567086] mb-1">
+											{t("paymentForm.amountAllocated") || "Amount Allocated"}
+										</label>
+										<input
+											type="number"
+											step="0.01"
+											value={allocation.amount_allocated}
+											onChange={e =>
+												handleAllocationChange(
+													allocation.id,
+													"amount_allocated",
+													e.target.value
+												)
+											}
+											placeholder="0.00"
+											className="w-full h-11 px-3 rounded-lg border border-[#d7e3ec] bg-white text-[#1e3a4f] focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent text-right"
+										/>
+									</div>
 
-          <FloatingLabelSelect
-            label="Currency"
-            name="currency"
-            value={paymentForm.currency}
-            onChange={handleChange}
-            options={currencyOptions}
-            required
-            placeholder="Select Currency"
-          />
+									<button
+										type="button"
+										onClick={() => handleRemoveAllocation(allocation.id)}
+										disabled={allocations.length === 1}
+										className="h-11 w-11 flex items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+										title={t("paymentForm.deleteAllocation") || "Delete Allocation"}
+									>
+										<FaTrash className="w-4 h-4" />
+									</button>
+								</div>
+							))}
+						</div>
 
-          <FloatingLabelSelect
-            label="Bank Account"
-            name="bankAccount"
-            value={paymentForm.bankAccount}
-            onChange={handleChange}
-            options={bankAccounts}
-            
-            placeholder="Select bank account"
-          />
+						{/* Allocations Summary */}
+						<div className="flex justify-end">
+							<div className="bg-white rounded-xl border border-[#d7e3ec] p-4 min-w-[200px]">
+								<div className="flex justify-between items-center text-sm">
+									<span className="text-[#567086] font-medium">
+										{t("paymentForm.totalAllocated") || "Total Allocated"}:
+									</span>
+									<span className="font-bold text-[#0d5f7a]">
+										{formatCurrency(getTotalAllocated())}
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
+			</Card>
 
-          <FloatingLabelSelect
-            label="Payment Method"
-            name="payment_method"
-            value={paymentForm.payment_method}
-            onChange={handleChange}
-            options={paymentMethods}
-            required
-            placeholder="Select payment method"
-          />
-
-          <FloatingLabelInput
-            label="Reference"
-            name="reference"
-            type="text"
-            value={paymentForm.reference}
-            onChange={handleChange}
-            placeholder="e.g., TRF-20251119-ABC123"
-          />
-
-          <div className="sm:col-span-2">
-            <FloatingLabelInput
-              label="Memo"
-              name="memo"
-              type="text"
-              value={paymentForm.memo}
-              onChange={handleChange}
-              placeholder="Payment notes or description"
-            />
-          </div>
-        </div>
-      </Card>
-
-      {/* Outstanding Bills */}
-      <Card 
-        title="Invoice Allocations"
-        subtitle={paymentForm.supplier ? 'Outstanding bills for selected supplier' : 'Select a supplier first'}
-      >
-        {!paymentForm.supplier ? (
-          <div className="rounded-2xl border border-dashed border-[#b6c4cc] bg-[#f5f8fb] p-6 text-center text-[#567086]">
-            <p className="text-lg font-semibold mb-2">Select a supplier to view outstanding bills</p>
-            <p className="text-sm mb-6">You can allocate this payment to specific bills after selecting a supplier.</p>
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-[#e1edf5] bg-[#f5f8fb] p-4">
-            {billsLoading ? (
-              <div className="flex flex-col items-center justify-center py-10 text-[#567086]">
-                <div className="h-10 w-10 border-4 border-[#b6c4cc] border-t-[#0d5f7a] rounded-full animate-spin mb-3"></div>
-                <span>Loading outstanding bills...</span>
-              </div>
-            ) : billsError ? (
-              <div className="text-center text-red-600 py-6">{billsError}</div>
-            ) : outstandingBills.length === 0 ? (
-              <div className="text-center text-[#567086] py-6">
-                No outstanding bills for this supplier.
-              </div>
-            ) : (
-              <div className="overflow-x-auto rounded-2xl border border-[#d7e3ec] bg-white">
-                <table className="min-w-full divide-y divide-gray-200 text-sm">
-                  <thead className="bg-[#f5f8fb] text-xs font-semibold uppercase tracking-wide text-[#567086]">
-                    <tr>
-                      <th className="px-4 py-3 text-left">
-                        <input
-                          type="checkbox"
-                          className="rounded border-gray-300"
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              // Select all bills
-                              const allAllocations = outstandingBills.map((bill) => ({
-                                invoice: bill.id,
-                                amount: parseFloat(bill.outstanding).toFixed(2),
-                                memo: `Payment for Invoice ${bill.number || bill.id}`,
-                              }));
-                              setAllocations(allAllocations);
-                            } else {
-                              // Deselect all
-                              setAllocations([]);
-                            }
-                          }}
-                          checked={allocations.length === outstandingBills.length && outstandingBills.length > 0}
-                        />
-                      </th>
-                      <th className="px-4 py-3 text-left">Bill #</th>
-                      <th className="px-4 py-3 text-left">Bill Date</th>
-                      <th className="px-4 py-3 text-left">Due Date</th>
-                      <th className="px-4 py-3 text-left">Currency</th>
-                      <th className="px-4 py-3 text-right">Total</th>
-                      <th className="px-4 py-3 text-right">Paid</th>
-                      <th className="px-4 py-3 text-right">Outstanding</th>
-                      <th className="px-4 py-3 text-right">Allocate Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 text-gray-700">
-                    {outstandingBills.map((bill) => (
-                      <tr 
-                        key={bill.id} 
-                        className={`transition-colors ${
-                          isAllocated(bill.id) ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-[#f8fbff]'
-                        }`}
-                      >
-                        <td className="px-4 py-3">
-                          <input
-                            type="checkbox"
-                            className="rounded border-gray-300"
-                            checked={isAllocated(bill.id)}
-                            onChange={() => handleToggleAllocation(bill)}
-                          />
-                        </td>
-                        <td className="px-4 py-3 font-semibold text-[#0d5f7a]">{bill.number || '-'}</td>
-                        <td className="px-4 py-3">{formatDate(bill.date)}</td>
-                        <td className="px-4 py-3">{formatDate(bill.due_date)}</td>
-                        <td className="px-4 py-3">{bill.currency || '-'}</td>
-                        <td className="px-4 py-3 text-right">{formatCurrency(bill.total)}</td>
-                        <td className="px-4 py-3 text-right text-green-700">{formatCurrency(bill.paid)}</td>
-                        <td className="px-4 py-3 text-right font-semibold text-[#b45309]">
-                          {formatCurrency(bill.outstanding)}
-                        </td>
-                        <td className="px-4 py-3">
-                          {isAllocated(bill.id) ? (
-                            <input
-                              type="number"
-                              step="0.01"
-                              className="w-28 px-2 py-1 border border-gray-300 rounded text-right focus:outline-none focus:ring-2 focus:ring-[#0d5f7a]"
-                              value={getAllocatedAmount(bill.id)}
-                              onChange={(e) => handleAllocationChange(bill.id, 'amount', e.target.value)}
-                              placeholder="0.00"
-                            />
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot className="bg-gray-50">
-                    <tr>
-                      <td colSpan="8" className="px-4 py-3 text-right font-semibold text-gray-700">
-                        Total Allocated:
-                      </td>
-                      <td className="px-4 py-3 text-right font-bold text-[#0d5f7a]">
-                        {formatCurrency(getTotalAllocated())}
-                      </td>
-                    </tr>
-                    {paymentForm.amount && (
-                      <tr>
-                        <td colSpan="8" className="px-4 py-3 text-right font-semibold text-gray-700">
-                          Payment Amount:
-                        </td>
-                        <td className="px-4 py-3 text-right font-bold text-gray-700">
-                          {formatCurrency(paymentForm.amount)}
-                        </td>
-                      </tr>
-                    )}
-                    {paymentForm.amount && getTotalAllocated() > 0 && (
-                      <tr>
-                        <td colSpan="8" className="px-4 py-3 text-right font-semibold text-gray-700">
-                          {getTotalAllocated() > parseFloat(paymentForm.amount || 0) ? 'Over-allocated:' : 'Unallocated:'}
-                        </td>
-                        <td className={`px-4 py-3 text-right font-bold ${
-                          getTotalAllocated() > parseFloat(paymentForm.amount || 0) ? 'text-red-600' : 'text-green-600'
-                        }`}>
-                          {formatCurrency(Math.abs(parseFloat(paymentForm.amount || 0) - getTotalAllocated()))}
-                        </td>
-                      </tr>
-                    )}
-                  </tfoot>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-      </Card>
-
-    {/* <Card
+			{/* <Card
         title="GL Distribution Lines"
         subtitle="Posting"
         actionSlot={
@@ -502,26 +430,38 @@ const MakePaymentForm = () => {
         </div>
       </Card> */}
 
-      {/* Action Buttons */}
-      <div className="mt-6 flex flex-wrap justify-end gap-3">
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="px-6 py-2 rounded-full border border-[#7A9098] text-[#7A9098] font-semibold hover:bg-[#f1f5f8] transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={handleMakePayment}
-          disabled={loading}
-          className="px-8 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? 'Processing...' : isEditMode ? 'Update Payment' : 'Make Payment'}
-        </button>
-      </div>
-    </div>
-  );
+			{/* GL Lines Section */}
+			<Card title={t("glLines.title") || "GL Lines"} subtitle={t("glLines.subtitle") || "Posting"}>
+				<GLLinesSection
+					lines={glLines}
+					onChange={setGlLines}
+					glEntry={glEntry}
+					onGlEntryChange={setGlEntry}
+					showGlEntryHeader={true}
+					title=""
+				/>
+			</Card>
+
+			{/* Action Buttons */}
+			<div className="mt-6 flex flex-wrap justify-end gap-3">
+				<button
+					type="button"
+					onClick={handleCancel}
+					className="px-6 py-2 rounded-full border border-[#7A9098] text-[#7A9098] font-semibold hover:bg-[#f1f5f8] transition-colors"
+				>
+					Cancel
+				</button>
+				<button
+					type="button"
+					onClick={handleMakePayment}
+					disabled={loading}
+					className="px-8 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+				>
+					{loading ? "Processing..." : isEditMode ? "Update Payment" : "Make Payment"}
+				</button>
+			</div>
+		</div>
+	);
 };
 
 export default MakePaymentForm;

@@ -54,6 +54,7 @@ const TableRow = memo(
 		onView,
 		onEdit,
 		onDelete,
+		customActions,
 		showActions,
 		showDeleteButton,
 		showViewButton,
@@ -82,12 +83,13 @@ const TableRow = memo(
 				</td>
 			))}
 
-			{(onView || onEdit || onDelete) && (
+			{(onView || onEdit || onDelete || customActions) && (
 				<td className="px-6 py-4" style={{ textAlign: "center" }}>
 					{!showActions ||
 					showActions(row) ||
 					(onView && (!showViewButton || showViewButton(row))) ||
-					(onEdit && (!showEditButton || showEditButton(row))) ? (
+					(onEdit && (!showEditButton || showEditButton(row))) ||
+					customActions ? (
 						<div className="flex items-center justify-center gap-3">
 							{onView && (!showViewButton || showViewButton(row)) && (
 								<button
@@ -118,6 +120,20 @@ const TableRow = memo(
 										<DeleteIcon />
 									</button>
 								)}
+							{/* Custom Actions */}
+							{customActions &&
+								customActions
+									.filter(action => !action.showWhen || action.showWhen(row))
+									.map((action, actionIndex) => (
+										<button
+											key={actionIndex}
+											onClick={() => action.onClick(row, rowIndex)}
+											className="hover:scale-110 transition-transform duration-200"
+											title={action.title}
+										>
+											{action.icon}
+										</button>
+									))}
 						</div>
 					) : (
 						<div className="flex items-center justify-center">
@@ -138,6 +154,7 @@ const Table = memo(
 		onView,
 		onEdit,
 		onDelete,
+		customActions = [],
 		className = "",
 		emptyMessage = "No data available",
 		showActions,
@@ -163,7 +180,7 @@ const Table = memo(
 										{column.header}
 									</th>
 								))}
-								{(onView || onEdit || onDelete) && (
+								{(onView || onEdit || onDelete || customActions.length > 0) && (
 									<th
 										className="px-6 py-4 text-sm font-semibold text-[#000000]"
 										style={{ textAlign: "center" }}
@@ -178,7 +195,10 @@ const Table = memo(
 							{data.length === 0 ? (
 								<tr>
 									<td
-										colSpan={columns.length + (onView || onEdit || onDelete ? 1 : 0)}
+										colSpan={
+											columns.length +
+											(onView || onEdit || onDelete || customActions.length > 0 ? 1 : 0)
+										}
 										className="px-6 py-12 text-gray-500"
 										style={{ textAlign: "center" }}
 									>
@@ -195,6 +215,7 @@ const Table = memo(
 										onView={onView}
 										onEdit={onEdit}
 										onDelete={onDelete}
+										customActions={customActions}
 										showActions={showActions}
 										showDeleteButton={showDeleteButton}
 										showViewButton={showViewButton}
@@ -224,6 +245,14 @@ Table.propTypes = {
 	onView: PropTypes.func,
 	onEdit: PropTypes.func,
 	onDelete: PropTypes.func,
+	customActions: PropTypes.arrayOf(
+		PropTypes.shape({
+			icon: PropTypes.node.isRequired,
+			title: PropTypes.string.isRequired,
+			onClick: PropTypes.func.isRequired,
+			showWhen: PropTypes.func,
+		})
+	),
 	className: PropTypes.string,
 	emptyMessage: PropTypes.string,
 	showActions: PropTypes.func,

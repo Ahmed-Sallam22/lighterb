@@ -362,7 +362,45 @@
 	},
 	"common": {
 		"scrollLeft": "Scroll left",
-		"scrollRight": "Scroll right"
+		"scrollRight": "Scroll right",
+		"yes": "Yes",
+		"no": "No"
+	},
+	"glLines": {
+		"title": "GL Lines",
+		"subtitle": "Posting",
+		"lines": "GL Lines",
+		"type": "Type",
+		"amount": "Amount",
+		"account": "Account",
+		"department": "Department",
+		"actions": "Actions",
+		"addLine": "Add Line",
+		"deleteLine": "Delete Line",
+		"selectType": "Select Type",
+		"selectAccount": "Select Account",
+		"selectSegment": "Select",
+		"selectFirst": "Select",
+		"debit": "DEBIT",
+		"credit": "CREDIT",
+		"noLines": "No lines added yet",
+		"glEntryDetails": "GL Entry Details",
+		"date": "Date",
+		"currency": "Currency",
+		"selectCurrency": "Select Currency",
+		"memo": "Memo",
+		"memoPlaceholder": "Enter memo/description...",
+		"allocations": "Invoice Allocations",
+		"allocationsSubtitle": "Allocate payment amounts to invoices",
+		"invoice": "Invoice",
+		"selectInvoice": "Select Invoice",
+		"amountAllocated": "Amount Allocated",
+		"addAllocation": "Add Allocation",
+		"addFirstAllocation": "Add First Allocation",
+		"deleteAllocation": "Delete Allocation",
+		"noAllocations": "No allocations added yet",
+		"noAllocationsDesc": "Add invoice allocations to specify how this payment should be applied.",
+		"totalAllocated": "Total Allocated"
 	},
 	"requisitions": {
 		"title": "Requisitions",
@@ -1028,6 +1066,8 @@
 		"ar": {
 			"title": "AR Payments",
 			"subtitle": "Receive payments from customers",
+			"createPayment": "Receive Payment",
+			"editPayment": "Edit Payment",
 			"deleteSuccess": "AR Payment deleted successfully",
 			"emptyMessage": "No customer payments found",
 			"customer": "Customer"
@@ -1035,6 +1075,8 @@
 		"ap": {
 			"title": "AP Payments",
 			"subtitle": "Make Payments to Suppliers",
+			"createPayment": "Make Payment",
+			"editPayment": "Edit Payment",
 			"deleteSuccess": "AP Payment deleted successfully",
 			"emptyMessage": "No supplier payments found",
 			"supplier": "Supplier"
@@ -1052,18 +1094,117 @@
 			"filterStatus": "Filter by Status",
 			"deleteError": "Failed to delete payment"
 		},
+		"table": {
+			"id": "ID",
+			"date": "Date",
+			"exchangeRate": "Exchange Rate",
+			"approvalStatus": "Approval Status",
+			"allocations": "Allocations",
+			"totalAllocated": "Total Allocated",
+			"posted": "Posted",
+			"createdAt": "Created At",
+			"glEntry": "GL Entry"
+		},
 		"status": {
 			"all": "All Status",
-			"completed": "Completed",
+			"draft": "Draft",
 			"pending": "Pending",
+			"approved": "Approved",
+			"rejected": "Rejected",
+			"completed": "Completed",
 			"failed": "Failed",
 			"cancelled": "Cancelled"
+		},
+		"actions": {
+			"submitForApproval": "Submit for Approval",
+			"postToGL": "Post to GL"
+		},
+		"messages": {
+			"submitSuccess": "Payment submitted for approval successfully",
+			"submitError": "Failed to submit payment for approval",
+			"postToGLSuccess": "Payment posted to GL successfully",
+			"postToGLError": "Failed to post payment to GL"
+		},
+		"filters": {
+			"title": "Filters",
+			"clear": "Clear Filters",
+			"reset": "Reset",
+			"applyFilters": "Apply Filters",
+			"status": "Approval Status",
+			"customer": "Customer",
+			"supplier": "Supplier",
+			"businessPartner": "Business Partner",
+			"currency": "Currency",
+			"dateFrom": "Date From",
+			"dateTo": "Date To",
+			"hasAllocations": "Has Allocations",
+			"selectAllocations": "Select",
+			"glEntryPosted": "GL Entry Posted",
+			"selectGLPosted": "Select",
+			"allocations": "Allocations",
+			"allCustomers": "All Customers",
+			"allSuppliers": "All Suppliers",
+			"allCurrencies": "Select currency",
+			"allAllocations": "All",
+			"withAllocations": "With Allocations",
+			"withoutAllocations": "Without Allocations"
 		},
 		"modals": {
 			"deleteTitle": "Delete Payment",
 			"deleteMessage": "Are you sure you want to delete payment \"{{reference}}\"? This action cannot be undone.",
 			"delete": "Delete",
 			"cancel": "Cancel"
+		}
+	},
+	"paymentDetails": {
+		"title": "Payment Details",
+		"loading": "Loading payment details...",
+		"errors": {
+			"loadFailed": "Unable to load payment details"
+		},
+		"sections": {
+			"paymentInfo": "Payment Information",
+			"amounts": "Amounts",
+			"status": "Status",
+			"allocations": "Invoice Allocations",
+			"glEntry": "GL Entry",
+			"timeline": "Approval Timeline"
+		},
+		"fields": {
+			"date": "Date",
+			"currency": "Currency",
+			"exchangeRate": "Exchange Rate",
+			"totalAllocated": "Total Allocated",
+			"allocatedInvoices": "Allocated Invoices",
+			"createdAt": "Created At",
+			"updatedAt": "Updated At",
+			"approvalStatus": "Approval Status",
+			"glEntry": "GL Entry",
+			"glPosted": "GL Posted",
+			"rejectionReason": "Rejection Reason",
+			"memo": "Memo",
+			"posted": "Posted",
+			"notPosted": "Not Posted"
+		},
+		"allocations": {
+			"invoiceId": "Invoice ID",
+			"invoiceDate": "Invoice Date",
+			"invoiceTotal": "Invoice Total",
+			"paidAmount": "Paid Amount",
+			"allocated": "Allocated",
+			"paymentStatus": "Payment Status"
+		},
+		"glLines": {
+			"type": "Type",
+			"amount": "Amount",
+			"segments": "Segments",
+			"noSegments": "No segments",
+			"noLines": "No journal lines available"
+		},
+		"timeline": {
+			"submitted": "Submitted for Approval",
+			"approved": "Approved",
+			"rejected": "Rejected"
 		}
 	},
 	"procurementApprovalDetail": {
@@ -1554,5 +1695,32 @@
 		"lastPage": "Last page",
 		"page": "Page",
 		"of": "of"
+	},
+	"paymentForm": {
+		"paymentDetails": "Payment Details",
+		"supplier": "Supplier",
+		"customer": "Customer",
+		"selectSupplier": "Select supplier",
+		"selectCustomer": "Select customer",
+		"date": "Date",
+		"currency": "Currency",
+		"selectCurrency": "Select Currency",
+		"exchangeRate": "Exchange Rate",
+		"allocations": "Invoice Allocations",
+		"allocationsSubtitle": "Allocate payment amounts to invoices",
+		"addAllocation": "Add Allocation",
+		"noAllocations": "No allocations added yet",
+		"noAllocationsDesc": "Add invoice allocations to specify how this payment should be applied.",
+		"addFirstAllocation": "Add First Allocation",
+		"invoice": "Invoice",
+		"selectInvoice": "Select Invoice",
+		"amountAllocated": "Amount Allocated",
+		"deleteAllocation": "Delete Allocation",
+		"totalAllocated": "Total Allocated",
+		"makePayment": "Make Payment",
+		"receivePayment": "Receive Payment",
+		"updatePayment": "Update Payment",
+		"cancel": "Cancel",
+		"processing": "Processing..."
 	}
 }
