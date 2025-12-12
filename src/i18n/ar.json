@@ -1732,6 +1732,92 @@
 		"cancel": "إلغاء",
 		"processing": "جاري المعالجة..."
 	},
+	"invoiceForm": {
+		"goodsReceipt": {
+			"title": "الربط بإيصال البضاعة (اختياري)",
+			"subtitle": "اختر إيصال البضاعة الذي يحتاج إلى فاتورة",
+			"label": "إيصال البضاعة",
+			"placeholder": "اختر إيصال البضاعة",
+			"helper": "تم العثور على إيصالات بضاعة تحتاج إلى فواتير. اختر واحدًا لملء تفاصيل الفاتورة تلقائيًا."
+		},
+		"details": {
+			"title": "تفاصيل الفاتورة",
+			"supplier": "المورد",
+			"customer": "العميل",
+			"selectSupplier": "اختر المورد",
+			"selectCustomer": "اختر العميل",
+			"invoiceNumber": "رقم الفاتورة",
+			"invoiceNumberPlaceholderAP": "مثال: AP-INV-2025-001 (يتم إنشاؤه تلقائيًا إذا كان فارغًا)",
+			"invoiceNumberPlaceholderAR": "مثال: AR-INV-2025-001 (يتم إنشاؤه تلقائيًا إذا كان فارغًا)",
+			"invoiceDate": "تاريخ الفاتورة",
+			"dueDate": "تاريخ الاستحقاق",
+			"datePlaceholder": "يوم/شهر/سنة",
+			"currency": "العملة",
+			"selectCurrency": "اختر العملة",
+			"country": "الدولة",
+			"selectCountry": "اختر الدولة",
+			"paymentTerms": "شروط الدفع",
+			"selectPaymentTerms": "اختر شروط الدفع",
+			"poReference": "رقم أمر الشراء",
+			"poReferencePlaceholder": "مثال: PO-2025-456",
+			"vendorInvoiceNumber": "رقم فاتورة المورد",
+			"vendorInvoiceNumberPlaceholder": "مثال: VENDOR-INV-789",
+			"memo": "ملاحظة",
+			"memoPlaceholder": "ملاحظات أو وصف الفاتورة"
+		},
+		"items": {
+			"title": "بنود الفاتورة",
+			"subtitle": "تمت إضافة {{count}} بند",
+			"subtitle_plural": "تمت إضافة {{count}} بنود",
+			"addNew": "+ بند جديد",
+			"noItems": "لم تتم إضافة بنود بعد",
+			"noItemsDesc": "أضف بنودًا لإنشاء فاتورتك.",
+			"addFirst": "+ إضافة البند الأول",
+			"name": "الاسم",
+			"namePlaceholder": "اسم البند",
+			"description": "الوصف",
+			"descriptionPlaceholder": "وصف البند",
+			"quantity": "الكمية",
+			"quantityPlaceholder": "1",
+			"unitPrice": "سعر الوحدة",
+			"unitPricePlaceholder": "0.00",
+			"taxRate": "معدل الضريبة",
+			"selectTaxRate": "اختر معدل الضريبة",
+			"taxExempt": "معفى من الضريبة (0%)",
+			"actions": "الإجراءات",
+			"deleteItem": "حذف البند"
+		},
+		"totals": {
+			"subtotal": "المجموع الفرعي",
+			"tax": "الضريبة",
+			"invoiceTotal": "إجمالي الفاتورة"
+		},
+		"glDistribution": {
+			"title": "توزيع دفتر الأستاذ",
+			"subtitle": "إنشاء بنود توزيع دفتر الأستاذ لهذه الفاتورة",
+			"invoiceTotal": "إجمالي الفاتورة:",
+			"glTotalDebits": "إجمالي دفتر الأستاذ (المدين):",
+			"totalsMatch": "المجاميع متطابقة - جاهز لإنشاء الفاتورة",
+			"totalsMismatch": "المجاميع غير متطابقة (الفرق: {{difference}})",
+			"adjustHelper": "اضبط بنود دفتر الأستاذ بحيث يطابق إجمالي المدين إجمالي الفاتورة."
+		},
+		"actions": {
+			"cancel": "إلغاء",
+			"creating": "جاري الإنشاء...",
+			"createInvoice": "إنشاء الفاتورة"
+		},
+		"messages": {
+			"itemRemoved": "تم حذف البند",
+			"requiredFields": "يرجى ملء جميع الحقول المطلوبة",
+			"noItems": "يرجى إضافة بند واحد على الأقل",
+			"noGlLines": "يرجى إضافة بند توزيع واحد على الأقل لدفتر الأستاذ",
+			"glNotBalanced": "بنود توزيع دفتر الأستاذ غير متوازنة. يجب أن يساوي المدين الدائن.",
+			"totalsMismatch": "إجمالي الفاتورة ({{invoiceTotal}}) يجب أن يطابق إجمالي توزيع دفتر الأستاذ ({{glTotal}})",
+			"apCreated": "تم إنشاء فاتورة الشراء بنجاح",
+			"arCreated": "تم إنشاء فاتورة المبيعات بنجاح",
+			"createFailed": "فشل إنشاء الفاتورة"
+		}
+	},
 	"countries": {
 		"title": "الدول",
 		"subtitle": "إدارة إعدادات الدول والتكوينات",

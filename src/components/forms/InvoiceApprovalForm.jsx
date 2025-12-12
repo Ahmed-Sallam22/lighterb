@@ -2,6 +2,7 @@ import React from "react";
 import FloatingLabelInput from "../shared/FloatingLabelInput";
 import FloatingLabelSelect from "../shared/FloatingLabelSelect";
 import LoadingSpan from "../shared/LoadingSpan";
+import Button from "../shared/Button";
 
 const InvoiceApprovalForm = ({
 	t,
@@ -55,33 +56,33 @@ const InvoiceApprovalForm = ({
 
 			{/* Action Buttons */}
 			<div className="border-t border-gray-200 mt-6 pt-4 flex gap-3">
-				<button
+				<Button
 					onClick={onCancel}
-					className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
 					disabled={loading}
-				>
-					{t("invoiceApprovals.actions.cancel")}
-				</button>
+					title={t("invoiceApprovals.actions.cancel")}
+					className="bg-transparent shadow-none hover:shadow-none flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
+				/>
 
-				<button
+				<Button
 					onClick={onSubmit}
 					disabled={loading}
+					title={
+						loading ? (
+							<LoadingSpan
+								text={
+									editingApproval
+										? t("invoiceApprovals.actions.updating")
+										: t("invoiceApprovals.actions.creating")
+								}
+							/>
+						) : editingApproval ? (
+							t("invoiceApprovals.actions.update")
+						) : (
+							t("invoiceApprovals.actions.create")
+						)
+					}
 					className="flex-1 px-4 py-2 bg-[#28819C] text-white rounded-lg hover:bg-[#1f6477] transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-				>
-					{loading ? (
-						<LoadingSpan
-							text={
-								editingApproval
-									? t("invoiceApprovals.actions.updating")
-									: t("invoiceApprovals.actions.creating")
-							}
-						/>
-					) : editingApproval ? (
-						t("invoiceApprovals.actions.update")
-					) : (
-						t("invoiceApprovals.actions.create")
-					)}
-				</button>
+				/>
 			</div>
 		</div>
 	);

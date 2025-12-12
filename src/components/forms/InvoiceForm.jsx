@@ -3,10 +3,12 @@ import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
 import Card from "../shared/Card";
 import FloatingLabelInput from "../shared/FloatingLabelInput";
 import FloatingLabelSelect from "../shared/FloatingLabelSelect";
 import GLLinesSection from "../shared/GLLinesSection";
+import Button from "../shared/Button";
 import { createARInvoice } from "../../store/arInvoicesSlice";
 import { createAPInvoice } from "../../store/apInvoicesSlice";
 import { fetchCurrencies } from "../../store/currenciesSlice";
@@ -39,6 +41,7 @@ const goodsReceiptOptions = [
 const InvoiceForm = ({ isAPInvoice = false }) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const { t } = useTranslation();
 	const { currencies } = useSelector(state => state.currencies);
 	const { customers } = useSelector(state => state.customers);
 	const { suppliers } = useSelector(state => state.suppliers);
@@ -154,7 +157,6 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 			tax_category: "",
 		};
 		setItems(prev => [...prev, newItem]);
-		toast.success("Item added");
 	};
 
 	const handleItemChange = (itemId, field, value) => {
@@ -192,7 +194,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 
 	const handleRemoveItem = itemId => {
 		setItems(prev => prev.filter(item => item.id !== itemId));
-		toast.success("Item removed");
+		toast.success(t("invoiceForm.messages.itemRemoved"));
 	};
 
 	const handleCancel = () => {
@@ -215,20 +217,20 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 		// Validate required fields
 		const entityField = isAPInvoice ? "supplier" : "customer";
 		if (!invoiceForm[entityField] || !invoiceForm.date || !invoiceForm.currency || !invoiceForm.country) {
-			toast.error("Please fill all required fields");
+			toast.error(t("invoiceForm.messages.requiredFields"));
 			console.log("Validation failed: missing required fields");
 			return;
 		}
 
 		if (items.length === 0) {
-			toast.error("Please add at least one item");
+			toast.error(t("invoiceForm.messages.noItems"));
 			console.log("Validation failed: no items");
 			return;
 		}
 
 		// Validate GL lines
 		if (glLines.length === 0) {
-			toast.error("Please add at least one GL distribution line");
+			toast.error(t("invoiceForm.messages.noGlLines"));
 			console.log("Validation failed: no GL lines");
 			return;
 		}
@@ -241,7 +243,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 			.reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
 
 		if (Math.abs(totalDebit - totalCredit) >= 0.01) {
-			toast.error("GL distribution lines are not balanced. Debits must equal Credits.");
+			toast.error(t("invoiceForm.messages.glNotBalanced"));
 			console.log("Validation failed: GL not balanced", { totalDebit, totalCredit });
 			return;
 		}
@@ -249,9 +251,10 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 		const glTotal = totalDebit;
 		if (Math.abs(invoiceTotalAmount - glTotal) >= 0.01) {
 			toast.error(
-				`Invoice total (${formatCurrency(
-					invoiceTotalAmount
-				)}) must match GL distribution total (${formatCurrency(glTotal)})`
+				t("invoiceForm.messages.totalsMismatch", {
+					invoiceTotal: formatCurrency(invoiceTotalAmount),
+					glTotal: formatCurrency(glTotal),
+				})
 			);
 			console.log("Validation failed: totals mismatch", { invoiceTotalAmount, glTotal });
 			return;
@@ -309,11 +312,11 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 			if (isAPInvoice) {
 				result = await dispatch(createAPInvoice(invoiceData)).unwrap();
 				console.log("AP Invoice created:", result);
-				toast.success("AP Invoice created successfully");
+				toast.success(t("invoiceForm.messages.apCreated"));
 			} else {
 				result = await dispatch(createARInvoice(invoiceData)).unwrap();
 				console.log("AR Invoice created:", result);
-				toast.success("AR Invoice created successfully");
+				toast.success(t("invoiceForm.messages.arCreated"));
 			}
 			navigate(-1);
 		} catch (error) {
@@ -321,7 +324,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 
 			// The error from unwrap() is already processed by the slice
 			// It can be a string (from rejectWithValue) or an Error object
-			let message = "Failed to create invoice";
+			let message = t("invoiceForm.messages.createFailed");
 
 			if (typeof error === "string") {
 				// Error is already a processed string from the slice
@@ -342,124 +345,128 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 		<div className="max-w-6xl mx-auto mt-5 pb-10 space-y-5">
 			{/* Goods Receipt Link (AP Invoice Only) */}
 			{isAPInvoice && (
-				<Card title="Link to Goods Receipt (Optional)" subtitle="Select Goods Receipt Needing Invoice">
+				<Card title={t("invoiceForm.goodsReceipt.title")} subtitle={t("invoiceForm.goodsReceipt.subtitle")}>
 					<div className="grid grid-cols-1 gap-6">
 						<FloatingLabelSelect
-							label="Goods Receipt"
+							label={t("invoiceForm.goodsReceipt.label")}
 							name="goodsReceipt"
 							value={goodsReceipt}
 							onChange={e => setGoodsReceipt(e.target.value)}
 							options={goodsReceiptOptions}
-							placeholder="Select goods receipt"
+							placeholder={t("invoiceForm.goodsReceipt.placeholder")}
 						/>
-						<p className="text-xs text-[#7A9098]">
-							Found goods receipts needing invoices. Select one to auto-populate invoice details.
-						</p>
+						<p className="text-xs text-[#7A9098]">{t("invoiceForm.goodsReceipt.helper")}</p>
 					</div>
 				</Card>
 			)}
 
 			{/* Invoice Details */}
-			<Card title="Invoice Details">
+			<Card title={t("invoiceForm.details.title")}>
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 					<FloatingLabelSelect
-						label={isAPInvoice ? "Supplier" : "Customer"}
+						label={isAPInvoice ? t("invoiceForm.details.supplier") : t("invoiceForm.details.customer")}
 						name={isAPInvoice ? "supplier" : "customer"}
 						value={isAPInvoice ? invoiceForm.supplier : invoiceForm.customer}
 						onChange={handleInvoiceChange}
 						options={isAPInvoice ? supplierOptions : customerOptions}
 						required
-						placeholder={`Select ${isAPInvoice ? "supplier" : "customer"}`}
+						placeholder={
+							isAPInvoice
+								? t("invoiceForm.details.selectSupplier")
+								: t("invoiceForm.details.selectCustomer")
+						}
 					/>
 
 					<FloatingLabelInput
-						label="Invoice Number"
+						label={t("invoiceForm.details.invoiceNumber")}
 						name="number"
 						type="text"
 						value={invoiceForm.number}
 						onChange={handleInvoiceChange}
-						placeholder={`e.g., ${
-							isAPInvoice ? "AP-INV-2025-001" : "AR-INV-2025-001"
-						} (auto-generated if empty)`}
+						placeholder={
+							isAPInvoice
+								? t("invoiceForm.details.invoiceNumberPlaceholderAP")
+								: t("invoiceForm.details.invoiceNumberPlaceholderAR")
+						}
 					/>
 
 					<FloatingLabelInput
-						label="Invoice Date"
+						label={t("invoiceForm.details.invoiceDate")}
 						name="date"
 						type="date"
 						value={invoiceForm.date}
 						onChange={handleInvoiceChange}
 						required
-						placeholder="dd/mm/yyyy"
+						placeholder={t("invoiceForm.details.datePlaceholder")}
 					/>
 
 					<FloatingLabelInput
-						label="Due Date"
+						label={t("invoiceForm.details.dueDate")}
 						name="due_date"
 						type="date"
 						value={invoiceForm.due_date}
 						onChange={handleInvoiceChange}
 						required
-						placeholder="dd/mm/yyyy"
+						placeholder={t("invoiceForm.details.datePlaceholder")}
 					/>
 
 					<FloatingLabelSelect
-						label="Currency"
+						label={t("invoiceForm.details.currency")}
 						name="currency"
 						value={invoiceForm.currency}
 						onChange={handleInvoiceChange}
 						options={currencyOptions}
 						required
-						placeholder="Select currency"
+						placeholder={t("invoiceForm.details.selectCurrency")}
 					/>
 
 					<FloatingLabelSelect
-						label="Country"
+						label={t("invoiceForm.details.country")}
 						name="country"
 						value={invoiceForm.country}
 						onChange={handleInvoiceChange}
 						options={countries}
 						required
-						placeholder="Select country"
+						placeholder={t("invoiceForm.details.selectCountry")}
 					/>
 
 					{isAPInvoice && (
 						<>
 							<FloatingLabelSelect
-								label="Payment Terms"
+								label={t("invoiceForm.details.paymentTerms")}
 								name="payment_terms"
 								value={invoiceForm.payment_terms}
 								onChange={handleInvoiceChange}
 								options={paymentTermsOptions}
-								placeholder="Select payment terms"
+								placeholder={t("invoiceForm.details.selectPaymentTerms")}
 							/>
 
 							<FloatingLabelInput
-								label="PO Reference"
+								label={t("invoiceForm.details.poReference")}
 								name="po_reference"
 								type="text"
 								value={invoiceForm.po_reference}
 								onChange={handleInvoiceChange}
-								placeholder="e.g., PO-2025-456"
+								placeholder={t("invoiceForm.details.poReferencePlaceholder")}
 							/>
 
 							<FloatingLabelInput
-								label="Vendor Invoice Number"
+								label={t("invoiceForm.details.vendorInvoiceNumber")}
 								name="vendor_invoice_number"
 								type="text"
 								value={invoiceForm.vendor_invoice_number}
 								onChange={handleInvoiceChange}
-								placeholder="e.g., VENDOR-INV-789"
+								placeholder={t("invoiceForm.details.vendorInvoiceNumberPlaceholder")}
 							/>
 
 							<div className="sm:col-span-2">
 								<FloatingLabelInput
-									label="Memo"
+									label={t("invoiceForm.details.memo")}
 									name="memo"
 									type="text"
 									value={invoiceForm.memo}
 									onChange={handleInvoiceChange}
-									placeholder="Invoice notes or description"
+									placeholder={t("invoiceForm.details.memoPlaceholder")}
 								/>
 							</div>
 						</>
@@ -469,29 +476,28 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 
 			{/* Line Items */}
 			<Card
-				title="Line Items"
-				subtitle={`${items.length} item${items.length !== 1 ? "s" : ""} added`}
+				title={t("invoiceForm.items.title")}
+				subtitle={t("invoiceForm.items.subtitle", { count: items.length })}
 				actionSlot={
 					<button
 						type="button"
 						onClick={handleAddItem}
 						className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
 					>
-						+ New Item
+						{t("invoiceForm.items.addNew")}
 					</button>
 				}
 			>
 				{items.length === 0 ? (
 					<div className="rounded-2xl border border-dashed border-[#b6c4cc] bg-[#f5f8fb] p-6 text-center text-[#567086]">
-						<p className="text-lg font-semibold mb-2">No items added yet</p>
-						<p className="text-sm mb-6">Add items to build your invoice.</p>
-						<button
+						<p className="text-lg font-semibold mb-2">{t("invoiceForm.items.noItems")}</p>
+						<p className="text-sm mb-6">{t("invoiceForm.items.noItemsDesc")}</p>
+						<Button
 							type="button"
 							onClick={handleAddItem}
 							className="px-4 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform"
-						>
-							+ Add First Item
-						</button>
+							title={t("invoiceForm.items.addFirst")}
+						/>
 					</div>
 				) : (
 					<div className="">
@@ -499,25 +505,25 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 							<thead>
 								<tr className="border-b border-gray-200 bg-gray-50">
 									<th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-										Name
+										{t("invoiceForm.items.name")}
 									</th>
 									<th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-										Description
+										{t("invoiceForm.items.description")}
 									</th>
 									<th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-										Quantity
+										{t("invoiceForm.items.quantity")}
 									</th>
 									<th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-										Unit Price
+										{t("invoiceForm.items.unitPrice")}
 									</th>
 									{!isAPInvoice && (
 										<th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-											Tax Rate
+											{t("invoiceForm.items.taxRate")}
 										</th>
 									)}
 
 									<th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-20">
-										Actions
+										{t("invoiceForm.items.actions")}
 									</th>
 								</tr>
 							</thead>
@@ -527,59 +533,62 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 										<tr key={item.id} className="hover:bg-gray-50 transition-colors">
 											<td className="px-4 py-3">
 												<FloatingLabelInput
-													label="Name"
+													label={t("invoiceForm.items.name")}
 													type="text"
 													value={item.name}
 													onChange={e => handleItemChange(item.id, "name", e.target.value)}
-													placeholder="Item name"
+													placeholder={t("invoiceForm.items.namePlaceholder")}
 												/>
 											</td>
 											<td className="px-4 py-3">
 												<FloatingLabelInput
-													label="Description"
+													label={t("invoiceForm.items.description")}
 													type="text"
 													value={item.description}
 													onChange={e =>
 														handleItemChange(item.id, "description", e.target.value)
 													}
-													placeholder="Item description"
+													placeholder={t("invoiceForm.items.descriptionPlaceholder")}
 												/>
 											</td>
 											<td className="px-4 py-3">
 												<FloatingLabelInput
-													label="Quantity"
+													label={t("invoiceForm.items.quantity")}
 													type="number"
 													step="1"
 													value={item.quantity}
 													onChange={e =>
 														handleItemChange(item.id, "quantity", e.target.value)
 													}
-													placeholder="1"
+													placeholder={t("invoiceForm.items.quantityPlaceholder")}
 												/>
 											</td>
 											<td className="px-4 py-3">
 												<FloatingLabelInput
-													label="Unit Price"
+													label={t("invoiceForm.items.unitPrice")}
 													type="number"
 													step="0.01"
 													value={item.unit_price}
 													onChange={e =>
 														handleItemChange(item.id, "unit_price", e.target.value)
 													}
-													placeholder="0.00"
+													placeholder={t("invoiceForm.items.unitPricePlaceholder")}
 												/>
 											</td>
 											{!isAPInvoice && (
 												<td className="px-4 py-3">
 													<FloatingLabelSelect
-														label="Tax Rate"
+														label={t("invoiceForm.items.taxRate")}
 														value={item.tax_rate_id || ""}
 														onChange={e =>
 															handleItemChange(item.id, "tax_rate_id", e.target.value)
 														}
 														options={[
-															{ value: "", label: "Select Tax Rate" },
-															{ value: "EXEMPT", label: "Tax Exempt (0%)" },
+															{ value: "", label: t("invoiceForm.items.selectTaxRate") },
+															{
+																value: "EXEMPT",
+																label: t("invoiceForm.items.taxExempt"),
+															},
 															...taxRateOptions,
 														]}
 													/>
@@ -587,26 +596,27 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 											)}
 
 											<td className="px-4 py-3 text-center">
-												<button
+												<Button
 													type="button"
 													onClick={() => handleRemoveItem(item.id)}
-													className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-													title="Delete item"
-												>
-													<svg
-														className="w-5 h-5"
-														fill="none"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-													>
-														<path
-															strokeLinecap="round"
-															strokeLinejoin="round"
-															strokeWidth={2}
-															d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-														/>
-													</svg>
-												</button>
+													className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors bg-transparent shadow-none hover:shadow-none"
+													title={t("invoiceForm.items.deleteItem")}
+													icon={
+														<svg
+															className="w-5 h-5"
+															fill="none"
+															stroke="currentColor"
+															viewBox="0 0 24 24"
+														>
+															<path
+																strokeLinecap="round"
+																strokeLinejoin="round"
+																strokeWidth={2}
+																d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+															/>
+														</svg>
+													}
+												/>
 											</td>
 										</tr>
 									);
@@ -618,17 +628,21 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 						<div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
 							<div className="grid grid-cols-3 gap-4">
 								<div className="text-center">
-									<p className="text-xs text-gray-500 uppercase">Subtotal</p>
+									<p className="text-xs text-gray-500 uppercase">
+										{t("invoiceForm.totals.subtotal")}
+									</p>
 									<p className="text-lg font-bold text-gray-800">{formatCurrency(invoiceSubtotal)}</p>
 								</div>
 								<div className="text-center">
-									<p className="text-xs text-gray-500 uppercase">Tax</p>
+									<p className="text-xs text-gray-500 uppercase">{t("invoiceForm.totals.tax")}</p>
 									<p className="text-lg font-bold text-gray-800">
 										{formatCurrency(invoiceTaxAmount)}
 									</p>
 								</div>
 								<div className="text-center border-l-2 border-[#0d5f7a]">
-									<p className="text-xs text-[#0d5f7a] uppercase font-semibold">Invoice Total</p>
+									<p className="text-xs text-[#0d5f7a] uppercase font-semibold">
+										{t("invoiceForm.totals.invoiceTotal")}
+									</p>
 									<p className="text-xl font-bold text-[#0d5f7a]">
 										{formatCurrency(invoiceTotalAmount)}
 									</p>
@@ -640,7 +654,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 			</Card>
 
 			{/* GL Lines Section */}
-			<Card title="GL Distribution" subtitle="Create GL distribution lines for this invoice">
+			<Card title={t("invoiceForm.glDistribution.title")} subtitle={t("invoiceForm.glDistribution.subtitle")}>
 				<GLLinesSection
 					lines={glLines}
 					onChange={setGLLines}
@@ -654,13 +668,17 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 				{glLines.length > 0 && (
 					<div className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
 						<div className="flex items-center justify-between mb-2">
-							<span className="text-sm font-medium text-gray-700">Invoice Total:</span>
+							<span className="text-sm font-medium text-gray-700">
+								{t("invoiceForm.glDistribution.invoiceTotal")}:
+							</span>
 							<span className="text-lg font-bold text-[#0d5f7a]">
 								{formatCurrency(invoiceTotalAmount)}
 							</span>
 						</div>
 						<div className="flex items-center justify-between mb-2">
-							<span className="text-sm font-medium text-gray-700">GL Total (Debits):</span>
+							<span className="text-sm font-medium text-gray-700">
+								{t("invoiceForm.glDistribution.glTotalDebits")}:
+							</span>
 							<span className="text-lg font-bold text-[#0d5f7a]">
 								{formatCurrency(
 									glLines
@@ -696,11 +714,12 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 													clipRule="evenodd"
 												/>
 											</svg>
-											Totals don't match (Difference:{" "}
-											{formatCurrency(Math.abs(invoiceTotalAmount - glTotal))})
+											{t("invoiceForm.glDistribution.totalsMismatch", {
+												difference: formatCurrency(Math.abs(invoiceTotalAmount - glTotal)),
+											})}
 										</span>
 										<p className="text-xs text-gray-500 mt-1">
-											Adjust your GL lines so the debit total matches the invoice total.
+											{t("invoiceForm.glDistribution.adjustHelper")}
 										</p>
 									</div>
 								);
@@ -712,21 +731,19 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 
 			{/* Action Buttons */}
 			<div className="mt-6 flex flex-wrap justify-end gap-3">
-				<button
+				<Button
 					type="button"
 					onClick={handleCancel}
-					className="px-6 py-2 rounded-full border border-[#7A9098] text-[#7A9098] font-semibold hover:bg-[#f1f5f8] transition-colors"
-				>
-					Cancel
-				</button>
-				<button
+					className="px-6 py-2 rounded-full border border-[#7A9098] text-[#7A9098] font-semibold hover:bg-[#f1f5f8] transition-colors bg-transparent shadow-none hover:shadow-none"
+					title={t("invoiceForm.actions.cancel")}
+				/>
+				<Button
 					type="button"
 					onClick={handleSubmit}
 					disabled={invoiceLoading}
 					className="px-8 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-				>
-					{invoiceLoading ? "Creating..." : "Create Invoice"}
-				</button>
+					title={invoiceLoading ? t("invoiceForm.actions.creating") : t("invoiceForm.actions.createInvoice")}
+				/>
 			</div>
 
 			{/* Toast Container */}

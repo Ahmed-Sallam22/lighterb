@@ -530,35 +530,35 @@ const CustomersPage = () => {
 
 					{/* Action Buttons */}
 					<div className="flex gap-3 pt-4 border-t border-gray-200 mt-6">
-						<button
-							type="button"
+						<Button
 							onClick={() => {
 								setIsModalOpen(false);
 								setEditingCustomer(null);
 								setFormData(FROM_INITIAL_STATE);
 							}}
-							className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
 							disabled={loading}
-						>
-							{t("customers.modal.cancel")}
-						</button>
-						<button
-							type="button"
+							title={t("customers.modal.cancel")}
+							className="bg-transparent shadow-none hover:shadow-none flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
+						/>
+						<Button
 							onClick={handleSubmit}
-							className="flex-1 px-4 py-2.5 bg-[#28819C] text-white rounded-lg hover:bg-[#206b85] transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 							disabled={loading}
-						>
-							{loading ? (
-								<span className="flex items-center justify-center gap-2">
-									<AiOutlineLoading3Quarters size={24} />
-									{editingCustomer ? t("customers.modal.updating") : t("customers.modal.creating")}
-								</span>
-							) : editingCustomer ? (
-								t("customers.modal.update")
-							) : (
-								t("customers.modal.create")
-							)}
-						</button>
+							title={
+								loading ? (
+									<span className="flex items-center justify-center gap-2">
+										<AiOutlineLoading3Quarters size={24} />
+										{editingCustomer
+											? t("customers.modal.updating")
+											: t("customers.modal.creating")}
+									</span>
+								) : editingCustomer ? (
+									t("customers.modal.update")
+								) : (
+									t("customers.modal.create")
+								)
+							}
+							className="flex-1 px-4 py-2.5 bg-[#28819C] text-white rounded-lg hover:bg-[#206b85] transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+						/>
 					</div>
 				</div>
 			</SlideUpModal>

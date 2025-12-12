@@ -1,21 +1,27 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useTranslation } from 'react-i18next';
-import PageHeader from '../components/shared/PageHeader';
-import Table from '../components/shared/Table';
-import SlideUpModal from '../components/shared/SlideUpModal';
-import ConfirmModal from '../components/shared/ConfirmModal';
-import FloatingLabelInput from '../components/shared/FloatingLabelInput';
-import FloatingLabelSelect from '../components/shared/FloatingLabelSelect';
-import Toggle from '../components/shared/Toggle';
-import { fetchTaxRates, createTaxRate, updateTaxRate, deleteTaxRate, toggleTaxRateActive } from '../store/taxRatesSlice';
-import { fetchCountries } from '../store/countriesSlice';
+import React, { useState, useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
+import PageHeader from "../components/shared/PageHeader";
+import Table from "../components/shared/Table";
+import SlideUpModal from "../components/shared/SlideUpModal";
+import ConfirmModal from "../components/shared/ConfirmModal";
+import FloatingLabelInput from "../components/shared/FloatingLabelInput";
+import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
+import Toggle from "../components/shared/Toggle";
+import {
+	fetchTaxRates,
+	createTaxRate,
+	updateTaxRate,
+	deleteTaxRate,
+	toggleTaxRateActive,
+} from "../store/taxRatesSlice";
+import { fetchCountries } from "../store/countriesSlice";
 
 const TaxRatesPage = () => {
 	const { t, i18n } = useTranslation();
-	const isRtl = i18n.dir() === 'rtl';
+	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const { taxRates, loading } = useSelector(state => state.taxRates);
 	const { countries = [] } = useSelector(state => state.countries || {});
@@ -25,10 +31,10 @@ const TaxRatesPage = () => {
 	const [editingId, setEditingId] = useState(null);
 	const [deleteId, setDeleteId] = useState(null);
 	const [formData, setFormData] = useState({
-		name: '',
-		rate: '',
-		country: '',
-		category: '',
+		name: "",
+		rate: "",
+		country: "",
+		category: "",
 		isActive: true,
 	});
 	const [errors, setErrors] = useState({});
@@ -41,19 +47,20 @@ const TaxRatesPage = () => {
 
 	// Country options
 	const countryOptions = useMemo(
-		() => countries.map(country => ({
-			value: country.id,
-			label: `${country.code} - ${country.name}`
-		})),
+		() =>
+			countries.map(country => ({
+				value: country.id,
+				label: `${country.code} - ${country.name}`,
+			})),
 		[countries]
 	);
 
 	// Category options
 	const categoryOptions = useMemo(
 		() => [
-			{ value: 'STANDARD', label: t('taxRates.options.categories.STANDARD') },
-			{ value: 'ZERO', label: t('taxRates.options.categories.ZERO') },
-			{ value: 'EXEMPT', label: t('taxRates.options.categories.EXEMPT') },
+			{ value: "STANDARD", label: t("taxRates.options.categories.STANDARD") },
+			{ value: "ZERO", label: t("taxRates.options.categories.ZERO") },
+			{ value: "EXEMPT", label: t("taxRates.options.categories.EXEMPT") },
 		],
 		[t]
 	);
@@ -61,33 +68,32 @@ const TaxRatesPage = () => {
 	// Table columns
 	const columns = useMemo(
 		() => [
-
 			{
-				header: t('taxRates.table.name'),
-				accessor: 'name',
+				header: t("taxRates.table.name"),
+				accessor: "name",
 				render: value => <span className="text-gray-900">{value}</span>,
 			},
 			{
-				header: t('taxRates.table.rate'),
-				accessor: 'rate',
+				header: t("taxRates.table.rate"),
+				accessor: "rate",
 				render: value => <span className="font-semibold text-[#28819C]">{value}%</span>,
 			},
 			{
-				header: t('taxRates.table.country'),
-				accessor: 'country_code',
-				render: value => <span className="text-gray-700 font-medium">{value || '-'}</span>,
+				header: t("taxRates.table.country"),
+				accessor: "country_code",
+				render: value => <span className="text-gray-700 font-medium">{value || "-"}</span>,
 			},
 			{
-				header: t('taxRates.table.category'),
-				accessor: 'category_display',
+				header: t("taxRates.table.category"),
+				accessor: "category_display",
 				render: (value, row) => (
 					<span
 						className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
-							row.category === 'STANDARD'
-								? 'bg-blue-100 text-blue-800'
-								: row.category === 'ZERO'
-								? 'bg-yellow-100 text-yellow-800'
-								: 'bg-purple-100 text-purple-800'
+							row.category === "STANDARD"
+								? "bg-blue-100 text-blue-800"
+								: row.category === "ZERO"
+								? "bg-yellow-100 text-yellow-800"
+								: "bg-purple-100 text-purple-800"
 						}`}
 					>
 						{value || row.category}
@@ -95,16 +101,16 @@ const TaxRatesPage = () => {
 				),
 			},
 			{
-				header: t('taxRates.table.status'),
-				accessor: 'is_active',
-				width: '100px',
+				header: t("taxRates.table.status"),
+				accessor: "is_active",
+				width: "100px",
 				render: value => (
 					<span
 						className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-							value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+							value ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
 						}`}
 					>
-						{value ? t('taxRates.table.active') : t('taxRates.table.inactive')}
+						{value ? t("taxRates.table.active") : t("taxRates.table.inactive")}
 					</span>
 				),
 			},
@@ -115,7 +121,7 @@ const TaxRatesPage = () => {
 	const handleInputChange = (field, value) => {
 		setFormData(prev => ({ ...prev, [field]: value }));
 		if (errors[field]) {
-			setErrors(prev => ({ ...prev, [field]: '' }));
+			setErrors(prev => ({ ...prev, [field]: "" }));
 		}
 	};
 
@@ -123,17 +129,17 @@ const TaxRatesPage = () => {
 		const newErrors = {};
 
 		if (!formData.name.trim()) {
-			newErrors.name = t('taxRates.validation.nameRequired');
+			newErrors.name = t("taxRates.validation.nameRequired");
 		}
 
 		if (!formData.rate.toString().trim()) {
-			newErrors.rate = t('taxRates.validation.rateRequired');
+			newErrors.rate = t("taxRates.validation.rateRequired");
 		} else if (isNaN(formData.rate) || parseFloat(formData.rate) < 0) {
-			newErrors.rate = t('taxRates.validation.ratePositive');
+			newErrors.rate = t("taxRates.validation.ratePositive");
 		}
 
 		if (!formData.country) {
-			newErrors.country = t('taxRates.validation.countryRequired');
+			newErrors.country = t("taxRates.validation.countryRequired");
 		}
 
 		setErrors(newErrors);
@@ -147,7 +153,7 @@ const TaxRatesPage = () => {
 			name: formData.name,
 			rate: parseFloat(formData.rate).toFixed(2),
 			country: parseInt(formData.country, 10),
-			category: formData.category || 'STANDARD',
+			category: formData.category || "STANDARD",
 			is_active: formData.isActive,
 		};
 
@@ -155,15 +161,15 @@ const TaxRatesPage = () => {
 			if (editingId) {
 				// Update existing tax rate
 				await dispatch(updateTaxRate({ id: editingId, data: taxRateData })).unwrap();
-				toast.success(t('taxRates.messages.updateSuccess'));
+				toast.success(t("taxRates.messages.updateSuccess"));
 			} else {
 				// Add new tax rate
 				await dispatch(createTaxRate(taxRateData)).unwrap();
-				toast.success(t('taxRates.messages.createSuccess'));
+				toast.success(t("taxRates.messages.createSuccess"));
 			}
 			handleCloseModal();
 		} catch (error) {
-			const errorMessage = error?.message || error?.error || t('taxRates.messages.saveError');
+			const errorMessage = error?.message || error?.error || t("taxRates.messages.saveError");
 			toast.error(errorMessage);
 		}
 	};
@@ -172,10 +178,10 @@ const TaxRatesPage = () => {
 		setIsModalOpen(false);
 		setEditingId(null);
 		setFormData({
-			name: '',
-			rate: '',
-			country: '',
-			category: '',
+			name: "",
+			rate: "",
+			country: "",
+			category: "",
 			isActive: true,
 		});
 		setErrors({});
@@ -190,7 +196,7 @@ const TaxRatesPage = () => {
 				name: taxRate.name,
 				rate: taxRate.rate.toString(),
 				country: taxRate.country.toString(),
-				category: taxRate.category || '',
+				category: taxRate.category || "",
 				isActive: taxRate.is_active,
 			});
 			setIsModalOpen(true);
@@ -206,11 +212,11 @@ const TaxRatesPage = () => {
 		if (deleteId) {
 			try {
 				await dispatch(deleteTaxRate(deleteId)).unwrap();
-				toast.success(t('taxRates.messages.deleteSuccess'));
+				toast.success(t("taxRates.messages.deleteSuccess"));
 				setIsDeleteModalOpen(false);
 				setDeleteId(null);
 			} catch (error) {
-				const errorMessage = error?.message || error?.error || t('taxRates.messages.deleteError');
+				const errorMessage = error?.message || error?.error || t("taxRates.messages.deleteError");
 				toast.error(errorMessage);
 			}
 		}
@@ -221,12 +227,12 @@ const TaxRatesPage = () => {
 		setDeleteId(null);
 	};
 
-	const handleToggleActive = async (id) => {
+	const handleToggleActive = async id => {
 		try {
 			await dispatch(toggleTaxRateActive(id)).unwrap();
-			toast.success(t('taxRates.messages.toggleSuccess'));
+			toast.success(t("taxRates.messages.toggleSuccess"));
 		} catch (error) {
-			const errorMessage = error?.message || error?.error || t('taxRates.messages.toggleError');
+			const errorMessage = error?.message || error?.error || t("taxRates.messages.toggleError");
 			toast.error(errorMessage);
 		}
 	};
@@ -234,7 +240,7 @@ const TaxRatesPage = () => {
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<ToastContainer
-				position={isRtl ? 'top-left' : 'top-right'}
+				position={isRtl ? "top-left" : "top-right"}
 				autoClose={3000}
 				hideProgressBar={false}
 				newestOnTop
@@ -246,8 +252,8 @@ const TaxRatesPage = () => {
 			/>
 
 			<PageHeader
-				title={t('taxRates.title')}
-				subtitle={t('taxRates.subtitle')}
+				title={t("taxRates.title")}
+				subtitle={t("taxRates.subtitle")}
 				icon={
 					<svg width="29" height="35" viewBox="0 0 29 35" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path
@@ -265,26 +271,27 @@ const TaxRatesPage = () => {
 			<div className=" mx-auto px-6 py-8">
 				{/* Header with Title and Buttons */}
 				<div className="flex items-center justify-between mb-6">
-					<h2 className="text-2xl font-bold text-gray-900">{t('taxRates.title')}</h2>
+					<h2 className="text-2xl font-bold text-gray-900">{t("taxRates.title")}</h2>
 					<div className="flex gap-3">
-						<button
+						<Button
 							onClick={() => setIsModalOpen(true)}
+							title={t("taxRates.actions.add")}
+							icon={
+								<svg
+									width="20"
+									height="20"
+									viewBox="0 0 20 20"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM15 11H11V15H9V11H5V9H9V5H11V9H15V11Z"
+										fill="white"
+									/>
+								</svg>
+							}
 							className="flex items-center gap-2 px-4 py-2 bg-[#28819C] text-white rounded-lg hover:bg-[#206b85] transition-colors duration-200 font-medium"
-						>
-							<svg
-								width="20"
-								height="20"
-								viewBox="0 0 20 20"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM15 11H11V15H9V11H5V9H9V5H11V9H15V11Z"
-									fill="white"
-								/>
-							</svg>
-							{t('taxRates.actions.add')}
-						</button>
+						/>
 					</div>
 				</div>
 
@@ -298,17 +305,22 @@ const TaxRatesPage = () => {
 					loading={loading}
 					customActions={[
 						{
-							title: (row) => row.is_active ? t('taxRates.actions.deactivate') : t('taxRates.actions.activate'),
-							icon: (row) => (
-								<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className={
-									row.is_active ? 'text-green-700' : 'text-gray-700'
-								}>
-									<path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
-									{row.is_active && <circle cx="10" cy="10" r="4"/>}
+							title: row =>
+								row.is_active ? t("taxRates.actions.deactivate") : t("taxRates.actions.activate"),
+							icon: row => (
+								<svg
+									width="20"
+									height="20"
+									viewBox="0 0 20 20"
+									fill="currentColor"
+									className={row.is_active ? "text-green-700" : "text-gray-700"}
+								>
+									<path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z" />
+									{row.is_active && <circle cx="10" cy="10" r="4" />}
 								</svg>
 							),
-							onClick: (row) => handleToggleActive(row.id),
-						}
+							onClick: row => handleToggleActive(row.id),
+						},
 					]}
 				/>
 			</div>
@@ -317,80 +329,78 @@ const TaxRatesPage = () => {
 			<SlideUpModal
 				isOpen={isModalOpen}
 				onClose={handleCloseModal}
-				title={editingId ? t('taxRates.modals.editTitle') : t('taxRates.modals.addTitle')}
+				title={editingId ? t("taxRates.modals.editTitle") : t("taxRates.modals.addTitle")}
 				maxWidth="550px"
 			>
 				<div className="space-y-6">
 					{/* Tax Name */}
 					<FloatingLabelInput
-						label={t('taxRates.form.name')}
+						label={t("taxRates.form.name")}
 						name="name"
 						value={formData.name}
-						onChange={e => handleInputChange('name', e.target.value)}
+						onChange={e => handleInputChange("name", e.target.value)}
 						error={errors.name}
 						required
-						placeholder={t('taxRates.form.placeholders.name')}
+						placeholder={t("taxRates.form.placeholders.name")}
 					/>
 
 					{/* Tax Rate */}
 					<FloatingLabelInput
-						label={t('taxRates.form.rate')}
+						label={t("taxRates.form.rate")}
 						name="rate"
 						type="number"
 						step="0.01"
 						min="0"
 						value={formData.rate}
-						onChange={e => handleInputChange('rate', e.target.value)}
+						onChange={e => handleInputChange("rate", e.target.value)}
 						error={errors.rate}
 						required
-						placeholder={t('taxRates.form.placeholders.rate')}
+						placeholder={t("taxRates.form.placeholders.rate")}
 					/>
 
 					{/* Country */}
 					<FloatingLabelSelect
-						label={t('taxRates.form.country')}
+						label={t("taxRates.form.country")}
 						name="country"
 						value={formData.country}
-						onChange={e => handleInputChange('country', e.target.value)}
+						onChange={e => handleInputChange("country", e.target.value)}
 						error={errors.country}
 						options={countryOptions}
 						required
-						placeholder={t('taxRates.options.selectCountry')}
+						placeholder={t("taxRates.options.selectCountry")}
 					/>
 
 					{/* Category (Optional) */}
 					<FloatingLabelSelect
-						label={t('taxRates.form.category')}
+						label={t("taxRates.form.category")}
 						name="category"
 						value={formData.category}
-						onChange={e => handleInputChange('category', e.target.value)}
+						onChange={e => handleInputChange("category", e.target.value)}
 						options={categoryOptions}
-						placeholder={t('taxRates.options.selectCategory')}
+						placeholder={t("taxRates.options.selectCategory")}
 					/>
 
 					{/* Toggle for Active Status */}
 					<div className="pt-2">
 						<Toggle
-							label={t('taxRates.form.setActive')}
+							label={t("taxRates.form.setActive")}
 							checked={formData.isActive}
-							onChange={checked => handleInputChange('isActive', checked)}
+							onChange={checked => handleInputChange("isActive", checked)}
 						/>
 					</div>
 
 					{/* Action Buttons */}
 					<div className="flex gap-3 pt-4">
-						<button
+						<Button
 							onClick={handleCloseModal}
-							className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
-						>
-							{t('taxRates.actions.cancel')}
-						</button>
-						<button
+							title={t("taxRates.actions.cancel")}
+							className="bg-transparent shadow-none hover:shadow-none flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
+						/>
+						<Button
 							onClick={handleAddTaxRate}
+							title={editingId ? t("taxRates.actions.update") : t("taxRates.actions.create")}
 							className="flex-1 px-4 py-2 bg-[#28819C] text-white rounded-lg hover:bg-[#206b85] transition-colors duration-200 font-medium"
-						>
-							{editingId ? t('taxRates.actions.update') : t('taxRates.actions.create')}
-						</button>
+						/>
 					</div>
 				</div>
 			</SlideUpModal>
@@ -400,10 +410,10 @@ const TaxRatesPage = () => {
 				isOpen={isDeleteModalOpen}
 				onClose={cancelDelete}
 				onConfirm={confirmDelete}
-				title={t('taxRates.modals.deleteTitle')}
-				message={t('taxRates.modals.deleteMessage')}
-				confirmText={t('taxRates.actions.delete')}
-				cancelText={t('taxRates.actions.cancel')}
+				title={t("taxRates.modals.deleteTitle")}
+				message={t("taxRates.modals.deleteMessage")}
+				confirmText={t("taxRates.actions.delete")}
+				cancelText={t("taxRates.actions.cancel")}
 				type="danger"
 			/>
 		</div>

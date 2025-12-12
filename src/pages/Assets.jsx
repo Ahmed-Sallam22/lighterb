@@ -1,24 +1,24 @@
-import { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { FiPlus, FiSearch, FiEye, FiEdit } from 'react-icons/fi';
-import PageHeader from '../components/shared/PageHeader';
-import FloatingLabelSelect from '../components/shared/FloatingLabelSelect';
-import RequisitionsHeadIcon from '../ui/icons/RequisitionsHeadIcon';
-import { IoDocumentTextOutline, IoLocationOutline, IoSettingsOutline } from 'react-icons/io5';
-import { useTranslation } from 'react-i18next';
-import DoneIcon from '../ui/icons/DoneIcon';
-import { HiOutlineSwitchHorizontal } from 'react-icons/hi';
-import { IoIosTrendingDown } from 'react-icons/io';
-import { PiGearFineBold } from 'react-icons/pi';
-import BoxIcon from '../ui/icons/BoxIcon';
-import DirectoriesIcon from '../ui/icons/DirectoriesIcon';
-import { PiCirclesFourFill } from 'react-icons/pi';
-import Table from '../components/shared/Table';
-import BoxesIcon from '../ui/icons/BoxesIcon';
-import Button from '../components/shared/Button';
-import StatisticsCard from '../components/shared/StatisticsCard';
-import SearchInput from '../components/shared/SearchInput';
-import { sampleData } from '../dummyData/assetsData';
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import { FiPlus, FiSearch, FiEye, FiEdit } from "react-icons/fi";
+import PageHeader from "../components/shared/PageHeader";
+import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
+import RequisitionsHeadIcon from "../ui/icons/RequisitionsHeadIcon";
+import { IoDocumentTextOutline, IoLocationOutline, IoSettingsOutline } from "react-icons/io5";
+import { useTranslation } from "react-i18next";
+import DoneIcon from "../ui/icons/DoneIcon";
+import { HiOutlineSwitchHorizontal } from "react-icons/hi";
+import { IoIosTrendingDown } from "react-icons/io";
+import { PiGearFineBold } from "react-icons/pi";
+import BoxIcon from "../ui/icons/BoxIcon";
+import DirectoriesIcon from "../ui/icons/DirectoriesIcon";
+import { PiCirclesFourFill } from "react-icons/pi";
+import Table from "../components/shared/Table";
+import BoxesIcon from "../ui/icons/BoxesIcon";
+import Button from "../components/shared/Button";
+import StatisticsCard from "../components/shared/StatisticsCard";
+import SearchInput from "../components/shared/SearchInput";
+import { sampleData } from "../dummyData/assetsData";
 
 const AssetsPage = () => {
 	const { t } = useTranslation();
@@ -28,9 +28,9 @@ const AssetsPage = () => {
 	);
 
 	const [filters, setFilters] = useState({
-		search: '',
-		status: 'All Statuses',
-		category: 'All Categories',
+		search: "",
+		status: "All Statuses",
+		category: "All Categories",
 	});
 
 	// Sample asset data
@@ -43,53 +43,53 @@ const AssetsPage = () => {
 
 	const statCards = [
 		{
-			title: t('assets.stats.totalAssets'),
+			title: t("assets.stats.totalAssets"),
 			value: statistics?.totalLines || 0,
 
-			valueColor: 'text-gray-900',
+			valueColor: "text-gray-900",
 		},
 		{
-			title: t('assets.stats.activeAssets'),
+			title: t("assets.stats.activeAssets"),
 			value: `$${(statistics?.totalDebits || 0).toFixed(2)}`,
-			valueColor: 'text-red-600',
+			valueColor: "text-red-600",
 		},
 		{
-			title: t('assets.stats.draftAssets'),
+			title: t("assets.stats.draftAssets"),
 			value: `$${(statistics?.totalCredits || 0).toFixed(2)}`,
 
-			valueColor: 'text-green-600',
+			valueColor: "text-green-600",
 		},
 		{
-			title: t('assets.stats.totalNetBookValue'),
+			title: t("assets.stats.totalNetBookValue"),
 			value: `$${(statistics?.totalBalance || 0).toFixed(2)}`,
-			valueColor: 'text-gray-900',
+			valueColor: "text-gray-900",
 		},
 	];
 
 	const statusOptions = [
-		{ value: 'All Statuses', label: t('assets.status.allStatuses') },
-		{ value: 'capitalized', label: t('assets.status.capitalized') },
-		{ value: 'cip', label: t('assets.status.cip') },
-		{ value: 'draft', label: t('assets.status.draft') },
-		{ value: 'retired', label: t('assets.status.retired') },
+		{ value: "All Statuses", label: t("assets.status.allStatuses") },
+		{ value: "capitalized", label: t("assets.status.capitalized") },
+		{ value: "cip", label: t("assets.status.cip") },
+		{ value: "draft", label: t("assets.status.draft") },
+		{ value: "retired", label: t("assets.status.retired") },
 	];
 	const categoryOptions = [
-		{ value: 'All Categories', label: t('assets.filters.allCategories') },
-		{ value: 'office', label: t('assets.filters.office') },
-		{ value: 'electronics', label: t('assets.filters.electronics') },
-		{ value: 'furniture', label: t('assets.filters.furniture') },
-		{ value: 'itEquipment', label: t('assets.filters.itEquipment') },
+		{ value: "All Categories", label: t("assets.filters.allCategories") },
+		{ value: "office", label: t("assets.filters.office") },
+		{ value: "electronics", label: t("assets.filters.electronics") },
+		{ value: "furniture", label: t("assets.filters.furniture") },
+		{ value: "itEquipment", label: t("assets.filters.itEquipment") },
 	];
 
 	const actions = [
-		{ label: t('assets.approvals'), icon: <DoneIcon color="#0A0A0A" width={18} height={18} /> },
-		{ label: t('assets.transfer'), icon: <HiOutlineSwitchHorizontal color="#0A0A0A" /> },
-		{ label: t('assets.adjustments'), icon: <IoSettingsOutline color="#0A0A0A" /> },
-		{ label: t('assets.retirements'), icon: <BoxesIcon /> },
-		{ label: t('assets.categories'), icon: <DirectoriesIcon /> },
-		{ label: t('assets.locations'), icon: <IoLocationOutline color="#0A0A0A" /> },
-		{ label: t('assets.depreciation'), icon: <IoIosTrendingDown color="#0A0A0A" /> },
-		{ label: t('assets.settings'), icon: <PiGearFineBold color="#0A0A0A" /> },
+		{ label: t("assets.approvals"), icon: <DoneIcon color="#0A0A0A" width={18} height={18} /> },
+		{ label: t("assets.transfer"), icon: <HiOutlineSwitchHorizontal color="#0A0A0A" /> },
+		{ label: t("assets.adjustments"), icon: <IoSettingsOutline color="#0A0A0A" /> },
+		{ label: t("assets.retirements"), icon: <BoxesIcon /> },
+		{ label: t("assets.categories"), icon: <DirectoriesIcon /> },
+		{ label: t("assets.locations"), icon: <IoLocationOutline color="#0A0A0A" /> },
+		{ label: t("assets.depreciation"), icon: <IoIosTrendingDown color="#0A0A0A" /> },
+		{ label: t("assets.settings"), icon: <PiGearFineBold color="#0A0A0A" /> },
 	];
 
 	const handleFilterChange = (name, value) => {
@@ -105,45 +105,45 @@ const AssetsPage = () => {
 
 	const columns = [
 		{
-			header: t('assets.table.assetNumber'),
-			accessor: 'assetNumber',
+			header: t("assets.table.assetNumber"),
+			accessor: "assetNumber",
 		},
 		{
-			header: t('assets.table.name'),
-			accessor: 'name',
+			header: t("assets.table.name"),
+			accessor: "name",
 		},
 		{
-			header: t('assets.table.category'),
-			accessor: 'category',
+			header: t("assets.table.category"),
+			accessor: "category",
 		},
 		{
-			header: t('assets.table.location'),
-			accessor: 'location',
+			header: t("assets.table.location"),
+			accessor: "location",
 		},
 		{
-			header: t('assets.table.acquisitionCost'),
-			accessor: 'acquisitionCost',
+			header: t("assets.table.acquisitionCost"),
+			accessor: "acquisitionCost",
 			render: value => <span className="font-semibold">{value}</span>,
 		},
 		{
-			header: t('assets.table.netBookValue'),
-			accessor: 'netBookValue',
+			header: t("assets.table.netBookValue"),
+			accessor: "netBookValue",
 			render: value => <span className="font-semibold">{value}</span>,
 		},
 		{
-			header: t('assets.table.status'),
-			accessor: 'status',
+			header: t("assets.table.status"),
+			accessor: "status",
 			render: value => {
 				const statusColors = {
-					Capitalized: 'bg-green-500 text-white',
-					CIP: 'bg-[#28819C] text-white',
-					Draft: 'bg-gray-100 text-gray-800',
-					Retired: 'bg-red-100 text-red-800',
+					Capitalized: "bg-green-500 text-white",
+					CIP: "bg-[#28819C] text-white",
+					Draft: "bg-gray-100 text-gray-800",
+					Retired: "bg-red-100 text-red-800",
 				};
 				return (
 					<span
 						className={`px-3 py-1 rounded-full text-xs font-semibold ${
-							statusColors[value] || 'bg-gray-100 text-gray-800'
+							statusColors[value] || "bg-gray-100 text-gray-800"
 						}`}
 					>
 						{value}
@@ -152,15 +152,14 @@ const AssetsPage = () => {
 			},
 		},
 		{
-			header: t('assets.table.actions'),
-			accessor: 'actions',
+			header: t("assets.table.actions"),
+			accessor: "actions",
 			render: (value, row) => (
-				<button
+				<Button
 					onClick={() => handleView(row)}
-					className="text-[#28819C] hover:text-[#206b82] transition-colors"
-				>
-					<FiEye size={20} />
-				</button>
+					className="text-[#28819C] hover:text-[#206b82] transition-colors bg-transparent shadow-none hover:shadow-none p-0"
+					icon={<FiEye size={20} />}
+				/>
 			),
 		},
 	];
@@ -169,21 +168,21 @@ const AssetsPage = () => {
 		<div className="min-h-screen bg-[#EEEEEE]">
 			{/* Header */}
 			<PageHeader
-				title={t('assets.title')}
-				subtitle={t('assets.subtitle')}
+				title={t("assets.title")}
+				subtitle={t("assets.subtitle")}
 				icon={<RequisitionsHeadIcon width={32} height={30} className="text-[#28819C]" />}
 			/>
 
 			<div className="p-6">
 				<div className=" py-4 flex justify-between items-center">
-					<h1 className="text-3xl font-semibold text-[#28819C]">{t('assets.title')}</h1>
+					<h1 className="text-3xl font-semibold text-[#28819C]">{t("assets.title")}</h1>
 					<div className="flex items-center gap-4">
 						<Button
 							onClick={() => {
 								// TODO: Implement new asset functionality
 							}}
 							icon={<FiPlus className="text-xl" />}
-							title={t('assets.newAsset')}
+							title={t("assets.newAsset")}
 						/>
 
 						<Button
@@ -191,7 +190,7 @@ const AssetsPage = () => {
 								// TODO: Implement add from AP invoice functionality
 							}}
 							icon={<IoDocumentTextOutline className="text-xl" />}
-							title={t('assets.fromAPInvoice')}
+							title={t("assets.fromAPInvoice")}
 							className="bg-[#00A63E] hover:bg-[#029839] text-white"
 						/>
 
@@ -200,7 +199,7 @@ const AssetsPage = () => {
 								// TODO: Implement add from GRN functionality
 							}}
 							icon={<BoxIcon />}
-							title={t('assets.fromGRN')}
+							title={t("assets.fromGRN")}
 							className="bg-[#00A63E] hover:bg-[#029839] text-white"
 						/>
 					</div>
@@ -211,7 +210,7 @@ const AssetsPage = () => {
 						<Button
 							key={label}
 							onClick={() => {}}
-							className={'bg-white hover:bg-gray-50 transition-colors text-gray-700 font-semibold'}
+							className={"bg-white hover:bg-gray-50 transition-colors text-gray-700 font-semibold"}
 							title={label}
 							icon={icon}
 						/>
@@ -229,14 +228,14 @@ const AssetsPage = () => {
 						<div className="flex flex-col md:flex-row md:items-center gap-4 w-full md:w-2/3">
 							<SearchInput
 								value={filters.search}
-								onChange={e => handleFilterChange('search', e.target.value)}
-								placeholder={t('assets.searchPlaceholder')}
+								onChange={e => handleFilterChange("search", e.target.value)}
+								placeholder={t("assets.searchPlaceholder")}
 							/>
 							<div className="flex items-center gap-4">
 								<FloatingLabelSelect
 									id="status"
 									value={filters.status}
-									onChange={e => handleFilterChange('status', e.target.value)}
+									onChange={e => handleFilterChange("status", e.target.value)}
 									options={statusOptions}
 									icon={<PiCirclesFourFill className="text-[#28819C]" size={20} />}
 									buttonClassName="min-w-[12rem]"
@@ -244,7 +243,7 @@ const AssetsPage = () => {
 								<FloatingLabelSelect
 									id="category"
 									value={filters.category}
-									onChange={e => handleFilterChange('category', e.target.value)}
+									onChange={e => handleFilterChange("category", e.target.value)}
 									options={categoryOptions}
 									icon={<PiCirclesFourFill className="text-[#28819C]" size={20} />}
 									buttonClassName="min-w-[12rem]"
@@ -262,7 +261,7 @@ const AssetsPage = () => {
 						<Table
 							columns={columns}
 							data={sampleData}
-							emptyMessage={t('assets.emptyMessage')}
+							emptyMessage={t("assets.emptyMessage")}
 							showActions={false}
 						/>
 					)}

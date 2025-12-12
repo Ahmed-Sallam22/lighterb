@@ -325,18 +325,16 @@ const InvoiceApprovalsPage = () => {
 				<div className="flex gap-2">
 					{row.status === "Pending" && (
 						<>
-							<button
+							<Button
 								onClick={() => handleApprove(value)}
-								className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
-							>
-								{t("invoiceApprovals.actions.approve")}
-							</button>
-							<button
+								title={t("invoiceApprovals.actions.approve")}
+								className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium bg-transparent shadow-none hover:shadow-none"
+							/>
+							<Button
 								onClick={() => handleReject(value)}
-								className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-medium"
-							>
-								{t("invoiceApprovals.actions.reject")}
-							</button>
+								title={t("invoiceApprovals.actions.reject")}
+								className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-medium bg-transparent shadow-none hover:shadow-none"
+							/>
 						</>
 					)}
 				</div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import PropTypes from "prop-types";
+import Button from "./Button";
 
 const SlideUpModal = ({
 	isOpen,
@@ -77,18 +78,33 @@ const SlideUpModal = ({
 					justify-between border-b border-gray-200
 				relative"
 				>
-					<button
+					<Button
 						type="button"
 						onClick={onClose}
-						className="text-gray-400 hover:text-gray-600 transition-colors p-2"
+						icon={
+							<svg
+								width="28"
+								height="28"
+								viewBox="0 0 30 30"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<rect
+									opacity="0.3"
+									x="0.5"
+									y="0.5"
+									width="29"
+									height="29"
+									rx="7.68099"
+									stroke="#28819C"
+								/>
+								<path d="M9.08203 8.85938L20.9185 21.1399" stroke="#28819C" />
+								<path d="M20.9199 8.85938L9.08347 21.1399" stroke="#28819C" />
+							</svg>
+						}
+						className="text-gray-400 hover:text-gray-600 transition-colors p-2 bg-transparent shadow-none hover:shadow-none"
 						aria-label="Close modal"
-					>
-						<svg width="28" height="28" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<rect opacity="0.3" x="0.5" y="0.5" width="29" height="29" rx="7.68099" stroke="#28819C" />
-							<path d="M9.08203 8.85938L20.9185 21.1399" stroke="#28819C" />
-							<path d="M20.9199 8.85938L9.08347 21.1399" stroke="#28819C" />
-						</svg>
-					</button>
+					/>
 					<div className="flex-1 flex justify-center">
 						<h2 className="text-xl font-bold text-[#0d5f7a] text-center">{title}</h2>
 					</div>

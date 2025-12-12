@@ -382,26 +382,22 @@ const CreateJournalPage = () => {
 						title={t("createJournal.glLines.title")}
 						subtitle={t("createJournal.glLines.subtitle")}
 						actionSlot={
-							<button
-								type="button"
+							<Button
 								onClick={handleAddLine}
-								className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
-							>
-								+ {t("createJournal.glLines.newLine")}
-							</button>
+								title={t("createJournal.glLines.newLine")}
+								className="bg-transparent shadow-none hover:shadow-none inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
+							/>
 						}
 					>
 						{lines.length === 0 ? (
 							<div className="rounded-2xl border border-dashed border-[#b6c4cc] bg-[#f5f8fb] p-6 text-center text-[#567086]">
 								<p className="text-lg font-semibold mb-2">{t("createJournal.glLines.emptyTitle")}</p>
 								<p className="text-sm mb-6">{t("createJournal.glLines.emptyDescription")}</p>
-								<button
-									type="button"
+								<Button
 									onClick={handleAddLine}
+									title={t("createJournal.glLines.newFirstLine")}
 									className="px-4 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform"
-								>
-									+ {t("createJournal.glLines.newFirstLine")}
-								</button>
+								/>
 							</div>
 						) : (
 							<div className="">
@@ -485,21 +481,20 @@ const CreateJournalPage = () => {
 																	>
 																		{segment.segment_type_name ||
 																			segment.segment_type}
-																		<button
-																			type="button"
+																		<Button
 																			onClick={() =>
 																				handleRemoveSegmentFromLine(
 																					line.id,
 																					segment.id
 																				)
 																			}
-																			className="ml-1 text-blue-600 hover:text-red-600"
+																			className="bg-transparent shadow-none hover:shadow-none p-0 ml-1 text-blue-600 hover:text-red-600"
 																			title={t(
 																				"createJournal.glLines.segments.removeSegment"
 																			)}
 																		>
 																			×
-																		</button>
+																		</Button>
 																	</span>
 																))}
 															</div>
@@ -548,21 +543,20 @@ const CreateJournalPage = () => {
 																		{segment.segment_value_name ||
 																			segment.alias ||
 																			segment.name}
-																		<button
-																			type="button"
+																		<Button
 																			onClick={() =>
 																				handleRemoveSegmentFromLine(
 																					line.id,
 																					segment.id
 																				)
 																			}
-																			className="ml-1 text-green-600 hover:text-red-600"
+																			className="bg-transparent shadow-none hover:shadow-none p-0 ml-1 text-green-600 hover:text-red-600"
 																			title={t(
 																				"createJournal.glLines.segments.removeSegment"
 																			)}
 																		>
 																			×
-																		</button>
+																		</Button>
 																	</span>
 																))}
 															</div>
@@ -605,19 +599,17 @@ const CreateJournalPage = () => {
 													</div>
 												</td>
 												<td className="px-4 py-3 text-center">
-													<button
-														type="button"
+													<Button
 														onClick={() => handleRemoveLine(line.id)}
 														disabled={lines.length === 1}
-														className={`p-2 rounded-lg transition-colors ${
+														icon={<FaTrash className="w-5 h-5" />}
+														className={`bg-transparent shadow-none hover:shadow-none p-2 rounded-lg transition-colors ${
 															lines.length === 1
 																? "text-gray-300 cursor-not-allowed"
 																: "text-red-600 hover:bg-red-50"
 														}`}
 														title={t("createJournal.glLines.deleteLine")}
-													>
-														<FaTrash className="w-5 h-5" />
-													</button>
+													/>
 												</td>
 											</tr>
 										))}
@@ -657,24 +649,21 @@ const CreateJournalPage = () => {
 
 					{/* Action Buttons */}
 					<div className="flex justify-end space-x-4">
-						<button
-							type="button"
+						<Button
 							onClick={handleCancel}
-							className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
-						>
-							{t("createJournal.actions.cancel")}
-						</button>
-						<button
+							title={t("createJournal.actions.cancel")}
+							className="bg-transparent shadow-none hover:shadow-none px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+						/>
+						<Button
 							type="submit"
 							disabled={!isBalanced}
+							title={isEditMode ? t("createJournal.actions.update") : t("createJournal.actions.create")}
 							className={`px-6 py-2 rounded-lg font-medium transition-colors ${
 								isBalanced
 									? "bg-[#28819C] text-white hover:bg-[#206a82]"
 									: "bg-gray-300 text-gray-500 cursor-not-allowed"
 							}`}
-						>
-							{isEditMode ? t("createJournal.actions.update") : t("createJournal.actions.create")}
-						</button>
+						/>
 					</div>
 				</form>
 			</div>

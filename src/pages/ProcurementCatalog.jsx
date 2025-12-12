@@ -1,17 +1,18 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useTranslation } from 'react-i18next'; // Import translation hook
-import PageHeader from '../components/shared/PageHeader';
-import SlideUpModal from '../components/shared/SlideUpModal';
-import Table from '../components/shared/Table';
-import FloatingLabelInput from '../components/shared/FloatingLabelInput';
-import FloatingLabelSelect from '../components/shared/FloatingLabelSelect';
+import React, { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next"; // Import translation hook
+import PageHeader from "../components/shared/PageHeader";
+import SlideUpModal from "../components/shared/SlideUpModal";
+import Table from "../components/shared/Table";
+import FloatingLabelInput from "../components/shared/FloatingLabelInput";
+import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
+import Button from "../components/shared/Button";
 import {
 	fetchCatalogItems,
 	createCatalogItem,
 	updateCatalogItem,
 	clearCatalogErrors,
-} from '../store/catalogItemsSlice';
+} from "../store/catalogItemsSlice";
 
 const HeaderIcon = () => (
 	<div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/30 flex items-center justify-center shadow-lg">
@@ -31,34 +32,34 @@ const HeaderIcon = () => (
 
 const ProcurementCatalog = () => {
 	const { t, i18n } = useTranslation();
-	const isRtl = i18n.dir() === 'rtl';
+	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
 	const { items, loading, creating, updating, error, actionError } = useSelector(state => state.catalogItems);
 
-	const [searchTerm, setSearchTerm] = useState('');
-	const [categoryFilter, setCategoryFilter] = useState('');
-	const [statusFilter, setStatusFilter] = useState('');
+	const [searchTerm, setSearchTerm] = useState("");
+	const [categoryFilter, setCategoryFilter] = useState("");
+	const [statusFilter, setStatusFilter] = useState("");
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [selectedItem, setSelectedItem] = useState(null);
 	const [newItem, setNewItem] = useState({
-		item_code: '',
-		name: '',
-		description: '',
-		supplier: '',
-		category: '',
-		unit_price: '',
+		item_code: "",
+		name: "",
+		description: "",
+		supplier: "",
+		category: "",
+		unit_price: "",
 	});
 	const [editForm, setEditForm] = useState({
-		unit_price: '',
+		unit_price: "",
 	});
 
 	// Helper for status dot using translations
 	const statusDot = active => (
-		<span className={`inline-flex items-center gap-1 text-sm ${active ? 'text-emerald-600' : 'text-gray-500'}`}>
-			<span className={`w-2.5 h-2.5 rounded-full ${active ? 'bg-emerald-500' : 'bg-gray-300'}`} />
-			{active ? t('procurementCatalog.status.posted') : t('procurementCatalog.status.inactive')}
+		<span className={`inline-flex items-center gap-1 text-sm ${active ? "text-emerald-600" : "text-gray-500"}`}>
+			<span className={`w-2.5 h-2.5 rounded-full ${active ? "bg-emerald-500" : "bg-gray-300"}`} />
+			{active ? t("procurementCatalog.status.posted") : t("procurementCatalog.status.inactive")}
 		</span>
 	);
 
@@ -67,14 +68,14 @@ const ProcurementCatalog = () => {
 			fetchCatalogItems({
 				category: categoryFilter,
 				active: statusFilter,
-				supplier: '',
+				supplier: "",
 			})
 		);
 	}, [dispatch, categoryFilter, statusFilter]);
 
 	useEffect(() => {
 		if (selectedItem) {
-			setEditForm({ unit_price: selectedItem.list_price || '' });
+			setEditForm({ unit_price: selectedItem.list_price || "" });
 		}
 	}, [selectedItem]);
 
@@ -104,9 +105,9 @@ const ProcurementCatalog = () => {
 				return `${item.category}` === `${categoryFilter}`;
 			})
 			.filter(item => {
-				if (statusFilter === '') return true;
-				if (statusFilter === 'true') return item.is_active;
-				if (statusFilter === 'false') return !item.is_active;
+				if (statusFilter === "") return true;
+				if (statusFilter === "true") return item.is_active;
+				if (statusFilter === "false") return !item.is_active;
 				return true;
 			});
 	}, [items, searchTerm, categoryFilter, statusFilter]);
@@ -119,18 +120,18 @@ const ProcurementCatalog = () => {
 				supplier: newItem.supplier ? Number(newItem.supplier) : null,
 				category: newItem.category ? Number(newItem.category) : null,
 				unit_price: newItem.unit_price,
-				name: newItem.name || newItem.description || '',
+				name: newItem.name || newItem.description || "",
 			};
 
 			await dispatch(createCatalogItem(payload)).unwrap();
 			setIsAddModalOpen(false);
 			setNewItem({
-				item_code: '',
-				name: '',
-				description: '',
-				supplier: '',
-				category: '',
-				unit_price: '',
+				item_code: "",
+				name: "",
+				description: "",
+				supplier: "",
+				category: "",
+				unit_price: "",
 			});
 		} catch (err) {
 			// errors are handled via slice state
@@ -155,15 +156,15 @@ const ProcurementCatalog = () => {
 
 	const openEdit = item => {
 		setSelectedItem(item);
-		setEditForm({ unit_price: item.list_price || '' });
+		setEditForm({ unit_price: item.list_price || "" });
 		setIsEditModalOpen(true);
 	};
 
 	const currencyFormat = (amount, code) => {
 		const numeric = Number(amount || 0);
-		return new Intl.NumberFormat(i18n.language === 'ar' ? 'ar-EG' : 'en-US', {
-			style: 'currency',
-			currency: code || 'USD',
+		return new Intl.NumberFormat(i18n.language === "ar" ? "ar-EG" : "en-US", {
+			style: "currency",
+			currency: code || "USD",
 			minimumFractionDigits: 2,
 			maximumFractionDigits: 2,
 		}).format(numeric);
@@ -171,49 +172,49 @@ const ProcurementCatalog = () => {
 
 	const columns = [
 		{
-			header: t('procurementCatalog.table.description'),
-			accessor: 'short_description',
-			render: value => value || t('procurementCatalog.na'),
+			header: t("procurementCatalog.table.description"),
+			accessor: "short_description",
+			render: value => value || t("procurementCatalog.na"),
 		},
 		{
-			header: t('procurementCatalog.table.code'),
-			accessor: 'item_code',
-			render: value => <span className="font-semibold text-gray-900">{value || t('procurementCatalog.na')}</span>,
+			header: t("procurementCatalog.table.code"),
+			accessor: "item_code",
+			render: value => <span className="font-semibold text-gray-900">{value || t("procurementCatalog.na")}</span>,
 		},
 		{
-			header: t('procurementCatalog.table.name'),
-			accessor: 'name',
-			render: value => value || t('procurementCatalog.na'),
+			header: t("procurementCatalog.table.name"),
+			accessor: "name",
+			render: value => value || t("procurementCatalog.na"),
 		},
 		{
-			header: t('procurementCatalog.table.price'),
-			accessor: 'list_price',
+			header: t("procurementCatalog.table.price"),
+			accessor: "list_price",
 			render: (value, row) => (
 				<span className="text-[#d33b3b] font-semibold">{currencyFormat(value, row.currency_code)}</span>
 			),
 		},
 		{
-			header: t('procurementCatalog.table.uom'),
-			accessor: 'uom_code',
-			render: value => value || t('procurementCatalog.na'),
+			header: t("procurementCatalog.table.uom"),
+			accessor: "uom_code",
+			render: value => value || t("procurementCatalog.na"),
 		},
 		{
-			header: t('procurementCatalog.table.supplier'),
-			accessor: 'supplier_name',
-			render: value => value || t('procurementCatalog.na'),
+			header: t("procurementCatalog.table.supplier"),
+			accessor: "supplier_name",
+			render: value => value || t("procurementCatalog.na"),
 		},
 		{
-			header: t('procurementCatalog.table.status'),
-			accessor: 'is_active',
+			header: t("procurementCatalog.table.status"),
+			accessor: "is_active",
 			render: value => statusDot(value),
 		},
 	];
 
 	const actions = [
 		{
-			label: t('procurementCatalog.actions.view'),
+			label: t("procurementCatalog.actions.view"),
 			onClick: row => openEdit(row),
-			className: 'text-[#28819C] hover:text-[#1d5c6d] font-semibold',
+			className: "text-[#28819C] hover:text-[#1d5c6d] font-semibold",
 		},
 	];
 
@@ -228,8 +229,8 @@ const ProcurementCatalog = () => {
 		<section className="min-h-screen bg-[#f2f3f5]">
 			<PageHeader
 				icon={<HeaderIcon />}
-				title={t('procurementCatalog.title')}
-				subtitle={t('procurementCatalog.subtitle')}
+				title={t("procurementCatalog.title")}
+				subtitle={t("procurementCatalog.subtitle")}
 			/>
 
 			<div className="px-6 mt-8">
@@ -242,14 +243,14 @@ const ProcurementCatalog = () => {
 									type="text"
 									value={searchTerm}
 									onChange={e => setSearchTerm(e.target.value)}
-									placeholder={t('procurementCatalog.filters.searchPlaceholder')}
+									placeholder={t("procurementCatalog.filters.searchPlaceholder")}
 									className={`w-full ${
-										isRtl ? 'pr-11 pl-4' : 'pl-11 pr-4'
+										isRtl ? "pr-11 pl-4" : "pl-11 pr-4"
 									} py-3 rounded-2xl border border-gray-200 bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#48C1F0]/50`}
 								/>
 								<svg
 									className={`absolute ${
-										isRtl ? 'right-4' : 'left-4'
+										isRtl ? "right-4" : "left-4"
 									} top-1/2 -translate-y-1/2 text-gray-400`}
 									width="18"
 									height="18"
@@ -275,58 +276,56 @@ const ProcurementCatalog = () => {
 							</div>
 							<div className="flex items-center gap-2">
 								<FloatingLabelSelect
-									label={t('procurementCatalog.filters.category')}
+									label={t("procurementCatalog.filters.category")}
 									value={categoryFilter}
 									onChange={e => setCategoryFilter(e.target.value)}
 									options={[
-										{ value: '', label: t('procurementCatalog.filters.allCategories') },
+										{ value: "", label: t("procurementCatalog.filters.allCategories") },
 										...categories.map(cat => ({ value: cat.value, label: cat.label })),
 									]}
 								/>
 								<FloatingLabelSelect
-									label={t('procurementCatalog.filters.status')}
+									label={t("procurementCatalog.filters.status")}
 									value={statusFilter}
 									onChange={e => setStatusFilter(e.target.value)}
 									options={[
-										{ value: '', label: t('procurementCatalog.filters.allStatus') },
-										{ value: 'true', label: t('procurementCatalog.filters.active') },
-										{ value: 'false', label: t('procurementCatalog.filters.inactive') },
+										{ value: "", label: t("procurementCatalog.filters.allStatus") },
+										{ value: "true", label: t("procurementCatalog.filters.active") },
+										{ value: "false", label: t("procurementCatalog.filters.inactive") },
 									]}
 								/>
 							</div>
 						</div>
-						<button
+						<Button
 							type="button"
 							onClick={() => setIsAddModalOpen(true)}
+							title={t("procurementCatalog.actions.newItem")}
+							icon={
+								<svg
+									width="16"
+									height="16"
+									viewBox="0 0 16 16"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M8 1.33337V14.6667"
+										stroke="white"
+										strokeWidth="1.6"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+									<path
+										d="M1.33398 8H14.6673"
+										stroke="white"
+										strokeWidth="1.6"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+								</svg>
+							}
 							className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#28819C] text-white font-semibold shadow-lg hover:bg-[#1f6b7e] transition-colors"
-						>
-							<svg
-								width="16"
-								height="16"
-								viewBox="0 0 16 16"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M8 1.33337V14.6667"
-									stroke="white"
-									strokeWidth="1.6"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-								<path
-									d="M1.33398 8H14.6673"
-									stroke="white"
-									strokeWidth="1.6"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-							</svg>
-							{t('procurementCatalog.actions.newItem')}
-						</button>
-					</div>
-
-					<div className="mt-6 overflow-x-auto rounded-3xl border border-gray-100 bg-white shadow-[0_10px_30px_rgba(3,27,40,0.08)]">
+						/>
 						<Table columns={columns} data={filteredItems} actions={actions} loading={loading} />
 					</div>
 					{(error || actionError) && (
@@ -338,67 +337,69 @@ const ProcurementCatalog = () => {
 			<SlideUpModal
 				isOpen={isAddModalOpen}
 				onClose={handleModalClose}
-				title={t('procurementCatalog.modals.newTitle')}
+				title={t("procurementCatalog.modals.newTitle")}
 				maxWidth="640px"
 			>
 				<div className="space-y-4">
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 						<FloatingLabelInput
-							label={t('procurementCatalog.modals.itemCode')}
+							label={t("procurementCatalog.modals.itemCode")}
 							value={newItem.item_code}
 							onChange={e => setNewItem({ ...newItem, item_code: e.target.value })}
-							placeholder={t('procurementCatalog.placeholders.code')}
+							placeholder={t("procurementCatalog.placeholders.code")}
 						/>
 						<FloatingLabelInput
-							label={t('procurementCatalog.table.name')}
+							label={t("procurementCatalog.table.name")}
 							value={newItem.name}
 							onChange={e => setNewItem({ ...newItem, name: e.target.value })}
-							placeholder={t('procurementCatalog.placeholders.name')}
+							placeholder={t("procurementCatalog.placeholders.name")}
 						/>
 						<FloatingLabelInput
-							label={t('procurementCatalog.modals.categoryId')}
+							label={t("procurementCatalog.modals.categoryId")}
 							value={newItem.category}
 							onChange={e => setNewItem({ ...newItem, category: e.target.value })}
-							placeholder={t('procurementCatalog.placeholders.categoryId')}
+							placeholder={t("procurementCatalog.placeholders.categoryId")}
 						/>
 						<FloatingLabelInput
-							label={t('procurementCatalog.modals.supplierId')}
+							label={t("procurementCatalog.modals.supplierId")}
 							value={newItem.supplier}
 							onChange={e => setNewItem({ ...newItem, supplier: e.target.value })}
-							placeholder={t('procurementCatalog.placeholders.supplierId')}
+							placeholder={t("procurementCatalog.placeholders.supplierId")}
 						/>
 						<FloatingLabelInput
-							label={t('procurementCatalog.modals.unitPrice')}
+							label={t("procurementCatalog.modals.unitPrice")}
 							type="number"
 							value={newItem.unit_price}
 							onChange={e => setNewItem({ ...newItem, unit_price: e.target.value })}
-							placeholder={t('procurementCatalog.placeholders.price')}
+							placeholder={t("procurementCatalog.placeholders.price")}
 						/>
 					</div>
 					<FloatingLabelInput
-						label={t('procurementCatalog.modals.description')}
+						label={t("procurementCatalog.modals.description")}
 						value={newItem.description}
 						onChange={e => setNewItem({ ...newItem, description: e.target.value })}
-						placeholder={t('procurementCatalog.placeholders.description')}
+						placeholder={t("procurementCatalog.placeholders.description")}
 						multiline
 						rows={3}
 					/>
 					<div className="flex gap-3 pt-2">
-						<button
+						<Button
 							type="button"
 							onClick={handleModalClose}
-							className="flex-1 px-4 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50"
-						>
-							{t('procurementCatalog.actions.cancel')}
-						</button>
-						<button
+							title={t("procurementCatalog.actions.cancel")}
+							className="flex-1 px-4 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent shadow-none hover:shadow-none"
+						/>
+						<Button
 							type="button"
 							disabled={creating}
 							onClick={handleCreate}
+							title={
+								creating
+									? t("procurementCatalog.actions.saving")
+									: t("procurementCatalog.actions.create")
+							}
 							className="flex-1 px-4 py-2 rounded-xl bg-[#28819C] text-white font-semibold hover:bg-[#1f6b7e] disabled:opacity-60"
-						>
-							{creating ? t('procurementCatalog.actions.saving') : t('procurementCatalog.actions.create')}
-						</button>
+						/>
 					</div>
 				</div>
 			</SlideUpModal>
@@ -406,79 +407,79 @@ const ProcurementCatalog = () => {
 			<SlideUpModal
 				isOpen={isEditModalOpen}
 				onClose={handleModalClose}
-				title={t('procurementCatalog.modals.editTitle')}
+				title={t("procurementCatalog.modals.editTitle")}
 				maxWidth="640px"
 			>
 				{selectedItem && (
 					<div className="space-y-4">
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<div>
-								<p className="text-sm text-gray-500">{t('procurementCatalog.table.code')}</p>
+								<p className="text-sm text-gray-500">{t("procurementCatalog.table.code")}</p>
 								<p className="font-semibold text-gray-900">
-									{selectedItem.item_code || t('procurementCatalog.na')}
+									{selectedItem.item_code || t("procurementCatalog.na")}
 								</p>
 							</div>
 							<div>
-								<p className="text-sm text-gray-500">{t('procurementCatalog.table.name')}</p>
+								<p className="text-sm text-gray-500">{t("procurementCatalog.table.name")}</p>
 								<p className="font-semibold text-gray-900">
-									{selectedItem.name || t('procurementCatalog.na')}
+									{selectedItem.name || t("procurementCatalog.na")}
 								</p>
 							</div>
 							<div>
-								<p className="text-sm text-gray-500">{t('procurementCatalog.filters.category')}</p>
+								<p className="text-sm text-gray-500">{t("procurementCatalog.filters.category")}</p>
 								<p className="font-semibold text-gray-900">
 									{selectedItem.category_name || selectedItem.category}
 								</p>
 							</div>
 							<div>
-								<p className="text-sm text-gray-500">{t('procurementCatalog.table.supplier')}</p>
+								<p className="text-sm text-gray-500">{t("procurementCatalog.table.supplier")}</p>
 								<p className="font-semibold text-gray-900">
 									{selectedItem.supplier_name ||
 										selectedItem.preferred_supplier ||
-										t('procurementCatalog.na')}
+										t("procurementCatalog.na")}
 								</p>
 							</div>
 							<div>
-								<p className="text-sm text-gray-500">{t('procurementCatalog.table.uom')}</p>
+								<p className="text-sm text-gray-500">{t("procurementCatalog.table.uom")}</p>
 								<p className="font-semibold text-gray-900">
-									{selectedItem.uom_code || t('procurementCatalog.na')}
+									{selectedItem.uom_code || t("procurementCatalog.na")}
 								</p>
 							</div>
 							<div>
-								<p className="text-sm text-gray-500">{t('procurementCatalog.filters.status')}</p>
+								<p className="text-sm text-gray-500">{t("procurementCatalog.filters.status")}</p>
 								{statusDot(selectedItem.is_active)}
 							</div>
 						</div>
 						<div>
-							<p className="text-sm text-gray-600 mb-1">{t('procurementCatalog.table.price')}</p>
+							<p className="text-sm text-gray-600 mb-1">{t("procurementCatalog.table.price")}</p>
 							<div className="flex items-center gap-3">
 								<FloatingLabelInput
-									label={t('procurementCatalog.modals.unitPrice')}
+									label={t("procurementCatalog.modals.unitPrice")}
 									type="number"
 									value={editForm.unit_price}
 									onChange={e => setEditForm({ ...editForm, unit_price: e.target.value })}
 								/>
-								<span className="text-sm text-gray-600">{selectedItem.currency_code || 'USD'}</span>
+								<span className="text-sm text-gray-600">{selectedItem.currency_code || "USD"}</span>
 							</div>
 						</div>
 						<div className="flex gap-3 pt-2">
-							<button
+							<Button
 								type="button"
 								onClick={handleModalClose}
-								className="flex-1 px-4 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50"
-							>
-								{t('procurementCatalog.actions.close')}
-							</button>
-							<button
+								title={t("procurementCatalog.actions.close")}
+								className="flex-1 px-4 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent shadow-none hover:shadow-none"
+							/>
+							<Button
 								type="button"
 								disabled={updating}
 								onClick={handleUpdate}
+								title={
+									updating
+										? t("procurementCatalog.actions.updating")
+										: t("procurementCatalog.actions.updatePrice")
+								}
 								className="flex-1 px-4 py-2 rounded-xl bg-[#28819C] text-white font-semibold hover:bg-[#1f6b7e] disabled:opacity-60"
-							>
-								{updating
-									? t('procurementCatalog.actions.updating')
-									: t('procurementCatalog.actions.updatePrice')}
-							</button>
+							/>
 						</div>
 					</div>
 				)}

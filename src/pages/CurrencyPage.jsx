@@ -129,15 +129,14 @@ const CurrencyPage = () => {
 			accessor: "id",
 			width: "120px",
 			render: (value, row) => (
-				<button
+				<Button
 					onClick={() => {
 						setConverterModal({ isOpen: true, currency: row });
 						setConversionAmount("100");
 					}}
-					className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
-				>
-					{t("currency.convert")}
-				</button>
+					className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm shadow-none hover:shadow-none"
+					title={t("currency.convert")}
+				/>
 			),
 		},
 		{

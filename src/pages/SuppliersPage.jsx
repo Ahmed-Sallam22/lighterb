@@ -341,12 +341,11 @@ const SuppliersPage = () => {
 							isRtl ? "text-right" : "text-left"
 						}`}
 					/>
-					<button
+					<Button
 						onClick={() => handleOpenModal()}
+						title={t("suppliers.actions.add")}
 						className="px-6 py-2 bg-[#0d5f7a] text-white rounded-lg hover:bg-[#0a4a5e] transition-colors font-medium"
-					>
-						{t("suppliers.actions.add")}
-					</button>
+					/>
 				</div>
 
 				{loading ? (
@@ -491,24 +490,23 @@ const SuppliersPage = () => {
 					</div>
 
 					<div className="flex justify-end gap-3 pt-4 sticky">
-						<button
-							type="button"
+						<Button
 							onClick={handleCloseModal}
-							className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-						>
-							{t("suppliers.actions.cancel")}
-						</button>
-						<button
-							type="submit"
+							title={t("suppliers.actions.cancel")}
+							className="bg-transparent shadow-none hover:shadow-none px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+						/>
+						<Button
+							onClick={handleSubmit}
 							disabled={loading}
+							title={
+								loading
+									? t("suppliers.actions.saving")
+									: editingSupplier
+									? t("suppliers.actions.update")
+									: t("suppliers.actions.create")
+							}
 							className="px-6 py-2 bg-[#0d5f7a] text-white rounded-lg hover:bg-[#0a4a5e] transition-colors disabled:opacity-50"
-						>
-							{loading
-								? t("suppliers.actions.saving")
-								: editingSupplier
-								? t("suppliers.actions.update")
-								: t("suppliers.actions.create")}
-						</button>
+						/>
 					</div>
 				</form>
 			</SlideUpModal>
@@ -660,23 +658,19 @@ const SuppliersPage = () => {
 						)}
 
 						<div className="flex justify-end gap-3 pt-4">
-							<button
-								type="button"
+							<Button
 								onClick={handleCloseViewModal}
-								className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-							>
-								{t("suppliers.actions.close") || "Close"}
-							</button>
-							<button
-								type="button"
+								title={t("suppliers.actions.close") || "Close"}
+								className="bg-transparent shadow-none hover:shadow-none px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+							/>
+							<Button
 								onClick={() => {
 									handleCloseViewModal();
 									handleOpenModal(viewingSupplier);
 								}}
+								title={t("suppliers.actions.edit")}
 								className="px-6 py-2 bg-[#0d5f7a] text-white rounded-lg hover:bg-[#0a4a5e] transition-colors"
-							>
-								{t("suppliers.actions.edit")}
-							</button>
+							/>
 						</div>
 					</div>
 				)}

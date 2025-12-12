@@ -1,24 +1,25 @@
-import React from 'react';
-import { FiEye } from 'react-icons/fi';
+import React from "react";
+import { FiEye } from "react-icons/fi";
+import Button from "./shared/Button";
 
 const RequisitionCard = ({ requisition, onView, onEdit, onSubmit, t }) => {
 	const getStatusColor = status => {
 		const colors = {
-			approved: 'bg-[#C9FFD7] text-[#34C759]',
-			pending: 'bg-yellow-100 text-yellow-700',
-			rejected: 'bg-red-100 text-red-700',
-			draft: 'bg-gray-100 text-gray-700',
+			approved: "bg-[#C9FFD7] text-[#34C759]",
+			pending: "bg-yellow-100 text-yellow-700",
+			rejected: "bg-red-100 text-red-700",
+			draft: "bg-gray-100 text-gray-700",
 		};
-		return colors[status?.toLowerCase()] || 'bg-gray-100 text-gray-700';
+		return colors[status?.toLowerCase()] || "bg-gray-100 text-gray-700";
 	};
 
 	const getPriorityColor = priority => {
 		const colors = {
-			high: 'bg-red-100 text-red-700',
-			normal: 'bg-gray-100 text-gray-700',
-			low: 'bg-[#DDF9FF] text-[#006F86]',
+			high: "bg-red-100 text-red-700",
+			normal: "bg-gray-100 text-gray-700",
+			low: "bg-[#DDF9FF] text-[#006F86]",
 		};
-		return colors[priority?.toLowerCase()] || 'bg-gray-100 text-gray-700';
+		return colors[priority?.toLowerCase()] || "bg-gray-100 text-gray-700";
 	};
 
 	return (
@@ -53,27 +54,24 @@ const RequisitionCard = ({ requisition, onView, onEdit, onSubmit, t }) => {
 				</div>
 				<div className="flex items-center gap-2 flex-wrap">
 					<div className="flex flex-wrap justify-end gap-2">
-						<button
+						<Button
 							onClick={() => onView(requisition)}
-							className="flex items-center gap-2 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
-						>
-							<FiEye size={16} />
-							{t('requisitions.view')}
-						</button>
+							className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
+							icon={<FiEye size={16} />}
+							title={t("requisitions.view")}
+						/>
 
-						<button
+						<Button
 							onClick={() => onEdit(requisition)}
-							className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
-						>
-							{t('requisitions.edit')}
-						</button>
+							className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
+							title={t("requisitions.edit")}
+						/>
 
-						<button
+						<Button
 							onClick={() => onSubmit(requisition)}
-							className="px-4 py-2 bg-[#28819C] text-white rounded-lg hover:bg-[#206b82] transition-colors text-sm font-medium"
-						>
-							{t('requisitions.submitForApproval')}
-						</button>
+							className="bg-[#3d5d67] hover:bg-[#206b82] text-white border border-transparent"
+							title={t("requisitions.submitForApproval")}
+						/>
 					</div>
 				</div>
 			</div>
@@ -83,15 +81,15 @@ const RequisitionCard = ({ requisition, onView, onEdit, onSubmit, t }) => {
 				<h4 className="text-base font-medium text-gray-900 mb-3">{requisition.title}</h4>
 				<div className="grid grid-cols-3 gap-6 text-sm">
 					<div>
-						<p className="text-gray-500 mb-1">{t('requisitions.requiredDate')}:</p>
+						<p className="text-gray-500 mb-1">{t("requisitions.requiredDate")}:</p>
 						<p className="text-gray-900 font-medium">{requisition.requiredDate}</p>
 					</div>
 					<div>
-						<p className="text-gray-500 mb-1">{t('requisitions.costCenter')}</p>
+						<p className="text-gray-500 mb-1">{t("requisitions.costCenter")}</p>
 						<p className="text-gray-900 font-medium">{requisition.costCenter}</p>
 					</div>
 					<div>
-						<p className="text-gray-500 mb-1">{t('requisitions.totalAmount')}</p>
+						<p className="text-gray-500 mb-1">{t("requisitions.totalAmount")}</p>
 						<p className="text-gray-900 font-semibold">{requisition.totalAmount}</p>
 					</div>
 				</div>
@@ -100,7 +98,7 @@ const RequisitionCard = ({ requisition, onView, onEdit, onSubmit, t }) => {
 			{/* Card Footer */}
 			<div className="pt-3 border-t border-gray-200">
 				<div className="text-sm text-gray-500">
-					<span>{t('requisitions.createdDate')}</span>
+					<span>{t("requisitions.createdDate")}</span>
 					<span className="ml-2 text-gray-900">{requisition.createdDate}</span>
 				</div>
 			</div>

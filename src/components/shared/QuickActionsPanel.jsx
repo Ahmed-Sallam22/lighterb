@@ -1,13 +1,14 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { MdSpeed } from 'react-icons/md';
+import React from "react";
+import PropTypes from "prop-types";
+import { MdSpeed } from "react-icons/md";
+import Button from "./Button";
 
 /**
  * Default stopwatch icon used for the Quick Actions header.
  */
 export const QuickActionsIcon = React.memo(() => <MdSpeed className="w-[42px] h-[35px] text-[#D3D3D3]" />);
 
-QuickActionsIcon.displayName = 'QuickActionsIcon';
+QuickActionsIcon.displayName = "QuickActionsIcon";
 
 /**
  * QuickActionsPanel Component
@@ -32,15 +33,14 @@ export const QuickActionsPanel = ({ title, actions, icon, onActionClick }) => {
 
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{actions.map(action => (
-					<button
+					<Button
 						key={action.id}
 						type="button"
 						onClick={() => onActionClick?.(action)}
-						className="w-full rounded-full border border-white/30 bg-white/5 py-3 px-6 text-center text-sm font-semibold uppercase tracking-wide text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-[#48C1F0] hover:bg-[#48C1F0]/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#48C1F0]"
+						title={action.label}
+						className="w-full rounded-full border border-white/30 bg-white/5 py-3 px-6 text-center text-sm font-semibold uppercase tracking-wide text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-[#48C1F0] hover:bg-[#48C1F0]/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#48C1F0] bg-transparent shadow-none hover:shadow-none"
 						aria-label={action.label}
-					>
-						{action.label}
-					</button>
+					/>
 				))}
 			</div>
 		</section>
@@ -61,8 +61,8 @@ QuickActionsPanel.propTypes = {
 };
 
 QuickActionsPanel.defaultProps = {
-	title: 'Quick Actions',
-	subtitle: '',
+	title: "Quick Actions",
+	subtitle: "",
 	actions: [],
 	icon: null,
 	onActionClick: undefined,

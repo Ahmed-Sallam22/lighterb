@@ -1731,6 +1731,92 @@
 		"cancel": "Cancel",
 		"processing": "Processing..."
 	},
+	"invoiceForm": {
+		"goodsReceipt": {
+			"title": "Link to Goods Receipt (Optional)",
+			"subtitle": "Select Goods Receipt Needing Invoice",
+			"label": "Goods Receipt",
+			"placeholder": "Select goods receipt",
+			"helper": "Found goods receipts needing invoices. Select one to auto-populate invoice details."
+		},
+		"details": {
+			"title": "Invoice Details",
+			"supplier": "Supplier",
+			"customer": "Customer",
+			"selectSupplier": "Select supplier",
+			"selectCustomer": "Select customer",
+			"invoiceNumber": "Invoice Number",
+			"invoiceNumberPlaceholderAP": "e.g., AP-INV-2025-001 (auto-generated if empty)",
+			"invoiceNumberPlaceholderAR": "e.g., AR-INV-2025-001 (auto-generated if empty)",
+			"invoiceDate": "Invoice Date",
+			"dueDate": "Due Date",
+			"datePlaceholder": "dd/mm/yyyy",
+			"currency": "Currency",
+			"selectCurrency": "Select currency",
+			"country": "Country",
+			"selectCountry": "Select country",
+			"paymentTerms": "Payment Terms",
+			"selectPaymentTerms": "Select payment terms",
+			"poReference": "PO Reference",
+			"poReferencePlaceholder": "e.g., PO-2025-456",
+			"vendorInvoiceNumber": "Vendor Invoice Number",
+			"vendorInvoiceNumberPlaceholder": "e.g., VENDOR-INV-789",
+			"memo": "Memo",
+			"memoPlaceholder": "Invoice notes or description"
+		},
+		"items": {
+			"title": "Line Items",
+			"subtitle": "{{count}} item added",
+			"subtitle_plural": "{{count}} items added",
+			"addNew": "+ New Item",
+			"noItems": "No items added yet",
+			"noItemsDesc": "Add items to build your invoice.",
+			"addFirst": "+ Add First Item",
+			"name": "Name",
+			"namePlaceholder": "Item name",
+			"description": "Description",
+			"descriptionPlaceholder": "Item description",
+			"quantity": "Quantity",
+			"quantityPlaceholder": "1",
+			"unitPrice": "Unit Price",
+			"unitPricePlaceholder": "0.00",
+			"taxRate": "Tax Rate",
+			"selectTaxRate": "Select Tax Rate",
+			"taxExempt": "Tax Exempt (0%)",
+			"actions": "Actions",
+			"deleteItem": "Delete item"
+		},
+		"totals": {
+			"subtotal": "Subtotal",
+			"tax": "Tax",
+			"invoiceTotal": "Invoice Total"
+		},
+		"glDistribution": {
+			"title": "GL Distribution",
+			"subtitle": "Create GL distribution lines for this invoice",
+			"invoiceTotal": "Invoice Total:",
+			"glTotalDebits": "GL Total (Debits):",
+			"totalsMatch": "Totals match - ready to create invoice",
+			"totalsMismatch": "Totals don't match (Difference: {{difference}})",
+			"adjustHelper": "Adjust your GL lines so the debit total matches the invoice total."
+		},
+		"actions": {
+			"cancel": "Cancel",
+			"creating": "Creating...",
+			"createInvoice": "Create Invoice"
+		},
+		"messages": {
+			"itemRemoved": "Item removed",
+			"requiredFields": "Please fill all required fields",
+			"noItems": "Please add at least one item",
+			"noGlLines": "Please add at least one GL distribution line",
+			"glNotBalanced": "GL distribution lines are not balanced. Debits must equal Credits.",
+			"totalsMismatch": "Invoice total ({{invoiceTotal}}) must match GL distribution total ({{glTotal}})",
+			"apCreated": "AP Invoice created successfully",
+			"arCreated": "AR Invoice created successfully",
+			"createFailed": "Failed to create invoice"
+		}
+	},
 	"countries": {
 		"title": "Countries",
 		"subtitle": "Manage country settings and configurations",

@@ -51,10 +51,9 @@ const SegmentTypeCard = ({ segment, onEdit, onDelete, onToggleRequired, onToggle
 			</div>
 
 			<div className="mt-3 flex flex-wrap gap-4">
-				<button
-					type="button"
+				<Button
 					onClick={() => onToggleRequired(segment)}
-					className="inline-flex items-center gap-2 rounded-2xl py-2 text-sm font-semibold text-[#1F809F]"
+					className="bg-transparent shadow-none hover:shadow-none inline-flex items-center gap-2 rounded-2xl py-2 text-sm font-semibold text-[#1F809F]"
 				>
 					<span
 						className={`h-4 w-4 rounded-md border flex items-center justify-center ${
@@ -64,12 +63,10 @@ const SegmentTypeCard = ({ segment, onEdit, onDelete, onToggleRequired, onToggle
 						{segment.is_required && <CheckmarkIcon />}
 					</span>
 					{t("segments.types.required")}
-				</button>
-
-				<button
-					type="button"
+				</Button>
+				<Button
 					onClick={() => onToggleHierarchy(segment)}
-					className="inline-flex items-center gap-2 rounded-2xl py-2 text-sm font-semibold text-[#1F809F]"
+					className="bg-transparent shadow-none hover:shadow-none inline-flex items-center gap-2 rounded-2xl py-2 text-sm font-semibold text-[#1F809F]"
 				>
 					<span
 						className={`h-4 w-4 rounded-md border flex items-center justify-center ${
@@ -79,7 +76,7 @@ const SegmentTypeCard = ({ segment, onEdit, onDelete, onToggleRequired, onToggle
 						{segment.has_hierarchy && <CheckmarkIcon />}
 					</span>
 					{t("segments.types.hasHierarchy")}
-				</button>
+				</Button>
 			</div>
 
 			<p className="mt-3 text-[15px] leading-relaxed text-gray-600">

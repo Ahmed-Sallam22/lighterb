@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import { fetchSegmentTypes, fetchSegmentValues } from "../../store/segmentsSlice";
 import { fetchCurrencies } from "../../store/currenciesSlice";
 import { FaTrash, FaPlus, FaChevronDown } from "react-icons/fa";
+import Button from "./Button";
 
 /**
  * GLLinesSection - A reusable component for GL Entry with Lines and Allocations
@@ -308,19 +309,17 @@ const GLLinesSection = ({
 
 									{/* Delete Action */}
 									<div className="flex justify-center pt-2">
-										<button
-											type="button"
+										<Button
 											onClick={() => handleRemoveLine(line.id)}
 											disabled={lines.length <= 1}
-											className={`p-2 rounded-lg transition-colors ${
+											icon={<FaTrash className="w-4 h-4" />}
+											className={`bg-transparent shadow-none hover:shadow-none p-2 rounded-lg transition-colors ${
 												lines.length <= 1
 													? "text-gray-300 cursor-not-allowed"
 													: "text-red-500 hover:bg-red-50 hover:text-red-600"
 											}`}
 											title={t("glLines.deleteLine")}
-										>
-											<FaTrash className="w-4 h-4" />
-										</button>
+										/>
 									</div>
 								</div>
 							))}
@@ -329,16 +328,14 @@ const GLLinesSection = ({
 				</div>
 
 				{/* Add Line Button */}
-				<button
-					type="button"
+				<Button
 					onClick={handleAddLine}
-					className={`mt-4 flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors ${
+					title={t("glLines.addLine")}
+					icon={<FaPlus className="w-3 h-3" />}
+					className={`shadow-none hover:shadow-none mt-4 flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors ${
 						isRtl ? "flex-row-reverse" : ""
 					}`}
-				>
-					<FaPlus className="w-3 h-3" />
-					{t("glLines.addLine")}
-				</button>
+				/>
 			</div>
 		</div>
 	);

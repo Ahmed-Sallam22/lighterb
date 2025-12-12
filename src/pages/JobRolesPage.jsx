@@ -9,13 +9,7 @@ import SlideUpModal from "../components/shared/SlideUpModal";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import ConfirmModal from "../components/shared/ConfirmModal";
 
-import {
-	fetchJobRoles,
-	createJobRole,
-	updateJobRole,
-	deleteJobRole,
-	clearError,
-} from "../store/jobRolesSlice";
+import { fetchJobRoles, createJobRole, updateJobRole, deleteJobRole, clearError } from "../store/jobRolesSlice";
 
 // Job Roles Icon
 const JobRolesIcon = () => (
@@ -46,9 +40,15 @@ const DUTY_ROLES_OPTIONS = [
 const JobRolesPage = () => {
 	const dispatch = useDispatch();
 
-	const { roles = [], loading, error, creating, updating, deleting, actionError } = useSelector(
-		state => state.jobRoles || {}
-	);
+	const {
+		roles = [],
+		loading,
+		error,
+		creating,
+		updating,
+		deleting,
+		actionError,
+	} = useSelector(state => state.jobRoles || {});
 
 	// Modal states
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -316,15 +316,16 @@ const JobRolesPage = () => {
 					</div>
 
 					{/* Create Button */}
-					<button
+					<Button
 						onClick={handleOpenCreate}
+						title="Create Job"
+						icon={
+							<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+								<path d="M8 1v14M1 8h14" stroke="white" strokeWidth="2" strokeLinecap="round" />
+							</svg>
+						}
 						className="flex items-center gap-2 px-5 py-3 bg-[#28819C] text-white rounded-xl hover:bg-[#1d6a80] transition-colors font-medium shadow-md"
-					>
-						<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-							<path d="M8 1v14M1 8h14" stroke="white" strokeWidth="2" strokeLinecap="round" />
-						</svg>
-						Create Job
-					</button>
+					/>
 				</div>
 
 				{/* Table */}
@@ -338,12 +339,7 @@ const JobRolesPage = () => {
 			</div>
 
 			{/* Create Modal */}
-			<SlideUpModal
-				isOpen={isCreateModalOpen}
-				onClose={handleCloseModals}
-				title="Create Job"
-				maxWidth="600px"
-			>
+			<SlideUpModal isOpen={isCreateModalOpen} onClose={handleCloseModals} title="Create Job" maxWidth="600px">
 				<div className="space-y-5 p-4">
 					<FloatingLabelInput
 						label="Job Title"
@@ -383,23 +379,17 @@ const JobRolesPage = () => {
 					</div>
 
 					{/* Submit Button */}
-					<button
+					<Button
 						onClick={handleCreate}
 						disabled={creating}
+						title={creating ? "Creating..." : "Create Job"}
 						className="w-full py-3 bg-[#28819C] text-white rounded-xl hover:bg-[#1d6a80] transition-colors font-medium disabled:opacity-50"
-					>
-						{creating ? "Creating..." : "Create Job"}
-					</button>
+					/>
 				</div>
 			</SlideUpModal>
 
 			{/* View Modal */}
-			<SlideUpModal
-				isOpen={isViewModalOpen}
-				onClose={handleCloseModals}
-				title="View Job"
-				maxWidth="600px"
-			>
+			<SlideUpModal isOpen={isViewModalOpen} onClose={handleCloseModals} title="View Job" maxWidth="600px">
 				{selectedRole && (
 					<div className="space-y-5 p-4">
 						<div>
@@ -435,30 +425,23 @@ const JobRolesPage = () => {
 
 						{/* Action Buttons */}
 						<div className="flex gap-3 pt-2">
-							<button
+							<Button
 								onClick={() => handleOpenEdit(selectedRole)}
+								title="Edit"
 								className="flex-1 py-3 bg-[#28819C] text-white rounded-xl hover:bg-[#1d6a80] transition-colors font-medium"
-							>
-								Edit
-							</button>
-							<button
+							/>
+							<Button
 								onClick={() => handleOpenDelete(selectedRole)}
-								className="flex-1 py-3 bg-white text-red-600 border border-red-300 rounded-xl hover:bg-red-50 transition-colors font-medium"
-							>
-								Delete
-							</button>
+								title="Delete"
+								className="shadow-none hover:shadow-none flex-1 py-3 bg-white text-red-600 border border-red-300 rounded-xl hover:bg-red-50 transition-colors font-medium"
+							/>
 						</div>
 					</div>
 				)}
 			</SlideUpModal>
 
 			{/* Edit Modal */}
-			<SlideUpModal
-				isOpen={isEditModalOpen}
-				onClose={handleCloseModals}
-				title="Edit Job"
-				maxWidth="600px"
-			>
+			<SlideUpModal isOpen={isEditModalOpen} onClose={handleCloseModals} title="Edit Job" maxWidth="600px">
 				<div className="space-y-5 p-4">
 					<FloatingLabelInput
 						label="Job Title"
@@ -505,13 +488,12 @@ const JobRolesPage = () => {
 					</div>
 
 					{/* Submit Button */}
-					<button
+					<Button
 						onClick={handleUpdate}
 						disabled={updating}
+						title={updating ? "Saving..." : "Save Changes"}
 						className="w-full py-3 bg-[#28819C] text-white rounded-xl hover:bg-[#1d6a80] transition-colors font-medium disabled:opacity-50"
-					>
-						{updating ? "Saving..." : "Save Changes"}
-					</button>
+					/>
 				</div>
 			</SlideUpModal>
 

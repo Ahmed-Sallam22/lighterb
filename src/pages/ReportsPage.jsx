@@ -7,6 +7,7 @@ import PageHeader from '../components/shared/PageHeader';
 import Card from '../components/shared/Card';
 import FloatingLabelInput from '../components/shared/FloatingLabelInput';
 import Table from '../components/shared/Table';
+import Button from '../components/shared/Button';
 import { fetchTrialBalance, fetchARAgingReport, fetchAPAgingReport } from '../store/reportsSlice';
 
 const ReportsIcon = () => (
@@ -284,17 +285,16 @@ const ReportsPage = () => {
 				<Card>
 					<div className="flex border-b border-gray-200">
 						{reportTabs.map(tab => (
-							<button
+							<Button
 								key={tab.value}
 								onClick={() => handleTabChange(tab.value)}
-								className={`px-6 py-3 font-medium text-sm transition-colors relative ${
+								title={tab.label}
+								className={`px-6 py-3 font-medium text-sm transition-colors relative bg-transparent shadow-none hover:shadow-none ${
 									selectedReport === tab.value
 										? 'text-[#0d5f7a] border-b-2 border-[#0d5f7a]'
 										: 'text-gray-500 hover:text-gray-700'
 								}`}
-							>
-								{tab.label}
-							</button>
+							/>
 						))}
 					</div>
 				</Card>
@@ -339,22 +339,16 @@ const ReportsPage = () => {
 						<div className="flex flex-wrap gap-3">
 							{currentReport.downloadLinks && (
 								<>
-									<button
-										onClick={() => handleDownload('xlsx')}
-										className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-									>
-										{t('reports.actions.downloadExcel')}
-									</button>
-									<button
-										onClick={() => handleDownload('csv')}
-										className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-									>
-										{t('reports.actions.downloadCsv')}
-									</button>
-								</>
-							)}
-						</div>
-					</div>
+								<Button
+									onClick={() => handleDownload('xlsx')}
+									title={t('reports.actions.downloadExcel')}
+									className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-none hover:shadow-none"
+								/>
+								<Button
+									onClick={() => handleDownload('csv')}
+									title={t('reports.actions.downloadCsv')}
+									className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-none hover:shadow-none"
+								/>
 				</Card>
 
 				{/* Report Content */}

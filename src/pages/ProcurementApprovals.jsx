@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import PageHeader from "../components/shared/PageHeader";
 import ConfirmModal from "../components/shared/ConfirmModal";
+import Button from "../components/shared/Button";
 import { fetchApprovalSteps, approveStep, rejectStep } from "../store/approvalStepsSlice";
 
 const HeaderIcon = () => (
@@ -199,18 +200,17 @@ const ProcurementApprovals = () => {
 							</h2>
 							<div className="flex flex-wrap gap-2">
 								{tabOptions.map(tab => (
-									<button
+									<Button
 										key={tab.id}
 										type="button"
 										onClick={() => setActiveTab(tab.id)}
-										className={`px-4 py-2 rounded-xl border text-sm font-semibold transition-colors ${
+										title={tab.label}
+										className={`px-4 py-2 rounded-xl border text-sm font-semibold transition-colors bg-transparent shadow-none hover:shadow-none ${
 											activeTab === tab.id
 												? "border-[#48C1F0] bg-[#e5f6ff] text-[#0c2a3c]"
 												: "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
 										}`}
-									>
-										{tab.label}
-									</button>
+									/>
 								))}
 							</div>
 						</div>
@@ -268,36 +268,37 @@ const ProcurementApprovals = () => {
 														• {wf.progress}
 													</p>
 												</div>
-												<button
+												<Button
 													type="button"
 													onClick={() => handleViewDetails(wf.instance)}
-													className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-[#28819C]"
-												>
-													<svg
-														width="18"
-														height="18"
-														viewBox="0 0 18 18"
-														fill="none"
-														xmlns="http://www.w3.org/2000/svg"
-														className={isRtl ? "rotate-180" : ""}
-													>
-														<path
-															d="M1.5 9C1.5 9 4.5 3 9 3C13.5 3 16.5 9 16.5 9C16.5 9 13.5 15 9 15C4.5 15 1.5 9 1.5 9Z"
-															stroke="currentColor"
-															strokeWidth="1.5"
-															strokeLinecap="round"
-															strokeLinejoin="round"
-														/>
-														<circle
-															cx="9"
-															cy="9"
-															r="2.5"
-															stroke="currentColor"
-															strokeWidth="1.5"
-														/>
-													</svg>
-													{t("procurementApprovals.card.viewDetails")}
-												</button>
+													title={t("procurementApprovals.card.viewDetails")}
+													icon={
+														<svg
+															width="18"
+															height="18"
+															viewBox="0 0 18 18"
+															fill="none"
+															xmlns="http://www.w3.org/2000/svg"
+															className={isRtl ? "rotate-180" : ""}
+														>
+															<path
+																d="M1.5 9C1.5 9 4.5 3 9 3C13.5 3 16.5 9 16.5 9C16.5 9 13.5 15 9 15C4.5 15 1.5 9 1.5 9Z"
+																stroke="currentColor"
+																strokeWidth="1.5"
+																strokeLinecap="round"
+																strokeLinejoin="round"
+															/>
+															<circle
+																cx="9"
+																cy="9"
+																r="2.5"
+																stroke="currentColor"
+																strokeWidth="1.5"
+															/>
+														</svg>
+													}
+													className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-[#28819C] bg-transparent shadow-none hover:shadow-none"
+												/>
 											</div>
 
 											<div
@@ -353,40 +354,41 @@ const ProcurementApprovals = () => {
 												</div>
 												{pendingStep && (
 													<div className="flex items-center gap-2">
-														<button
+														<Button
 															type="button"
 															onClick={() => openApproveModal(pendingStep)}
 															disabled={actionLoading}
-															className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-														>
-															{actionLoading
-																? t("procurementApprovals.actions.processing")
-																: t("procurementApprovals.actions.approve")}
-														</button>
-														<button
+															title={
+																actionLoading
+																	? t("procurementApprovals.actions.processing")
+																	: t("procurementApprovals.actions.approve")
+															}
+															className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-none hover:shadow-none"
+														/>
+														<Button
 															type="button"
 															onClick={() => openRejectModal(pendingStep)}
 															disabled={actionLoading}
-															className="px-4 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-														>
-															{actionLoading
-																? t("procurementApprovals.actions.processing")
-																: t("procurementApprovals.actions.reject")}
-														</button>
+															title={
+																actionLoading
+																	? t("procurementApprovals.actions.processing")
+																	: t("procurementApprovals.actions.reject")
+															}
+															className="px-4 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-none hover:shadow-none"
+														/>
 													</div>
 												)}
+												{wf.status === "APPROVED" && (
+													<p className="mt-3 text-sm font-semibold text-emerald-600">
+														{t("procurementApprovals.card.allCompleted")}
+													</p>
+												)}
+												{wf.status === "REJECTED" && (
+													<p className="mt-3 text-sm font-semibold text-red-600">
+														{t("procurementApprovals.card.workflowRejected")}
+													</p>
+												)}
 											</div>
-
-											{wf.status === "APPROVED" && (
-												<p className="mt-3 text-sm font-semibold text-emerald-600">
-													{t("procurementApprovals.card.allCompleted")}
-												</p>
-											)}
-											{wf.status === "REJECTED" && (
-												<p className="mt-3 text-sm font-semibold text-red-600">
-													{t("procurementApprovals.card.workflowRejected")}
-												</p>
-											)}
 										</div>
 									);
 								})
