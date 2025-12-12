@@ -9,7 +9,6 @@ import Pagination from "../components/shared/Pagination";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import PaymentDetailsModal from "../components/shared/PaymentDetailsModal";
 import SlideUpModal from "../components/shared/SlideUpModal";
-import ReceivePaymentForm from "../components/forms/ReceivePaymentForm";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import Button from "../components/shared/Button";
@@ -24,6 +23,7 @@ import { fetchCustomers } from "../store/customersSlice";
 import { fetchCurrencies } from "../store/currenciesSlice";
 import LoadingSpan from "../components/shared/LoadingSpan";
 import ARPaymentIcon from "../assets/icons/ARPaymentIcon";
+import ReceivePaymentForm from "../components/forms/ReceivePaymentForm";
 
 const ARPaymentsPage = () => {
 	const { t, i18n } = useTranslation();
