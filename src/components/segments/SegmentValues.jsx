@@ -6,6 +6,7 @@ import Table from "../shared/Table";
 import Toolbar from "../shared/Toolbar";
 import SlideUpModal from "../shared/SlideUpModal";
 import ConfirmModal from "../shared/ConfirmModal";
+import Pagination from "../shared/Pagination";
 import SegmentValueForm from "../forms/SegmentValueForm";
 import {
 	fetchSegmentValues,
@@ -15,7 +16,21 @@ import {
 } from "../../store/segmentsSlice";
 import Button from "../shared/Button";
 
-const SegmentValues = ({ types, values, loading, selectedSegmentType, onSegmentTypeChange }) => {
+const SegmentValues = ({
+	types,
+	values,
+	loading,
+	selectedSegmentType,
+	onSegmentTypeChange,
+	// Pagination props
+	currentPage,
+	totalCount,
+	pageSize,
+	hasNext,
+	hasPrevious,
+	onPageChange,
+	onPageSizeChange,
+}) => {
 	const { t } = useTranslation();
 	const dispatch = useDispatch();
 
@@ -192,37 +207,19 @@ const SegmentValues = ({ types, values, loading, selectedSegmentType, onSegmentT
 				render: value => <span className="text-gray-900">{value}</span>,
 			},
 			{
-				header: t("segments.table.name"),
-				accessor: "name",
-				render: value => <span className="text-gray-600 text-sm">{value}</span>,
-			},
-			{
 				header: t("segments.table.type"),
 				accessor: "segment_type_name",
 				width: "140px",
 				render: value => <span className="font-semibold text-[#28819C]">{value}</span>,
 			},
 			{
-				header: t("segments.table.parent"),
-				accessor: "parent_code",
-				width: "100px",
-				render: value => <span className="text-gray-600">{value || "-"}</span>,
-			},
-			{
 				header: t("segments.table.nodeType"),
 				accessor: "node_type",
-				width: "100px",
 				render: value => (
 					<span className={`font-medium ${value === "parent" ? "text-blue-600" : "text-green-600"}`}>
 						{value === "parent" ? t("segments.form.parentNode") : t("segments.form.childNode")}
 					</span>
 				),
-			},
-			{
-				header: t("segments.table.level"),
-				accessor: "level",
-				width: "80px",
-				render: value => <span className="text-gray-600">{value}</span>,
 			},
 			{
 				header: t("segments.table.status"),
@@ -285,15 +282,28 @@ const SegmentValues = ({ types, values, loading, selectedSegmentType, onSegmentT
 						<p className="text-gray-500">{t("segments.values.loading")}</p>
 					</div>
 				) : (
-					<Table
-						columns={columns}
-						data={filteredValues}
-						onEdit={handleEdit}
-						onDelete={handleDeleteClick}
-						editIcon="edit"
-						emptyMessage={t("segments.values.empty")}
-						showDeleteButton={row => row.can_delete !== false}
-					/>
+					<>
+						<Table
+							columns={columns}
+							data={filteredValues}
+							onEdit={handleEdit}
+							onDelete={handleDeleteClick}
+							editIcon="edit"
+							emptyMessage={t("segments.values.empty")}
+							showDeleteButton={row => row.can_delete !== false}
+						/>
+
+						{/* Pagination */}
+						<Pagination
+							currentPage={currentPage}
+							totalCount={totalCount}
+							pageSize={pageSize}
+							hasNext={hasNext}
+							hasPrevious={hasPrevious}
+							onPageChange={onPageChange}
+							onPageSizeChange={onPageSizeChange}
+						/>
+					</>
 				)}
 			</div>
 

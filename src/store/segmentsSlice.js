@@ -41,15 +41,27 @@ export const deleteSegmentType = createAsyncThunk("segments/deleteType", async (
 // Async thunks for Segment Values
 export const fetchSegmentValues = createAsyncThunk(
 	"segments/fetchValues",
-	async ({ segment_type = "", node_type = "", is_active = "" } = {}, { rejectWithValue }) => {
+	async (
+		{ segment_type = "", node_type = "", is_active = "", page = 1, page_size = 20 } = {},
+		{ rejectWithValue }
+	) => {
 		try {
 			const params = new URLSearchParams();
 			if (segment_type) params.append("segment_type", segment_type);
 			if (node_type) params.append("node_type", node_type);
 			if (is_active !== "") params.append("is_active", is_active);
+			params.append("page", page);
+			params.append("page_size", page_size);
 
 			const response = await api.get(`/finance/gl/segments/?${params.toString()}`);
-			return response.data.data.results;
+			return {
+				results: response.data.data.results,
+				count: response.data.data.count,
+				next: response.data.data.next,
+				previous: response.data.data.previous,
+				page,
+				pageSize: page_size,
+			};
 		} catch (error) {
 			return rejectWithValue(error.response?.data || "Failed to fetch segment values");
 		}
@@ -91,6 +103,12 @@ const segmentsSlice = createSlice({
 	initialState: {
 		types: [],
 		values: [],
+		// Pagination state for values
+		valuesCount: 0,
+		valuesPage: 1,
+		valuesPageSize: 20,
+		valuesHasNext: false,
+		valuesHasPrevious: false,
 		loading: false,
 		error: null,
 		typesLoading: false,
@@ -99,6 +117,9 @@ const segmentsSlice = createSlice({
 	reducers: {
 		clearError: state => {
 			state.error = null;
+		},
+		setValuesPage: (state, action) => {
+			state.valuesPage = action.payload;
 		},
 	},
 	extraReducers: builder => {
@@ -173,7 +194,12 @@ const segmentsSlice = createSlice({
 			})
 			.addCase(fetchSegmentValues.fulfilled, (state, action) => {
 				state.valuesLoading = false;
-				state.values = action.payload;
+				state.values = action.payload.results;
+				state.valuesCount = action.payload.count;
+				state.valuesPage = action.payload.page;
+				state.valuesPageSize = action.payload.pageSize;
+				state.valuesHasNext = !!action.payload.next;
+				state.valuesHasPrevious = !!action.payload.previous;
 			})
 			.addCase(fetchSegmentValues.rejected, (state, action) => {
 				state.valuesLoading = false;
@@ -230,5 +256,5 @@ const segmentsSlice = createSlice({
 	},
 });
 
-export const { clearError } = segmentsSlice.actions;
+export const { clearError, setValuesPage } = segmentsSlice.actions;
 export default segmentsSlice.reducer;
