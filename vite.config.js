@@ -4,7 +4,23 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react({
+      // Disable React Fast Refresh to avoid runtime registration errors when HMR can't connect
+      fastRefresh: false,
+    }),
+    tailwindcss(),
+  ],
+  server: {
+    host: "0.0.0.0",
+    port: 5173,
+    strictPort: true,
+    hmr: {
+      host: "localhost",
+      port: 5173,
+      protocol: "ws",
+    },
+  },
   build: {
     // Enable code splitting for better caching
     rollupOptions: {
