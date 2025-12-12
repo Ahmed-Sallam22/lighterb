@@ -15,10 +15,12 @@ import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import Button from "../components/shared/Button";
 import {
 	fetchAPPayments,
+	fetchAPPaymentDetails,
 	deleteAPPayment,
 	submitAPPaymentForApproval,
 	postAPPaymentToGL,
 	setPage,
+	clearCurrentPayment,
 } from "../store/apPaymentsSlice";
 import { fetchSuppliers } from "../store/suppliersSlice";
 import { fetchCurrencies } from "../store/currenciesSlice";
@@ -31,7 +33,7 @@ const APPaymentsPage = () => {
 	const dispatch = useDispatch();
 
 	// Get data from Redux
-	const { payments, loading, count, page, hasNext, hasPrevious } = useSelector(state => state.apPayments);
+	const { payments, loading, count, page, hasNext, hasPrevious, currentPayment, detailsLoading } = useSelector(state => state.apPayments);
 	const { suppliers } = useSelector(state => state.suppliers);
 	const { currencies } = useSelector(state => state.currencies);
 
@@ -40,7 +42,6 @@ const APPaymentsPage = () => {
 	const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 	const [selectedPaymentId, setSelectedPaymentId] = useState(null);
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-	const [editingPayment, setEditingPayment] = useState(null);
 	const [localPageSize, setLocalPageSize] = useState(20);
 
 	// Filter states
@@ -262,18 +263,18 @@ const APPaymentsPage = () => {
 	};
 
 	const handleCreate = () => {
-		setEditingPayment(null);
+		dispatch(clearCurrentPayment());
 		setIsCreateModalOpen(true);
 	};
 
 	const handleCloseCreateModal = () => {
 		setIsCreateModalOpen(false);
-		setEditingPayment(null);
+		dispatch(clearCurrentPayment());
 	};
 
 	const handlePaymentSuccess = () => {
 		setIsCreateModalOpen(false);
-		setEditingPayment(null);
+		dispatch(clearCurrentPayment());
 		// Refresh payments list
 		dispatch(fetchAPPayments({ page, page_size: localPageSize }));
 	};
@@ -288,9 +289,14 @@ const APPaymentsPage = () => {
 		setSelectedPaymentId(null);
 	};
 
-	const handleEdit = payment => {
-		setEditingPayment(payment);
-		setIsCreateModalOpen(true);
+	const handleEdit = async payment => {
+		try {
+			// Fetch full payment details from Redux action
+			await dispatch(fetchAPPaymentDetails(payment.id)).unwrap();
+			setIsCreateModalOpen(true);
+		} catch (error) {
+			toast.error(error || 'Failed to load payment details');
+		}
 	};
 
 	const handleDeleteClick = payment => {
@@ -534,7 +540,7 @@ const APPaymentsPage = () => {
 				isOpen={isCreateModalOpen}
 				onClose={handleCloseCreateModal}
 				title={
-					editingPayment
+					currentPayment
 						? t("payments.ap.editPayment") || "Edit Payment"
 						: t("payments.ap.createPayment") || "Make Payment"
 				}
@@ -543,7 +549,7 @@ const APPaymentsPage = () => {
 				<MakePaymentForm
 					onCancel={handleCloseCreateModal}
 					onSuccess={handlePaymentSuccess}
-					editPaymentData={editingPayment}
+					editPaymentData={currentPayment}
 				/>
 			</SlideUpModal>
 

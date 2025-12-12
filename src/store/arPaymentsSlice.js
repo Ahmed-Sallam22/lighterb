@@ -53,6 +53,46 @@ export const fetchARPayments = createAsyncThunk(
 	}
 );
 
+// Fetch single AR payment details
+export const fetchARPaymentDetails = createAsyncThunk(
+	"arPayments/fetchDetails",
+	async (id, { rejectWithValue }) => {
+		try {
+			const response = await api.get(`/finance/payments/${id}/`);
+			const paymentData = response.data?.data ?? response.data;
+
+			// Transform GL entry lines to match form structure
+			const transformedPayment = {
+				...paymentData,
+				gl_entry: paymentData.gl_entry_details ? {
+					date: paymentData.gl_entry_details.date,
+					currency_id: paymentData.gl_entry_details.currency_id,
+					memo: paymentData.gl_entry_details.memo,
+					lines: paymentData.gl_entry_details.lines?.map(line => ({
+						id: line.id,
+						amount: line.amount,
+						type: line.type,
+						segments: line.segment_combination?.segments?.map(seg => ({
+							segment_type_id: seg.segment_type_id,
+							segment_code: seg.segment_code,
+						})) || [],
+					})) || [],
+				} : null,
+			};
+
+			return transformedPayment;
+		} catch (error) {
+			const errorMessage =
+				error.response?.data?.message ||
+				error.response?.data?.error ||
+				error.response?.data?.detail ||
+				error.message ||
+				"Failed to fetch payment details";
+			return rejectWithValue(errorMessage);
+		}
+	}
+);
+
 // Create AR payment
 export const createARPayment = createAsyncThunk("arPayments/create", async (paymentData, { rejectWithValue }) => {
 	try {
@@ -180,6 +220,7 @@ const arPaymentsSlice = createSlice({
 	name: "arPayments",
 	initialState: {
 		payments: [],
+		currentPayment: null, // For storing fetched payment details
 		// Pagination state
 		count: 0,
 		page: 1,
@@ -187,6 +228,7 @@ const arPaymentsSlice = createSlice({
 		hasNext: false,
 		hasPrevious: false,
 		loading: false,
+		detailsLoading: false, // Separate loading state for details
 		error: null,
 	},
 	reducers: {
@@ -195,6 +237,9 @@ const arPaymentsSlice = createSlice({
 		},
 		setPage: (state, action) => {
 			state.page = action.payload;
+		},
+		clearCurrentPayment: state => {
+			state.currentPayment = null;
 		},
 	},
 	extraReducers: builder => {
@@ -215,6 +260,19 @@ const arPaymentsSlice = createSlice({
 			})
 			.addCase(fetchARPayments.rejected, (state, action) => {
 				state.loading = false;
+				state.error = action.payload;
+			})
+			// Fetch payment details
+			.addCase(fetchARPaymentDetails.pending, state => {
+				state.detailsLoading = true;
+				state.error = null;
+			})
+			.addCase(fetchARPaymentDetails.fulfilled, (state, action) => {
+				state.detailsLoading = false;
+				state.currentPayment = action.payload;
+			})
+			.addCase(fetchARPaymentDetails.rejected, (state, action) => {
+				state.detailsLoading = false;
 				state.error = action.payload;
 			})
 			// Create AR payment
@@ -310,5 +368,5 @@ const arPaymentsSlice = createSlice({
 	},
 });
 
-export const { clearError, setPage } = arPaymentsSlice.actions;
+export const { clearError, setPage, clearCurrentPayment } = arPaymentsSlice.actions;
 export default arPaymentsSlice.reducer;
