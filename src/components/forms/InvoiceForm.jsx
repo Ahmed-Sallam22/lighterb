@@ -60,7 +60,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 	});
 
 	const [items, setItems] = useState([]);
-	
+
 	// GL Lines state for GLLinesSection
 	const [glLines, setGLLines] = useState([]);
 	const [glEntry, setGlEntry] = useState({
@@ -649,7 +649,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 					showGlEntryHeader={false}
 					title=""
 				/>
-				
+
 				{/* Invoice Total vs GL Total Comparison */}
 				{glLines.length > 0 && (
 					<div className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
@@ -696,7 +696,8 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 													clipRule="evenodd"
 												/>
 											</svg>
-											Totals don't match (Difference: {formatCurrency(Math.abs(invoiceTotalAmount - glTotal))})
+											Totals don't match (Difference:{" "}
+											{formatCurrency(Math.abs(invoiceTotalAmount - glTotal))})
 										</span>
 										<p className="text-xs text-gray-500 mt-1">
 											Adjust your GL lines so the debit total matches the invoice total.
