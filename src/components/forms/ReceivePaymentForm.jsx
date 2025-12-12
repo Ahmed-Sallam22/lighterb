@@ -3,18 +3,17 @@ import { useNavigate, useLocation } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import Card from "../shared/Card";
 import FloatingLabelInput from "../shared/FloatingLabelInput";
 import FloatingLabelSelect from "../shared/FloatingLabelSelect";
-import GLLinesSection from "../shared/GLLinesSection";
 import { fetchCurrencies } from "../../store/currenciesSlice";
 import { fetchCustomers } from "../../store/customersSlice";
 import { fetchARInvoices } from "../../store/arInvoicesSlice";
+import { fetchSegmentTypes, fetchSegmentValues } from "../../store/segmentsSlice";
 import { createARPayment, updateARPayment } from "../../store/arPaymentsSlice";
-import { FaTrash, FaPlus, FaChevronDown } from "react-icons/fa";
+import { FaTrash, FaPlus, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
-	const { t } = useTranslation();
+	useTranslation();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const dispatch = useDispatch();
@@ -22,21 +21,25 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 	const { customers } = useSelector(state => state.customers);
 	const { invoices: arInvoices } = useSelector(state => state.arInvoices);
 	const { loading } = useSelector(state => state.arPayments);
-	console.log("arInvoices", arInvoices);
-	// Check if we're in edit mode - support both route state and prop
+	const { types: segmentTypes = [], values: segmentValues = [] } = useSelector(state => state.segments);
+
+	// Check if we're in edit mode
 	const editPayment = editPaymentData || location.state?.payment;
 	const paymentId = editPaymentData?.id || location.state?.paymentId;
 	const isEditMode = !!editPayment;
 
-	// Payment form state - matching API structure
+	// Collapsible state for GL Entry Details
+	const [isGLEntryOpen, setIsGLEntryOpen] = useState(true);
+
+	// Payment form state
 	const [paymentForm, setPaymentForm] = useState({
 		date: "",
 		business_partner_id: "",
 		currency_id: "",
-		exchange_rate: "1.0000",
+		exchange_rate: "",
 	});
 
-	// Allocations state - matching API structure: { invoice_id, amount_allocated }
+	// Allocations state
 	const [allocations, setAllocations] = useState([{ id: Date.now(), invoice_id: "", amount_allocated: "" }]);
 
 	// GL Entry state
@@ -48,11 +51,13 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 
 	const [glLines, setGlLines] = useState([{ id: Date.now(), type: "", amount: "", segments: [] }]);
 
-	// Fetch currencies, customers, and invoices on mount
+	// Fetch data on mount
 	useEffect(() => {
 		dispatch(fetchCurrencies({ page_size: 100 }));
 		dispatch(fetchCustomers({ page_size: 100 }));
 		dispatch(fetchARInvoices({ page_size: 100 }));
+		dispatch(fetchSegmentTypes());
+		dispatch(fetchSegmentValues({ node_type: "child", page_size: 1000 }));
 	}, [dispatch]);
 
 	// Pre-fill form if in edit mode
@@ -65,7 +70,6 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 				exchange_rate: editPayment.exchange_rate || "1.0000",
 			});
 
-			// Pre-fill allocations if they exist
 			if (editPayment.allocations && Array.isArray(editPayment.allocations)) {
 				setAllocations(
 					editPayment.allocations.map((a, idx) => ({
@@ -76,7 +80,6 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 				);
 			}
 
-			// Pre-fill GL entry if exists
 			if (editPayment.gl_entry) {
 				setGlEntry({
 					date: editPayment.gl_entry.date || editPayment.date || "",
@@ -105,7 +108,8 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 			currency_id: paymentForm.currency_id,
 		}));
 	}, [paymentForm.date, paymentForm.currency_id]);
-	// Currency options from Redux - filter active currencies only
+
+	// Options
 	const currencyOptions = (currencies || [])
 		.filter(currency => currency.is_active)
 		.map(currency => ({
@@ -113,31 +117,37 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 			label: `${currency.code} - ${currency.name}`,
 		}));
 
-	// Customer options from Redux
 	const customerOptions = (customers || []).map(customer => ({
 		value: customer.id,
 		label: customer.name || customer.company_name || `Customer ${customer.id}`,
 	}));
 
-	// Invoice options for allocations - filter by selected customer if any
 	const invoiceOptions = (arInvoices || [])
 		.filter(
 			inv => !paymentForm.business_partner_id || inv.customer_id === parseInt(paymentForm.business_partner_id)
 		)
 		.map(invoice => ({
 			value: invoice.invoice_id,
-			label: `#${invoice.invoice_id} - ${invoice.customer_name || "N/A"} (${invoice.total || 0} ${
-				invoice.currency_code || ""
-			})`,
-			total_amount: invoice.total || 0,
+			label: `#${invoice.invoice_id}`,
 		}));
 
+	// Get segment options for a specific segment type
+	const getSegmentOptions = segmentTypeId => {
+		if (!segmentTypeId) return [];
+		return segmentValues
+			.filter(seg => seg.segment_type === segmentTypeId && seg.node_type === "child")
+			.map(seg => ({
+				value: seg.code,
+				label: `${seg.code} - ${seg.name || seg.alias || ""}`,
+			}));
+	};
+
+	// Handlers
 	const handleChange = e => {
 		const { name, value } = e.target;
 		setPaymentForm(prev => ({ ...prev, [name]: value }));
 	};
 
-	// Allocation handlers
 	const handleAddAllocation = () => {
 		setAllocations(prev => [...prev, { id: Date.now(), invoice_id: "", amount_allocated: "" }]);
 	};
@@ -152,8 +162,52 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 		setAllocations(prev => prev.map(a => (a.id === allocationId ? { ...a, [field]: value } : a)));
 	};
 
-	const getTotalAllocated = () => {
-		return allocations.reduce((sum, a) => sum + parseFloat(a.amount_allocated || 0), 0);
+	const handleAddGLLine = () => {
+		const newLine = {
+			id: Date.now(),
+			type: "",
+			amount: "",
+			segments: segmentTypes.map(st => ({
+				segment_type_id: st.id,
+				segment_code: "",
+			})),
+		};
+		setGlLines(prev => [...prev, newLine]);
+	};
+
+	const handleRemoveGLLine = lineId => {
+		if (glLines.length > 1) {
+			setGlLines(prev => prev.filter(l => l.id !== lineId));
+		}
+	};
+
+	const handleGLLineChange = (lineId, field, value) => {
+		setGlLines(prev => prev.map(line => (line.id === lineId ? { ...line, [field]: value } : line)));
+	};
+
+	const handleSegmentChange = (lineId, segmentTypeId, segmentCode) => {
+		setGlLines(prev =>
+			prev.map(line => {
+				if (line.id === lineId) {
+					const existingIndex = (line.segments || []).findIndex(s => s.segment_type_id === segmentTypeId);
+					let updatedSegments;
+					if (existingIndex !== -1) {
+						updatedSegments = line.segments.map(s =>
+							s.segment_type_id === segmentTypeId ? { ...s, segment_code: segmentCode } : s
+						);
+					} else {
+						updatedSegments = [...(line.segments || []), { segment_type_id: segmentTypeId, segment_code: segmentCode }];
+					}
+					return { ...line, segments: updatedSegments };
+				}
+				return line;
+			})
+		);
+	};
+
+	const getSegmentValue = (line, segmentTypeId) => {
+		const segment = (line.segments || []).find(s => s.segment_type_id === segmentTypeId);
+		return segment?.segment_code || "";
 	};
 
 	const handleCancel = () => {
@@ -165,20 +219,17 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 	};
 
 	const handleReceivePayment = async () => {
-		// Validate required fields
 		if (!paymentForm.business_partner_id || !paymentForm.date || !paymentForm.currency_id) {
 			toast.error("Please fill all required fields (Customer, Date, Currency)");
 			return;
 		}
 
-		// Validate allocations - at least one should have invoice and amount
 		const validAllocations = allocations.filter(a => a.invoice_id && a.amount_allocated);
 		if (validAllocations.length === 0) {
 			toast.error("Please add at least one invoice allocation");
 			return;
 		}
 
-		// Prepare GL entry lines (filter out empty lines)
 		const validGlLines = glLines
 			.filter(line => line.type && line.amount)
 			.map(line => ({
@@ -192,7 +243,6 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 					})),
 			}));
 
-		// Prepare payment data according to API structure
 		const paymentData = {
 			date: paymentForm.date,
 			business_partner_id: parseInt(paymentForm.business_partner_id),
@@ -209,6 +259,8 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 				lines: validGlLines,
 			},
 		};
+
+		console.log("Payment Request Body:", JSON.stringify(paymentData, null, 2));
 
 		try {
 			if (isEditMode && paymentId) {
@@ -228,54 +280,39 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 		}
 	};
 
-	const formatCurrency = value => {
-		const numericValue = Number(value ?? 0);
-		if (Number.isNaN(numericValue)) {
-			return "0.00";
-		}
-		return numericValue.toLocaleString("en-US", {
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-		});
-	};
-
 	return (
-		<div className="max-w-4xl mx-auto mt-5 pb-10 space-y-5">
-			{/* Payment Details */}
-			<Card title={t("paymentForm.paymentDetails") || "Payment Details"}>
-				<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-					<FloatingLabelSelect
-						label={t("paymentForm.customer") || "Customer"}
-						name="business_partner_id"
-						value={paymentForm.business_partner_id}
-						onChange={handleChange}
-						options={customerOptions}
-						required
-						placeholder={t("paymentForm.selectCustomer") || "Select customer"}
-					/>
-
+		<div className="bg-gray-50 rounded-xl p-6 space-y-6">
+			{/* Payment Information Section */}
+			<div>
+				<h3 className="text-sm font-semibold text-gray-700 mb-4">Payment Information</h3>
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<FloatingLabelInput
-						label={t("paymentForm.date") || "Date"}
+						label="Payment Date"
 						name="date"
 						type="date"
 						value={paymentForm.date}
 						onChange={handleChange}
 						required
-						placeholder="dd/mm/yyyy"
 					/>
-
 					<FloatingLabelSelect
-						label={t("paymentForm.currency") || "Currency"}
+						label="Customer"
+						name="business_partner_id"
+						value={paymentForm.business_partner_id}
+						onChange={handleChange}
+						options={customerOptions}
+						required
+						placeholder="Select..."
+					/>
+					<FloatingLabelSelect
+						label="Currency"
 						name="currency_id"
 						value={paymentForm.currency_id}
 						onChange={handleChange}
 						options={currencyOptions}
-						required
-						placeholder={t("paymentForm.selectCurrency") || "Select Currency"}
+						placeholder="Select..."
 					/>
-
 					<FloatingLabelInput
-						label={t("paymentForm.exchangeRate") || "Exchange Rate"}
+						label="Exchange Rate"
 						name="exchange_rate"
 						type="number"
 						step="0.0001"
@@ -284,149 +321,231 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 						placeholder="1.0000"
 					/>
 				</div>
-			</Card>
+			</div>
 
-			{/* Invoice Allocations */}
-			<Card
-				title={t("paymentForm.allocations") || "Invoice Allocations"}
-				subtitle={t("paymentForm.allocationsSubtitle") || "Allocate payment amounts to invoices"}
-				actionSlot={
-					<Button
-						onClick={handleAddAllocation}
-						title={t("paymentForm.addAllocation") || "Add Allocation"}
-						className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
-						icon={<FaPlus className="w-3 h-3" />}
-					/>
-				}
-			>
-				{allocations.length === 0 ? (
-					<div className="rounded-2xl border border-dashed border-[#b6c4cc] bg-[#f5f8fb] p-6 text-center text-[#567086]">
-						<p className="text-lg font-semibold mb-2">
-							{t("paymentForm.noAllocations") || "No allocations added yet"}
-						</p>
-						<p className="text-sm mb-6">
-							{t("paymentForm.noAllocationsDesc") ||
-								"Add invoice allocations to specify how this payment should be applied."}
-						</p>
-
-						<Button
-							onClick={handleAddAllocation}
-							title={t("paymentForm.addFirstAllocation") || "Add First Allocation"}
-						/>
+			{/* Allocations Section */}
+			<div>
+				<h3 className="text-sm font-semibold text-gray-700 mb-4">Allocations (Invoices)</h3>
+				<div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+					{/* Table Header */}
+					<div className="grid grid-cols-[1fr_2fr_80px] gap-4 px-4 py-3 bg-gray-50 border-b border-gray-200">
+						<span className="text-xs font-medium text-gray-600">Invoice ID</span>
+						<span className="text-xs font-medium text-gray-600">Amount Allocated</span>
+						<span className="text-xs font-medium text-gray-600 text-center">Actions</span>
 					</div>
-				) : (
-					<div className="space-y-4">
-						{/* Allocations List */}
-						<div className="space-y-3">
-							{allocations.map((allocation, index) => (
-								<div
-									key={allocation.id}
-									className="flex flex-wrap items-end gap-4 p-4 rounded-xl border border-[#e1edf5] bg-[#f5f8fb]"
-								>
-									<div className="flex-1 min-w-[200px]">
-										<label className="block text-xs font-medium text-[#567086] mb-1">
-											{t("paymentForm.invoice") || "Invoice"} #{index + 1}
-										</label>
-										<div className="relative">
-											<select
-												value={allocation.invoice_id}
-												onChange={e =>
-													handleAllocationChange(allocation.id, "invoice_id", e.target.value)
-												}
-												className="w-full h-11 px-3 pr-10 rounded-lg border border-[#d7e3ec] bg-white text-[#1e3a4f] focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent appearance-none"
-											>
-												<option value="">
-													{t("paymentForm.selectInvoice") || "Select Invoice"}
-												</option>
-												{invoiceOptions.map(opt => (
-													<option key={opt.value} value={opt.value}>
-														{opt.label}
-													</option>
-												))}
-											</select>
-											<FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#567086] pointer-events-none" />
-										</div>
-									</div>
-
-									<div className="w-40">
-										<label className="block text-xs font-medium text-[#567086] mb-1">
-											{t("paymentForm.amountAllocated") || "Amount Allocated"}
-										</label>
-										<input
-											type="number"
-											step="0.01"
-											value={allocation.amount_allocated}
-											onChange={e =>
-												handleAllocationChange(
-													allocation.id,
-													"amount_allocated",
-													e.target.value
-												)
-											}
-											placeholder="0.00"
-											className="w-full h-11 px-3 rounded-lg border border-[#d7e3ec] bg-white text-[#1e3a4f] focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent text-right"
-										/>
-									</div>
-
-									<Button
+					{/* Table Body */}
+					<div className="divide-y divide-gray-100">
+						{allocations.map(allocation => (
+							<div key={allocation.id} className="grid grid-cols-[1fr_2fr_80px] gap-4 px-4 py-3 items-center">
+								<div className="relative">
+									<select
+										value={allocation.invoice_id}
+										onChange={e => handleAllocationChange(allocation.id, "invoice_id", e.target.value)}
+										className="w-full h-10 px-3 pr-8 text-sm bg-white border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
+									>
+										<option value="">Select ID</option>
+										{invoiceOptions.map(opt => (
+											<option key={opt.value} value={opt.value}>
+												{opt.label}
+											</option>
+										))}
+									</select>
+									<FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+								</div>
+								<input
+									type="number"
+									step="0.01"
+									value={allocation.amount_allocated}
+									onChange={e => handleAllocationChange(allocation.id, "amount_allocated", e.target.value)}
+									placeholder="0.00"
+									className="w-full h-10 px-3 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
+								/>
+								<div className="flex justify-center">
+									<button
+										type="button"
 										onClick={() => handleRemoveAllocation(allocation.id)}
 										disabled={allocations.length === 1}
-										className="h-11 w-11 flex items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-										icon={<FaTrash className="w-4 h-4" />}
-									/>
-								</div>
-							))}
-						</div>
-
-						{/* Allocations Summary */}
-						<div className="flex justify-end">
-							<div className="bg-white rounded-xl border border-[#d7e3ec] p-4 min-w-[200px]">
-								<div className="flex justify-between items-center text-sm">
-									<span className="text-[#567086] font-medium">
-										{t("paymentForm.totalAllocated") || "Total Allocated"}:
-									</span>
-									<span className="font-bold text-[#0d5f7a]">
-										{formatCurrency(getTotalAllocated())}
-									</span>
+										className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+									>
+										<FaTrash className="w-4 h-4" />
+									</button>
 								</div>
 							</div>
+						))}
+					</div>
+				</div>
+				<button
+					type="button"
+					onClick={handleAddAllocation}
+					className="mt-3 flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+				>
+					<FaPlus className="w-3 h-3" />
+					Add Invoice Allocation
+				</button>
+			</div>
+
+			{/* GL Entry Details Section - Collapsible */}
+			<div>
+				<button
+					type="button"
+					onClick={() => setIsGLEntryOpen(!isGLEntryOpen)}
+					className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-4"
+				>
+					{isGLEntryOpen ? <FaChevronUp className="w-3 h-3" /> : <FaChevronDown className="w-3 h-3" />}
+					GL Entry Details
+				</button>
+
+				{isGLEntryOpen && (
+					<div className="space-y-4">
+						{/* GL Entry Header */}
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<FloatingLabelInput
+								label="GL Date"
+								name="gl_date"
+								type="date"
+								value={glEntry.date}
+								onChange={e => setGlEntry(prev => ({ ...prev, date: e.target.value }))}
+							/>
+							<FloatingLabelSelect
+								label="Currency"
+								name="gl_currency_id"
+								value={glEntry.currency_id}
+								onChange={e => setGlEntry(prev => ({ ...prev, currency_id: e.target.value }))}
+								options={currencyOptions}
+								placeholder="Select..."
+							/>
+						</div>
+						<FloatingLabelInput
+							label="Description"
+							name="memo"
+							value={glEntry.memo}
+							onChange={e => setGlEntry(prev => ({ ...prev, memo: e.target.value }))}
+							placeholder="Enter memo/description..."
+						/>
+
+						{/* GL Lines */}
+						<div>
+							<h4 className="text-sm font-medium text-gray-600 mb-3">GL Lines</h4>
+							<div className="bg-white rounded-lg border border-gray-200 overflow-hidden overflow-x-auto">
+								{/* GL Lines Header */}
+								<div
+									className="grid gap-3 px-4 py-3 bg-gray-50 border-b border-gray-200 min-w-[700px]"
+									style={{
+										gridTemplateColumns: `120px 150px ${segmentTypes.map(() => "1fr").join(" ")} 60px`,
+									}}
+								>
+									<span className="text-xs font-medium text-gray-600">Type</span>
+									<span className="text-xs font-medium text-gray-600">Amount</span>
+									{segmentTypes.map(st => (
+										<span key={st.id} className="text-xs font-medium text-gray-600">
+											{st.name || `Segment ${st.id}`}
+										</span>
+									))}
+									<span className="text-xs font-medium text-gray-600 text-center">Actions</span>
+								</div>
+
+								{/* GL Lines Body */}
+								<div className="divide-y divide-gray-100 min-w-[700px]">
+									{glLines.map(line => (
+										<div
+											key={line.id}
+											className="grid gap-3 px-4 py-3 items-center"
+											style={{
+												gridTemplateColumns: `120px 150px ${segmentTypes.map(() => "1fr").join(" ")} 60px`,
+											}}
+										>
+											{/* Type */}
+											<div className="relative">
+												<select
+													value={line.type}
+													onChange={e => handleGLLineChange(line.id, "type", e.target.value)}
+													className="w-full h-10 px-3 pr-8 text-sm bg-white border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
+												>
+													<option value="">Select Type</option>
+													<option value="DEBIT">DEBIT</option>
+													<option value="CREDIT">CREDIT</option>
+												</select>
+												<FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+											</div>
+
+											{/* Amount */}
+											<input
+												type="number"
+												step="0.01"
+												value={line.amount}
+												onChange={e => handleGLLineChange(line.id, "amount", e.target.value)}
+												placeholder="Amount"
+												className="w-full h-10 px-3 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
+											/>
+
+											{/* Segment Columns */}
+											{segmentTypes.map(st => {
+												const options = getSegmentOptions(st.id);
+												return (
+													<div key={`${line.id}-${st.id}`} className="relative">
+														<select
+															value={getSegmentValue(line, st.id)}
+															onChange={e => handleSegmentChange(line.id, st.id, e.target.value)}
+															className="w-full h-10 px-3 pr-8 text-sm bg-white border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
+														>
+															<option value="">Select {st.name || "Account"}</option>
+															{options.map(opt => (
+																<option key={opt.value} value={opt.value}>
+																	{opt.label}
+																</option>
+															))}
+														</select>
+														<FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+													</div>
+												);
+											})}
+
+											{/* Delete */}
+											<div className="flex justify-center">
+												<button
+													type="button"
+													onClick={() => handleRemoveGLLine(line.id)}
+													disabled={glLines.length === 1}
+													className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+												>
+													<FaTrash className="w-4 h-4" />
+												</button>
+											</div>
+										</div>
+									))}
+								</div>
+							</div>
+
+							<button
+								type="button"
+								onClick={handleAddGLLine}
+								className="mt-3 flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+							>
+								<FaPlus className="w-3 h-3" />
+								Add Line
+							</button>
 						</div>
 					</div>
 				)}
-			</Card>
-
-			{/* GL Lines Section */}
-			<Card title={t("glLines.title") || "GL Lines"} subtitle={t("glLines.subtitle") || "Posting"}>
-				<GLLinesSection
-					lines={glLines}
-					onChange={setGlLines}
-					glEntry={glEntry}
-					onGlEntryChange={setGlEntry}
-					showGlEntryHeader={true}
-					title=""
-				/>
-			</Card>
+			</div>
 
 			{/* Action Buttons */}
-			<div className="mt-6 flex flex-wrap justify-end gap-3">
-				<Button
+			<div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+				<button
+					type="button"
 					onClick={handleCancel}
-					title={t("paymentForm.cancel") || "Cancel"}
-					className="bg-white hover:bg-gray-100 text-gray-700 border border-gray-300"
-				/>
-				<Button
+					className="px-6 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+				>
+					Cancel
+				</button>
+				<button
+					type="button"
 					onClick={handleReceivePayment}
 					disabled={loading}
-					title={
-						loading
-							? isEditMode
-								? t("paymentForm.updating")
-								: t("paymentForm.processing")
-							: isEditMode
-							? t("paymentForm.updatePayment") || "Update Payment"
-							: t("paymentForm.receivePayment") || "Receive Payment"
-					}
-				/>
+					className="px-6 py-2.5 text-sm font-medium text-white bg-[#4A9AAF] rounded-lg hover:bg-[#3d8294] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+				>
+					{loading ? "Processing..." : isEditMode ? "Update Payment" : "Receive Payment"}
+				</button>
 			</div>
 		</div>
 	);
