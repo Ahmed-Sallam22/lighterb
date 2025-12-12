@@ -7,7 +7,7 @@ export const fetchTaxRates = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/finance/core/tax-rates/');
-      return response.data.result;
+      return response.data?.data?.results || response.data?.results || response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch tax rates');
     }
@@ -19,9 +19,11 @@ export const createTaxRate = createAsyncThunk(
   async (taxRateData, { rejectWithValue }) => {
     try {
       const response = await api.post('/finance/core/tax-rates/', taxRateData);
-      return response.data;
+      return response.data?.data || response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to create tax rate');
+      const errorData = error.response?.data || error.data || error;
+      const errorMessage = errorData?.message || errorData?.error || 'Failed to create tax rate';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -31,9 +33,11 @@ export const updateTaxRate = createAsyncThunk(
   async ({ id, data }, { rejectWithValue }) => {
     try {
       const response = await api.put(`/finance/core/tax-rates/${id}/`, data);
-      return response.data;
+      return response.data?.data || response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to update tax rate');
+      const errorData = error.response?.data || error.data || error;
+      const errorMessage = errorData?.message || errorData?.error || 'Failed to update tax rate';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -46,6 +50,21 @@ export const deleteTaxRate = createAsyncThunk(
       return id;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to delete tax rate');
+    }
+  }
+);
+
+// Toggle active status
+export const toggleTaxRateActive = createAsyncThunk(
+  'taxRates/toggleActive',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`/finance/core/tax-rates/${id}/toggle-active/`);
+      return response.data?.data || response.data;
+    } catch (error) {
+      const errorData = error.response?.data || error.data || error;
+      const errorMessage = errorData?.message || errorData?.error || 'Failed to toggle tax rate status';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -206,6 +225,24 @@ const taxRatesSlice = createSlice({
         state.taxRates = state.taxRates.filter((rate) => rate.id !== action.payload);
       })
       .addCase(deleteTaxRate.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Toggle Active Status
+    builder
+      .addCase(toggleTaxRateActive.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(toggleTaxRateActive.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.taxRates.findIndex((rate) => rate.id === action.payload.id);
+        if (index !== -1) {
+          state.taxRates[index] = action.payload;
+        }
+      })
+      .addCase(toggleTaxRateActive.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

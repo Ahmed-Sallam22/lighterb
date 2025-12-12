@@ -1629,7 +1629,9 @@
 			"create": "Create",
 			"cancel": "Cancel",
 			"delete": "Delete",
-			"edit": "Edit"
+			"edit": "Edit",
+			"activate": "Activate",
+			"deactivate": "Deactivate"
 		},
 		"table": {
 			"code": "Code",
@@ -1680,8 +1682,10 @@
 			"createSuccess": "Tax rate created successfully!",
 			"updateSuccess": "Tax rate updated successfully!",
 			"deleteSuccess": "Tax rate deleted successfully!",
+			"toggleSuccess": "Tax rate status updated successfully!",
 			"saveError": "Failed to save tax rate",
-			"deleteError": "Failed to delete tax rate"
+			"deleteError": "Failed to delete tax rate",
+			"toggleError": "Failed to update tax rate status"
 		},
 		"modals": {
 			"addTitle": "Add Tax Rate",

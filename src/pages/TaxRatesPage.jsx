@@ -10,13 +10,15 @@ import ConfirmModal from '../components/shared/ConfirmModal';
 import FloatingLabelInput from '../components/shared/FloatingLabelInput';
 import FloatingLabelSelect from '../components/shared/FloatingLabelSelect';
 import Toggle from '../components/shared/Toggle';
-import { fetchTaxRates, createTaxRate, updateTaxRate, deleteTaxRate } from '../store/taxRatesSlice';
+import { fetchTaxRates, createTaxRate, updateTaxRate, deleteTaxRate, toggleTaxRateActive } from '../store/taxRatesSlice';
+import { fetchCountries } from '../store/countriesSlice';
 
 const TaxRatesPage = () => {
 	const { t, i18n } = useTranslation();
 	const isRtl = i18n.dir() === 'rtl';
 	const dispatch = useDispatch();
 	const { taxRates, loading } = useSelector(state => state.taxRates);
+	const { countries = [] } = useSelector(state => state.countries || {});
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -26,7 +28,6 @@ const TaxRatesPage = () => {
 		name: '',
 		rate: '',
 		country: '',
-		code: '',
 		category: '',
 		isActive: true,
 	});
@@ -35,18 +36,16 @@ const TaxRatesPage = () => {
 	// Fetch tax rates on component mount
 	useEffect(() => {
 		dispatch(fetchTaxRates());
+		dispatch(fetchCountries());
 	}, [dispatch]);
 
 	// Country options
 	const countryOptions = useMemo(
-		() => [
-			{ value: 'AE', label: t('taxRates.options.countries.AE') },
-			{ value: 'EG', label: t('taxRates.options.countries.EG') },
-			{ value: 'IN', label: t('taxRates.options.countries.IN') },
-			{ value: 'SA', label: t('taxRates.options.countries.SA') },
-			{ value: 'US', label: t('taxRates.options.countries.US') },
-		],
-		[t]
+		() => countries.map(country => ({
+			value: country.id,
+			label: `${country.code} - ${country.name}`
+		})),
+		[countries]
 	);
 
 	// Category options
@@ -62,12 +61,7 @@ const TaxRatesPage = () => {
 	// Table columns
 	const columns = useMemo(
 		() => [
-			{
-				header: t('taxRates.table.code'),
-				accessor: 'code',
-				width: '120px',
-				render: value => <span className="font-semibold text-gray-900">{value}</span>,
-			},
+
 			{
 				header: t('taxRates.table.name'),
 				accessor: 'name',
@@ -76,31 +70,27 @@ const TaxRatesPage = () => {
 			{
 				header: t('taxRates.table.rate'),
 				accessor: 'rate',
-				width: '100px',
 				render: value => <span className="font-semibold text-[#28819C]">{value}%</span>,
 			},
 			{
 				header: t('taxRates.table.country'),
-				accessor: 'country',
-				width: '100px',
-				render: value => <span className="text-gray-700 font-medium">{value}</span>,
+				accessor: 'country_code',
+				render: value => <span className="text-gray-700 font-medium">{value || '-'}</span>,
 			},
 			{
 				header: t('taxRates.table.category'),
-				accessor: 'category',
-				width: '120px',
-				render: value => (
+				accessor: 'category_display',
+				render: (value, row) => (
 					<span
 						className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
-							value === 'STANDARD'
+							row.category === 'STANDARD'
 								? 'bg-blue-100 text-blue-800'
-								: value === 'ZERO'
+								: row.category === 'ZERO'
 								? 'bg-yellow-100 text-yellow-800'
 								: 'bg-purple-100 text-purple-800'
 						}`}
 					>
-						{/* Try to translate, fallback to value if not found */}
-						{t(`taxRates.options.categories.${value}`, { defaultValue: value })}
+						{value || row.category}
 					</span>
 				),
 			},
@@ -155,10 +145,9 @@ const TaxRatesPage = () => {
 
 		const taxRateData = {
 			name: formData.name,
-			rate: parseFloat(formData.rate),
-			country: formData.country,
-			code: formData.code || null,
-			category: formData.category || null,
+			rate: parseFloat(formData.rate).toFixed(2),
+			country: parseInt(formData.country, 10),
+			category: formData.category || 'STANDARD',
 			is_active: formData.isActive,
 		};
 
@@ -186,7 +175,6 @@ const TaxRatesPage = () => {
 			name: '',
 			rate: '',
 			country: '',
-			code: '',
 			category: '',
 			isActive: true,
 		});
@@ -201,8 +189,7 @@ const TaxRatesPage = () => {
 			setFormData({
 				name: taxRate.name,
 				rate: taxRate.rate.toString(),
-				country: taxRate.country,
-				code: taxRate.code || '',
+				country: taxRate.country.toString(),
 				category: taxRate.category || '',
 				isActive: taxRate.is_active,
 			});
@@ -232,6 +219,16 @@ const TaxRatesPage = () => {
 	const cancelDelete = () => {
 		setIsDeleteModalOpen(false);
 		setDeleteId(null);
+	};
+
+	const handleToggleActive = async (id) => {
+		try {
+			await dispatch(toggleTaxRateActive(id)).unwrap();
+			toast.success(t('taxRates.messages.toggleSuccess'));
+		} catch (error) {
+			const errorMessage = error?.message || error?.error || t('taxRates.messages.toggleError');
+			toast.error(errorMessage);
+		}
 	};
 
 	return (
@@ -299,6 +296,20 @@ const TaxRatesPage = () => {
 					onDelete={handleDelete}
 					editIcon="edit"
 					loading={loading}
+					customActions={[
+						{
+							title: (row) => row.is_active ? t('taxRates.actions.deactivate') : t('taxRates.actions.activate'),
+							icon: (row) => (
+								<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className={
+									row.is_active ? 'text-green-700' : 'text-gray-700'
+								}>
+									<path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
+									{row.is_active && <circle cx="10" cy="10" r="4"/>}
+								</svg>
+							),
+							onClick: (row) => handleToggleActive(row.id),
+						}
+					]}
 				/>
 			</div>
 
@@ -345,15 +356,6 @@ const TaxRatesPage = () => {
 						options={countryOptions}
 						required
 						placeholder={t('taxRates.options.selectCountry')}
-					/>
-
-					{/* Tax Code (Optional) */}
-					<FloatingLabelInput
-						label={t('taxRates.form.code')}
-						name="code"
-						value={formData.code}
-						onChange={e => handleInputChange('code', e.target.value)}
-						placeholder={t('taxRates.form.placeholders.code')}
 					/>
 
 					{/* Category (Optional) */}

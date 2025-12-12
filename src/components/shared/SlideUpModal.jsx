@@ -53,7 +53,7 @@ const SlideUpModal = ({
 	}
 
 	const modalContent = (
-		<div className="fixed inset-0 z-[999] flex items-end sm:items-center justify-center">
+		<div className="fixed inset-0 z-999 flex items-end sm:items-center justify-center">
 			<div
 				className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
 				onClick={onClose}
@@ -64,7 +64,7 @@ const SlideUpModal = ({
 				className={`
           relative w-full  bg-[#F2F4F5] rounded-t-3xl sm:rounded-2xl shadow-2xl
           transform transition-all duration-300 animate-fadeInUp
-          max-h-screen overflow-hidden ${className}
+          max-h-screen  ${className}
         `}
 				style={{ maxWidth }}
 				role="dialog"
@@ -94,7 +94,7 @@ const SlideUpModal = ({
 					</div>
 				</div>
 
-				<div className={`px-6 py-3 overflow-y-auto max-h-[calc(99vh-4.5rem)] ${childrenClassName}`}>
+				<div className={`px-6 py-3  max-h-[calc(99vh-4.5rem)] ${childrenClassName}`}>
 					{children}
 				</div>
 			</div>
