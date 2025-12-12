@@ -2,14 +2,29 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/axios";
 
 // Fetch all currencies
-export const fetchCurrencies = createAsyncThunk("currencies/fetchAll", async (_, { rejectWithValue }) => {
-	try {
-		const response = await api.get("/finance/core/currencies/");
-		return response.data.data.results;
-	} catch (error) {
-		return rejectWithValue(error.response?.data || { message: "Failed to fetch currencies" });
+export const fetchCurrencies = createAsyncThunk(
+	"currencies/fetchAll",
+	async ({ page = 1, page_size = 20 } = {}, { rejectWithValue }) => {
+		try {
+			const params = new URLSearchParams();
+			params.append("page", page);
+			params.append("page_size", page_size);
+
+			const response = await api.get(`/finance/core/currencies/?${params.toString()}`);
+			const data = response.data?.data ?? response.data;
+			return {
+				results: data?.results ?? data,
+				count: data?.count ?? 0,
+				next: data?.next ?? null,
+				previous: data?.previous ?? null,
+				page,
+				pageSize: page_size,
+			};
+		} catch (error) {
+			return rejectWithValue(error.response?.data || { message: "Failed to fetch currencies" });
+		}
 	}
-});
+);
 
 // Create a new currency
 export const createCurrency = createAsyncThunk("currencies/create", async (currencyData, { rejectWithValue }) => {
@@ -101,12 +116,21 @@ const currenciesSlice = createSlice({
 	name: "currencies",
 	initialState: {
 		currencies: [],
+		// Pagination state
+		count: 0,
+		page: 1,
+		pageSize: 20,
+		hasNext: false,
+		hasPrevious: false,
 		loading: false,
 		error: null,
 	},
 	reducers: {
 		clearError: state => {
 			state.error = null;
+		},
+		setPage: (state, action) => {
+			state.page = action.payload;
 		},
 	},
 	extraReducers: builder => {
@@ -118,7 +142,12 @@ const currenciesSlice = createSlice({
 			})
 			.addCase(fetchCurrencies.fulfilled, (state, action) => {
 				state.loading = false;
-				state.currencies = action.payload;
+				state.currencies = action.payload.results || [];
+				state.count = action.payload.count;
+				state.page = action.payload.page;
+				state.pageSize = action.payload.pageSize;
+				state.hasNext = !!action.payload.next;
+				state.hasPrevious = !!action.payload.previous;
 			})
 			.addCase(fetchCurrencies.rejected, (state, action) => {
 				state.loading = false;
@@ -189,5 +218,5 @@ const currenciesSlice = createSlice({
 	},
 });
 
-export const { clearError } = currenciesSlice.actions;
+export const { clearError, setPage } = currenciesSlice.actions;
 export default currenciesSlice.reducer;

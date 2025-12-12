@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 import PageHeader from "../components/shared/PageHeader";
 import Table from "../components/shared/Table";
+import Pagination from "../components/shared/Pagination";
 import SlideUpModal from "../components/shared/SlideUpModal";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import Toggle from "../components/shared/Toggle";
@@ -15,6 +16,7 @@ import {
 	deleteCurrency,
 	convertToBaseCurrency,
 	toggleCurrencyActive,
+	setPage,
 } from "../store/currenciesSlice";
 import Button from "../components/shared/Button";
 import { BiPlus } from "react-icons/bi";
@@ -25,13 +27,14 @@ import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 const CurrencyPage = () => {
 	const { t } = useTranslation();
 	const dispatch = useDispatch();
-	const { currencies } = useSelector(state => state.currencies);
+	const { currencies, count, page, hasNext, hasPrevious } = useSelector(state => state.currencies);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingCurrency, setEditingCurrency] = useState(null);
 	const [confirmDelete, setConfirmDelete] = useState(false);
 	const [currencyToDelete, setCurrencyToDelete] = useState(null);
 	const [converterModal, setConverterModal] = useState({ isOpen: false, currency: null });
 	const [conversionAmount, setConversionAmount] = useState("100");
+	const [localPageSize, setLocalPageSize] = useState(20);
 
 	const [formData, setFormData] = useState({
 		code: "",
@@ -42,10 +45,25 @@ const CurrencyPage = () => {
 	});
 	const [errors, setErrors] = useState({});
 
-	// Fetch currencies on component mount
+	// Fetch currencies on component mount and when pagination changes
 	useEffect(() => {
-		dispatch(fetchCurrencies());
-	}, [dispatch]);
+		dispatch(fetchCurrencies({ page, page_size: localPageSize }));
+	}, [dispatch, page, localPageSize]);
+
+	const handlePageChange = useCallback(
+		newPage => {
+			dispatch(setPage(newPage));
+		},
+		[dispatch]
+	);
+
+	const handlePageSizeChange = useCallback(
+		newPageSize => {
+			setLocalPageSize(newPageSize);
+			dispatch(setPage(1)); // Reset to first page when page size changes
+		},
+		[dispatch]
+	);
 
 	const handleToggleActive = async (currency, newValue) => {
 		try {
@@ -189,7 +207,7 @@ const CurrencyPage = () => {
 				toast.success(t("currency.messages.createSuccess"));
 			}
 			// Refresh the currencies list
-			await dispatch(fetchCurrencies());
+			await dispatch(fetchCurrencies({ page, page_size: localPageSize }));
 			handleCloseModal();
 		} catch (err) {
 			// Display detailed error message from API response
@@ -338,6 +356,17 @@ const CurrencyPage = () => {
 					onEdit={handleEdit}
 					onDelete={handleDelete}
 					editIcon="edit"
+				/>
+
+				{/* Pagination */}
+				<Pagination
+					currentPage={page}
+					totalCount={count}
+					pageSize={localPageSize}
+					hasNext={hasNext}
+					hasPrevious={hasPrevious}
+					onPageChange={handlePageChange}
+					onPageSizeChange={handlePageSizeChange}
 				/>
 			</div>
 
