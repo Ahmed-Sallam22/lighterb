@@ -33,7 +33,7 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 		date: "",
 		business_partner_id: "",
 		currency_id: "",
-		exchange_rate: "1.0000",
+		exchange_rate: "",
 	});
 
 	// Allocations state - matching API structure: { invoice_id, amount_allocated }

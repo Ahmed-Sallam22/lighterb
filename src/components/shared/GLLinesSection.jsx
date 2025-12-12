@@ -46,7 +46,7 @@ const GLLinesSection = ({
 
 	// Get segment types and values from Redux store
 	const { types: segmentTypes = [], values: segmentValues = [] } = useSelector(state => state.segments);
-	const { items: currencies = [] } = useSelector(state => state.currencies);
+	const { currencies = [] } = useSelector(state => state.currencies);
 
 	// Fetch segment types, segment values, and currencies on mount
 	useEffect(() => {
@@ -114,9 +114,24 @@ const GLLinesSection = ({
 		onChange(
 			lines.map(line => {
 				if (line.id === lineId) {
-					const updatedSegments = line.segments.map(seg =>
-						seg.segment_type_id === segmentTypeId ? { ...seg, segment_code: segmentCode } : seg
+					// Check if segment exists
+					const existingSegmentIndex = (line.segments || []).findIndex(
+						seg => seg.segment_type_id === segmentTypeId
 					);
+					
+					let updatedSegments;
+					if (existingSegmentIndex !== -1) {
+						// Update existing segment
+						updatedSegments = line.segments.map(seg =>
+							seg.segment_type_id === segmentTypeId ? { ...seg, segment_code: segmentCode } : seg
+						);
+					} else {
+						// Add new segment (for lines with empty segments array)
+						updatedSegments = [
+							...(line.segments || []),
+							{ segment_type_id: segmentTypeId, segment_code: segmentCode }
+						];
+					}
 					return { ...line, segments: updatedSegments };
 				}
 				return line;

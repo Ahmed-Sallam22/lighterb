@@ -56,8 +56,8 @@ export const fetchAPPayments = createAsyncThunk(
 // Create AP payment
 export const createAPPayment = createAsyncThunk("apPayments/create", async (paymentData, { rejectWithValue }) => {
 	try {
-		const response = await api.post("/ap/payments/", paymentData);
-		return response.data;
+		const response = await api.post("/finance/payments/", paymentData);
+		return response.data?.data ?? response.data;
 	} catch (error) {
 		if (error.response?.data) {
 			const errorData = error.response.data;
@@ -84,8 +84,8 @@ export const createAPPayment = createAsyncThunk("apPayments/create", async (paym
 // Post AP payment
 export const postAPPayment = createAsyncThunk("apPayments/post", async (id, { rejectWithValue }) => {
 	try {
-		const response = await api.post(`/ap/payments/${id}/post/`);
-		return response.data;
+		const response = await api.post(`/finance/payments/${id}/post/`);
+		return response.data?.data ?? response.data;
 	} catch (error) {
 		const errorMessage =
 			error.response?.data?.message ||
@@ -135,8 +135,8 @@ export const postAPPaymentToGL = createAsyncThunk("apPayments/postToGL", async (
 // Update AP payment
 export const updateAPPayment = createAsyncThunk("apPayments/update", async ({ id, data }, { rejectWithValue }) => {
 	try {
-		const response = await api.put(`/ap/payments/${id}/`, data);
-		return response.data;
+		const response = await api.put(`/finance/payments/${id}/`, data);
+		return response.data?.data ?? response.data;
 	} catch (error) {
 		if (error.response?.data) {
 			const errorData = error.response.data;
