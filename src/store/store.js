@@ -7,7 +7,7 @@ import arInvoicesReducer from "./arInvoicesSlice";
 import apInvoicesReducer from "./apInvoicesSlice";
 import oneTimeSupplierInvoicesReducer from "./oneTimeSupplierInvoicesSlice";
 import arPaymentsReducer from "./arPaymentsSlice";
-// import apPaymentsReducer from './apPaymentsSlice';
+import apPaymentsReducer from './apPaymentsSlice';
 import customersReducer from "./customersSlice";
 import suppliersReducer from "./suppliersSlice";
 import reportsReducer from "./reportsSlice";
@@ -29,7 +29,7 @@ export const store = configureStore({
 		apInvoices: apInvoicesReducer,
 		oneTimeSupplierInvoices: oneTimeSupplierInvoicesReducer,
 		arPayments: arPaymentsReducer,
-		// apPayments: apPaymentsReducer,
+		apPayments: apPaymentsReducer,
 		customers: customersReducer,
 		suppliers: suppliersReducer,
 		reports: reportsReducer,

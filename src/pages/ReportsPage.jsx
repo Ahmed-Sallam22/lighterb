@@ -339,16 +339,20 @@ const ReportsPage = () => {
 						<div className="flex flex-wrap gap-3">
 							{currentReport.downloadLinks && (
 								<>
-								<Button
-									onClick={() => handleDownload('xlsx')}
-									title={t('reports.actions.downloadExcel')}
-									className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-none hover:shadow-none"
-								/>
-								<Button
-									onClick={() => handleDownload('csv')}
-									title={t('reports.actions.downloadCsv')}
-									className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-none hover:shadow-none"
-								/>
+									<Button
+										onClick={() => handleDownload('xlsx')}
+										title={t('reports.actions.downloadExcel')}
+										className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-none hover:shadow-none"
+									/>
+									<Button
+										onClick={() => handleDownload('csv')}
+										title={t('reports.actions.downloadCsv')}
+										className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-none hover:shadow-none"
+									/>
+								</>
+							)}
+						</div>
+					</div>
 				</Card>
 
 				{/* Report Content */}
