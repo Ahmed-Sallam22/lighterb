@@ -6,8 +6,8 @@ export const fetchTaxRates = createAsyncThunk(
   'taxRates/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/tax/rates/');
-      return response.data;
+      const response = await api.get('/finance/core/tax-rates/');
+      return response.data.result;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch tax rates');
     }
@@ -18,7 +18,7 @@ export const createTaxRate = createAsyncThunk(
   'taxRates/create',
   async (taxRateData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/tax/rates/', taxRateData);
+      const response = await api.post('/finance/core/tax-rates/', taxRateData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to create tax rate');
@@ -30,7 +30,7 @@ export const updateTaxRate = createAsyncThunk(
   'taxRates/update',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/tax/rates/${id}/`, data);
+      const response = await api.put(`/finance/core/tax-rates/${id}/`, data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to update tax rate');
@@ -42,7 +42,7 @@ export const deleteTaxRate = createAsyncThunk(
   'taxRates/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await api.delete(`/tax/rates/${id}/`);
+      await api.delete(`/finance/core/tax-rates/${id}/`);
       return id;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to delete tax rate');

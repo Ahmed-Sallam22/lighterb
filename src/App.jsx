@@ -27,7 +27,7 @@ const JournalLinesPage = lazy(() => import("./pages/JournalLinesPage"));
 const CreateJournalPage = lazy(() => import("./pages/CreateJournalPage"));
 const SegmentsPage = lazy(() => import("./pages/SegmentsPage"));
 const CurrencyPage = lazy(() => import("./pages/CurrencyPage"));
-const ExchangeRatesPage = lazy(() => import("./pages/ExchangeRatesPage"));
+const CountryPage = lazy(() => import("./pages/CountryPage"));
 const TaxRatesPage = lazy(() => import("./pages/TaxRatesPage"));
 const InvoiceApprovalsPage = lazy(() => import("./pages/InvoiceApprovalsPage"));
 const CustomersPage = lazy(() => import("./pages/CustomersPage"));
@@ -75,7 +75,7 @@ const App = () => {
 						<Route path="segments" element={<SegmentsPage />} />
 						<Route path="assets" element={<AssetsPage />} />
 						<Route path="currency" element={<CurrencyPage />} />
-						<Route path="exchange-rates" element={<ExchangeRatesPage />} />
+						<Route path="countries" element={<CountryPage />} />
 						<Route path="tax-rates" element={<TaxRatesPage />} />
 						<Route path="invoice-approvals" element={<InvoiceApprovalsPage />} />
 						<Route path="customers" element={<CustomersPage />} />

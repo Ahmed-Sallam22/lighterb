@@ -1,7 +1,7 @@
 export const cardNavigationMap = {
 	Setup: "/segments",
 	Currencies: "/currency",
-	"Exchange Rates": "/exchange-rates",
+	Countries: "/countries",
 	"Tax Rates": "/tax-rates",
 	"Invoice Approvals": "/invoice-approvals",
 	"Journal Entries": "/journal/entries",

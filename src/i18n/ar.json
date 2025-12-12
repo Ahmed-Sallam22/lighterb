@@ -83,6 +83,10 @@
 				"title": "أسعار الصرف",
 				"description": "إدارة الصرف الأجنبي"
 			},
+			"countries": {
+				"title": "الدول",
+				"description": "إدارة الدول"
+			},
 			"fxConfiguration": {
 				"title": "إعدادات الصرف",
 				"description": "العملة الأساسية والحسابات"
@@ -1723,5 +1727,51 @@
 		"updatePayment": "تحديث الدفع",
 		"cancel": "إلغاء",
 		"processing": "جاري المعالجة..."
+	},
+	"countries": {
+		"title": "الدول",
+		"subtitle": "إدارة إعدادات الدول والتكوينات",
+		"searchPlaceholder": "البحث عن الدول...",
+		"actions": {
+			"add": "إضافة دولة",
+			"create": "إنشاء",
+			"update": "تحديث",
+			"delete": "حذف",
+			"cancel": "إلغاء",
+			"saving": "جاري الحفظ...",
+			"deleting": "جاري الحذف..."
+		},
+		"table": {
+			"code": "الرمز",
+			"name": "اسم الدولة",
+			"emptyMessage": "لم يتم العثور على دول"
+		},
+		"form": {
+			"code": "رمز الدولة",
+			"codePlaceholder": "مثال: AE",
+			"name": "اسم الدولة",
+			"namePlaceholder": "مثال: الإمارات العربية المتحدة"
+		},
+		"modals": {
+			"addTitle": "إضافة دولة",
+			"editTitle": "تعديل الدولة",
+			"deleteTitle": "حذف الدولة",
+			"deleteMessage": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+		},
+		"validation": {
+			"codeRequired": "رمز الدولة مطلوب",
+			"codeMaxLength": "رمز الدولة يجب ألا يتجاوز 3 أحرف",
+			"nameRequired": "اسم الدولة مطلوب"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء الدولة بنجاح",
+			"updateSuccess": "تم تحديث الدولة بنجاح",
+			"deleteSuccess": "تم حذف الدولة بنجاح"
+		},
+		"stats": {
+			"total": "إجمالي الدول",
+			"active": "الدول النشطة",
+			"lastUpdated": "آخر تحديث"
+		}
 	}
 }

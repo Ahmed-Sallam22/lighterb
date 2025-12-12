@@ -28,9 +28,9 @@ export const getCardsData = t => ({
 			key: "Currencies",
 		},
 		{
-			title: t("home.cards.exchangeRates.title"),
-			description: t("home.cards.exchangeRates.description"),
-			key: "Exchange Rates",
+			title: t("home.cards.countries.title"),
+			description: t("home.cards.countries.description"),
+			key: "Countries",
 		},
 		{
 			title: t("home.cards.fxConfiguration.title"),

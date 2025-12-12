@@ -83,6 +83,10 @@
 				"title": "Exchange Rates",
 				"description": "FX Management"
 			},
+			"countries": {
+				"title": "Countries",
+				"description": "Country Management"
+			},
 			"fxConfiguration": {
 				"title": "FX Configuration",
 				"description": "Base Currency & Accounts"
@@ -1722,5 +1726,51 @@
 		"updatePayment": "Update Payment",
 		"cancel": "Cancel",
 		"processing": "Processing..."
+	},
+	"countries": {
+		"title": "Countries",
+		"subtitle": "Manage country settings and configurations",
+		"searchPlaceholder": "Search countries...",
+		"actions": {
+			"add": "Add Country",
+			"create": "Create",
+			"update": "Update",
+			"delete": "Delete",
+			"cancel": "Cancel",
+			"saving": "Saving...",
+			"deleting": "Deleting..."
+		},
+		"table": {
+			"code": "Code",
+			"name": "Country Name",
+			"emptyMessage": "No countries found"
+		},
+		"form": {
+			"code": "Country Code",
+			"codePlaceholder": "e.g., AE",
+			"name": "Country Name",
+			"namePlaceholder": "e.g., United Arab Emirates"
+		},
+		"modals": {
+			"addTitle": "Add Country",
+			"editTitle": "Edit Country",
+			"deleteTitle": "Delete Country",
+			"deleteMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+		},
+		"validation": {
+			"codeRequired": "Country code is required",
+			"codeMaxLength": "Country code must be at most 3 characters",
+			"nameRequired": "Country name is required"
+		},
+		"messages": {
+			"createSuccess": "Country created successfully",
+			"updateSuccess": "Country updated successfully",
+			"deleteSuccess": "Country deleted successfully"
+		},
+		"stats": {
+			"total": "Total Countries",
+			"active": "Active Countries",
+			"lastUpdated": "Last Updated"
+		}
 	}
 }

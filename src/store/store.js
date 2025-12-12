@@ -3,7 +3,6 @@ import segmentsReducer from './segmentsSlice';
 import journalsReducer from './journalsSlice';
 import currenciesReducer from './currenciesSlice';
 import journalLinesReducer from './journalLinesSlice';
-import exchangeRatesReducer from './exchangeRatesSlice';
 import arInvoicesReducer from './arInvoicesSlice';
 import apInvoicesReducer from './apInvoicesSlice';
 import arPaymentsReducer from './arPaymentsSlice';
@@ -17,6 +16,7 @@ import invoiceApprovalsReducer from './invoiceApprovalsSlice';
 import approvalStepsReducer from './approvalStepsSlice';
 import catalogItemsReducer from './catalogItemsSlice';
 import jobRolesReducer from './jobRolesSlice';
+import countriesReducer from './countriesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -24,7 +24,6 @@ export const store = configureStore({
     journals: journalsReducer,
     currencies: currenciesReducer,
     journalLines: journalLinesReducer,
-    exchangeRates: exchangeRatesReducer,
     arInvoices: arInvoicesReducer,
     apInvoices: apInvoicesReducer,
     arPayments: arPaymentsReducer,
@@ -38,6 +37,7 @@ export const store = configureStore({
     approvalSteps: approvalStepsReducer,
     catalogItems: catalogItemsReducer,
     jobRoles: jobRolesReducer,
+    countries: countriesReducer,
   },
 });
 
