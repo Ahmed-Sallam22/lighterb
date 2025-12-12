@@ -119,7 +119,7 @@ const GLLinesSection = ({
 					const existingSegmentIndex = (line.segments || []).findIndex(
 						seg => seg.segment_type_id === segmentTypeId
 					);
-					
+
 					let updatedSegments;
 					if (existingSegmentIndex !== -1) {
 						// Update existing segment
@@ -130,7 +130,7 @@ const GLLinesSection = ({
 						// Add new segment (for lines with empty segments array)
 						updatedSegments = [
 							...(line.segments || []),
-							{ segment_type_id: segmentTypeId, segment_code: segmentCode }
+							{ segment_type_id: segmentTypeId, segment_code: segmentCode },
 						];
 					}
 					return { ...line, segments: updatedSegments };

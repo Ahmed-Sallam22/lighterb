@@ -12,6 +12,7 @@ import { fetchSuppliers } from "../../store/suppliersSlice";
 import { fetchAPInvoices } from "../../store/apInvoicesSlice";
 import { createAPPayment, updateAPPayment } from "../../store/apPaymentsSlice";
 import { FaTrash, FaPlus, FaChevronDown } from "react-icons/fa";
+import Button from "../shared/Button";
 
 const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 	const { t } = useTranslation();
@@ -289,19 +290,15 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 				</div>
 			</Card>
 
-			{/* Invoice Allocations */}
 			<Card
 				title={t("paymentForm.allocations") || "Invoice Allocations"}
 				subtitle={t("paymentForm.allocationsSubtitle") || "Allocate payment amounts to invoices"}
 				actionSlot={
-					<button
-						type="button"
+					<Button
 						onClick={handleAddAllocation}
-						className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
-					>
-						<FaPlus className="w-3 h-3" />
-						{t("paymentForm.addAllocation") || "Add Allocation"}
-					</button>
+						title={t("paymentForm.addAllocation") || "Add Allocation"}
+						icon={<FaPlus className="w-3 h-3" />}
+					/>
 				}
 			>
 				{allocations.length === 0 ? (
@@ -313,14 +310,11 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 							{t("paymentForm.noAllocationsDesc") ||
 								"Add invoice allocations to specify how this payment should be applied."}
 						</p>
-						<button
-							type="button"
+
+						<Button
 							onClick={handleAddAllocation}
-							className="px-4 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform"
-						>
-							<FaPlus className="inline w-3 h-3 mr-2" />
-							{t("paymentForm.addFirstAllocation") || "Add First Allocation"}
-						</button>
+							title={t("paymentForm.addFirstAllocation") || "Add First Allocation"}
+						/>
 					</div>
 				) : (
 					<div className="space-y-4">
@@ -376,15 +370,11 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 										/>
 									</div>
 
-									<button
-										type="button"
+									<Button
 										onClick={() => handleRemoveAllocation(allocation.id)}
 										disabled={allocations.length === 1}
 										className="h-11 w-11 flex items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-										title={t("paymentForm.deleteAllocation") || "Delete Allocation"}
-									>
-										<FaTrash className="w-4 h-4" />
-									</button>
+									/>
 								</div>
 							))}
 						</div>
@@ -406,30 +396,6 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 				)}
 			</Card>
 
-			{/* <Card
-        title="GL Distribution Lines"
-        subtitle="Posting"
-        actionSlot={
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
-          >
-            + New Line
-          </button>
-        }
-      >
-        <div className="rounded-2xl border border-dashed border-[#b6c4cc] bg-[#f5f8fb] p-6 text-center text-[#567086]">
-          <p className="text-lg font-semibold mb-2">No GL distribution lines added yet</p>
-          <p className="text-sm mb-6">GL distribution lines are required to post this invoice.</p>
-          <button
-            type="button"
-            className="px-4 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform"
-          >
-            + New First Line
-          </button>
-        </div>
-      </Card> */}
-
 			{/* GL Lines Section */}
 			<Card title={t("glLines.title") || "GL Lines"} subtitle={t("glLines.subtitle") || "Posting"}>
 				<GLLinesSection
@@ -444,21 +410,22 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 
 			{/* Action Buttons */}
 			<div className="mt-6 flex flex-wrap justify-end gap-3">
-				<button
-					type="button"
+				<Button
 					onClick={handleCancel}
-					className="px-6 py-2 rounded-full border border-[#7A9098] text-[#7A9098] font-semibold hover:bg-[#f1f5f8] transition-colors"
-				>
-					Cancel
-				</button>
-				<button
-					type="button"
+					title={t("paymentForm.cancel") || "Cancel"}
+					className="bg-white hover:bg-gray-100 text-gray-700 border border-gray-300"
+				/>
+				<Button
 					onClick={handleMakePayment}
 					disabled={loading}
-					className="px-8 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-				>
-					{loading ? "Processing..." : isEditMode ? "Update Payment" : "Make Payment"}
-				</button>
+					title={
+						loading
+							? t("paymentForm.processing") || "Processing..."
+							: isEditMode
+							? t("paymentForm.updatePayment") || "Update Payment"
+							: t("paymentForm.makePayment") || "Make Payment"
+					}
+				/>
 			</div>
 		</div>
 	);
