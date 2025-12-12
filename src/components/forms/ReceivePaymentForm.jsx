@@ -12,7 +12,6 @@ import { fetchCustomers } from "../../store/customersSlice";
 import { fetchARInvoices } from "../../store/arInvoicesSlice";
 import { createARPayment, updateARPayment } from "../../store/arPaymentsSlice";
 import { FaTrash, FaPlus, FaChevronDown } from "react-icons/fa";
-import Button from "../shared/Button";
 
 const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 	const { t } = useTranslation();
@@ -292,12 +291,14 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 				title={t("paymentForm.allocations") || "Invoice Allocations"}
 				subtitle={t("paymentForm.allocationsSubtitle") || "Allocate payment amounts to invoices"}
 				actionSlot={
-					<Button
+					<button
+						type="button"
 						onClick={handleAddAllocation}
-						title={t("paymentForm.addAllocation") || "Add Allocation"}
-						icon={<FaPlus className="w-3 h-3" />}
-						className="bg-transparent shadow-none hover:shadow-none inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
-					/>
+						className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
+					>
+						<FaPlus className="w-3 h-3" />
+						{t("paymentForm.addAllocation") || "Add Allocation"}
+					</button>
 				}
 			>
 				{allocations.length === 0 ? (
@@ -309,12 +310,14 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 							{t("paymentForm.noAllocationsDesc") ||
 								"Add invoice allocations to specify how this payment should be applied."}
 						</p>
-						<Button
+						<button
+							type="button"
 							onClick={handleAddAllocation}
-							title={t("paymentForm.addFirstAllocation") || "Add First Allocation"}
-							icon={<FaPlus className="w-3 h-3" />}
 							className="px-4 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform"
-						/>
+						>
+							<FaPlus className="inline w-3 h-3 mr-2" />
+							{t("paymentForm.addFirstAllocation") || "Add First Allocation"}
+						</button>
 					</div>
 				) : (
 					<div className="space-y-4">
@@ -370,12 +373,15 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 										/>
 									</div>
 
-									<Button
+									<button
+										type="button"
 										onClick={() => handleRemoveAllocation(allocation.id)}
 										disabled={allocations.length === 1}
-										icon={<FaTrash className="w-4 h-4" />}
-										className="bg-transparent shadow-none hover:shadow-none h-11 w-11 flex items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-									/>
+										className="h-11 w-11 flex items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+										title={t("paymentForm.deleteAllocation") || "Delete Allocation"}
+									>
+										<FaTrash className="w-4 h-4" />
+									</button>
 								</div>
 							))}
 						</div>
@@ -411,17 +417,21 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 
 			{/* Action Buttons */}
 			<div className="mt-6 flex flex-wrap justify-end gap-3">
-				<Button
+				<button
+					type="button"
 					onClick={handleCancel}
-					title="Cancel"
-					className="bg-transparent shadow-none hover:shadow-none px-6 py-2 rounded-full border border-[#7A9098] text-[#7A9098] font-semibold hover:bg-[#f1f5f8] transition-colors"
-				/>
-				<Button
+					className="px-6 py-2 rounded-full border border-[#7A9098] text-[#7A9098] font-semibold hover:bg-[#f1f5f8] transition-colors"
+				>
+					Cancel
+				</button>
+				<button
+					type="button"
 					onClick={handleReceivePayment}
 					disabled={loading}
-					title={loading ? "Processing..." : isEditMode ? "Update Payment" : "Receive Payment"}
 					className="px-8 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-				/>
+				>
+					{loading ? "Processing..." : isEditMode ? "Update Payment" : "Receive Payment"}
+				</button>
 			</div>
 		</div>
 	);
