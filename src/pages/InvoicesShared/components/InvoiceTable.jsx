@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import Table from "../../../components/shared/Table";
+import Pagination from "../../../components/shared/Pagination";
 
 const InvoiceTable = ({
 	columns,
@@ -14,6 +15,14 @@ const InvoiceTable = ({
 	emptyMessage = "No invoices found",
 	showActionsCondition,
 	showDeleteCondition,
+	// Pagination props
+	currentPage,
+	totalCount,
+	pageSize,
+	hasNext,
+	hasPrevious,
+	onPageChange,
+	onPageSizeChange,
 }) => {
 	const { t } = useTranslation();
 
@@ -49,16 +58,31 @@ const InvoiceTable = ({
 	].filter(Boolean); // Remove undefined actions
 
 	return (
-		<Table
-			columns={columns}
-			data={data}
-			onView={onView}
-			onDelete={onDelete}
-			emptyMessage={emptyMessage}
-			showActions={showActionsCondition}
-			showDeleteButton={showDeleteCondition}
-			actions={actions}
-		/>
+		<>
+			<Table
+				columns={columns}
+				data={data}
+				onView={onView}
+				onDelete={onDelete}
+				emptyMessage={emptyMessage}
+				showActions={showActionsCondition}
+				showDeleteButton={showDeleteCondition}
+				actions={actions}
+			/>
+
+			{/* Pagination */}
+			{totalCount > 0 && (
+				<Pagination
+					currentPage={currentPage}
+					totalCount={totalCount}
+					pageSize={pageSize}
+					hasNext={hasNext}
+					hasPrevious={hasPrevious}
+					onPageChange={onPageChange}
+					onPageSizeChange={onPageSizeChange}
+				/>
+			)}
+		</>
 	);
 };
 

@@ -28,6 +28,14 @@ const ARInvoicesPage = () => {
 		reverseInvoice,
 		postInvoiceToGL,
 		submitForApproval,
+		// Pagination
+		count,
+		page,
+		pageSize,
+		hasNext,
+		hasPrevious,
+		onPageChange,
+		onPageSizeChange,
 	} = useARInvoices();
 
 	// Component state
@@ -123,6 +131,14 @@ const ARInvoicesPage = () => {
 						const approvalStatus = row.rawData?.approval_status;
 						return approvalStatus !== "APPROVED";
 					}}
+					// Pagination props
+					currentPage={page}
+					totalCount={count}
+					pageSize={pageSize}
+					hasNext={hasNext}
+					hasPrevious={hasPrevious}
+					onPageChange={onPageChange}
+					onPageSizeChange={onPageSizeChange}
 				/>
 			</div>
 

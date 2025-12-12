@@ -30,6 +30,14 @@ const APInvoicesPage = () => {
 		postInvoiceToGL,
 		submitForApproval,
 		performThreeWayMatch,
+		// Pagination
+		count,
+		page,
+		pageSize,
+		hasNext,
+		hasPrevious,
+		onPageChange,
+		onPageSizeChange,
 	} = useAPInvoices();
 
 	// Component state
@@ -123,6 +131,14 @@ const APInvoicesPage = () => {
 					onPostToGL={handlePostToGL}
 					emptyMessage={t("apInvoices.table.emptyMessage")}
 					showActionsCondition={row => row.rawData?.approval_status === "DRAFT"}
+					// Pagination props
+					currentPage={page}
+					totalCount={count}
+					pageSize={pageSize}
+					hasNext={hasNext}
+					hasPrevious={hasPrevious}
+					onPageChange={onPageChange}
+					onPageSizeChange={onPageSizeChange}
 				/>
 			</div>
 
