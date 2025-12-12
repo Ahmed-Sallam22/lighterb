@@ -1,13 +1,14 @@
 /**
  * Transforms invoice data for table display
  * @param {Array} invoices - Array of invoice objects
- * @param {string} type - 'AR' or 'AP' to determine customer/supplier field
+ * @param {string} type - 'AR', 'AP', or 'ONE_TIME_SUPPLIER' to determine customer/supplier field
  * @returns {Array} Transformed data for table
  */
 export const buildInvoiceTableData = (invoices, type = "AP") => {
 	const isAR = type === "AR";
+	const isOneTimeSupplier = type === "ONE_TIME_SUPPLIER";
 	const partyField = isAR ? "customer_name" : "supplier_name";
-	const partyIdField = isAR ? "customer_id" : "supplier_id";
+	const partyIdField = isAR ? "customer_id" : isOneTimeSupplier ? null : "supplier_id";
 
 	const formatStatus = value => {
 		if (!value) return "-";
@@ -24,7 +25,7 @@ export const buildInvoiceTableData = (invoices, type = "AP") => {
 	return invoices.map(invoice => ({
 		id: invoice.invoice_id || invoice.id || invoice.number,
 		invoice: invoice.invoice_id || invoice.id || invoice.number || "-",
-		entityId: invoice[partyIdField] || null,
+		entityId: partyIdField ? invoice[partyIdField] || null : null,
 		customer: invoice[partyField] || "-",
 		date: invoice.date || invoice.invoice_date || "-",
 		currency: invoice.currency_code || invoice.currency || "-",

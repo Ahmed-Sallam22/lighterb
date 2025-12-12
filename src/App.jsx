@@ -22,6 +22,7 @@ const ARPaymentsPage = lazy(() => import("./pages/ARPaymentsPage"));
 const APPaymentsPage = lazy(() => import("./pages/APPaymentsPage"));
 const ARInvoicesPage = lazy(() => import("./pages/ARInvoicesPage"));
 const APInvoicesPage = lazy(() => import("./pages/APInvoicesPage"));
+const OneTimeSupplierInvoicesPage = lazy(() => import("./pages/OneTimeSupplierInvoicesPage"));
 const JournalEntriesPage = lazy(() => import("./pages/JournalEntriesPage"));
 const JournalLinesPage = lazy(() => import("./pages/JournalLinesPage"));
 const CreateJournalPage = lazy(() => import("./pages/CreateJournalPage"));
@@ -69,6 +70,7 @@ const App = () => {
 						<Route path="ap-payments" element={<APPaymentsPage />} />
 						<Route path="ar-invoices" element={<ARInvoicesPage />} />
 						<Route path="ap-invoices" element={<APInvoicesPage />} />
+						<Route path="one-time-supplier-invoices" element={<OneTimeSupplierInvoicesPage />} />
 						<Route path="journal/entries" element={<JournalEntriesPage />} />
 						<Route path="journal/lines" element={<JournalLinesPage />} />
 						<Route path="journal/create" element={<CreateJournalPage />} />

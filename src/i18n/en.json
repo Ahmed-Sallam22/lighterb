@@ -235,6 +235,7 @@
 		"arPayments": "AR Payments",
 		"apInvoices": "AP Invoices",
 		"apPayments": "AP Payments",
+		"oneTimeSupplierInvoices": "One-Time Supplier",
 		"reports": "Reports"
 	},
 	"apInvoices": {
@@ -361,6 +362,41 @@
 				"delete": "Delete",
 				"reverse": "Reverse",
 				"post": "Post"
+			}
+		}
+	},
+	"oneTimeSupplierInvoices": {
+		"title": "One-Time Supplier Invoices",
+		"subtitle": "Invoices from one-time suppliers",
+		"toolbar": {
+			"searchPlaceholder": "Search invoices...",
+			"newInvoice": "New One-Time Supplier Invoice",
+			"filterLabel": "Filter by Payment Status",
+			"filterAll": "All Status",
+			"filterPaid": "Paid",
+			"filterUnpaid": "Unpaid",
+			"filterPartial": "Partial"
+		},
+		"table": {
+			"invoice": "Invoice",
+			"supplier": "Supplier",
+			"date": "Date",
+			"currency": "Currency",
+			"total": "Total",
+			"paymentStatus": "Payment Status",
+			"approvalStatus": "Approval Status",
+			"loading": "Loading invoices...",
+			"emptyMessage": "No one-time supplier invoices found"
+		},
+		"messages": {
+			"deleteSuccess": "Invoice deleted successfully",
+			"actionFailed": "Action failed"
+		},
+		"modals": {
+			"deleteTitle": "Delete Invoice",
+			"deleteMessage": "Are you sure you want to delete invoice {{invoiceNumber}}? This action cannot be undone.",
+			"confirmText": {
+				"delete": "Delete"
 			}
 		}
 	},
