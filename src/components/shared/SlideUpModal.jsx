@@ -53,7 +53,7 @@ const SlideUpModal = ({
 	}
 
 	const modalContent = (
-		<div className="fixed inset-0 z-999 flex items-end sm:items-center justify-center">
+		<div className="fixed  inset-0 z-999 flex items-end sm:items-center justify-center">
 			<div
 				className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
 				onClick={onClose}
@@ -94,7 +94,7 @@ const SlideUpModal = ({
 					</div>
 				</div>
 
-				<div className={`px-6 py-3  max-h-[calc(99vh-4.5rem)] ${childrenClassName}`}>
+				<div className={`px-6 py-3 overflow-scroll  max-h-[calc(90vh-4.5rem)] ${childrenClassName}`}>
 					{children}
 				</div>
 			</div>
