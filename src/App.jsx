@@ -4,6 +4,7 @@ import { lazy, Suspense, useEffect } from "react";
 
 import MainLayout from "./layouts/MainLayout";
 import ScrollToTop from "./components/ScrollToTop";
+import AuthGuard from "./components/auth/AuthGuard";
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
@@ -42,6 +43,7 @@ const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const ForgetPasswordPage = lazy(() => import("./pages/ForgetPasswordPage"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const ChangePasswordPage = lazy(() => import("./pages/ChangePasswordPage"));
 const Requisitions = lazy(() => import("./pages/Requisitions"));
 const AssetsPage = lazy(() => import("./pages/Assets"));
 const JobRolesPage = lazy(() => import("./pages/JobRolesPage"));
@@ -58,11 +60,25 @@ const App = () => {
 			<ScrollToTop />
 			<Suspense fallback={<PageLoader />}>
 				<Routes>
+					{/* Public Routes */}
 					<Route path="/auth/login" element={<LoginPage />} />
 					<Route path="/auth/register" element={<RegisterPage />} />
 					<Route path="/auth/forgot-password" element={<ForgetPasswordPage />} />
 					<Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-					<Route path="/" element={<MainLayout />}>
+					
+					{/* Semi-Protected Route - Requires Auth but uses Auth Layout */}
+					<Route path="/change-password" element={
+						<AuthGuard>
+							<ChangePasswordPage />
+						</AuthGuard>
+					} />
+					
+					{/* Protected Routes */}
+					<Route path="/" element={
+						<AuthGuard>
+							<MainLayout />
+						</AuthGuard>
+					}>
 						<Route index element={<Home />} />
 						<Route path="dashboard" element={<Home />} />
 						<Route path="quick-actions/:actionId" element={<QuickActionDetail />} />

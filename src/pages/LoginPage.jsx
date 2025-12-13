@@ -1,24 +1,58 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import AuthLayout from '../components/auth/AuthLayout';
 import AuthInput from '../components/auth/AuthInput';
 import AuthButton from '../components/auth/AuthButton';
-import SocialLogin from '../components/auth/SocialLogin';
+// import SocialLogin from '../components/auth/SocialLogin';
 import AuthLogo from '../components/auth/AuthLogo';
+import { loginUser, clearError } from '../store/authSlice';
 
 const LoginPage = () => {
 	const { t } = useTranslation();
-	const [username, setUsername] = useState('');
+	const navigate = useNavigate();
+	const location = useLocation();
+	const dispatch = useDispatch();
+	const { loading, error } = useSelector((state) => state.auth);
+
+	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [rememberMe, setRememberMe] = useState(false);
-	const navigate = useNavigate();
 
-	const handleSubmit = e => {
+	// Get the return URL from location state or default to home
+	const from = location.state?.from?.pathname || '/';
+
+	// Redirect is now handled in handleSubmit after successful login
+	// Removed automatic redirect on isAuthenticated change to prevent immediate navigation
+
+	// Show error toast
+	useEffect(() => {
+		if (error) {
+			toast.error(error);
+			dispatch(clearError());
+		}
+	}, [error, dispatch]);
+
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		// Add your login logic here
-		// navigate to home or dashboard after successful login
-		// navigate('/');
+
+		if (!email.trim() || !password) {
+			toast.error(t('auth.login.fillAllFields'));
+			return;
+		}
+
+		try {
+			await dispatch(loginUser({ email, password, rememberMe })).unwrap();
+			toast.success(t('auth.login.success'));
+							navigate(from, { replace: true });
+
+	
+		} catch {
+			// Error is handled by the useEffect
+		}
 	};
 
 	return (
@@ -27,18 +61,19 @@ const LoginPage = () => {
 			footerLinkText={t('auth.login.createAccount')}
 			footerLinkTo="/auth/register"
 		>
+			<ToastContainer position="top-right" autoClose={3000} />
 			<AuthLogo title={t('auth.login.title')} subtitle={t('auth.login.subtitle')} />
 
 			{/* Login Form */}
 			<form onSubmit={handleSubmit} className="space-y-5">
 				<AuthInput
-					id="username"
-					label={t('auth.login.username')}
-					type="text"
-					value={username}
-					onChange={e => setUsername(e.target.value)}
-					placeholder={t('auth.login.usernamePlaceholder')}
-					autoComplete="username"
+					id="email"
+					label={t('auth.login.email')}
+					type="email"
+					value={email}
+					onChange={e => setEmail(e.target.value)}
+					placeholder={t('auth.login.emailPlaceholder')}
+					autoComplete="email"
 					required
 				/>
 
@@ -70,10 +105,12 @@ const LoginPage = () => {
 					</Link>
 				</div>
 
-				<AuthButton type="submit">{t('auth.login.signIn')}</AuthButton>
+				<AuthButton type="submit" disabled={loading}>
+					{loading ? t('auth.login.signingIn') : t('auth.login.signIn')}
+				</AuthButton>
 			</form>
 
-			<SocialLogin />
+			{/* <SocialLogin /> */}
 		</AuthLayout>
 	);
 };

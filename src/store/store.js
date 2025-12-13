@@ -18,9 +18,11 @@ import approvalStepsReducer from "./approvalStepsSlice";
 import catalogItemsReducer from "./catalogItemsSlice";
 import jobRolesReducer from "./jobRolesSlice";
 import countriesReducer from "./countriesSlice";
+import authReducer from "./authSlice";
 
 export const store = configureStore({
 	reducer: {
+		auth: authReducer,
 		segments: segmentsReducer,
 		journals: journalsReducer,
 		currencies: currenciesReducer,

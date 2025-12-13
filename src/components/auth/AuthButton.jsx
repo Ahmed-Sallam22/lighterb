@@ -1,7 +1,7 @@
 import React from "react";
 
 const AuthButton = ({ children, type = "button", onClick, variant = "primary", disabled = false }) => {
-  const baseClasses = "w-full font-semibold py-2.5 px-4 rounded-md transition-all duration-200 text-base";
+  const baseClasses = "w-full flex items-center justify-center font-semibold py-2.5 px-4 rounded-md transition-all duration-200 text-base";
 
   const variants = {
     primary: "bg-[#11576C] hover:bg-[#0d4557] text-white shadow-sm",
