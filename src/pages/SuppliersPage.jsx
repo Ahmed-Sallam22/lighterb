@@ -11,6 +11,7 @@ import ConfirmModal from "../components/shared/ConfirmModal";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import Toggle from "../components/shared/Toggle";
+import Button from "../components/shared/Button";
 import {
 	fetchSuppliers,
 	fetchSupplierById,

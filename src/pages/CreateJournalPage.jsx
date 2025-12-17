@@ -15,6 +15,7 @@ import { fetchAccounts } from "../store/accountsSlice";
 import { fetchSegmentTypes, fetchSegmentValues } from "../store/segmentsSlice";
 import HeroPattern from "../ui/HeroPatterns";
 import CreateJournalHeaderIcon from "../assets/icons/CreateJournalHeaderIcon";
+import Button from "../components/shared/Button";
 
 const CreateJournalPage = () => {
 	const { t } = useTranslation(); // ADD THIS LINE

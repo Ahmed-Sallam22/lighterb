@@ -8,6 +8,7 @@ import Table from "../components/shared/Table";
 import SlideUpModal from "../components/shared/SlideUpModal";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import ConfirmModal from "../components/shared/ConfirmModal";
+import Button from "../components/shared/Button";
 
 import { fetchJobRoles, createJobRole, updateJobRole, deleteJobRole, clearError } from "../store/jobRolesSlice";
 
