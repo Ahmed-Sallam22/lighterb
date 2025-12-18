@@ -1,11 +1,11 @@
-import React, { useMemo, useEffect } from 'react';
-import { useParams } from 'react-router';
-import { QuickActionsIcon } from '../components/shared/QuickActionsPanel';
-import PageHeader from '../components/shared/PageHeader';
-import InvoiceForm from '../components/forms/InvoiceForm';
-import ReceivePaymentForm from '../components/forms/ReceivePaymentForm';
-import MakePaymentForm from '../components/forms/MakePaymentForm';
-import { QUICK_ACTIONS, getQuickActionById } from '../constants/quickActions';
+import React, { useMemo, useEffect } from "react";
+import { useParams } from "react-router";
+import { QuickActionsIcon } from "../components/shared/QuickActionsPanel";
+import PageHeader from "../components/shared/PageHeader";
+import InvoiceForm from "../components/forms/InvoiceForm";
+import ReceivePaymentForm from "../components/forms/ReceivePaymentForm";
+import MakePaymentForm from "../components/forms/MakePaymentForm";
+import { QUICK_ACTIONS, getQuickActionById } from "../constants/quickActions";
 
 const QuickActionDetail = () => {
 	const { actionId } = useParams();
@@ -13,23 +13,23 @@ const QuickActionDetail = () => {
 	const action = useMemo(() => getQuickActionById(actionId) || QUICK_ACTIONS[0], [actionId]);
 
 	useEffect(() => {
-		const pageTitle = action?.label ? `Light ERP | ${action.label}` : 'Light ERP | Quick Actions';
+		const pageTitle = action?.label ? `Light ERP | ${action.label}` : "Light ERP | Quick Actions";
 		document.title = pageTitle;
 	}, [action?.id, action?.label]);
 
 	// Determine which form to display based on action ID
 	const renderFormContent = () => {
 		switch (action?.id) {
-			case 'create-ar-invoice':
+			case "create-ar-invoice":
 				return <InvoiceForm isAPInvoice={false} />;
 
-			case 'create-ap-invoice':
+			case "create-ap-invoice":
 				return <InvoiceForm isAPInvoice={true} />;
 
-			case 'receive-payment':
+			case "receive-payment":
 				return <ReceivePaymentForm />;
 
-			case 'make-payment':
+			case "make-payment":
 				return <MakePaymentForm />;
 
 			default:

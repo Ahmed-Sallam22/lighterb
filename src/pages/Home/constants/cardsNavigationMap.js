@@ -11,4 +11,5 @@ export const cardNavigationMap = {
 	Reports: "/reports",
 	"Accounts Receivable": "/ar-invoices",
 	"Accounts Payable": "/ap-invoices",
+	"One-Time Supplier Invoices": "/one-time-supplier-invoices",
 };

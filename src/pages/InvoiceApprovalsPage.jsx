@@ -9,12 +9,16 @@ import SlideUpModal from "../components/shared/SlideUpModal";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import {
-	fetchInvoiceApprovals,
+	fetchAllPendingApprovals,
+	fetchAPPendingApprovals,
+	fetchARPendingApprovals,
+	fetchOTSPendingApprovals,
 	createInvoiceApproval,
 	updateInvoiceApproval,
 	deleteInvoiceApproval,
 	approveInvoice,
 	rejectInvoice,
+	delegateInvoice,
 } from "../store/invoiceApprovalsSlice";
 import { fetchARInvoices } from "../store/arInvoicesSlice";
 import { fetchAPInvoices } from "../store/apInvoicesSlice";
@@ -34,7 +38,9 @@ const InvoiceApprovalsPage = () => {
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
-	const { approvals, loading } = useSelector(state => state.invoiceApprovals);
+	const { pendingApprovals, apPendingApprovals, arPendingApprovals, otsPendingApprovals, loading } = useSelector(
+		state => state.invoiceApprovals
+	);
 	const { invoices: arInvoices } = useSelector(state => state.arInvoices);
 	const { invoices: apInvoices } = useSelector(state => state.apInvoices);
 
@@ -48,6 +54,7 @@ const InvoiceApprovalsPage = () => {
 	const [editingApproval, setEditingApproval] = useState(null);
 	const [deleteId, setDeleteId] = useState(null);
 	const [actionId, setActionId] = useState(null);
+	const [actionInvoiceType, setActionInvoiceType] = useState(null);
 	const [formData, setFormData] = useState({
 		invoice_type: "",
 		invoice_id: "",
@@ -56,11 +63,29 @@ const InvoiceApprovalsPage = () => {
 	const [actionComments, setActionComments] = useState("");
 	const [availableInvoices, setAvailableInvoices] = useState([]);
 
+	// Delegate modal state
+	const [isDelegateModalOpen, setIsDelegateModalOpen] = useState(false);
+	const [delegateTargetUserId, setDelegateTargetUserId] = useState("");
+
 	useEffect(() => {
-		dispatch(fetchInvoiceApprovals());
 		dispatch(fetchARInvoices());
 		dispatch(fetchAPInvoices());
+		// Fetch pending approvals from all endpoints
+		dispatch(fetchAllPendingApprovals());
 	}, [dispatch]);
+
+	// Refetch based on selected type filter
+	useEffect(() => {
+		if (selectedType === "all") {
+			dispatch(fetchAllPendingApprovals());
+		} else if (selectedType === "AP Invoice") {
+			dispatch(fetchAPPendingApprovals());
+		} else if (selectedType === "AR Invoice") {
+			dispatch(fetchARPendingApprovals());
+		} else if (selectedType === "OTS Invoice") {
+			dispatch(fetchOTSPendingApprovals());
+		}
+	}, [dispatch, selectedType]);
 
 	// Update available invoices when invoice type changes
 	useEffect(() => {
@@ -74,26 +99,6 @@ const InvoiceApprovalsPage = () => {
 		// Reset invoice_id when invoice type changes
 		setFormData(prev => ({ ...prev, invoice_id: "" }));
 	}, [formData.invoice_type, arInvoices, apInvoices]);
-
-	const handleCreate = () => {
-		setEditingApproval(null);
-		setFormData({
-			invoice_type: "",
-			invoice_id: "",
-			submitted_by: "",
-		});
-		setIsModalOpen(true);
-	};
-
-	const handleEdit = approval => {
-		setEditingApproval(approval);
-		setFormData({
-			invoice_type: approval.invoice_type,
-			invoice_id: approval.invoice_id.toString(),
-			submitted_by: approval.submitted_by,
-		});
-		setIsModalOpen(true);
-	};
 
 	const handleDelete = id => {
 		setDeleteId(id?.id);
@@ -111,16 +116,26 @@ const InvoiceApprovalsPage = () => {
 		}
 	};
 
-	const handleApprove = id => {
+	const handleApprove = (id, invoiceType) => {
 		setActionId(id);
+		setActionInvoiceType(invoiceType);
 		setActionComments("");
 		setIsApproveModalOpen(true);
 	};
 
-	const handleReject = id => {
+	const handleReject = (id, invoiceType) => {
 		setActionId(id);
+		setActionInvoiceType(invoiceType);
 		setActionComments("");
 		setIsRejectModalOpen(true);
+	};
+
+	const handleDelegate = (id, invoiceType) => {
+		setActionId(id);
+		setActionInvoiceType(invoiceType);
+		setActionComments("");
+		setDelegateTargetUserId("");
+		setIsDelegateModalOpen(true);
 	};
 
 	const confirmApprove = async () => {
@@ -128,16 +143,25 @@ const InvoiceApprovalsPage = () => {
 			await dispatch(
 				approveInvoice({
 					id: actionId,
-					approvalData: {
-						approver: "Current User", // Replace with actual user
-						comments: actionComments,
-					},
+					invoiceType: actionInvoiceType,
+					comment: actionComments,
 				})
 			).unwrap();
 			toast.success(t("invoiceApprovals.messages.approveSuccess"));
 			setIsApproveModalOpen(false);
 			setActionId(null);
+			setActionInvoiceType(null);
 			setActionComments("");
+			// Refresh the list
+			if (selectedType === "all") {
+				dispatch(fetchAllPendingApprovals());
+			} else if (selectedType === "AP Invoice") {
+				dispatch(fetchAPPendingApprovals());
+			} else if (selectedType === "AR Invoice") {
+				dispatch(fetchARPendingApprovals());
+			} else if (selectedType === "OTS Invoice") {
+				dispatch(fetchOTSPendingApprovals());
+			}
 		} catch (error) {
 			toast.error(error || t("invoiceApprovals.messages.approveError"));
 		}
@@ -148,18 +172,62 @@ const InvoiceApprovalsPage = () => {
 			await dispatch(
 				rejectInvoice({
 					id: actionId,
-					approvalData: {
-						approver: "Current User", // Replace with actual user
-						comments: actionComments,
-					},
+					invoiceType: actionInvoiceType,
+					comment: actionComments,
 				})
 			).unwrap();
 			toast.success(t("invoiceApprovals.messages.rejectSuccess"));
 			setIsRejectModalOpen(false);
 			setActionId(null);
+			setActionInvoiceType(null);
 			setActionComments("");
+			// Refresh the list
+			if (selectedType === "all") {
+				dispatch(fetchAllPendingApprovals());
+			} else if (selectedType === "AP Invoice") {
+				dispatch(fetchAPPendingApprovals());
+			} else if (selectedType === "AR Invoice") {
+				dispatch(fetchARPendingApprovals());
+			} else if (selectedType === "OTS Invoice") {
+				dispatch(fetchOTSPendingApprovals());
+			}
 		} catch (error) {
 			toast.error(error || t("invoiceApprovals.messages.rejectError"));
+		}
+	};
+
+	const confirmDelegate = async () => {
+		if (!delegateTargetUserId) {
+			toast.error(t("invoiceApprovals.messages.selectUser"));
+			return;
+		}
+		try {
+			await dispatch(
+				delegateInvoice({
+					id: actionId,
+					invoiceType: actionInvoiceType,
+					targetUserId: parseInt(delegateTargetUserId),
+					comment: actionComments,
+				})
+			).unwrap();
+			toast.success(t("invoiceApprovals.messages.delegateSuccess"));
+			setIsDelegateModalOpen(false);
+			setActionId(null);
+			setActionInvoiceType(null);
+			setActionComments("");
+			setDelegateTargetUserId("");
+			// Refresh the list
+			if (selectedType === "all") {
+				dispatch(fetchAllPendingApprovals());
+			} else if (selectedType === "AP Invoice") {
+				dispatch(fetchAPPendingApprovals());
+			} else if (selectedType === "AR Invoice") {
+				dispatch(fetchARPendingApprovals());
+			} else if (selectedType === "OTS Invoice") {
+				dispatch(fetchOTSPendingApprovals());
+			}
+		} catch (error) {
+			toast.error(error || t("invoiceApprovals.messages.delegateError"));
 		}
 	};
 
@@ -207,29 +275,65 @@ const InvoiceApprovalsPage = () => {
 		}));
 	};
 
-	const mappedApprovals = approvals.map(approval => ({
-		id: approval.id,
+	// Get pending approvals based on selected type
+	const getPendingApprovalsData = () => {
+		if (selectedType === "all") {
+			return pendingApprovals || [];
+		} else if (selectedType === "AP Invoice") {
+			return apPendingApprovals || [];
+		} else if (selectedType === "AR Invoice") {
+			return arPendingApprovals || [];
+		} else if (selectedType === "OTS Invoice") {
+			return otsPendingApprovals || [];
+		}
+		return pendingApprovals || [];
+	};
+
+	const mappedApprovals = getPendingApprovalsData().map(approval => ({
+		id: approval.invoice_id || approval.id,
+		invoiceId: approval.invoice_id,
 		type:
 			approval.invoice_type === "AP"
 				? t("invoiceApprovals.actions.apInvoice")
-				: t("invoiceApprovals.actions.arInvoice"),
-		invoiceNumber: `INV-${approval.invoice_id}`,
-		submittedBy: approval.submitted_by,
-		approver: approval.approver || t("invoiceApprovals.form.na"),
+				: approval.invoice_type === "AR"
+				? t("invoiceApprovals.actions.arInvoice")
+				: t("invoiceApprovals.actions.otsInvoice"),
+		invoiceType: approval.invoice_type, // Raw invoice type for API calls
+		invoiceNumber: approval.invoice_number || `INV-${approval.invoice_id || approval.id}`,
+		customerName: approval.customer_name || approval.supplier_name || t("invoiceApprovals.form.na"),
+		total: approval.total ? `${approval.currency || ""} ${approval.total}` : t("invoiceApprovals.form.na"),
+		currentStage: approval.current_stage || t("invoiceApprovals.form.na"),
 		// Keep internal status for logic, translate in render
 		status:
-			approval.status === "PENDING_APPROVAL"
+			approval.approval_status === "PENDING_APPROVAL"
 				? "Pending"
-				: approval.status === "APPROVED"
+				: approval.approval_status === "APPROVED"
 				? "Approved"
-				: "Rejected",
-		submittedDate: new Date(approval.submitted_at).toLocaleDateString(),
-		rawStatus: approval.status,
-		rawType: approval.invoice_type === "AP" ? "AP Invoice" : "AR Invoice", // Used for filtering
+				: approval.approval_status === "REJECTED"
+				? "Rejected"
+				: "Pending",
+		submittedDate: approval.date
+			? new Date(approval.date).toLocaleDateString()
+			: approval.submitted_at
+			? new Date(approval.submitted_at).toLocaleDateString()
+			: t("invoiceApprovals.form.na"),
+		rawStatus: approval.approval_status || approval.status,
+		rawType:
+			approval.invoice_type === "AP"
+				? "AP Invoice"
+				: approval.invoice_type === "AR"
+				? "AR Invoice"
+				: "OTS Invoice",
+		// Permissions from API
+		canApprove: approval.can_approve || false,
+		canReject: approval.can_reject || false,
+		canDelegate: approval.can_delegate || false,
+		workflowId: approval.workflow_id,
+		rawData: approval, // Keep raw data for actions
 	}));
 
-	// Use real data if available, otherwise use sample data
-	const displayApprovals = approvals.length > 0 ? mappedApprovals : [];
+	// Use pending approvals data
+	const displayApprovals = mappedApprovals;
 
 	// Calculate counts for tabs
 	const getCounts = () => {
@@ -282,14 +386,19 @@ const InvoiceApprovalsPage = () => {
 			render: value => <span className="font-semibold text-[#28819C]">{value}</span>,
 		},
 		{
-			header: t("invoiceApprovals.table.submittedBy"),
-			accessor: "submittedBy",
+			header: t("invoiceApprovals.table.customerSupplier"),
+			accessor: "customerName",
 			render: value => <span className="text-gray-900">{value}</span>,
 		},
 		{
-			header: t("invoiceApprovals.table.approver"),
-			accessor: "approver",
-			render: value => <span className="text-gray-900">{value}</span>,
+			header: t("invoiceApprovals.table.total"),
+			accessor: "total",
+			render: value => <span className="text-gray-900 font-semibold">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.table.currentStage"),
+			accessor: "currentStage",
+			render: value => <span className="text-gray-700">{value}</span>,
 		},
 		{
 			header: t("invoiceApprovals.table.status"),
@@ -312,29 +421,40 @@ const InvoiceApprovalsPage = () => {
 			),
 		},
 		{
-			header: t("invoiceApprovals.table.submittedDate"),
+			header: t("invoiceApprovals.table.date"),
 			accessor: "submittedDate",
-			width: "150px",
+			width: "120px",
 			render: value => <span className="text-gray-700">{value}</span>,
 		},
 		{
 			header: t("invoiceApprovals.table.actions"),
 			accessor: "id",
-			width: "200px",
+			width: "250px",
 			render: (value, row) => (
-				<div className="flex gap-2">
+				<div className="flex gap-2 flex-wrap justify-center">
 					{row.status === "Pending" && (
 						<>
-							<Button
-								onClick={() => handleApprove(value)}
-								title={t("invoiceApprovals.actions.approve")}
-								className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium bg-transparent shadow-none hover:shadow-none"
-							/>
-							<Button
-								onClick={() => handleReject(value)}
-								title={t("invoiceApprovals.actions.reject")}
-								className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-medium bg-transparent shadow-none hover:shadow-none"
-							/>
+							{row.canApprove && (
+								<Button
+									onClick={() => handleApprove(row.invoiceId, row.invoiceType)}
+									title={t("invoiceApprovals.actions.approve")}
+									className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium shadow-none hover:shadow-none"
+								/>
+							)}
+							{row.canReject && (
+								<Button
+									onClick={() => handleReject(row.invoiceId, row.invoiceType)}
+									title={t("invoiceApprovals.actions.reject")}
+									className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-medium shadow-none hover:shadow-none"
+								/>
+							)}
+							{row.canDelegate && (
+								<Button
+									onClick={() => handleDelegate(row.invoiceId, row.invoiceType)}
+									title={t("invoiceApprovals.actions.delegate")}
+									className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs font-medium shadow-none hover:shadow-none"
+								/>
+							)}
 						</>
 					)}
 				</div>
@@ -342,19 +462,17 @@ const InvoiceApprovalsPage = () => {
 		},
 	];
 
-	// Filter data based on active tab
+	// Filter data based on active tab and search
 	const getFilteredData = () => {
 		let filtered = displayApprovals;
 
-		// Filter by tab
+		// Filter by tab (status)
 		if (activeTab !== "all") {
 			filtered = filtered.filter(item => item.status.toLowerCase() === activeTab.toLowerCase());
 		}
 
-		// Filter by type
-		if (selectedType !== "all") {
-			filtered = filtered.filter(item => item.rawType === selectedType);
-		}
+		// Note: Type filtering is now handled by fetching from different endpoints
+		// No need to filter by type here since we already fetch the correct data
 
 		// Filter by search
 		if (searchQuery) {
@@ -381,6 +499,7 @@ const InvoiceApprovalsPage = () => {
 			{ value: "all", label: t("invoiceApprovals.actions.filterAllTypes") },
 			{ value: "AP Invoice", label: t("invoiceApprovals.actions.apInvoice") },
 			{ value: "AR Invoice", label: t("invoiceApprovals.actions.arInvoice") },
+			{ value: "OTS Invoice", label: t("invoiceApprovals.actions.otsInvoice") },
 		],
 		[t]
 	);
@@ -398,12 +517,6 @@ const InvoiceApprovalsPage = () => {
 				<div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
 					<h2 className="text-2xl font-bold text-gray-900">{t("invoiceApprovals.title")}</h2>
 					<div className="flex gap-3 items-center w-full md:w-auto">
-						<Button
-							onClick={handleCreate}
-							className="bg-[#28819C] hover:bg-[#1f6477]"
-							icon={<BiPlus size={20} color="white" />}
-							title={t("invoiceApprovals.actions.createApproval")}
-						/>
 						<div className="relative">
 							<SearchInput
 								placeholder={t("invoiceApprovals.actions.searchPlaceholder")}
@@ -438,7 +551,6 @@ const InvoiceApprovalsPage = () => {
 				<Table
 					columns={columns}
 					data={getFilteredData()}
-					onEdit={row => (row.status === "Pending" ? handleEdit(row) : null)}
 					onDelete={row => (row.status === "Pending" ? handleDelete(row) : null)}
 					showActions={row => row.status === "Pending"}
 				/>
@@ -500,6 +612,7 @@ const InvoiceApprovalsPage = () => {
 				onClose={() => {
 					setIsApproveModalOpen(false);
 					setActionId(null);
+					setActionInvoiceType(null);
 					setActionComments("");
 				}}
 				onConfirm={confirmApprove}
@@ -520,6 +633,7 @@ const InvoiceApprovalsPage = () => {
 				onClose={() => {
 					setIsRejectModalOpen(false);
 					setActionId(null);
+					setActionInvoiceType(null);
 					setActionComments("");
 				}}
 				onConfirm={confirmReject}
@@ -533,6 +647,75 @@ const InvoiceApprovalsPage = () => {
 				onTextareaChange={e => setActionComments(e.target.value)}
 				loading={loading}
 			/>
+
+			{/* Delegate Modal */}
+			<SlideUpModal
+				isOpen={isDelegateModalOpen}
+				onClose={() => {
+					setIsDelegateModalOpen(false);
+					setActionId(null);
+					setActionInvoiceType(null);
+					setActionComments("");
+					setDelegateTargetUserId("");
+				}}
+				title={t("invoiceApprovals.modals.delegateTitle")}
+			>
+				<div className="space-y-4">
+					<p className="text-gray-600">{t("invoiceApprovals.modals.delegateMessage")}</p>
+
+					<FloatingLabelSelect
+						label={t("invoiceApprovals.modals.selectUser")}
+						value={delegateTargetUserId}
+						onChange={e => setDelegateTargetUserId(e.target.value)}
+						options={[
+							{ value: "", label: t("invoiceApprovals.modals.selectUserPlaceholder") },
+							// TODO: Replace with actual users from API
+							{ value: "1", label: "User 1" },
+							{ value: "2", label: "User 2" },
+							{ value: "3", label: "User 3" },
+							{ value: "5", label: "Department Head" },
+						]}
+						required
+					/>
+
+					<div>
+						<label className="block text-sm font-medium text-gray-700 mb-1">
+							{t("invoiceApprovals.modals.commentsLabel")}
+						</label>
+						<textarea
+							value={actionComments}
+							onChange={e => setActionComments(e.target.value)}
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+							rows={3}
+							placeholder={t("invoiceApprovals.modals.delegateCommentPlaceholder")}
+						/>
+					</div>
+
+					<div className="flex justify-end gap-3 pt-4">
+						<Button
+							onClick={() => {
+								setIsDelegateModalOpen(false);
+								setActionId(null);
+								setActionInvoiceType(null);
+								setActionComments("");
+								setDelegateTargetUserId("");
+							}}
+							title={t("invoiceApprovals.actions.cancel")}
+							className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 bg-transparent shadow-none hover:shadow-none"
+						/>
+						<Button
+							onClick={confirmDelegate}
+							disabled={loading || !delegateTargetUserId}
+							title={
+								loading
+									? t("invoiceApprovals.actions.delegating")
+									: t("invoiceApprovals.actions.delegate")
+							}
+							className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-none hover:shadow-none"
+						/>
+					</div>
+				</div>
+			</SlideUpModal>
 
 			{/* Toast Container */}
 			<ToastContainer

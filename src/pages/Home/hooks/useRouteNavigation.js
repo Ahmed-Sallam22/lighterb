@@ -30,6 +30,12 @@ export const useRouteNavigation = (cardsData, routes) => {
 				navigate("/procurement/catalog");
 			}
 		}
+
+		if (currentActiveRoute === "Assets") {
+			if (cardKey === "Asset Register") {
+				navigate("/assets");
+			}
+		}
 	};
 
 	const handleRouteClick = routeKey => {

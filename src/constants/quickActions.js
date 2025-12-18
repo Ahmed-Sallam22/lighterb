@@ -19,26 +19,26 @@ export const QUICK_ACTIONS = [
 		labelKey: 'home.quickActionsList.makePayment.label',
 		descriptionKey: 'home.quickActionsList.makePayment.description',
 	},
-	{
-		id: 'create-vendor-bill',
-		labelKey: 'home.quickActionsList.createVendorBill.label',
-		descriptionKey: 'home.quickActionsList.createVendorBill.description',
-	},
-	{
-		id: 'new-payment-request',
-		labelKey: 'home.quickActionsList.newPaymentRequest.label',
-		descriptionKey: 'home.quickActionsList.newPaymentRequest.description',
-	},
-	{
-		id: 'new-asset-category',
-		labelKey: 'home.quickActionsList.newAssetCategory.label',
-		descriptionKey: 'home.quickActionsList.newAssetCategory.description',
-	},
-	{
-		id: 'register-new-asset',
-		labelKey: 'home.quickActionsList.registerNewAsset.label',
-		descriptionKey: 'home.quickActionsList.registerNewAsset.description',
-	},
+	// {
+	// 	id: 'create-vendor-bill',
+	// 	labelKey: 'home.quickActionsList.createVendorBill.label',
+	// 	descriptionKey: 'home.quickActionsList.createVendorBill.description',
+	// },
+	// {
+	// 	id: 'new-payment-request',
+	// 	labelKey: 'home.quickActionsList.newPaymentRequest.label',
+	// 	descriptionKey: 'home.quickActionsList.newPaymentRequest.description',
+	// },
+	// {
+	// 	id: 'new-asset-category',
+	// 	labelKey: 'home.quickActionsList.newAssetCategory.label',
+	// 	descriptionKey: 'home.quickActionsList.newAssetCategory.description',
+	// },
+	// {
+	// 	id: 'register-new-asset',
+	// 	labelKey: 'home.quickActionsList.registerNewAsset.label',
+	// 	descriptionKey: 'home.quickActionsList.registerNewAsset.description',
+	// },
 ];
 
 export const getQuickActionById = id => QUICK_ACTIONS.find(action => action.id === id);

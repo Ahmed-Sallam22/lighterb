@@ -10,11 +10,16 @@ const CardsGrid = ({ cards, activeRoute, isAnimating, onCardClick }) => {
 			{cards.map((card, index) => (
 				<div
 					key={`${activeRoute}-${index}`}
-					onClick={() => onCardClick(card.key)}
-					className="rounded-xl border border-white/10 bg-[#28819C]/30 py-6 px-3 shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:bg-white/20 hover:shadow-[0_10px_30px_rgba(72,193,240,0.3)] animate-fadeInUp cursor-pointer"
-					style={{
-						animationDelay: `${index * 50}ms`,
+					onClick={() => {
+						if (card.isDisabled) return;
+						onCardClick(card.key);
 					}}
+					className={`rounded-xl border py-6 px-3 shadow-xl transition-all duration-500 ${
+						card.isDisabled
+							? "bg-[#1E5F72]/60 border-white/5 cursor-not-allowed opacity-70"
+							: "border-white/10 bg-[#28819C]/30 cursor-pointer animate-fadeInUp transform hover:-translate-y-2 hover:bg-white/20 hover:shadow-[0_10px_30px_rgba(72,193,240,0.3)]"
+					}`}
+					style={card.isDisabled ? undefined : { animationDelay: `${index * 50}ms` }}
 				>
 					<div className="flex flex-row items-center gap-4">
 						{/* Icon */}

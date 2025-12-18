@@ -1,8 +1,8 @@
 export const getHomeRoutes = t => [
 	{ name: t("home.routes.dashboard"), key: "Dashboard", path: "/dashboard" },
-	{ name: t("home.routes.assets"), key: "Assets", path: "/assets" },
-	{ name: t("home.routes.procurement"), key: "Procurement", path: "/procurement" },
-	{ name: t("home.routes.accounts"), key: "Accounts", path: "/accounts" },
+	// { name: t("home.routes.assets"), key: "Assets", path: "/assets" },
+	// { name: t("home.routes.procurement"), key: "Procurement", path: "/procurement" },
+	// { name: t("home.routes.accounts"), key: "Accounts", path: "/accounts" },
 	{ name: t("home.routes.suppliers"), key: "Suppliers", path: "/suppliers" },
 	{ name: t("home.routes.customers"), key: "Customers", path: "/customers" },
 	{ name: t("home.routes.journal"), key: "Journal", path: "/journal" },
@@ -10,5 +10,5 @@ export const getHomeRoutes = t => [
 	{ name: t("home.routes.arPayments"), key: "AR Payments", path: "/ar-payments" },
 	{ name: t("home.routes.apInvoices"), key: "AP Invoices", path: "/ap-invoices" },
 	{ name: t("home.routes.apPayments"), key: "AP Payments", path: "/ap-payments" },
-	{ name: t("home.routes.reports"), key: "Reports", path: "/reports" },
+	// { name: t("home.routes.reports"), key: "Reports", path: "/reports" },
 ];

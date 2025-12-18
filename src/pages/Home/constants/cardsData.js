@@ -21,7 +21,12 @@ export const getCardsData = t => ({
 			description: t("home.cards.accountsPayable.description"),
 			key: "Accounts Payable",
 		},
-		{ title: t("home.cards.reports.title"), description: t("home.cards.reports.description"), key: "Reports" },
+		{
+			title: t("home.cards.reports.title"),
+			description: t("home.cards.reports.description"),
+			key: "Reports",
+			isDisabled: true,
+		},
 		{
 			title: t("home.cards.currencies.title"),
 			description: t("home.cards.currencies.description"),
@@ -36,6 +41,7 @@ export const getCardsData = t => ({
 			title: t("home.cards.fxConfiguration.title"),
 			description: t("home.cards.fxConfiguration.description"),
 			key: "FX Configuration",
+			isDisabled: true,
 		},
 		{
 			title: t("home.cards.taxRates.title"),
@@ -46,6 +52,7 @@ export const getCardsData = t => ({
 			title: t("home.cards.corporateTax.title"),
 			description: t("home.cards.corporateTax.description"),
 			key: "Corporate Tax",
+			isDisabled: true,
 		},
 		{
 			title: t("home.cards.customers.title"),
@@ -61,6 +68,11 @@ export const getCardsData = t => ({
 			title: t("home.cards.invoiceApprovals.title"),
 			description: t("home.cards.invoiceApprovals.description"),
 			key: "Invoice Approvals",
+		},
+		{
+			title: t("oneTimeSupplierInvoices.title"),
+			description: t("oneTimeSupplierInvoices.subtitle"),
+			key: "One-Time Supplier Invoices",
 		},
 	],
 	Assets: [

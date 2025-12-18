@@ -4,7 +4,7 @@ import { HiDocumentText, HiUsers } from "react-icons/hi";
 import { FaFileInvoiceDollar, FaCreditCard, FaFileAlt, FaUserTie } from "react-icons/fa";
 export const getSidebarLinks = t => [
 	{ label: t("sidebar.dashboard"), path: "/dashboard", icon: <MdDashboard className={iconBase} /> },
-	{ label: t("sidebar.accounts"), icon: <HiUsers className={iconBase} /> },
+	// { label: t("sidebar.accounts"), icon: <HiUsers className={iconBase} /> },
 	{ label: t("sidebar.journalEntries"), icon: <HiDocumentText className={iconBase} /> },
 	{ label: t("sidebar.customers"), icon: <MdPeople className={iconBase} /> },
 	{ label: t("sidebar.suppliers"), icon: <MdShoppingCart className={iconBase} /> },

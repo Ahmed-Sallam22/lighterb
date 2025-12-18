@@ -6,7 +6,7 @@ export const fetchJobRoles = createAsyncThunk(
   'jobRoles/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/job-roles/');
+      const response = await api.get('/core/job_roles/job-roles/');
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message 

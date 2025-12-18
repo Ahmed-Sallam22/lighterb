@@ -966,14 +966,17 @@
 			"filterByType": "Filter by Type",
 			"apInvoice": "AP Invoice",
 			"arInvoice": "AR Invoice",
+			"otsInvoice": "One-Time Supplier Invoice",
 			"approve": "Approve",
 			"reject": "Reject",
+			"delegate": "Delegate",
 			"cancel": "Cancel",
 			"delete": "Delete",
 			"update": "Update",
 			"create": "Create",
 			"approving": "Approving...",
 			"rejecting": "Rejecting...",
+			"delegating": "Delegating...",
 			"updating": "Updating...",
 			"creating": "Creating..."
 		},
@@ -992,9 +995,13 @@
 		"table": {
 			"type": "Type",
 			"invoiceNumber": "Invoice #",
+			"customerSupplier": "Customer/Supplier",
+			"total": "Total",
+			"currentStage": "Current Stage",
 			"submittedBy": "Submitted By",
 			"approver": "Approver",
 			"status": "Status",
+			"date": "Date",
 			"submittedDate": "Submitted Date",
 			"actions": "Actions",
 			"statusValues": {
@@ -1009,11 +1016,16 @@
 			"deleteTitle": "Delete Invoice Approval",
 			"approveTitle": "Approve Invoice",
 			"rejectTitle": "Reject Invoice",
+			"delegateTitle": "Delegate Invoice Approval",
 			"deleteMessage": "Are you sure you want to delete this invoice approval? This action cannot be undone.",
 			"approveMessage": "Are you sure you want to approve this invoice? You can add optional comments below.",
 			"rejectMessage": "Are you sure you want to reject this invoice? Please provide a reason for rejection.",
+			"delegateMessage": "Select a user to delegate this invoice approval to.",
 			"commentsLabel": "Comments (Optional)",
-			"rejectionReasonLabel": "Rejection Reason"
+			"rejectionReasonLabel": "Rejection Reason",
+			"selectUser": "Delegate To",
+			"selectUserPlaceholder": "Select a user...",
+			"delegateCommentPlaceholder": "Add a comment for the delegate..."
 		},
 		"form": {
 			"invoiceType": "Invoice Type",
@@ -1027,12 +1039,15 @@
 			"deleteSuccess": "Invoice approval deleted successfully",
 			"approveSuccess": "Invoice approved successfully",
 			"rejectSuccess": "Invoice rejected successfully",
+			"delegateSuccess": "Invoice delegated successfully",
 			"createSuccess": "Invoice approval created successfully",
 			"updateSuccess": "Invoice approval updated successfully",
 			"deleteError": "Failed to delete invoice approval",
 			"approveError": "Failed to approve invoice",
 			"rejectError": "Failed to reject invoice",
-			"saveError": "Failed to save invoice approval"
+			"delegateError": "Failed to delegate invoice",
+			"saveError": "Failed to save invoice approval",
+			"selectUser": "Please select a user to delegate to"
 		}
 	},
 	"journals": {

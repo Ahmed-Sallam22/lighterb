@@ -136,8 +136,12 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 
 	const invoiceTotalAmount = invoiceSubtotal + invoiceTaxAmount;
 
+	// Get selected currency code for formatting
+	const selectedCurrency = currencies.find(c => c.id === parseInt(invoiceForm.currency));
+	const currencyCode = selectedCurrency?.code || "AED";
+
 	const formatCurrency = value =>
-		new Intl.NumberFormat("en-AE", { style: "currency", currency: "AED" }).format(value);
+		new Intl.NumberFormat("en-AE", { style: "currency", currency: currencyCode }).format(value);
 
 	const handleInvoiceChange = e => {
 		const { name, value } = e.target;
@@ -344,7 +348,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 	return (
 		<div className="max-w-6xl mx-auto mt-5 pb-10 space-y-5">
 			{/* Goods Receipt Link (AP Invoice Only) */}
-			{isAPInvoice && (
+			{/* {isAPInvoice && (
 				<Card title={t("invoiceForm.goodsReceipt.title")} subtitle={t("invoiceForm.goodsReceipt.subtitle")}>
 					<div className="grid grid-cols-1 gap-6">
 						<FloatingLabelSelect
@@ -358,7 +362,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 						<p className="text-xs text-[#7A9098]">{t("invoiceForm.goodsReceipt.helper")}</p>
 					</div>
 				</Card>
-			)}
+			)} */}
 
 			{/* Invoice Details */}
 			<Card title={t("invoiceForm.details.title")}>
@@ -432,32 +436,32 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 
 					{isAPInvoice && (
 						<>
-							<FloatingLabelSelect
+							{/* <FloatingLabelSelect
 								label={t("invoiceForm.details.paymentTerms")}
 								name="payment_terms"
 								value={invoiceForm.payment_terms}
 								onChange={handleInvoiceChange}
 								options={paymentTermsOptions}
 								placeholder={t("invoiceForm.details.selectPaymentTerms")}
-							/>
+							/> */}
 
-							<FloatingLabelInput
+							{/* <FloatingLabelInput
 								label={t("invoiceForm.details.poReference")}
 								name="po_reference"
 								type="text"
 								value={invoiceForm.po_reference}
 								onChange={handleInvoiceChange}
 								placeholder={t("invoiceForm.details.poReferencePlaceholder")}
-							/>
+							/> */}
 
-							<FloatingLabelInput
+							{/* <FloatingLabelInput
 								label={t("invoiceForm.details.vendorInvoiceNumber")}
 								name="vendor_invoice_number"
 								type="text"
 								value={invoiceForm.vendor_invoice_number}
 								onChange={handleInvoiceChange}
 								placeholder={t("invoiceForm.details.vendorInvoiceNumberPlaceholder")}
-							/>
+							/> */}
 
 							<div className="sm:col-span-2">
 								<FloatingLabelInput

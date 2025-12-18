@@ -967,14 +967,17 @@
 			"filterByType": "تصفية حسب النوع",
 			"apInvoice": "فاتورة مشتريات",
 			"arInvoice": "فاتورة مبيعات",
+			"otsInvoice": "فاتورة مورد لمرة واحدة",
 			"approve": "اعتماد",
 			"reject": "رفض",
+			"delegate": "تفويض",
 			"cancel": "إلغاء",
 			"delete": "حذف",
 			"update": "تحديث",
 			"create": "إنشاء",
 			"approving": "جارٍ الاعتماد...",
 			"rejecting": "جارٍ الرفض...",
+			"delegating": "جارٍ التفويض...",
 			"updating": "جارٍ التحديث...",
 			"creating": "جارٍ الإنشاء..."
 		},
@@ -993,9 +996,13 @@
 		"table": {
 			"type": "النوع",
 			"invoiceNumber": "رقم الفاتورة",
+			"customerSupplier": "العميل/المورد",
+			"total": "الإجمالي",
+			"currentStage": "المرحلة الحالية",
 			"submittedBy": "مقدم الطلب",
 			"approver": "المعتمد",
 			"status": "الحالة",
+			"date": "التاريخ",
 			"submittedDate": "تاريخ التقديم",
 			"actions": "الإجراءات",
 			"statusValues": {
@@ -1010,11 +1017,16 @@
 			"deleteTitle": "حذف اعتماد الفاتورة",
 			"approveTitle": "اعتماد الفاتورة",
 			"rejectTitle": "رفض الفاتورة",
+			"delegateTitle": "تفويض اعتماد الفاتورة",
 			"deleteMessage": "هل أنت متأكد من أنك تريد حذف اعتماد الفاتورة هذا؟ لا يمكن التراجع عن هذا الإجراء.",
 			"approveMessage": "هل أنت متأكد من اعتماد هذه الفاتورة؟ يمكنك إضافة تعليقات اختيارية أدناه.",
 			"rejectMessage": "هل أنت متأكد من رفض هذه الفاتورة؟ يرجى ذكر سبب الرفض.",
+			"delegateMessage": "اختر مستخدمًا لتفويض اعتماد هذه الفاتورة إليه.",
 			"commentsLabel": "تعليقات (اختياري)",
-			"rejectionReasonLabel": "سبب الرفض"
+			"rejectionReasonLabel": "سبب الرفض",
+			"selectUser": "تفويض إلى",
+			"selectUserPlaceholder": "اختر مستخدمًا...",
+			"delegateCommentPlaceholder": "أضف تعليقًا للمفوض إليه..."
 		},
 		"form": {
 			"invoiceType": "نوع الفاتورة",
@@ -1028,12 +1040,15 @@
 			"deleteSuccess": "تم حذف اعتماد الفاتورة بنجاح",
 			"approveSuccess": "تم اعتماد الفاتورة بنجاح",
 			"rejectSuccess": "تم رفض الفاتورة بنجاح",
+			"delegateSuccess": "تم تفويض الفاتورة بنجاح",
 			"createSuccess": "تم إنشاء اعتماد الفاتورة بنجاح",
 			"updateSuccess": "تم تحديث اعتماد الفاتورة بنجاح",
 			"deleteError": "فشل حذف اعتماد الفاتورة",
 			"approveError": "فشل اعتماد الفاتورة",
 			"rejectError": "فشل رفض الفاتورة",
-			"saveError": "فشل حفظ اعتماد الفاتورة"
+			"delegateError": "فشل تفويض الفاتورة",
+			"saveError": "فشل حفظ اعتماد الفاتورة",
+			"selectUser": "يرجى اختيار مستخدم للتفويض إليه"
 		}
 	},
 	"journals": {
