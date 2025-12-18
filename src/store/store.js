@@ -7,7 +7,7 @@ import arInvoicesReducer from "./arInvoicesSlice";
 import apInvoicesReducer from "./apInvoicesSlice";
 import oneTimeSupplierInvoicesReducer from "./oneTimeSupplierInvoicesSlice";
 import arPaymentsReducer from "./arPaymentsSlice";
-import apPaymentsReducer from './apPaymentsSlice';
+import apPaymentsReducer from "./apPaymentsSlice";
 import customersReducer from "./customersSlice";
 import suppliersReducer from "./suppliersSlice";
 import reportsReducer from "./reportsSlice";
@@ -19,6 +19,7 @@ import catalogItemsReducer from "./catalogItemsSlice";
 import jobRolesReducer from "./jobRolesSlice";
 import countriesReducer from "./countriesSlice";
 import authReducer from "./authSlice";
+import workflowTemplatesReducer from "./workflowTemplatesSlice";
 
 export const store = configureStore({
 	reducer: {
@@ -42,6 +43,7 @@ export const store = configureStore({
 		catalogItems: catalogItemsReducer,
 		jobRoles: jobRolesReducer,
 		countries: countriesReducer,
+		workflowTemplates: workflowTemplatesReducer,
 	},
 });
 

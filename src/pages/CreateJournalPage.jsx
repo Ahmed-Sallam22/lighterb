@@ -4,27 +4,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
-import { FaCheckCircle, FaTimesCircle, FaTrash } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import PageHeader from "../components/shared/PageHeader";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import Card from "../components/shared/Card";
+import GLLinesSection from "../components/shared/GLLinesSection";
 import { createJournal, updateJournal } from "../store/journalsSlice";
 import { fetchCurrencies } from "../store/currenciesSlice";
-import { fetchAccounts } from "../store/accountsSlice";
-import { fetchSegmentTypes, fetchSegmentValues } from "../store/segmentsSlice";
 import HeroPattern from "../ui/HeroPatterns";
 import CreateJournalHeaderIcon from "../assets/icons/CreateJournalHeaderIcon";
 import Button from "../components/shared/Button";
 
 const CreateJournalPage = () => {
-	const { t } = useTranslation(); // ADD THIS LINE
+	const { t, i18n } = useTranslation();
+	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const location = useLocation();
 	const dispatch = useDispatch();
 	const { currencies } = useSelector(state => state.currencies);
-	const { accounts } = useSelector(state => state.accounts);
-	const { types: segmentTypes = [], values: segmentValues = [] } = useSelector(state => state.segments);
 
 	// Check if we're in edit mode (journal data passed via navigation state)
 	const editJournal = location.state?.journal;
@@ -36,23 +34,24 @@ const CreateJournalPage = () => {
 		label: `${currency.code} - ${currency.name}`,
 	}));
 
-	// Generate account options from Redux state
-	const accountOptions = accounts.map(account => ({
-		value: account.id.toString(),
-		label: `${account.account_number || account.id} - ${account.account_name || account.name || "Account"}`,
-	}));
-
 	const [formData, setFormData] = useState({
 		name: "",
 		date: "",
 		reference: "",
 		description: "",
-		currency: "1", // USD is currency ID 1
+		currency: "1",
 		status: "draft",
 	});
 
-	const [lines, setLines] = useState([]);
-	const [segmentFormState, setSegmentFormState] = useState({}); // Track segment form for each line
+	// Lines format for GLLinesSection: { id, type: "DEBIT"|"CREDIT", amount, segments: [{ segment_type_id, segment_code }] }
+	const [lines, setLines] = useState([
+		{
+			id: Date.now(),
+			type: "",
+			amount: "",
+			segments: [],
+		},
+	]);
 
 	const [errors, setErrors] = useState({
 		date: "",
@@ -60,12 +59,9 @@ const CreateJournalPage = () => {
 		description: "",
 	});
 
-	// Fetch currencies, accounts, segment types, and segment values on component mount
+	// Fetch currencies on component mount
 	useEffect(() => {
 		dispatch(fetchCurrencies());
-		dispatch(fetchAccounts());
-		dispatch(fetchSegmentTypes());
-		dispatch(fetchSegmentValues());
 	}, [dispatch]);
 
 	// Pre-fill form data when in edit mode
@@ -76,19 +72,20 @@ const CreateJournalPage = () => {
 				date: editJournal.date || "",
 				reference: editJournal.reference || "",
 				description: editJournal.memo || "",
-				currency: editJournal.currency || "USD",
+				currency: editJournal.currency_id?.toString() || editJournal.currency?.toString() || "1",
 				status: editJournal.is_posted ? "posted" : "draft",
 			});
 
-			// If journal has lines, populate them
+			// If journal has lines, populate them in GLLinesSection format
 			if (editJournal.lines && editJournal.lines.length > 0) {
-				// Map API lines to form lines structure
 				const mappedLines = editJournal.lines.map((line, index) => ({
 					id: index + 1,
-					account: line.account || "",
-					debit: line.debit || "0.00",
-					credit: line.credit || "0.00",
-					segments: line.segments || [],
+					type: line.type || (parseFloat(line.debit) > 0 ? "DEBIT" : "CREDIT"),
+					amount: line.amount || (parseFloat(line.debit) > 0 ? line.debit : line.credit) || "",
+					segments: (line.segments || []).map(seg => ({
+						segment_type_id: seg.segment_type_id || seg.segment_type,
+						segment_code: seg.segment_code || "",
+					})),
 				}));
 				setLines(mappedLines);
 			}
@@ -97,99 +94,13 @@ const CreateJournalPage = () => {
 
 	const handleInputChange = (field, value) => {
 		setFormData(prev => ({ ...prev, [field]: value }));
-		// Clear error when user starts typing
 		if (errors[field]) {
 			setErrors(prev => ({ ...prev, [field]: "" }));
 		}
 	};
 
-	const handleAddLine = () => {
-		const newLine = {
-			id: Date.now(), // Use timestamp as unique ID
-			account: "",
-			debit: "0.00",
-			credit: "0.00",
-			segments: [],
-		};
-		setLines([...lines, newLine]);
-	};
-
-	const handleRemoveLine = lineId => {
-		if (lines.length > 1) {
-			setLines(lines.filter(line => line.id !== lineId));
-		}
-	};
-
-	const handleLineChange = (lineId, field, value) => {
-		setLines(lines.map(line => (line.id === lineId ? { ...line, [field]: value } : line)));
-	};
-
-	const handleSegmentFormChange = (lineId, field, value) => {
-		const currentSegmentForm = segmentFormState[lineId] || { segment_type: "", segment: "" };
-
-		const updatedForm = {
-			...currentSegmentForm,
-			[field]: value,
-			// Reset segment value when segment type changes
-			...(field === "segment_type" ? { segment: "" } : {}),
-		};
-
-		setSegmentFormState(prev => ({
-			...prev,
-			[lineId]: updatedForm,
-		}));
-
-		// Auto-add segment when both segment_type and segment are selected
-		if (field === "segment" && value && updatedForm.segment_type) {
-			// Both are now selected, auto-add the segment
-			const segmentType = segmentTypes.find(st => st.segment_id === parseInt(updatedForm.segment_type));
-			const segmentValue = segmentValues.find(sv => sv.id === parseInt(value));
-
-			const newSegment = {
-				id: Date.now(),
-				segment_type: parseInt(updatedForm.segment_type),
-				segment: parseInt(value),
-				// Store display names for UI
-				segment_type_name:
-					segmentType?.segment_name || segmentType?.segment_type || `Type ${updatedForm.segment_type}`,
-				segment_value_name: segmentValue?.alias || segmentValue?.name || `Value ${value}`,
-			};
-
-			setLines(
-				lines.map(line => {
-					if (line.id === lineId) {
-						return {
-							...line,
-							segments: [...(line.segments || []), newSegment],
-						};
-					}
-					return line;
-				})
-			);
-
-			// Reset segment form for this line
-			setSegmentFormState(prev => ({
-				...prev,
-				[lineId]: { segment_type: "", segment: "" },
-			}));
-
-			toast.success(t("createJournal.messages.segmentAdded"));
-		}
-	};
-
-	const handleRemoveSegmentFromLine = (lineId, segmentId) => {
-		setLines(
-			lines.map(line => {
-				if (line.id === lineId) {
-					return {
-						...line,
-						segments: line.segments.filter(seg => seg.id !== segmentId),
-					};
-				}
-				return line;
-			})
-		);
-		toast.success(t("createJournal.messages.segmentRemoved"));
+	const handleLinesChange = newLines => {
+		setLines(newLines);
 	};
 
 	const validateForm = () => {
@@ -211,9 +122,14 @@ const CreateJournalPage = () => {
 		return Object.keys(newErrors).length === 0;
 	};
 
+	// Calculate totals from lines with type and amount
 	const calculateTotals = () => {
-		const totalDebit = lines.reduce((sum, line) => sum + (parseFloat(line.debit) || 0), 0);
-		const totalCredit = lines.reduce((sum, line) => sum + (parseFloat(line.credit) || 0), 0);
+		const totalDebit = lines
+			.filter(line => line.type === "DEBIT")
+			.reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
+		const totalCredit = lines
+			.filter(line => line.type === "CREDIT")
+			.reduce((sum, line) => sum + (parseFloat(line.amount) || 0), 0);
 		return { totalDebit, totalCredit };
 	};
 
@@ -232,25 +148,35 @@ const CreateJournalPage = () => {
 			return;
 		}
 
-		// Prepare journal data for API
+		if (totalDebit === 0) {
+			toast.error(t("createJournal.validation.noLines"));
+			return;
+		}
+
+		// Prepare journal data for API - lines are already in correct format from GLLinesSection
+		const journalLines = lines
+			.filter(line => line.type && parseFloat(line.amount) > 0)
+			.map(line => ({
+				amount: parseFloat(line.amount).toFixed(2),
+				type: line.type,
+				segments: (line.segments || [])
+					.filter(seg => seg.segment_code)
+					.map(seg => ({
+						segment_type_id: seg.segment_type_id,
+						segment_code: seg.segment_code,
+					})),
+			}));
+
 		const journalData = {
 			date: formData.date,
-			currency: parseInt(formData.currency) || 1, // Convert currency to integer ID
+			currency_id: parseInt(formData.currency) || 1,
 			memo: formData.description,
-			lines: lines.map(line => ({
-				account: parseInt(line.account),
-				debit: parseFloat(line.debit),
-				credit: parseFloat(line.credit),
-				segments: (line.segments || []).map(seg => ({
-					segment_type: seg.segment_type || seg.id, // segment_type ID
-					segment: seg.segment || seg.id, // segment ID
-				})),
-			})),
+			status: formData.status || "draft",
+			lines: journalLines,
 		};
 
 		try {
 			if (isEditMode) {
-				// Update existing journal
 				await dispatch(
 					updateJournal({
 						id: editJournal.id,
@@ -259,18 +185,14 @@ const CreateJournalPage = () => {
 				).unwrap();
 				toast.success(t("createJournal.messages.updateSuccess"));
 			} else {
-				// Create new journal
 				await dispatch(createJournal(journalData)).unwrap();
 				toast.success(t("createJournal.messages.createSuccess"));
 			}
 
-			// Navigate back to journal entries page
 			navigate("/journal/entries");
 		} catch (err) {
-			// Display detailed error message from API response
 			const errorMessage = err?.message || err?.error || err?.detail || t("createJournal.messages.createError");
 
-			// If there are field-specific errors, display them
 			if (err && typeof err === "object" && !err.message && !err.error && !err.detail) {
 				const errorMessages = [];
 				Object.keys(err).forEach(key => {
@@ -279,7 +201,6 @@ const CreateJournalPage = () => {
 					} else if (typeof err[key] === "string") {
 						errorMessages.push(`${key}: ${err[key]}`);
 					} else if (typeof err[key] === "object") {
-						// Handle nested errors (e.g., lines[0].account: ["error"])
 						errorMessages.push(`${key}: ${JSON.stringify(err[key])}`);
 					}
 				});
@@ -304,12 +225,12 @@ const CreateJournalPage = () => {
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<ToastContainer
-				position="top-right"
+				position={isRtl ? "top-left" : "top-right"}
 				autoClose={3000}
 				hideProgressBar={false}
 				newestOnTop
 				closeOnClick
-				rtl={false}
+				rtl={isRtl}
 				pauseOnFocusLoss
 				draggable
 				pauseOnHover
@@ -321,12 +242,12 @@ const CreateJournalPage = () => {
 				icon={<CreateJournalHeaderIcon />}
 			/>
 
-			<div className=" mx-auto py-6">
+			<div className="mx-auto py-6">
 				<form onSubmit={handleSubmit} className="space-y-6">
 					{/* Hero Card */}
-					<div className="relative  rounded-[36px] border border-[#D7E8EF] bg-linear-to-br from-[#F4FBFE] via-white to-[#EAF5FB] p-8 shadow-xl">
+					<div className="relative rounded-[36px] border border-[#D7E8EF] bg-linear-to-br from-[#F4FBFE] via-white to-[#EAF5FB] p-8 shadow-xl">
 						<HeroPattern />
-						<div className="relative space-y-6 ">
+						<div className="relative space-y-6">
 							<div>
 								<h2 className="text-3xl font-bold text-[#1F6F8B]">
 									{isEditMode
@@ -378,274 +299,48 @@ const CreateJournalPage = () => {
 						</div>
 					</div>
 
-					{/* GL Distribution Lines */}
-					<Card
-						title={t("createJournal.glLines.title")}
-						subtitle={t("createJournal.glLines.subtitle")}
-						actionSlot={
-							<Button
-								onClick={handleAddLine}
-								title={t("createJournal.glLines.newLine")}
-								className="bg-transparent shadow-none hover:shadow-none inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#48C1F0] text-[#48C1F0] text-sm font-semibold hover:bg-[#48C1F0]/10 transition-colors"
-							/>
-						}
-					>
-						{lines.length === 0 ? (
-							<div className="rounded-2xl border border-dashed border-[#b6c4cc] bg-[#f5f8fb] p-6 text-center text-[#567086]">
-								<p className="text-lg font-semibold mb-2">{t("createJournal.glLines.emptyTitle")}</p>
-								<p className="text-sm mb-6">{t("createJournal.glLines.emptyDescription")}</p>
-								<Button
-									onClick={handleAddLine}
-									title={t("createJournal.glLines.newFirstLine")}
-									className="px-4 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform"
-								/>
+					{/* GL Distribution Lines using GLLinesSection */}
+					<Card title={t("createJournal.glLines.title")} subtitle={t("createJournal.glLines.subtitle")}>
+						<GLLinesSection lines={lines} onChange={handleLinesChange} showGlEntryHeader={false} title="" />
+
+						{/* Totals Summary */}
+						<div className="mt-4 p-4 bg-gray-50 rounded-lg border-t-2 border-gray-300">
+							<div className="flex flex-wrap items-center justify-between gap-4">
+								<div className="flex items-center gap-6">
+									<div>
+										<span className="text-sm text-gray-600">
+											{t("createJournal.glLines.totalDebit")}:
+										</span>
+										<span className="ms-2 text-lg font-semibold text-[#28819C]">
+											{totalDebit.toFixed(2)}
+										</span>
+									</div>
+									<div>
+										<span className="text-sm text-gray-600">
+											{t("createJournal.glLines.totalCredit")}:
+										</span>
+										<span className="ms-2 text-lg font-semibold text-[#28819C]">
+											{totalCredit.toFixed(2)}
+										</span>
+									</div>
+								</div>
+								<div>
+									{isBalanced ? (
+										<span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
+											<FaCheckCircle className="w-5 h-5" />
+											{t("createJournal.glLines.balanced")}
+										</span>
+									) : (
+										<span className="inline-flex items-center gap-1 text-red-600 text-sm font-medium">
+											<FaTimesCircle className="w-5 h-5" />
+											{t("createJournal.glLines.notBalanced")}{" "}
+											{Math.abs(totalDebit - totalCredit).toFixed(2)}{" "}
+											{t("createJournal.glLines.difference")}
+										</span>
+									)}
+								</div>
 							</div>
-						) : (
-							<div className="">
-								<table className="w-full border-collapse">
-									<thead>
-										<tr className="border-b border-gray-200 bg-gray-50">
-											<th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-												{t("createJournal.glLines.table.account")}
-											</th>
-											<th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-												{t("createJournal.glLines.table.debit")}
-											</th>
-											<th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-												{t("createJournal.glLines.table.credit")}
-											</th>
-											<th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-												{t("createJournal.glLines.table.segmentsType")}
-											</th>
-											<th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-												{t("createJournal.glLines.table.segmentsValue")}
-											</th>
-											<th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-20">
-												{t("createJournal.glLines.table.actions")}
-											</th>
-										</tr>
-									</thead>
-									<tbody className="divide-y divide-gray-100">
-										{lines.map(line => (
-											<tr key={line.id} className="hover:bg-gray-50 transition-colors">
-												<td className="px-4 py-3">
-													<FloatingLabelSelect
-														label={t("createJournal.glLines.table.account")}
-														value={line.account}
-														onChange={e =>
-															handleLineChange(line.id, "account", e.target.value)
-														}
-														options={[
-															{
-																value: "",
-																label: t(
-																	"createJournal.glLines.placeholders.selectAccount"
-																),
-															},
-															...accountOptions,
-														]}
-													/>
-												</td>
-												<td className="px-4 py-3">
-													<FloatingLabelInput
-														label={t("createJournal.glLines.table.debit")}
-														type="number"
-														step="0.01"
-														value={line.debit}
-														onChange={e =>
-															handleLineChange(line.id, "debit", e.target.value)
-														}
-														placeholder={t("createJournal.glLines.placeholders.debit")}
-													/>
-												</td>
-												<td className="px-4 py-3">
-													<FloatingLabelInput
-														label={t("createJournal.glLines.table.credit")}
-														type="number"
-														step="0.01"
-														value={line.credit}
-														onChange={e =>
-															handleLineChange(line.id, "credit", e.target.value)
-														}
-														placeholder={t("createJournal.glLines.placeholders.credit")}
-													/>
-												</td>
-												<td className="px-4 py-3">
-													<div className="flex flex-col gap-2">
-														{/* Display existing segments */}
-														{line.segments && line.segments.length > 0 && (
-															<div className="flex flex-wrap gap-1 mb-2">
-																{line.segments.map(segment => (
-																	<span
-																		key={segment.id}
-																		className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 group relative"
-																	>
-																		{segment.segment_type_name ||
-																			segment.segment_type}
-																		<Button
-																			onClick={() =>
-																				handleRemoveSegmentFromLine(
-																					line.id,
-																					segment.id
-																				)
-																			}
-																			className="bg-transparent shadow-none hover:shadow-none p-0 ml-1 text-blue-600 hover:text-red-600"
-																			title={t(
-																				"createJournal.glLines.segments.removeSegment"
-																			)}
-																		>
-																			×
-																		</Button>
-																	</span>
-																))}
-															</div>
-														)}
-
-														<FloatingLabelSelect
-															label={t("createJournal.glLines.table.segmentsType")}
-															value={segmentFormState[line.id]?.segment_type || ""}
-															onChange={e =>
-																handleSegmentFormChange(
-																	line.id,
-																	"segment_type",
-																	e.target.value
-																)
-															}
-															options={[
-																{
-																	value: "",
-																	label: t(
-																		"createJournal.glLines.placeholders.selectSegmentType"
-																	),
-																},
-																...(segmentTypes?.map(type => ({
-																	value: type.segment_id.toString(),
-																	label: `${type.segment_name} (${type.segment_type})`,
-																})) || []),
-															]}
-														/>
-
-														{/* Optional manual add button (segments auto-add when both dropdowns are selected) */}
-														<div className="text-xs text-gray-500 italic mt-1">
-															{t("createJournal.glLines.segments.autoAddNote")}
-														</div>
-													</div>
-												</td>
-												<td className="px-4 py-3">
-													<div className="flex flex-col gap-2">
-														{/* Display existing segment values */}
-														{line.segments && line.segments.length > 0 && (
-															<div className="flex flex-wrap gap-1 mb-2">
-																{line.segments.map(segment => (
-																	<span
-																		key={segment.id}
-																		className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 group relative"
-																	>
-																		{segment.segment_value_name ||
-																			segment.alias ||
-																			segment.name}
-																		<Button
-																			onClick={() =>
-																				handleRemoveSegmentFromLine(
-																					line.id,
-																					segment.id
-																				)
-																			}
-																			className="bg-transparent shadow-none hover:shadow-none p-0 ml-1 text-green-600 hover:text-red-600"
-																			title={t(
-																				"createJournal.glLines.segments.removeSegment"
-																			)}
-																		>
-																			×
-																		</Button>
-																	</span>
-																))}
-															</div>
-														)}
-
-														<FloatingLabelSelect
-															label={t("createJournal.glLines.table.segmentsValue")}
-															value={segmentFormState[line.id]?.segment || ""}
-															onChange={e =>
-																handleSegmentFormChange(
-																	line.id,
-																	"segment",
-																	e.target.value
-																)
-															}
-															disabled={!segmentFormState[line.id]?.segment_type}
-															options={[
-																{
-																	value: "",
-																	label: t(
-																		"createJournal.glLines.placeholders.selectSegmentValue"
-																	),
-																},
-																...(segmentValues
-																	?.filter(value => {
-																		const selectedTypeId =
-																			segmentFormState[line.id]?.segment_type;
-																		if (!selectedTypeId) return false;
-																		return (
-																			value.segment_type ===
-																			parseInt(selectedTypeId)
-																		);
-																	})
-																	.map(value => ({
-																		value: value.id.toString(),
-																		label: `${value.alias} (${value.code})`,
-																	})) || []),
-															]}
-														/>
-													</div>
-												</td>
-												<td className="px-4 py-3 text-center">
-													<Button
-														onClick={() => handleRemoveLine(line.id)}
-														disabled={lines.length === 1}
-														icon={<FaTrash className="w-5 h-5" />}
-														className={`bg-transparent shadow-none hover:shadow-none p-2 rounded-lg transition-colors ${
-															lines.length === 1
-																? "text-gray-300 cursor-not-allowed"
-																: "text-red-600 hover:bg-red-50"
-														}`}
-														title={t("createJournal.glLines.deleteLine")}
-													/>
-												</td>
-											</tr>
-										))}
-									</tbody>
-									<tfoot className="border-t-2 border-gray-300 bg-gray-50">
-										<tr className="font-semibold">
-											<td className="px-4 py-3 text-right text-gray-700">
-												{t("createJournal.glLines.totals")}
-											</td>
-											<td className="px-4 py-3 text-right text-lg text-[#28819C]">
-												{totalDebit.toFixed(2)}
-											</td>
-											<td className="px-4 py-3 text-right text-lg text-[#28819C]">
-												{totalCredit.toFixed(2)}
-											</td>
-											<td colSpan="2" className="px-4 py-3">
-												{isBalanced ? (
-													<span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
-														<FaCheckCircle className="w-5 h-5" />
-														{t("createJournal.glLines.balanced")}
-													</span>
-												) : (
-													<span className="inline-flex items-center gap-1 text-red-600 text-sm font-medium">
-														<FaTimesCircle className="w-5 h-5" />
-														{t("createJournal.glLines.notBalanced")}
-														{Math.abs(totalDebit - totalCredit).toFixed(2)}
-														{t("createJournal.glLines.difference")}
-													</span>
-												)}
-											</td>
-										</tr>
-									</tfoot>
-								</table>
-							</div>
-						)}
+						</div>
 					</Card>
 
 					{/* Action Buttons */}

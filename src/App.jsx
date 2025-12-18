@@ -5,6 +5,7 @@ import { lazy, Suspense, useEffect } from "react";
 import MainLayout from "./layouts/MainLayout";
 import ScrollToTop from "./components/ScrollToTop";
 import AuthGuard from "./components/auth/AuthGuard";
+import ApprovalWorkflow from "./pages/ApprovalWorkflowPage";
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
@@ -105,6 +106,7 @@ const App = () => {
 						<Route path="procurement/approvals/:instanceId" element={<ProcurementApprovalDetail />} />
 						<Route path="procurement/catalog" element={<ProcurementCatalog />} />
 						<Route path="job-roles" element={<JobRolesPage />} />
+						<Route path="approval-workflow" element={<ApprovalWorkflow />} />
 					</Route>
 				</Routes>
 			</Suspense>

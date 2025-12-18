@@ -664,7 +664,8 @@
 			"dateRequired": "التاريخ مطلوب",
 			"currencyRequired": "العملة مطلوبة",
 			"descriptionRequired": "الوصف مطلوب",
-			"debitCreditMustMatch": "يجب أن يتساوى إجمالي المدين والدائن!"
+			"debitCreditMustMatch": "يجب أن يتساوى إجمالي المدين والدائن!",
+			"noLines": "يرجى إضافة بند واحد على الأقل بمبلغ"
 		},
 		"glLines": {
 			"title": "بنود توزيع دفتر الأستاذ",
@@ -694,6 +695,8 @@
 			},
 			"deleteLine": "حذف البند",
 			"totals": "الإجماليات:",
+			"totalDebit": "إجمالي المدين",
+			"totalCredit": "إجمالي الدائن",
 			"balanced": "متوازن",
 			"notBalanced": "غير متوازن (الفرق:",
 			"difference": ")"
@@ -964,6 +967,7 @@
 			"createApproval": "إنشاء اعتماد",
 			"searchPlaceholder": "بحث...",
 			"filterAllTypes": "جميع الأنواع",
+			"approvalWorkflow": "سير عمل الاعتماد",
 			"filterByType": "تصفية حسب النوع",
 			"apInvoice": "فاتورة مشتريات",
 			"arInvoice": "فاتورة مبيعات",
@@ -1956,6 +1960,65 @@
 			"total": "إجمالي الدول",
 			"active": "الدول النشطة",
 			"lastUpdated": "آخر تحديث"
+		}
+	},
+	"approvalWorkflow": {
+		"title": "سير عمل الموافقات",
+		"subtitle": "إدارة قوالب سير العمل ومراحل الموافقة",
+		"emptyMessage": "لم يتم العثور على قوالب سير العمل",
+		"table": {
+			"id": "المعرّف",
+			"code": "الرمز",
+			"name": "الاسم",
+			"contentType": "نوع المحتوى",
+			"status": "الحالة",
+			"version": "الإصدار",
+			"stages": "المراحل",
+			"stagesLabel": "مراحل",
+			"instances": "الحالات",
+			"createdAt": "تاريخ الإنشاء"
+		},
+		"status": {
+			"active": "نشط",
+			"inactive": "غير نشط"
+		},
+		"filters": {
+			"code": "رمز سير العمل",
+			"codePlaceholder": "أدخل رمز سير العمل",
+			"contentType": "معرّف نوع المحتوى",
+			"contentTypePlaceholder": "أدخل معرّف نوع المحتوى",
+			"status": "الحالة",
+			"allStatuses": "جميع الحالات",
+			"reset": "إعادة تعيين",
+			"applyFilters": "تطبيق الفلاتر"
+		},
+		"modals": {
+			"viewTitle": "تفاصيل قالب سير العمل",
+			"deleteTitle": "حذف قالب سير العمل",
+			"deleteMessage": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"delete": "حذف",
+			"cancel": "إلغاء",
+			"thisTemplate": "هذا القالب"
+		},
+		"details": {
+			"basicInfo": "المعلومات الأساسية",
+			"description": "الوصف",
+			"stages": "مراحل الموافقة",
+			"noStages": "لا توجد مراحل محددة لسير العمل هذا",
+			"requiredRole": "الدور المطلوب",
+			"decisionPolicy": "سياسة القرار",
+			"allowReject": "السماح بالرفض",
+			"allowDelegate": "السماح بالتفويض",
+			"slaHours": "مدة التنفيذ",
+			"hours": "ساعات",
+			"createdAt": "تاريخ الإنشاء",
+			"updatedAt": "تاريخ التحديث"
+		},
+		"messages": {
+			"fetchError": "فشل تحميل تفاصيل قالب سير العمل",
+			"deleteSuccess": "تم حذف قالب سير العمل بنجاح",
+			"deleteError": "فشل حذف قالب سير العمل",
+			"noData": "لا توجد بيانات متاحة"
 		}
 	}
 }

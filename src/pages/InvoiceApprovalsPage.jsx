@@ -32,6 +32,7 @@ import InvoiceIcon from "../assets/icons/InvoiceIcon";
 import { IoIosCheckmarkCircleOutline, IoMdCloseCircleOutline } from "react-icons/io";
 import { MdAccessTime } from "react-icons/md";
 import InvoiceApprovalForm from "../components/forms/InvoiceApprovalForm";
+import { useNavigate } from "react-router";
 
 const InvoiceApprovalsPage = () => {
 	const { t, i18n } = useTranslation();
@@ -504,6 +505,8 @@ const InvoiceApprovalsPage = () => {
 		[t]
 	);
 
+	const navigate = useNavigate();
+
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<PageHeader
@@ -517,6 +520,10 @@ const InvoiceApprovalsPage = () => {
 				<div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
 					<h2 className="text-2xl font-bold text-gray-900">{t("invoiceApprovals.title")}</h2>
 					<div className="flex gap-3 items-center w-full md:w-auto">
+							<Button 
+								onClick={() => navigate("/approval-workflow/")}
+								title={t("invoiceApprovals.actions.approvalWorkflow")}
+							/>
 						<div className="relative">
 							<SearchInput
 								placeholder={t("invoiceApprovals.actions.searchPlaceholder")}

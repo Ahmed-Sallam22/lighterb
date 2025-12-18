@@ -663,7 +663,8 @@
 			"dateRequired": "Date is required",
 			"currencyRequired": "Currency is required",
 			"descriptionRequired": "Description is required",
-			"debitCreditMustMatch": "Total Debit and Total Credit must be equal!"
+			"debitCreditMustMatch": "Total Debit and Total Credit must be equal!",
+			"noLines": "Please add at least one GL line with amount"
 		},
 		"glLines": {
 			"title": "GL Distribution Lines",
@@ -693,6 +694,8 @@
 			},
 			"deleteLine": "Delete line",
 			"totals": "Totals:",
+			"totalDebit": "Total Debit",
+			"totalCredit": "Total Credit",
 			"balanced": "Balanced",
 			"notBalanced": "Not Balanced (Diff:",
 			"difference": ")"
@@ -966,6 +969,7 @@
 			"filterByType": "Filter by Type",
 			"apInvoice": "AP Invoice",
 			"arInvoice": "AR Invoice",
+			"approvalWorkflow": "Approval Workflow",
 			"otsInvoice": "One-Time Supplier Invoice",
 			"approve": "Approve",
 			"reject": "Reject",
@@ -1955,6 +1959,65 @@
 			"total": "Total Countries",
 			"active": "Active Countries",
 			"lastUpdated": "Last Updated"
+		}
+	},
+	"approvalWorkflow": {
+		"title": "Approval Workflows",
+		"subtitle": "Manage workflow templates and approval stages",
+		"emptyMessage": "No workflow templates found",
+		"table": {
+			"id": "ID",
+			"code": "Code",
+			"name": "Name",
+			"contentType": "Content Type",
+			"status": "Status",
+			"version": "Version",
+			"stages": "Stages",
+			"stagesLabel": "stages",
+			"instances": "Instances",
+			"createdAt": "Created At"
+		},
+		"status": {
+			"active": "Active",
+			"inactive": "Inactive"
+		},
+		"filters": {
+			"code": "Workflow Code",
+			"codePlaceholder": "Enter workflow code",
+			"contentType": "Content Type ID",
+			"contentTypePlaceholder": "Enter content type ID",
+			"status": "Status",
+			"allStatuses": "All Statuses",
+			"reset": "Reset",
+			"applyFilters": "Apply Filters"
+		},
+		"modals": {
+			"viewTitle": "Workflow Template Details",
+			"deleteTitle": "Delete Workflow Template",
+			"deleteMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+			"delete": "Delete",
+			"cancel": "Cancel",
+			"thisTemplate": "this template"
+		},
+		"details": {
+			"basicInfo": "Basic Information",
+			"description": "Description",
+			"stages": "Approval Stages",
+			"noStages": "No stages defined for this workflow",
+			"requiredRole": "Required Role",
+			"decisionPolicy": "Decision Policy",
+			"allowReject": "Allow Reject",
+			"allowDelegate": "Allow Delegate",
+			"slaHours": "SLA",
+			"hours": "hours",
+			"createdAt": "Created",
+			"updatedAt": "Updated"
+		},
+		"messages": {
+			"fetchError": "Failed to load workflow template details",
+			"deleteSuccess": "Workflow template deleted successfully",
+			"deleteError": "Failed to delete workflow template",
+			"noData": "No data available"
 		}
 	}
 }

@@ -23,7 +23,7 @@ export const fetchJournalById = createAsyncThunk("journals/fetchById", async (id
 
 export const createJournal = createAsyncThunk("journals/create", async (journalData, { rejectWithValue }) => {
 	try {
-		const response = await api.post("/finance/gl/journal-entries/", journalData);
+		const response = await api.post("/finance/gl/journal-entries/save/", journalData);
 		return response.data?.data ?? response.data;
 	} catch (error) {
 		return rejectWithValue(error.response?.data || "Failed to create journal");
@@ -32,8 +32,10 @@ export const createJournal = createAsyncThunk("journals/create", async (journalD
 
 export const updateJournal = createAsyncThunk("journals/update", async ({ id, data }, { rejectWithValue }) => {
 	try {
-		const response = await api.patch(`/journals/${id}/`, data);
-		return response.data;
+		// Include the ID in the data for update
+		const updateData = { ...data, id };
+		const response = await api.put("/finance/gl/journal-entries/save/", updateData);
+		return response.data?.data ?? response.data;
 	} catch (error) {
 		return rejectWithValue(error.response?.data || "Failed to update journal");
 	}
