@@ -458,7 +458,8 @@
 		"scrollLeft": "Scroll left",
 		"scrollRight": "Scroll right",
 		"yes": "Yes",
-		"no": "No"
+		"no": "No",
+		"cancel": "Cancel"
 	},
 	"glLines": {
 		"title": "GL Lines",

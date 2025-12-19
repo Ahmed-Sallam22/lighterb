@@ -25,7 +25,7 @@ const ApprovalWorkflowForm = () => {
 	const dispatch = useDispatch();
 	const { t } = useTranslation();
 	const { loading, contentTypes } = useSelector(state => state.workflowTemplates);
-	const { jobRoles } = useSelector(state => state.jobRoles);
+	const { roles: jobRoles } = useSelector(state => state.jobRoles);
 
 	// Workflow form state
 	const [workflowForm, setWorkflowForm] = useState({
