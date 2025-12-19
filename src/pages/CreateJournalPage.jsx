@@ -333,8 +333,8 @@ const CreateJournalPage = () => {
 									) : (
 										<span className="inline-flex items-center gap-1 text-red-600 text-sm font-medium">
 											<FaTimesCircle className="w-5 h-5" />
-											{t("createJournal.glLines.notBalanced")}{" "}
-											{Math.abs(totalDebit - totalCredit).toFixed(2)}{" "}
+											{t("createJournal.glLines.notBalanced")}
+											{Math.abs(totalDebit - totalCredit).toFixed(2)}
 											{t("createJournal.glLines.difference")}
 										</span>
 									)}

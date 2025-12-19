@@ -4,11 +4,14 @@ import api from "../api/axios";
 // Fetch AR invoices
 export const fetchARInvoices = createAsyncThunk(
 	"arInvoices/fetchAll",
-	async ({ page = 1, page_size = 20 } = {}, { rejectWithValue }) => {
+	async ({ page = 1, page_size = 20, customer_id } = {}, { rejectWithValue }) => {
 		try {
 			const params = new URLSearchParams();
 			params.append("page", page);
 			params.append("page_size", page_size);
+			if (customer_id) {
+				params.append("customer_id", customer_id);
+			}
 
 			const response = await api.get(`/finance/invoice/ar/?${params.toString()}`);
 			const data = response.data?.data ?? response.data;
@@ -127,7 +130,7 @@ export const reverseARInvoice = createAsyncThunk("arInvoices/reverse", async (id
 // Post AR invoice to GL
 export const postARInvoiceToGL = createAsyncThunk("arInvoices/postGL", async (id, { rejectWithValue }) => {
 	try {
-		const response = await api.post(`/finance/invoice/ar/${id}/post-gl/`);
+		const response = await api.post(`/finance/invoice/ar/${id}/post-to-gl/`);
 		return response.data;
 	} catch (error) {
 		return rejectWithValue(error.message || "Failed to post AR invoice to GL");

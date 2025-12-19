@@ -13,6 +13,7 @@ import {
 	fetchAPPendingApprovals,
 	fetchARPendingApprovals,
 	fetchOTSPendingApprovals,
+	fetchPaymentPendingApprovals,
 	createInvoiceApproval,
 	updateInvoiceApproval,
 	deleteInvoiceApproval,
@@ -39,9 +40,14 @@ const InvoiceApprovalsPage = () => {
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
-	const { pendingApprovals, apPendingApprovals, arPendingApprovals, otsPendingApprovals, loading } = useSelector(
-		state => state.invoiceApprovals
-	);
+	const {
+		pendingApprovals,
+		apPendingApprovals,
+		arPendingApprovals,
+		otsPendingApprovals,
+		paymentPendingApprovals,
+		loading,
+	} = useSelector(state => state.invoiceApprovals);
 	const { invoices: arInvoices } = useSelector(state => state.arInvoices);
 	const { invoices: apInvoices } = useSelector(state => state.apInvoices);
 
@@ -85,6 +91,8 @@ const InvoiceApprovalsPage = () => {
 			dispatch(fetchARPendingApprovals());
 		} else if (selectedType === "OTS Invoice") {
 			dispatch(fetchOTSPendingApprovals());
+		} else if (selectedType === "Payment") {
+			dispatch(fetchPaymentPendingApprovals());
 		}
 	}, [dispatch, selectedType]);
 
@@ -162,6 +170,8 @@ const InvoiceApprovalsPage = () => {
 				dispatch(fetchARPendingApprovals());
 			} else if (selectedType === "OTS Invoice") {
 				dispatch(fetchOTSPendingApprovals());
+			} else if (selectedType === "Payment") {
+				dispatch(fetchPaymentPendingApprovals());
 			}
 		} catch (error) {
 			toast.error(error || t("invoiceApprovals.messages.approveError"));
@@ -191,6 +201,8 @@ const InvoiceApprovalsPage = () => {
 				dispatch(fetchARPendingApprovals());
 			} else if (selectedType === "OTS Invoice") {
 				dispatch(fetchOTSPendingApprovals());
+			} else if (selectedType === "Payment") {
+				dispatch(fetchPaymentPendingApprovals());
 			}
 		} catch (error) {
 			toast.error(error || t("invoiceApprovals.messages.rejectError"));
@@ -226,6 +238,8 @@ const InvoiceApprovalsPage = () => {
 				dispatch(fetchARPendingApprovals());
 			} else if (selectedType === "OTS Invoice") {
 				dispatch(fetchOTSPendingApprovals());
+			} else if (selectedType === "Payment") {
+				dispatch(fetchPaymentPendingApprovals());
 			}
 		} catch (error) {
 			toast.error(error || t("invoiceApprovals.messages.delegateError"));
@@ -286,23 +300,34 @@ const InvoiceApprovalsPage = () => {
 			return arPendingApprovals || [];
 		} else if (selectedType === "OTS Invoice") {
 			return otsPendingApprovals || [];
+		} else if (selectedType === "Payment") {
+			return paymentPendingApprovals || [];
 		}
 		return pendingApprovals || [];
 	};
 
 	const mappedApprovals = getPendingApprovalsData().map(approval => ({
-		id: approval.invoice_id || approval.id,
-		invoiceId: approval.invoice_id,
+		id: approval.invoice_id || approval.payment_id || approval.id,
+		invoiceId: approval.invoice_id || approval.payment_id,
 		type:
 			approval.invoice_type === "AP"
 				? t("invoiceApprovals.actions.apInvoice")
 				: approval.invoice_type === "AR"
 				? t("invoiceApprovals.actions.arInvoice")
+				: approval.invoice_type === "PAYMENT"
+				? t("invoiceApprovals.actions.payment")
 				: t("invoiceApprovals.actions.otsInvoice"),
 		invoiceType: approval.invoice_type, // Raw invoice type for API calls
-		invoiceNumber: approval.invoice_number || `INV-${approval.invoice_id || approval.id}`,
-		customerName: approval.customer_name || approval.supplier_name || t("invoiceApprovals.form.na"),
-		total: approval.total ? `${approval.currency || ""} ${approval.total}` : t("invoiceApprovals.form.na"),
+		invoiceNumber:
+			approval.invoice_number ||
+			approval.payment_number ||
+			`INV-${approval.invoice_id || approval.payment_id || approval.id}`,
+		customerName:
+			approval.customer_name || approval.supplier_name || approval.payee_name || t("invoiceApprovals.form.na"),
+		total:
+			approval.total || approval.amount
+				? `${approval.currency || ""} ${approval.total || approval.amount}`
+				: t("invoiceApprovals.form.na"),
 		currentStage: approval.current_stage || t("invoiceApprovals.form.na"),
 		// Keep internal status for logic, translate in render
 		status:
@@ -324,6 +349,8 @@ const InvoiceApprovalsPage = () => {
 				? "AP Invoice"
 				: approval.invoice_type === "AR"
 				? "AR Invoice"
+				: approval.invoice_type === "PAYMENT"
+				? "Payment"
 				: "OTS Invoice",
 		// Permissions from API
 		canApprove: approval.can_approve || false,
@@ -501,6 +528,7 @@ const InvoiceApprovalsPage = () => {
 			{ value: "AP Invoice", label: t("invoiceApprovals.actions.apInvoice") },
 			{ value: "AR Invoice", label: t("invoiceApprovals.actions.arInvoice") },
 			{ value: "OTS Invoice", label: t("invoiceApprovals.actions.otsInvoice") },
+			{ value: "Payment", label: t("invoiceApprovals.actions.payment") },
 		],
 		[t]
 	);
@@ -520,10 +548,10 @@ const InvoiceApprovalsPage = () => {
 				<div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
 					<h2 className="text-2xl font-bold text-gray-900">{t("invoiceApprovals.title")}</h2>
 					<div className="flex gap-3 items-center w-full md:w-auto">
-							<Button 
-								onClick={() => navigate("/approval-workflow/")}
-								title={t("invoiceApprovals.actions.approvalWorkflow")}
-							/>
+						<Button
+							onClick={() => navigate("/approval-workflow/")}
+							title={t("invoiceApprovals.actions.approvalWorkflow")}
+						/>
 						<div className="relative">
 							<SearchInput
 								placeholder={t("invoiceApprovals.actions.searchPlaceholder")}

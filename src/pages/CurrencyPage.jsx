@@ -42,6 +42,7 @@ const CurrencyPage = () => {
 		symbol: "",
 		exchangeRateToBase: "1.0",
 		isActive: true,
+		isBase: false,
 	});
 	const [errors, setErrors] = useState({});
 
@@ -124,21 +125,7 @@ const CurrencyPage = () => {
 				<span className="text-gray-900">{value !== null && value !== undefined ? value : "1.0"}</span>
 			),
 		},
-		{
-			header: t("currency.table.converter"),
-			accessor: "id",
-			width: "120px",
-			render: (value, row) => (
-				<Button
-					onClick={() => {
-						setConverterModal({ isOpen: true, currency: row });
-						setConversionAmount("100");
-					}}
-					className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm shadow-none hover:shadow-none"
-					title={t("currency.convert")}
-				/>
-			),
-		},
+
 		{
 			header: t("currency.table.active"),
 			accessor: "is_active",
@@ -147,6 +134,16 @@ const CurrencyPage = () => {
 				<div className="flex items-center gap-3">
 					<Toggle checked={!!value} onChange={checked => handleToggleActive(row, checked)} />
 				</div>
+			),
+		},
+		{
+			header: t("currency.table.isBase"),
+			accessor: "is_base_currency",
+			width: "140px",
+			render: value => (
+				<span className={`font-semibold ${value ? "text-green-600" : "text-gray-500"}`}>
+					{t(value ? "currency.table.isBase" : "currency.table.notBase")}
+				</span>
 			),
 		},
 	];
@@ -188,6 +185,7 @@ const CurrencyPage = () => {
 			symbol: formData.symbol.trim(),
 			exchange_rate_to_base_currency: formData.exchangeRateToBase,
 			is_active: formData.isActive,
+			is_base_currency: formData.isBase,
 		};
 
 		try {
@@ -256,6 +254,7 @@ const CurrencyPage = () => {
 			symbol: currency.symbol || "",
 			exchangeRateToBase: currency.exchange_rate_to_base_currency || "1.0",
 			isActive: currency.is_active !== undefined ? currency.is_active : true,
+			isBase: currency.is_base_currency || false,
 		});
 		setIsModalOpen(true);
 	};
@@ -381,7 +380,8 @@ const CurrencyPage = () => {
 					formData={formData}
 					errors={errors}
 					onChange={handleInputChange}
-					onToggleBase={checked => setFormData(prev => ({ ...prev, isActive: checked }))}
+					onToggleBase={checked => setFormData(prev => ({ ...prev, isBase: checked }))}
+					onToggleActive={checked => setFormData(prev => ({ ...prev, isActive: checked }))}
 					onCancel={handleCloseModal}
 					onSubmit={handleAddCurrency}
 					isEditing={!!editingCurrency}
@@ -405,7 +405,7 @@ const CurrencyPage = () => {
 							{converterModal.currency?.code} - {converterModal.currency?.name}
 						</p>
 						<p className="text-sm text-gray-500">
-							{t("currency.converter.rate")}:{" "}
+							{t("currency.converter.rate")}:
 							{converterModal.currency?.exchange_rate_to_base_currency || "1.0"}
 						</p>
 					</div>

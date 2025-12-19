@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -19,6 +19,7 @@ import {
 	updateSupplier,
 	deleteSupplier,
 } from "../store/suppliersSlice";
+import { fetchCountries } from "../store/countriesSlice";
 
 import LoadingSpan from "../components/shared/LoadingSpan";
 
@@ -44,6 +45,7 @@ const SuppliersPage = () => {
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const { suppliers, loading, error } = useSelector(state => state.suppliers);
+	const { countries: countriesData = [] } = useSelector(state => state.countries || {});
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -66,17 +68,13 @@ const SuppliersPage = () => {
 		tax_id: "",
 	});
 
-	// Countries with backend IDs
-	const countries = [
-		{ value: 1, label: "United Arab Emirates" },
-		{ value: 2, label: "United States" },
-		{ value: 3, label: "United Kingdom" },
-		{ value: 4, label: "Germany" },
-		{ value: 5, label: "France" },
-		{ value: 6, label: "Saudi Arabia" },
-		{ value: 7, label: "Egypt" },
-		{ value: 8, label: "India" },
-	];
+	// Countries from backend
+	const countries = useMemo(() => {
+		return countriesData.map(country => ({
+			value: country.id,
+			label: `${country.name} (${country.code})`,
+		}));
+	}, [countriesData]);
 
 	// Update browser title
 	useEffect(() => {
@@ -90,7 +88,8 @@ const SuppliersPage = () => {
 
 	useEffect(() => {
 		refreshSuppliers();
-	}, [refreshSuppliers]);
+		dispatch(fetchCountries());
+	}, [refreshSuppliers, dispatch]);
 
 	useEffect(() => {
 		if (error) {
@@ -369,7 +368,7 @@ const SuppliersPage = () => {
 				onClose={handleCloseModal}
 				title={editingSupplier ? t("suppliers.modals.editTitle") : t("suppliers.modals.addTitle")}
 			>
-				<form onSubmit={handleSubmit} className="space-y-6 max-h-[80vh] overflow-y-auto">
+				<form onSubmit={handleSubmit} className="space-y-6">
 					{/* Basic Information */}
 					<div>
 						<h4 className="text-sm font-semibold text-gray-700 mb-3">{t("suppliers.form.basicInfo")}</h4>
@@ -494,7 +493,7 @@ const SuppliersPage = () => {
 						<Button
 							onClick={handleCloseModal}
 							title={t("suppliers.actions.cancel")}
-							className="bg-transparent shadow-none hover:shadow-none px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+							className="bg-transparent shadow-none hover:shadow-none px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
 						/>
 						<Button
 							onClick={handleSubmit}

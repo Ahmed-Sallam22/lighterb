@@ -114,9 +114,30 @@ export const deleteWorkflowTemplate = createAsyncThunk("workflowTemplates/delete
 	}
 });
 
+// Fetch content types for workflow templates
+export const fetchContentTypes = createAsyncThunk(
+	"workflowTemplates/fetchContentTypes",
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await api.get("/core/approval/content-types/");
+			const data = response.data?.data ?? response.data;
+			return data?.results ?? (Array.isArray(data) ? data : []);
+		} catch (error) {
+			const errorMessage =
+				error.response?.data?.message ||
+				error.response?.data?.error ||
+				error.response?.data?.detail ||
+				error.message ||
+				"Failed to fetch content types";
+			return rejectWithValue(errorMessage);
+		}
+	}
+);
+
 const initialState = {
 	templates: [],
 	currentTemplate: null,
+	contentTypes: [],
 	loading: false,
 	detailsLoading: false,
 	error: null,
@@ -227,6 +248,11 @@ const workflowTemplatesSlice = createSlice({
 			.addCase(deleteWorkflowTemplate.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
+			})
+
+			// Fetch content types
+			.addCase(fetchContentTypes.fulfilled, (state, action) => {
+				state.contentTypes = action.payload;
 			});
 	},
 });

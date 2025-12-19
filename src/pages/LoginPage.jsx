@@ -57,9 +57,6 @@ const LoginPage = () => {
 
 	return (
 		<AuthLayout
-			footerText={t('auth.login.noAccount')}
-			footerLinkText={t('auth.login.createAccount')}
-			footerLinkTo="/auth/register"
 		>
 			<ToastContainer position="top-right" autoClose={3000} />
 			<AuthLogo title={t('auth.login.title')} subtitle={t('auth.login.subtitle')} />

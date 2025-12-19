@@ -15,14 +15,14 @@ import { fetchCurrencies } from "../../store/currenciesSlice";
 import { fetchCustomers } from "../../store/customersSlice";
 import { fetchSuppliers } from "../../store/suppliersSlice";
 import { fetchTaxRates } from "../../store/taxRatesSlice";
-
+import { fetchCountries } from "../../store/countriesSlice";
 // Static country options with ids expected by backend
-const countries = [
-	{ value: 1, code: "AE", label: "United Arab Emirates (AE)" },
-	{ value: 2, code: "US", label: "United States (US)" },
-	{ value: 3, code: "GB", label: "United Kingdom (GB)" },
-	{ value: 4, code: "SA", label: "Saudi Arabia (SA)" },
-];
+// const countries = [
+// 	{ value: 1, code: "AE", label: "United Arab Emirates (AE)" },
+// 	{ value: 2, code: "US", label: "United States (US)" },
+// 	{ value: 3, code: "GB", label: "United Kingdom (GB)" },
+// 	{ value: 4, code: "SA", label: "Saudi Arabia (SA)" },
+// ];
 
 const paymentTermsOptions = [
 	{ value: "NET30", label: "Net 30 Days" },
@@ -46,7 +46,14 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 	const { customers } = useSelector(state => state.customers);
 	const { suppliers } = useSelector(state => state.suppliers);
 	const { taxRates } = useSelector(state => state.taxRates);
+	const { countries: fetchedCountries } = useSelector(state => state.countries);
 	const { loading: invoiceLoading } = useSelector(state => (isAPInvoice ? state.apInvoices : state.arInvoices));
+
+	const countries = fetchedCountries.map(country => ({
+		value: country.id,
+		code: country.code || "N/A",
+		label: `${country.name} `,
+	}));
 
 	const [invoiceForm, setInvoiceForm] = useState({
 		customer: "",
@@ -79,8 +86,15 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 		dispatch(fetchCurrencies());
 		dispatch(fetchCustomers());
 		dispatch(fetchSuppliers());
-		dispatch(fetchTaxRates());
+		dispatch(fetchCountries());
 	}, [dispatch]);
+
+	// Fetch tax rates when country changes
+	useEffect(() => {
+		if (invoiceForm.country) {
+			dispatch(fetchTaxRates({ country: invoiceForm.country }));
+		}
+	}, [dispatch, invoiceForm.country]);
 
 	// Sync glEntry date and currency with invoice form
 	useEffect(() => {
@@ -92,12 +106,13 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 		}));
 	}, [invoiceForm.date, invoiceForm.currency, invoiceForm.memo]);
 
-	// Tax Rate options from Redux
+	// Tax Rate options from Redux (filtered by country from API)
 	const taxRateOptions = (taxRates || []).map(tax => ({
 		value: tax.id,
-		label: `${tax.name || "Tax"} - ${tax.rate}% (${tax.country || "N/A"})`,
+		label: `${tax.name || "Tax"} - ${tax.rate}%`,
 		rate: tax.rate,
 		country: tax.country,
+		country_code: tax.country_code,
 		category: tax.category,
 	}));
 

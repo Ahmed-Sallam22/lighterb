@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
 	fetchOneTimeSupplierInvoices,
 	deleteOneTimeSupplierInvoice,
+	submitOneTimeSupplierInvoiceForApproval,
 	setPage,
 } from "../../../store/oneTimeSupplierInvoicesSlice";
 
@@ -43,6 +44,12 @@ export const useOneTimeSupplierInvoices = () => {
 		return result;
 	};
 
+	const submitForApproval = async id => {
+		const result = await dispatch(submitOneTimeSupplierInvoiceForApproval(id)).unwrap();
+		refreshInvoices();
+		return result;
+	};
+
 	return {
 		invoices,
 		loading,
@@ -58,5 +65,6 @@ export const useOneTimeSupplierInvoices = () => {
 		// Actions
 		refreshInvoices,
 		deleteInvoice,
+		submitForApproval,
 	};
 };

@@ -125,6 +125,25 @@ export const deleteOneTimeSupplierInvoice = createAsyncThunk(
 	}
 );
 
+// Submit One-Time Supplier invoice for approval
+export const submitOneTimeSupplierInvoiceForApproval = createAsyncThunk(
+	"oneTimeSupplierInvoices/submitForApproval",
+	async (id, { rejectWithValue }) => {
+		try {
+			const response = await api.post(`/finance/invoice/one-time-supplier/${id}/submit-for-approval/`);
+			return { id, data: response.data?.data ?? response.data };
+		} catch (error) {
+			const errorMessage =
+				error.response?.data?.message ||
+				error.response?.data?.error ||
+				error.response?.data?.detail ||
+				error.message ||
+				"Failed to submit invoice for approval";
+			return rejectWithValue(errorMessage);
+		}
+	}
+);
+
 const oneTimeSupplierInvoicesSlice = createSlice({
 	name: "oneTimeSupplierInvoices",
 	initialState: {
@@ -208,6 +227,22 @@ const oneTimeSupplierInvoicesSlice = createSlice({
 				state.invoices = state.invoices.filter(invoice => getId(invoice) !== action.payload);
 			})
 			.addCase(deleteOneTimeSupplierInvoice.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			// Submit for approval
+			.addCase(submitOneTimeSupplierInvoiceForApproval.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(submitOneTimeSupplierInvoiceForApproval.fulfilled, (state, action) => {
+				state.loading = false;
+				const index = state.invoices.findIndex(inv => getId(inv) === action.payload.id);
+				if (index !== -1 && action.payload.data) {
+					state.invoices[index] = action.payload.data;
+				}
+			})
+			.addCase(submitOneTimeSupplierInvoiceForApproval.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

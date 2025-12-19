@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
@@ -12,6 +13,7 @@ import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import Button from "../components/shared/Button";
 import LoadingSpan from "../components/shared/LoadingSpan";
+import { FaPlus } from "react-icons/fa";
 import {
 	fetchWorkflowTemplates,
 	fetchWorkflowTemplateDetails,
@@ -40,6 +42,7 @@ const ApprovalWorkflowPage = () => {
 	const { t, i18n } = useTranslation();
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	// Get data from Redux
 	const { templates, loading, detailsLoading, count, page, hasNext, hasPrevious, currentTemplate } = useSelector(
@@ -247,6 +250,18 @@ const ApprovalWorkflowPage = () => {
 				title={t("approvalWorkflow.title")}
 				subtitle={t("approvalWorkflow.subtitle")}
 			/>
+
+			{/* Create Workflow Button */}
+			<div className="px-6 mt-6 flex justify-end">
+				<Button
+					variant="primary"
+					onClick={() => navigate("/quick-actions/create-approval-workflow")}
+					className="inline-flex items-center gap-2"
+				>
+					<FaPlus className="w-4 h-4" />
+					{t("approvalWorkflow.form.createWorkflow")}
+				</Button>
+			</div>
 
 			{/* Filters Section */}
 			<div className="px-6 mt-6">

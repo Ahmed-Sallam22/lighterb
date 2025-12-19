@@ -13,10 +13,11 @@ import { createAPPayment, updateAPPayment } from "../../store/apPaymentsSlice";
 import { FaTrash, FaPlus, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
-	useTranslation();
+	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const dispatch = useDispatch();
+	const hasInitialized = React.useRef(false);
 	const { currencies } = useSelector(state => state.currencies);
 	const { suppliers } = useSelector(state => state.suppliers);
 	const { invoices: apInvoices } = useSelector(state => state.apInvoices);
@@ -55,14 +56,26 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 	useEffect(() => {
 		dispatch(fetchCurrencies({ page_size: 100 }));
 		dispatch(fetchSuppliers({ page_size: 100 }));
-		dispatch(fetchAPInvoices({ page_size: 100 }));
 		dispatch(fetchSegmentTypes());
 		dispatch(fetchSegmentValues({ node_type: "child", page_size: 1000 }));
 	}, [dispatch]);
 
-	// Pre-fill form if in edit mode
+	// Fetch invoices when supplier is selected
 	useEffect(() => {
-		if (editPayment) {
+		if (paymentForm.business_partner_id) {
+			const supplierId = suppliers.find(
+				s => s.business_partner_id === parseInt(paymentForm.business_partner_id)
+			)?.id;
+			if (supplierId) {
+				dispatch(fetchAPInvoices({ supplier_id: supplierId, page_size: 100 }));
+			}
+		}
+	}, [dispatch, paymentForm.business_partner_id, suppliers]);
+
+	// Pre-fill form if in edit mode (only once)
+	useEffect(() => {
+		if (editPayment && !hasInitialized.current) {
+			hasInitialized.current = true;
 			setPaymentForm({
 				date: editPayment.date || "",
 				business_partner_id: editPayment.business_partner_id || editPayment.supplier || "",
@@ -118,18 +131,15 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 		}));
 
 	const supplierOptions = (suppliers || []).map(supplier => ({
-		value: supplier.id,
+		value: supplier.business_partner_id,
+		key: supplier.id,
 		label: supplier.name || supplier.company_name || `Supplier ${supplier.id}`,
 	}));
 
-	const invoiceOptions = (apInvoices || [])
-		.filter(
-			inv => !paymentForm.business_partner_id || inv.supplier_id === parseInt(paymentForm.business_partner_id)
-		)
-		.map(invoice => ({
-			value: invoice.invoice_id,
-			label: `#${invoice.invoice_id}`,
-		}));
+	const invoiceOptions = (apInvoices || []).map(invoice => ({
+		value: invoice.invoice_id,
+		label: `#${invoice.invoice_id}`,
+	}));
 
 	// Get segment options for a specific segment type
 	const getSegmentOptions = segmentTypeId => {
@@ -196,7 +206,10 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 							s.segment_type_id === segmentTypeId ? { ...s, segment_code: segmentCode } : s
 						);
 					} else {
-						updatedSegments = [...(line.segments || []), { segment_type_id: segmentTypeId, segment_code: segmentCode }];
+						updatedSegments = [
+							...(line.segments || []),
+							{ segment_type_id: segmentTypeId, segment_code: segmentCode },
+						];
 					}
 					return { ...line, segments: updatedSegments };
 				}
@@ -220,13 +233,13 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 
 	const handleMakePayment = async () => {
 		if (!paymentForm.business_partner_id || !paymentForm.date || !paymentForm.currency_id) {
-			toast.error("Please fill all required fields (Supplier, Date, Currency)");
+			toast.error(t("paymentForm.errors.requiredFields"));
 			return;
 		}
 
 		const validAllocations = allocations.filter(a => a.invoice_id && a.amount_allocated);
 		if (validAllocations.length === 0) {
-			toast.error("Please add at least one invoice allocation");
+			toast.error(t("paymentForm.errors.noAllocations"));
 			return;
 		}
 
@@ -265,10 +278,10 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 		try {
 			if (isEditMode && paymentId) {
 				await dispatch(updateAPPayment({ id: paymentId, data: paymentData })).unwrap();
-				toast.success("AP Payment updated successfully");
+				toast.success(t("paymentForm.messages.apUpdated"));
 			} else {
 				await dispatch(createAPPayment(paymentData)).unwrap();
-				toast.success("AP Payment created successfully");
+				toast.success(t("paymentForm.messages.apCreated"));
 			}
 			if (onSuccess) {
 				onSuccess();
@@ -276,7 +289,7 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 				navigate(-1);
 			}
 		} catch (error) {
-			toast.error(error || `Failed to ${isEditMode ? "update" : "create"} payment`);
+			toast.error(error || t("paymentForm.messages.createFailed"));
 		}
 	};
 
@@ -284,10 +297,10 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 		<div className="bg-gray-50 rounded-xl p-6 space-y-6">
 			{/* Payment Information Section */}
 			<div>
-				<h3 className="text-sm font-semibold text-gray-700 mb-4">Payment Information</h3>
+				<h3 className="text-sm font-semibold text-gray-700 mb-4">{t("paymentForm.paymentInformation")}</h3>
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<FloatingLabelInput
-						label="Payment Date"
+						label={t("paymentForm.paymentDate")}
 						name="date"
 						type="date"
 						value={paymentForm.date}
@@ -295,24 +308,24 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 						required
 					/>
 					<FloatingLabelSelect
-						label="Business Partner"
+						label={t("paymentForm.businessPartner")}
 						name="business_partner_id"
 						value={paymentForm.business_partner_id}
 						onChange={handleChange}
 						options={supplierOptions}
 						required
-						placeholder="Select..."
+						placeholder={t("paymentForm.select")}
 					/>
 					<FloatingLabelSelect
-						label="Currency"
+						label={t("paymentForm.currency")}
 						name="currency_id"
 						value={paymentForm.currency_id}
 						onChange={handleChange}
 						options={currencyOptions}
-						placeholder="Select..."
+						placeholder={t("paymentForm.select")}
 					/>
 					<FloatingLabelInput
-						label="Exchange Rate"
+						label={t("paymentForm.exchangeRate")}
 						name="exchange_rate"
 						type="number"
 						step="0.0001"
@@ -325,25 +338,32 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 
 			{/* Allocations Section */}
 			<div>
-				<h3 className="text-sm font-semibold text-gray-700 mb-4">Allocations (Invoices)</h3>
+				<h3 className="text-sm font-semibold text-gray-700 mb-4">{t("paymentForm.allocations")}</h3>
 				<div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
 					{/* Table Header */}
 					<div className="grid grid-cols-[1fr_2fr_80px] gap-4 px-4 py-3 bg-gray-50 border-b border-gray-200">
-						<span className="text-xs font-medium text-gray-600">Invoice ID</span>
-						<span className="text-xs font-medium text-gray-600">Amount Allocated</span>
-						<span className="text-xs font-medium text-gray-600 text-center">Actions</span>
+						<span className="text-xs font-medium text-gray-600">{t("paymentForm.invoiceId")}</span>
+						<span className="text-xs font-medium text-gray-600">{t("paymentForm.amountAllocated")}</span>
+						<span className="text-xs font-medium text-gray-600 text-center">
+							{t("paymentForm.actions")}
+						</span>
 					</div>
 					{/* Table Body */}
 					<div className="divide-y divide-gray-100">
 						{allocations.map(allocation => (
-							<div key={allocation.id} className="grid grid-cols-[1fr_2fr_80px] gap-4 px-4 py-3 items-center">
+							<div
+								key={allocation.id}
+								className="grid grid-cols-[1fr_2fr_80px] gap-4 px-4 py-3 items-center"
+							>
 								<div className="relative">
 									<select
 										value={allocation.invoice_id}
-										onChange={e => handleAllocationChange(allocation.id, "invoice_id", e.target.value)}
+										onChange={e =>
+											handleAllocationChange(allocation.id, "invoice_id", e.target.value)
+										}
 										className="w-full h-10 px-3 pr-8 text-sm bg-white border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
 									>
-										<option value="">Select ID</option>
+										<option value="">{t("paymentForm.selectInvoice")}</option>
 										{invoiceOptions.map(opt => (
 											<option key={opt.value} value={opt.value}>
 												{opt.label}
@@ -356,7 +376,9 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 									type="number"
 									step="0.01"
 									value={allocation.amount_allocated}
-									onChange={e => handleAllocationChange(allocation.id, "amount_allocated", e.target.value)}
+									onChange={e =>
+										handleAllocationChange(allocation.id, "amount_allocated", e.target.value)
+									}
 									placeholder="0.00"
 									className="w-full h-10 px-3 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
 								/>
@@ -380,7 +402,7 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 					className="mt-3 flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
 				>
 					<FaPlus className="w-3 h-3" />
-					Add Invoice Allocation
+					{t("paymentForm.addAllocation")}
 				</button>
 			</div>
 
@@ -392,7 +414,7 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 					className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-4"
 				>
 					{isGLEntryOpen ? <FaChevronUp className="w-3 h-3" /> : <FaChevronDown className="w-3 h-3" />}
-					GL Entry Details
+					{t("paymentForm.glEntryDetails")}
 				</button>
 
 				{isGLEntryOpen && (
@@ -400,48 +422,52 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 						{/* GL Entry Header */}
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<FloatingLabelInput
-								label="GL Date"
+								label={t("paymentForm.glDate")}
 								name="gl_date"
 								type="date"
 								value={glEntry.date}
 								onChange={e => setGlEntry(prev => ({ ...prev, date: e.target.value }))}
 							/>
 							<FloatingLabelSelect
-								label="Currency"
+								label={t("paymentForm.currency")}
 								name="gl_currency_id"
 								value={glEntry.currency_id}
 								onChange={e => setGlEntry(prev => ({ ...prev, currency_id: e.target.value }))}
 								options={currencyOptions}
-								placeholder="Select..."
+								placeholder={t("paymentForm.select")}
 							/>
 						</div>
 						<FloatingLabelInput
-							label="Description"
+							label={t("paymentForm.description")}
 							name="memo"
 							value={glEntry.memo}
 							onChange={e => setGlEntry(prev => ({ ...prev, memo: e.target.value }))}
-							placeholder="Enter memo/description..."
+							placeholder={t("paymentForm.memoPlaceholder")}
 						/>
 
 						{/* GL Lines */}
 						<div>
-							<h4 className="text-sm font-medium text-gray-600 mb-3">GL Lines</h4>
+							<h4 className="text-sm font-medium text-gray-600 mb-3">{t("paymentForm.glLines")}</h4>
 							<div className="bg-white rounded-lg border border-gray-200 overflow-hidden overflow-x-auto">
 								{/* GL Lines Header */}
 								<div
 									className="grid gap-3 px-4 py-3 bg-gray-50 border-b border-gray-200 min-w-[700px]"
 									style={{
-										gridTemplateColumns: `120px 150px ${segmentTypes.map(() => "1fr").join(" ")} 60px`,
+										gridTemplateColumns: `120px 150px ${segmentTypes
+											.map(() => "1fr")
+											.join(" ")} 60px`,
 									}}
 								>
-									<span className="text-xs font-medium text-gray-600">Type</span>
-									<span className="text-xs font-medium text-gray-600">Amount</span>
+									<span className="text-xs font-medium text-gray-600">{t("paymentForm.type")}</span>
+									<span className="text-xs font-medium text-gray-600">{t("paymentForm.amount")}</span>
 									{segmentTypes.map(st => (
 										<span key={st.id} className="text-xs font-medium text-gray-600">
 											{st.name || `Segment ${st.id}`}
 										</span>
 									))}
-									<span className="text-xs font-medium text-gray-600 text-center">Actions</span>
+									<span className="text-xs font-medium text-gray-600 text-center">
+										{t("paymentForm.actions")}
+									</span>
 								</div>
 
 								{/* GL Lines Body */}
@@ -451,7 +477,9 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 											key={line.id}
 											className="grid gap-3 px-4 py-3 items-center"
 											style={{
-												gridTemplateColumns: `120px 150px ${segmentTypes.map(() => "1fr").join(" ")} 60px`,
+												gridTemplateColumns: `120px 150px ${segmentTypes
+													.map(() => "1fr")
+													.join(" ")} 60px`,
 											}}
 										>
 											{/* Type */}
@@ -461,7 +489,7 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 													onChange={e => handleGLLineChange(line.id, "type", e.target.value)}
 													className="w-full h-10 px-3 pr-8 text-sm bg-white border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
 												>
-													<option value="">Select Type</option>
+													<option value="">{t("paymentForm.selectType")}</option>
 													<option value="DEBIT">DEBIT</option>
 													<option value="CREDIT">CREDIT</option>
 												</select>
@@ -474,7 +502,7 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 												step="0.01"
 												value={line.amount}
 												onChange={e => handleGLLineChange(line.id, "amount", e.target.value)}
-												placeholder="Amount"
+												placeholder={t("paymentForm.amount")}
 												className="w-full h-10 px-3 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
 											/>
 
@@ -485,10 +513,12 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 													<div key={`${line.id}-${st.id}`} className="relative">
 														<select
 															value={getSegmentValue(line, st.id)}
-															onChange={e => handleSegmentChange(line.id, st.id, e.target.value)}
+															onChange={e =>
+																handleSegmentChange(line.id, st.id, e.target.value)
+															}
 															className="w-full h-10 px-3 pr-8 text-sm bg-white border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
 														>
-															<option value="">Select {st.name || "Account"}</option>
+															<option value="">{t("paymentForm.selectAccount")}</option>
 															{options.map(opt => (
 																<option key={opt.value} value={opt.value}>
 																	{opt.label}
@@ -522,7 +552,7 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 								className="mt-3 flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
 							>
 								<FaPlus className="w-3 h-3" />
-								Add Line
+								{t("paymentForm.addLine")}
 							</button>
 						</div>
 					</div>
@@ -536,7 +566,7 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 					onClick={handleCancel}
 					className="px-6 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
 				>
-					Cancel
+					{t("paymentForm.cancel")}
 				</button>
 				<button
 					type="button"
@@ -544,7 +574,11 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 					disabled={loading}
 					className="px-6 py-2.5 text-sm font-medium text-white bg-[#4A9AAF] rounded-lg hover:bg-[#3d8294] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 				>
-					{loading ? "Processing..." : isEditMode ? "Update Payment" : "Create Payment"}
+					{loading
+						? t("paymentForm.processing")
+						: isEditMode
+						? t("paymentForm.updatePayment")
+						: t("paymentForm.createPayment")}
 				</button>
 			</div>
 		</div>

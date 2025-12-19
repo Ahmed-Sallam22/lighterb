@@ -96,7 +96,7 @@ export const fetchARPaymentDetails = createAsyncThunk(
 // Create AR payment
 export const createARPayment = createAsyncThunk("arPayments/create", async (paymentData, { rejectWithValue }) => {
 	try {
-		const response = await api.post("//finance/payments/", paymentData);
+		const response = await api.post("/finance/payments/", paymentData);
 		return response.data;
 	} catch (error) {
 		if (error.response?.data) {
@@ -124,7 +124,7 @@ export const createARPayment = createAsyncThunk("arPayments/create", async (paym
 // Post AR payment
 export const postARPayment = createAsyncThunk("arPayments/post", async (id, { rejectWithValue }) => {
 	try {
-		const response = await api.post(`//finance/payments/${id}/post/`);
+		const response = await api.post(`/finance/payments/${id}/post/`);
 		return response.data;
 	} catch (error) {
 		const errorMessage =
@@ -175,7 +175,7 @@ export const postARPaymentToGL = createAsyncThunk("arPayments/postToGL", async (
 // Update AR payment
 export const updateARPayment = createAsyncThunk("arPayments/update", async ({ id, data }, { rejectWithValue }) => {
 	try {
-		const response = await api.put(`//finance/payments/${id}/`, data);
+		const response = await api.put(`/finance/payments/${id}/`, data);
 		return response.data;
 	} catch (error) {
 		if (error.response?.data) {

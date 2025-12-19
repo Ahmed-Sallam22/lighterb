@@ -194,9 +194,9 @@ const TaxRatesPage = () => {
 		if (taxRate) {
 			setEditingId(row?.id);
 			setFormData({
-				name: taxRate.name,
-				rate: taxRate.rate.toString(),
-				country: taxRate.country.toString(),
+				name: taxRate.name || "",
+				rate: taxRate.rate?.toString() || "",
+				country: taxRate.country?.toString() || "",
 				category: taxRate.category || "",
 				isActive: taxRate.is_active,
 			});

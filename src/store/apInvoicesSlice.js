@@ -4,11 +4,14 @@ import api from "../api/axios";
 // Fetch AP invoices
 export const fetchAPInvoices = createAsyncThunk(
 	"apInvoices/fetchAll",
-	async ({ page = 1, page_size = 20 } = {}, { rejectWithValue }) => {
+	async ({ page = 1, page_size = 20, supplier_id } = {}, { rejectWithValue }) => {
 		try {
 			const params = new URLSearchParams();
 			params.append("page", page);
 			params.append("page_size", page_size);
+			if (supplier_id) {
+				params.append("supplier_id", supplier_id);
+			}
 
 			const response = await api.get(`/finance/invoice/ap/?${params.toString()}`);
 			const data = response.data?.data ?? response.data;
@@ -169,7 +172,7 @@ export const reverseAPInvoice = createAsyncThunk("apInvoices/reverse", async (id
 // Post AP invoice to GL
 export const postAPInvoiceToGL = createAsyncThunk("apInvoices/postGL", async (id, { rejectWithValue }) => {
 	try {
-		const response = await api.post(`/finance/invoice/ap/${id}/post-gl/`);
+		const response = await api.post(`/finance/invoice/ap/${id}/post-to-gl/`);
 		return response.data;
 	} catch (error) {
 		const errorMessage =

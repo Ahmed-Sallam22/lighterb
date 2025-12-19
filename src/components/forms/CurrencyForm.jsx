@@ -3,7 +3,7 @@ import FloatingLabelInput from "../shared/FloatingLabelInput";
 import Toggle from "../shared/Toggle";
 import Button from "../shared/Button";
 
-const CurrencyForm = ({ t, formData, errors, onChange, onToggleBase, onCancel, onSubmit, isEditing }) => {
+const CurrencyForm = ({ t, formData, errors, onChange, onToggleBase, onToggleActive, onCancel, onSubmit, isEditing }) => {
 	return (
 		<div className="flex flex-col gap-6 py-2">
 			{/* Currency Code */}
@@ -56,10 +56,17 @@ const CurrencyForm = ({ t, formData, errors, onChange, onToggleBase, onCancel, o
 
 			{/* Active Toggle */}
 			<div className="flex items-center gap-3">
-				<Toggle checked={formData.isActive} onChange={onToggleBase} />
+				<Toggle checked={formData.isActive} onChange={onToggleActive} />
 				<div>
 					<p className="text-sm font-semibold text-gray-700">{t("currency.modal.setAsActive")}</p>
 					<p className="text-xs text-gray-500">{t("currency.modal.activeDescription")}</p>
+				</div>
+			</div>
+			<div className="flex items-center gap-3">
+				<Toggle checked={formData.isBase} onChange={onToggleBase} />
+				<div>
+					<p className="text-sm font-semibold text-gray-700">{t("currency.modal.setAsBase")}</p>
+					<p className="text-xs text-gray-500">{t("currency.modal.baseDescription")}</p>
 				</div>
 			</div>
 

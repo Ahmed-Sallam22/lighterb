@@ -3,8 +3,10 @@ import { useParams } from "react-router";
 import { QuickActionsIcon } from "../components/shared/QuickActionsPanel";
 import PageHeader from "../components/shared/PageHeader";
 import InvoiceForm from "../components/forms/InvoiceForm";
+import OneTimeSupplierInvoiceForm from "../components/forms/OneTimeSupplierInvoiceForm";
 import ReceivePaymentForm from "../components/forms/ReceivePaymentForm";
 import MakePaymentForm from "../components/forms/MakePaymentForm";
+import ApprovalWorkflowForm from "../components/forms/ApprovalWorkflowForm";
 import { QUICK_ACTIONS, getQuickActionById } from "../constants/quickActions";
 
 const QuickActionDetail = () => {
@@ -26,11 +28,17 @@ const QuickActionDetail = () => {
 			case "create-ap-invoice":
 				return <InvoiceForm isAPInvoice={true} />;
 
+			case "create-one-time-supplier-invoice":
+				return <OneTimeSupplierInvoiceForm />;
+
 			case "receive-payment":
 				return <ReceivePaymentForm />;
 
 			case "make-payment":
 				return <MakePaymentForm />;
+
+			case "create-approval-workflow":
+				return <ApprovalWorkflowForm />;
 
 			default:
 				return (

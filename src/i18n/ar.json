@@ -19,6 +19,14 @@
 				"label": "إجراء دفعة",
 				"description": "صرف مدفوعات الموردين أو المصروفات بشكل آمن."
 			},
+			"createOneTimeSupplierInvoice": {
+				"label": "إنشاء فاتورة مورد لمرة واحدة",
+				"description": "إنشاء فاتورة من مورد لمرة واحدة بدون إضافته للبيانات الرئيسية."
+			},
+			"createApprovalWorkflow": {
+				"label": "إنشاء سير عمل الموافقات",
+				"description": "تحديد سير عمل موافقات جديد مع المراحل والأدوار."
+			},
 			"createVendorBill": {
 				"label": "إنشاء فاتورة مورد",
 				"description": "إدخال فواتير الموردين للموافقة والترحيل."
@@ -108,7 +116,7 @@
 				"description": "إدارة الموردين"
 			},
 			"invoiceApprovals": {
-				"title": "اعتمادات الفواتير",
+				"title": "الاعتماد",
 				"description": "المراجعة والموافقة"
 			},
 			"assetRegister": {
@@ -328,7 +336,8 @@
 				"approved": "معتمد",
 				"pending": "قيد الانتظار",
 				"rejected": "مرفوض",
-				"draft": "مسودة"
+				"draft": "مسودة",
+				"pending_approval": "قيد الانتظار"
 			}
 		},
 		"modals": {
@@ -433,7 +442,9 @@
 		},
 		"messages": {
 			"deleteSuccess": "تم حذف الفاتورة بنجاح",
-			"actionFailed": "فشل الإجراء"
+			"actionFailed": "فشل الإجراء",
+			"submitSuccess": "تم تقديم الفاتورة للاعتماد بنجاح",
+			"submitFailed": "فشل تقديم الفاتورة للاعتماد"
 		},
 		"modals": {
 			"deleteTitle": "حذف الفاتورة",
@@ -728,7 +739,9 @@
 			"actions": "الإجراءات",
 			"exchangeRateToBase": "سعر الصرف إلى العملة الأساسية",
 			"converter": "محول العملات",
-			"noCurrencies": "لم يتم العثور على عملات"
+			"noCurrencies": "لم يتم العثور على عملات",
+			"isBase": "أساسية",
+			"notBase": "غير أساسية"
 		},
 		"modal": {
 			"titleAdd": "إضافة عملة",
@@ -972,6 +985,7 @@
 			"apInvoice": "فاتورة مشتريات",
 			"arInvoice": "فاتورة مبيعات",
 			"otsInvoice": "فاتورة مورد لمرة واحدة",
+			"payment": "دفعة",
 			"approve": "اعتماد",
 			"reject": "رفض",
 			"delegate": "تفويض",
@@ -1805,30 +1819,79 @@
 	},
 	"paymentForm": {
 		"paymentDetails": "تفاصيل الدفع",
+		"paymentInformation": "معلومات الدفع",
+		"paymentDate": "تاريخ الدفع",
+		"businessPartner": "الشريك التجاري",
 		"supplier": "المورد",
 		"customer": "العميل",
 		"selectSupplier": "اختر المورد",
 		"selectCustomer": "اختر العميل",
+		"select": "اختر...",
 		"date": "التاريخ",
 		"currency": "العملة",
 		"selectCurrency": "اختر العملة",
 		"exchangeRate": "سعر الصرف",
-		"allocations": "تخصيصات الفواتير",
+		"allocations": "التخصيصات (الفواتير)",
 		"allocationsSubtitle": "تخصيص مبالغ الدفع للفواتير",
-		"addAllocation": "إضافة تخصيص",
+		"addAllocation": "إضافة تخصيص فاتورة",
 		"noAllocations": "لم تتم إضافة تخصيصات بعد",
 		"noAllocationsDesc": "أضف تخصيصات الفواتير لتحديد كيفية تطبيق هذه الدفعة.",
 		"addFirstAllocation": "إضافة التخصيص الأول",
+		"invoiceId": "رقم الفاتورة",
 		"invoice": "الفاتورة",
-		"selectInvoice": "اختر الفاتورة",
+		"selectInvoice": "اختر الرقم",
 		"amountAllocated": "المبلغ المخصص",
+		"actions": "الإجراءات",
 		"deleteAllocation": "حذف التخصيص",
 		"totalAllocated": "إجمالي المخصص",
+		"glEntryDetails": "تفاصيل قيد دفتر الأستاذ",
+		"glDate": "تاريخ القيد",
+		"description": "الوصف",
+		"memoPlaceholder": "أدخل الملاحظة/الوصف...",
+		"glLines": "بنود القيد",
+		"type": "النوع",
+		"selectType": "اختر النوع",
+		"amount": "المبلغ",
+		"addLine": "إضافة بند",
+		"selectAccount": "اختر الحساب",
 		"makePayment": "إجراء الدفع",
+		"createPayment": "إنشاء الدفع",
 		"receivePayment": "استلام الدفع",
 		"updatePayment": "تحديث الدفع",
 		"cancel": "إلغاء",
-		"processing": "جاري المعالجة..."
+		"processing": "جاري المعالجة...",
+		"errors": {
+			"requiredFields": "يرجى ملء جميع الحقول المطلوبة (المورد، التاريخ، العملة)",
+			"requiredFieldsCustomer": "يرجى ملء جميع الحقول المطلوبة (العميل، التاريخ، العملة)",
+			"noAllocations": "يرجى إضافة تخصيص فاتورة واحد على الأقل"
+		},
+		"messages": {
+			"apCreated": "تم إنشاء دفعة الموردين بنجاح",
+			"apUpdated": "تم تحديث دفعة الموردين بنجاح",
+			"arCreated": "تم استلام دفعة العملاء بنجاح",
+			"arUpdated": "تم تحديث دفعة العملاء بنجاح",
+			"createFailed": "فشل في إنشاء الدفعة",
+			"updateFailed": "فشل في تحديث الدفعة"
+		}
+	},
+	"oneTimeSupplierForm": {
+		"supplierInfo": {
+			"title": "معلومات المورد",
+			"subtitle": "أدخل تفاصيل المورد لمرة واحدة",
+			"name": "اسم المورد",
+			"namePlaceholder": "أدخل اسم المورد",
+			"email": "البريد الإلكتروني",
+			"emailPlaceholder": "أدخل البريد الإلكتروني",
+			"phone": "الهاتف",
+			"phonePlaceholder": "أدخل رقم الهاتف",
+			"taxId": "الرقم الضريبي",
+			"taxIdPlaceholder": "أدخل الرقم الضريبي"
+		},
+		"messages": {
+			"supplierNameRequired": "اسم المورد مطلوب",
+			"createSuccess": "تم إنشاء فاتورة المورد لمرة واحدة بنجاح",
+			"createFailed": "فشل في إنشاء فاتورة المورد لمرة واحدة"
+		}
 	},
 	"invoiceForm": {
 		"goodsReceipt": {
@@ -2019,6 +2082,52 @@
 			"deleteSuccess": "تم حذف قالب سير العمل بنجاح",
 			"deleteError": "فشل حذف قالب سير العمل",
 			"noData": "لا توجد بيانات متاحة"
+		},
+		"form": {
+			"title": "سير عمل الموافقات",
+			"workflowInfo": "معلومات سير العمل",
+			"active": "نشط",
+			"code": "الرمز",
+			"codePlaceholder": "أدخل الرمز",
+			"workflowName": "اسم سير العمل",
+			"workflowNamePlaceholder": "أدخل اسم سير العمل",
+			"contentType": "نوع المحتوى",
+			"selectContentType": "اختر نوع المحتوى",
+			"version": "الإصدار",
+			"versionPlaceholder": "أدخل الإصدار",
+			"description": "الوصف",
+			"descriptionPlaceholder": "صف سير العمل بالتفصيل...",
+			"approvalStages": "مراحل الموافقة",
+			"addStage": "إضافة مرحلة",
+			"editStage": "تعديل مرحلة",
+			"noStages": "لم تتم إضافة مراحل موافقة",
+			"noStagesDesc": "أضف مرحلة موافقة واحدة على الأقل لتحديد عملية سير العمل.",
+			"addFirstStage": "إضافة أول مرحلة",
+			"stageName": "اسم المرحلة",
+			"stageNamePlaceholder": "أدخل اسم المرحلة",
+			"stageNameRequired": "اسم المرحلة مطلوب",
+			"stageOrder": "ترتيب المرحلة",
+			"stageOrderPlaceholder": "رقم الترتيب",
+			"decisionPolicy": "سياسة القرار",
+			"quorumCount": "عدد النصاب",
+			"quorumCountPlaceholder": "الحد الأدنى من الموافقين المطلوبين",
+			"requiredRole": "الدور المطلوب",
+			"requiredLevel": "المستوى المطلوب",
+			"selectRole": "اختر الدور",
+			"sla": "مدة التنفيذ",
+			"slaHours": "ساعات التنفيذ",
+			"slaHoursPlaceholder": "ساعات لإكمال المرحلة",
+			"allowReject": "السماح بالرفض",
+			"allowDelegate": "السماح بالتفويض",
+			"stageAdded": "تمت إضافة المرحلة بنجاح",
+			"stageUpdated": "تم تحديث المرحلة بنجاح",
+			"stageDeleted": "تم حذف المرحلة بنجاح",
+			"updateStage": "تحديث المرحلة",
+			"requiredFields": "يرجى ملء جميع الحقول المطلوبة",
+			"createWorkflow": "إنشاء سير العمل",
+			"creating": "جاري الإنشاء...",
+			"createSuccess": "تم إنشاء سير العمل بنجاح",
+			"createFailed": "فشل إنشاء سير العمل"
 		}
 	}
 }

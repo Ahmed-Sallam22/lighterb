@@ -22,6 +22,7 @@ import {
 	updateCustomer,
 	deleteCustomer,
 } from "../store/customersSlice";
+import { fetchCountries } from "../store/countriesSlice";
 import { MdPerson } from "react-icons/md";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 const FROM_INITIAL_STATE = {
@@ -49,6 +50,7 @@ const CustomersPage = () => {
 	const dispatch = useDispatch();
 
 	const { customers = [], loading, error } = useSelector(state => state.customers || {});
+	const { countries = [] } = useSelector(state => state.countries || {});
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingCustomer, setEditingCustomer] = useState(null);
@@ -63,15 +65,8 @@ const CustomersPage = () => {
 	const title = t("customers.title");
 	const subtitle = t("customers.subtitle");
 
-	// use countires from backend
+	// use countries from backend
 	const countryOptions = useMemo(() => {
-		const countries = [
-			{ id: 1, code: "AE", name: "United Arab Emirates" },
-			{ id: 2, code: "EG", name: "Egypt" },
-			{ id: 3, code: "IN", name: "India" },
-			{ id: 4, code: "SA", name: "Saudi Arabia" },
-			{ id: 5, code: "US", name: "United States" },
-		];
 		return [
 			{ value: "", label: t("customers.form.selectCountry") || "Select Country" },
 			...countries.map(country => ({
@@ -79,7 +74,7 @@ const CustomersPage = () => {
 				label: `${country.name} (${country.code})`,
 			})),
 		];
-	}, [t]);
+	}, [countries, t]);
 
 	const statusOptions = useMemo(
 		() => [
@@ -91,13 +86,6 @@ const CustomersPage = () => {
 	);
 
 	const countryCodeOptions = useMemo(() => {
-		const countries = [
-			{ id: 1, code: "AE", name: "United Arab Emirates" },
-			{ id: 2, code: "EG", name: "Egypt" },
-			{ id: 3, code: "IN", name: "India" },
-			{ id: 4, code: "SA", name: "Saudi Arabia" },
-			{ id: 5, code: "US", name: "United States" },
-		];
 		return [
 			{ value: "", label: t("customers.filters.all") || "All" },
 			...countries.map(country => ({
@@ -105,7 +93,7 @@ const CustomersPage = () => {
 				label: `${country.name} (${country.code})`,
 			})),
 		];
-	}, [t]);
+	}, [countries, t]);
 
 	// const currencyOptions = [
 	// 	{ value: "", label: t("customers.form.selectCurrency") || "Select Currency" },
@@ -124,9 +112,10 @@ const CustomersPage = () => {
 	// 	];
 	// }, [currencies, t]);
 
-	// Fetch customers on mount
+	// Fetch customers and countries on mount
 	useEffect(() => {
 		dispatch(fetchCustomers());
+		dispatch(fetchCountries());
 	}, [dispatch]);
 
 	// Show error toast if any

@@ -19,6 +19,14 @@
 				"label": "Make Payment",
 				"description": "Disburse supplier or expense payments securely."
 			},
+			"createOneTimeSupplierInvoice": {
+				"label": "Create One-Time Supplier Invoice",
+				"description": "Create an invoice from a one-time supplier without adding them to master data."
+			},
+			"createApprovalWorkflow": {
+				"label": "Create Approval Workflow",
+				"description": "Define a new approval workflow with stages and roles."
+			},
 			"createVendorBill": {
 				"label": "Create Vendor Bill",
 				"description": "Enter vendor bills for approval and posting."
@@ -108,7 +116,7 @@
 				"description": "Supplier Management"
 			},
 			"invoiceApprovals": {
-				"title": "Invoice Approvals",
+				"title": "Approvals",
 				"description": "Review & Approve"
 			},
 			"assetRegister": {
@@ -328,7 +336,8 @@
 				"approved": "Approved",
 				"pending": "Pending",
 				"rejected": "Rejected",
-				"draft": "Draft"
+				"draft": "Draft",
+				"pending_approval": "Pending"
 			}
 		},
 		"modals": {
@@ -433,7 +442,9 @@
 		},
 		"messages": {
 			"deleteSuccess": "Invoice deleted successfully",
-			"actionFailed": "Action failed"
+			"actionFailed": "Action failed",
+			"submitSuccess": "Invoice submitted for approval successfully",
+			"submitFailed": "Failed to submit invoice for approval"
 		},
 		"modals": {
 			"deleteTitle": "Delete Invoice",
@@ -727,7 +738,9 @@
 			"actions": "Actions",
 			"exchangeRateToBase": "Exchange Rate to Base",
 			"converter": "Converter",
-			"noCurrencies": "No currencies found"
+			"noCurrencies": "No currencies found",
+			"isBase": "Base",
+			"notBase": "Not Base"
 		},
 		"modal": {
 			"titleAdd": "Add Currency",
@@ -971,6 +984,7 @@
 			"arInvoice": "AR Invoice",
 			"approvalWorkflow": "Approval Workflow",
 			"otsInvoice": "One-Time Supplier Invoice",
+			"payment": "Payment",
 			"approve": "Approve",
 			"reject": "Reject",
 			"delegate": "Delegate",
@@ -1804,30 +1818,79 @@
 	},
 	"paymentForm": {
 		"paymentDetails": "Payment Details",
+		"paymentInformation": "Payment Information",
+		"paymentDate": "Payment Date",
+		"businessPartner": "Business Partner",
 		"supplier": "Supplier",
 		"customer": "Customer",
 		"selectSupplier": "Select supplier",
 		"selectCustomer": "Select customer",
+		"select": "Select...",
 		"date": "Date",
 		"currency": "Currency",
 		"selectCurrency": "Select Currency",
 		"exchangeRate": "Exchange Rate",
-		"allocations": "Invoice Allocations",
+		"allocations": "Allocations (Invoices)",
 		"allocationsSubtitle": "Allocate payment amounts to invoices",
-		"addAllocation": "Add Allocation",
+		"addAllocation": "Add Invoice Allocation",
 		"noAllocations": "No allocations added yet",
 		"noAllocationsDesc": "Add invoice allocations to specify how this payment should be applied.",
 		"addFirstAllocation": "Add First Allocation",
+		"invoiceId": "Invoice ID",
 		"invoice": "Invoice",
-		"selectInvoice": "Select Invoice",
+		"selectInvoice": "Select ID",
 		"amountAllocated": "Amount Allocated",
+		"actions": "Actions",
 		"deleteAllocation": "Delete Allocation",
 		"totalAllocated": "Total Allocated",
+		"glEntryDetails": "GL Entry Details",
+		"glDate": "GL Date",
+		"description": "Description",
+		"memoPlaceholder": "Enter memo/description...",
+		"glLines": "GL Lines",
+		"type": "Type",
+		"selectType": "Select Type",
+		"amount": "Amount",
+		"addLine": "Add Line",
+		"selectAccount": "Select Account",
 		"makePayment": "Make Payment",
+		"createPayment": "Create Payment",
 		"receivePayment": "Receive Payment",
 		"updatePayment": "Update Payment",
 		"cancel": "Cancel",
-		"processing": "Processing..."
+		"processing": "Processing...",
+		"errors": {
+			"requiredFields": "Please fill all required fields (Supplier, Date, Currency)",
+			"requiredFieldsCustomer": "Please fill all required fields (Customer, Date, Currency)",
+			"noAllocations": "Please add at least one invoice allocation"
+		},
+		"messages": {
+			"apCreated": "AP Payment created successfully",
+			"apUpdated": "AP Payment updated successfully",
+			"arCreated": "AR Payment received successfully",
+			"arUpdated": "AR Payment updated successfully",
+			"createFailed": "Failed to create payment",
+			"updateFailed": "Failed to update payment"
+		}
+	},
+	"oneTimeSupplierForm": {
+		"supplierInfo": {
+			"title": "Supplier Information",
+			"subtitle": "Enter one-time supplier details",
+			"name": "Supplier Name",
+			"namePlaceholder": "Enter supplier name",
+			"email": "Email",
+			"emailPlaceholder": "Enter email address",
+			"phone": "Phone",
+			"phonePlaceholder": "Enter phone number",
+			"taxId": "Tax ID",
+			"taxIdPlaceholder": "Enter tax ID"
+		},
+		"messages": {
+			"supplierNameRequired": "Supplier name is required",
+			"createSuccess": "One-time supplier invoice created successfully",
+			"createFailed": "Failed to create one-time supplier invoice"
+		}
 	},
 	"invoiceForm": {
 		"goodsReceipt": {
@@ -2018,6 +2081,52 @@
 			"deleteSuccess": "Workflow template deleted successfully",
 			"deleteError": "Failed to delete workflow template",
 			"noData": "No data available"
+		},
+		"form": {
+			"title": "Approval Workflows",
+			"workflowInfo": "Workflow Information",
+			"active": "Active",
+			"code": "Code",
+			"codePlaceholder": "Enter Code",
+			"workflowName": "Workflow Name",
+			"workflowNamePlaceholder": "Enter Workflow name",
+			"contentType": "Content Type",
+			"selectContentType": "Select Content Type",
+			"version": "Version",
+			"versionPlaceholder": "Enter Version",
+			"description": "Description",
+			"descriptionPlaceholder": "Describe your workflow in detail...",
+			"approvalStages": "Approval Stages",
+			"addStage": "Add Stage",
+			"editStage": "Edit Stage",
+			"noStages": "No approval stages added",
+			"noStagesDesc": "Add at least one approval stage to define the workflow process.",
+			"addFirstStage": "Add First Stage",
+			"stageName": "Stage Name",
+			"stageNamePlaceholder": "Enter stage name",
+			"stageNameRequired": "Stage name is required",
+			"stageOrder": "Stage Order",
+			"stageOrderPlaceholder": "Order number",
+			"decisionPolicy": "Decision Policy",
+			"quorumCount": "Quorum Count",
+			"quorumCountPlaceholder": "Minimum approvers required",
+			"requiredRole": "Required Role",
+			"requiredLevel": "Required Level",
+			"selectRole": "Select Role",
+			"sla": "SLA",
+			"slaHours": "SLA Hours",
+			"slaHoursPlaceholder": "Hours to complete stage",
+			"allowReject": "Allow Reject",
+			"allowDelegate": "Allow Delegate",
+			"stageAdded": "Stage added successfully",
+			"stageUpdated": "Stage updated successfully",
+			"stageDeleted": "Stage deleted successfully",
+			"updateStage": "Update Stage",
+			"requiredFields": "Please fill in all required fields",
+			"createWorkflow": "Create Workflow",
+			"creating": "Creating...",
+			"createSuccess": "Workflow created successfully",
+			"createFailed": "Failed to create workflow"
 		}
 	}
 }

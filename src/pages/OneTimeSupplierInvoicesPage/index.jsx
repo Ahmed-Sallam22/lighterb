@@ -23,6 +23,7 @@ const OneTimeSupplierInvoicesPage = () => {
 		loading,
 		error,
 		deleteInvoice,
+		submitForApproval,
 		// Pagination
 		count,
 		page,
@@ -114,6 +115,19 @@ const OneTimeSupplierInvoicesPage = () => {
 		setIsDetailOpen(true);
 	};
 
+	const handleSubmitForApproval = async row => {
+		const invoice = row.rawData || row;
+		const id = invoice.invoice_id || invoice.id;
+		if (!id) return;
+
+		try {
+			await submitForApproval(id);
+			toast.success(t("oneTimeSupplierInvoices.messages.submitSuccess"));
+		} catch (err) {
+			toast.error(err?.message || err || t("oneTimeSupplierInvoices.messages.submitFailed"));
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-gray-50">
 			{/* Page Header */}
@@ -143,7 +157,7 @@ const OneTimeSupplierInvoicesPage = () => {
 					onEdit={null}
 					onDelete={handleDelete}
 					onThreeWayMatch={null}
-					onSubmitForApproval={null}
+					onSubmitForApproval={handleSubmitForApproval}
 					onPostToGL={null}
 					emptyMessage={t("oneTimeSupplierInvoices.table.emptyMessage")}
 					showActionsCondition={row => row.rawData?.approval_status === "DRAFT"}

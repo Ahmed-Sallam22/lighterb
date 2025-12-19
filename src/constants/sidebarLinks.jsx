@@ -5,9 +5,9 @@ import { FaFileInvoiceDollar, FaCreditCard, FaFileAlt, FaUserTie } from "react-i
 export const getSidebarLinks = t => [
 	{ label: t("sidebar.dashboard"), path: "/dashboard", icon: <MdDashboard className={iconBase} /> },
 	// { label: t("sidebar.accounts"), icon: <HiUsers className={iconBase} /> },
-	{ label: t("sidebar.journalEntries"), icon: <HiDocumentText className={iconBase} /> },
-	{ label: t("sidebar.customers"), icon: <MdPeople className={iconBase} /> },
-	{ label: t("sidebar.suppliers"), icon: <MdShoppingCart className={iconBase} /> },
+	{ label: t("sidebar.journalEntries"), path: "/journal/entries", icon: <HiDocumentText className={iconBase} /> },
+	{ label: t("sidebar.customers"), path: "/customers", icon: <MdPeople className={iconBase} /> },
+	{ label: t("sidebar.suppliers"), path: "/suppliers", icon: <MdShoppingCart className={iconBase} /> },
 	{ label: t("sidebar.arInvoices"), path: "/ar-invoices", icon: <FaCreditCard className={iconBase} /> },
 	{ label: t("sidebar.arPayments"), path: "/ar-payments", icon: <FaFileInvoiceDollar className={iconBase} /> },
 	{ label: t("sidebar.apInvoices"), path: "/ap-invoices", icon: <FaFileAlt className={iconBase} /> },

@@ -65,24 +65,48 @@ export const fetchOTSPendingApprovals = createAsyncThunk(
 	}
 );
 
-// Fetch all pending approvals (combines AP, AR, OTS)
+// Fetch pending Payment approvals
+export const fetchPaymentPendingApprovals = createAsyncThunk(
+	"invoiceApprovals/fetchPaymentPendingApprovals",
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await api.get("/finance/payments/pending-approvals/");
+			console.log("Payment Pending Approvals Response:", response);
+			// Handle response shape: { status, message, data: { count, next, previous, results } }
+			const results = response.data?.data?.results || response.data?.results || response.data?.data || [];
+			const dataArray = Array.isArray(results) ? results : [];
+			return dataArray.map(item => ({ ...item, invoice_type: "PAYMENT" }));
+		} catch (error) {
+			console.error("Payment Pending Approvals Error:", error.response?.data || error.message);
+			return rejectWithValue(
+				error.response?.data?.message ||
+					error.response?.data?.detail ||
+					"Failed to fetch Payment pending approvals"
+			);
+		}
+	}
+);
+
+// Fetch all pending approvals (combines AP, AR, OTS, Payment)
 export const fetchAllPendingApprovals = createAsyncThunk(
 	"invoiceApprovals/fetchAllPendingApprovals",
 	async (_, { dispatch, rejectWithValue }) => {
 		try {
-			const [apResult, arResult, otsResult] = await Promise.allSettled([
+			const [apResult, arResult, otsResult, paymentResult] = await Promise.allSettled([
 				dispatch(fetchAPPendingApprovals()).unwrap(),
 				dispatch(fetchARPendingApprovals()).unwrap(),
 				dispatch(fetchOTSPendingApprovals()).unwrap(),
+				dispatch(fetchPaymentPendingApprovals()).unwrap(),
 			]);
 
-			console.log("All pending results:", { apResult, arResult, otsResult });
+			console.log("All pending results:", { apResult, arResult, otsResult, paymentResult });
 
 			const apData = apResult.status === "fulfilled" ? apResult.value : [];
 			const arData = arResult.status === "fulfilled" ? arResult.value : [];
 			const otsData = otsResult.status === "fulfilled" ? otsResult.value : [];
+			const paymentData = paymentResult.status === "fulfilled" ? paymentResult.value : [];
 
-			const combined = [...apData, ...arData, ...otsData];
+			const combined = [...apData, ...arData, ...otsData, ...paymentData];
 			console.log("Combined pending approvals:", combined);
 			return combined;
 		} catch (_error) {
@@ -230,6 +254,7 @@ const invoiceApprovalsSlice = createSlice({
 		apPendingApprovals: [],
 		arPendingApprovals: [],
 		otsPendingApprovals: [],
+		paymentPendingApprovals: [],
 		loading: false,
 		error: null,
 	},
@@ -272,6 +297,19 @@ const invoiceApprovalsSlice = createSlice({
 				state.otsPendingApprovals = action.payload;
 			})
 			.addCase(fetchOTSPendingApprovals.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			// Fetch Payment pending approvals
+			.addCase(fetchPaymentPendingApprovals.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchPaymentPendingApprovals.fulfilled, (state, action) => {
+				state.loading = false;
+				state.paymentPendingApprovals = action.payload;
+			})
+			.addCase(fetchPaymentPendingApprovals.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			})
