@@ -48,6 +48,7 @@ const ChangePasswordPage = lazy(() => import("./pages/ChangePasswordPage"));
 const Requisitions = lazy(() => import("./pages/Requisitions"));
 const AssetsPage = lazy(() => import("./pages/Assets"));
 const JobRolesPage = lazy(() => import("./pages/JobRolesPage"));
+const UsersPage = lazy(() => import("./pages/UsersPage"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -66,20 +67,26 @@ const App = () => {
 					{/* <Route path="/auth/register" element={<RegisterPage />} /> */}
 					<Route path="/auth/forgot-password" element={<ForgetPasswordPage />} />
 					<Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-					
+
 					{/* Semi-Protected Route - Requires Auth but uses Auth Layout */}
-					<Route path="/change-password" element={
-						<AuthGuard>
-							<ChangePasswordPage />
-						</AuthGuard>
-					} />
-					
+					<Route
+						path="/change-password"
+						element={
+							<AuthGuard>
+								<ChangePasswordPage />
+							</AuthGuard>
+						}
+					/>
+
 					{/* Protected Routes */}
-					<Route path="/" element={
-						<AuthGuard>
-							<MainLayout />
-						</AuthGuard>
-					}>
+					<Route
+						path="/"
+						element={
+							<AuthGuard>
+								<MainLayout />
+							</AuthGuard>
+						}
+					>
 						<Route index element={<Home />} />
 						<Route path="dashboard" element={<Home />} />
 						<Route path="quick-actions/:actionId" element={<QuickActionDetail />} />
@@ -107,6 +114,7 @@ const App = () => {
 						<Route path="procurement/catalog" element={<ProcurementCatalog />} />
 						<Route path="job-roles" element={<JobRolesPage />} />
 						<Route path="approval-workflow" element={<ApprovalWorkflow />} />
+						<Route path="users" element={<UsersPage />} />
 					</Route>
 				</Routes>
 			</Suspense>

@@ -20,6 +20,7 @@ import jobRolesReducer from "./jobRolesSlice";
 import countriesReducer from "./countriesSlice";
 import authReducer from "./authSlice";
 import workflowTemplatesReducer from "./workflowTemplatesSlice";
+import usersReducer from "./usersSlice";
 
 export const store = configureStore({
 	reducer: {
@@ -44,6 +45,7 @@ export const store = configureStore({
 		jobRoles: jobRolesReducer,
 		countries: countriesReducer,
 		workflowTemplates: workflowTemplatesReducer,
+		users: usersReducer,
 	},
 });
 

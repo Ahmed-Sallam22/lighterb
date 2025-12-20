@@ -287,7 +287,8 @@
 		"apInvoices": "AP Invoices",
 		"apPayments": "AP Payments",
 		"oneTimeSupplierInvoices": "One-Time Supplier",
-		"reports": "Reports"
+		"reports": "Reports",
+		"users": "Users"
 	},
 	"apInvoices": {
 		"title": "AP Invoices",
@@ -2128,6 +2129,67 @@
 			"creating": "Creating...",
 			"createSuccess": "Workflow created successfully",
 			"createFailed": "Failed to create workflow"
+		}
+	},
+	"users": {
+		"title": "Users",
+		"subtitle": "Manage system users and access",
+		"searchPlaceholder": "Search users...",
+		"addUser": "New User",
+		"table": {
+			"id": "ID",
+			"name": "Name",
+			"email": "Email",
+			"phone": "Phone",
+			"userType": "User Type",
+			"jobRole": "Job Role",
+			"emptyMessage": "No users found"
+		},
+		"filters": {
+			"all": "All",
+			"userType": "User Type",
+			"clear": "Clear Filters"
+		},
+		"userTypes": {
+			"user": "User",
+			"admin": "Admin",
+			"superAdmin": "Super Admin"
+		},
+		"form": {
+			"name": "Name",
+			"email": "Email",
+			"phone": "Phone Number",
+			"userType": "User Type",
+			"jobRole": "Job Role",
+			"password": "Password",
+			"confirmPassword": "Confirm Password",
+			"selectJobRole": "Select Job Role"
+		},
+		"modal": {
+			"createTitle": "New User",
+			"editTitle": "Edit User",
+			"create": "Create User",
+			"update": "Update User",
+			"cancel": "Cancel"
+		},
+		"messages": {
+			"required": "Please fill in all required fields",
+			"invalidEmail": "Please enter a valid email address",
+			"passwordMismatch": "Passwords do not match",
+			"created": "User created successfully",
+			"updated": "User updated successfully",
+			"deleted": "User deleted successfully",
+			"deleteError": "Failed to delete user",
+			"saveError": "Failed to save user",
+			"fetchError": "Failed to fetch user details",
+			"filtersCleared": "Filters cleared",
+			"noPermission": "You don't have permission to edit this user"
+		},
+		"deleteModal": {
+			"title": "Delete User",
+			"message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
 		}
 	}
 }
