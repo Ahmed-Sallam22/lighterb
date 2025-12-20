@@ -73,17 +73,18 @@ const JournalEntriesPage = () => {
 
 	// Transform data for table display
 	const journalEntries = filteredJournals.map(journal => {
-		const totalDebit = journal.lines?.reduce((sum, line) => sum + parseFloat(line.debit || 0), 0) || 0;
-		const totalCredit = journal.lines?.reduce((sum, line) => sum + parseFloat(line.credit || 0), 0) || 0;
+		// Use total_debit/total_credit from API response
+		const totalDebit = parseFloat(journal.total_debit || 0);
+		const totalCredit = parseFloat(journal.total_credit || 0);
 		const isPosted = journal.is_posted || journal.posted;
 
 		return {
 			id: journal.id,
 			name: journal.memo || `Journal Entry ${journal.id}`,
 			date: journal.date || new Date().toISOString().split("T")[0],
-			lines: journal.lines?.length || 0,
-			totalDebit: `$${totalDebit.toFixed(2)}`,
-			totalCredit: `$${totalCredit.toFixed(2)}`,
+			lines: journal.line_count || 0,
+			totalDebit: `${journal.currency_code || "$"}${totalDebit.toFixed(2)}`,
+			totalCredit: `${journal.currency_code || "$"}${totalCredit.toFixed(2)}`,
 			// Use localized keys for logic, we will translate in render
 			status: isPosted ? "posted" : "draft",
 			rawData: journal, // Keep original data for actions

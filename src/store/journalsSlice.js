@@ -43,7 +43,7 @@ export const updateJournal = createAsyncThunk("journals/update", async ({ id, da
 
 export const deleteJournal = createAsyncThunk("journals/delete", async (id, { rejectWithValue }) => {
 	try {
-		await api.delete(`/journals/${id}/`);
+		await api.delete(`/finance/gl/journal-entries/${id}/`);
 		return id;
 	} catch (error) {
 		return rejectWithValue(error.response?.data || "Failed to delete journal");
@@ -52,7 +52,7 @@ export const deleteJournal = createAsyncThunk("journals/delete", async (id, { re
 
 export const postJournal = createAsyncThunk("journals/post", async (id, { rejectWithValue }) => {
 	try {
-		const response = await api.post(`/journals/${id}/post/`);
+		const response = await api.post(`/finance/gl/journal-entries/${id}/post/`);
 		return response.data;
 	} catch (error) {
 		return rejectWithValue(error.response?.data || "Failed to post journal");
@@ -61,7 +61,7 @@ export const postJournal = createAsyncThunk("journals/post", async (id, { reject
 
 export const reverseJournal = createAsyncThunk("journals/reverse", async (id, { rejectWithValue }) => {
 	try {
-		const response = await api.post(`/journals/${id}/reverse/`);
+		const response = await api.post(`/finance/gl/journal-entries/${id}/reverse/`);
 		return response.data;
 	} catch (error) {
 		return rejectWithValue(error.response?.data || "Failed to reverse journal");
