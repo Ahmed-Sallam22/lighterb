@@ -168,6 +168,8 @@ export const approveInvoice = createAsyncThunk(
 				endpoint = `/finance/invoice/ar/${id}/approval-action/`;
 			} else if (invoiceType === "OTS") {
 				endpoint = `/finance/invoice/one-time-supplier/${id}/approval-action/`;
+			} else if (invoiceType === "PAYMENT") {
+				endpoint = `/finance/payments/${id}/approval-action/`;
 			} else {
 				endpoint = `/finance/invoice/ap/${id}/approval-action/`;
 			}
@@ -198,6 +200,8 @@ export const rejectInvoice = createAsyncThunk(
 				endpoint = `/finance/invoice/ar/${id}/approval-action/`;
 			} else if (invoiceType === "OTS") {
 				endpoint = `/finance/invoice/one-time-supplier/${id}/approval-action/`;
+			} else if (invoiceType === "PAYMENT") {
+				endpoint = `/finance/payments/${id}/approval-action/`;
 			} else {
 				endpoint = `/finance/invoice/ap/${id}/approval-action/`;
 			}
@@ -228,6 +232,8 @@ export const delegateInvoice = createAsyncThunk(
 				endpoint = `/finance/invoice/ar/${id}/approval-action/`;
 			} else if (invoiceType === "OTS") {
 				endpoint = `/finance/invoice/one-time-supplier/${id}/approval-action/`;
+			} else if (invoiceType === "PAYMENT") {
+				endpoint = `/finance/payments/${id}/approval-action/`;
 			} else {
 				endpoint = `/finance/invoice/ap/${id}/approval-action/`;
 			}

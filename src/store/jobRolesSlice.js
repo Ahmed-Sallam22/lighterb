@@ -22,7 +22,7 @@ export const fetchJobRoles = createAsyncThunk("jobRoles/fetchAll", async (_, { r
 // Create job role
 export const createJobRole = createAsyncThunk("jobRoles/create", async (roleData, { rejectWithValue }) => {
 	try {
-		const response = await api.post("/api/job-roles/", roleData);
+		const response = await api.post("/core/job_roles/job-roles/", roleData);
 		return response.data;
 	} catch (error) {
 		if (error.response?.data) {

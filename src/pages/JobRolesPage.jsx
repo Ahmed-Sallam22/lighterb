@@ -28,16 +28,6 @@ const JobRolesIcon = () => (
 	</svg>
 );
 
-// Available Duty Roles Options
-const DUTY_ROLES_OPTIONS = [
-	{ id: "invoice", label: "Invoice" },
-	{ id: "dashboard", label: "Dashboard" },
-	{ id: "payment", label: "Payment" },
-	{ id: "rules", label: "Rules" },
-	{ id: "reports", label: "Reports" },
-	{ id: "segments", label: "Segments" },
-];
-
 const JobRolesPage = () => {
 	const dispatch = useDispatch();
 
@@ -68,14 +58,12 @@ const JobRolesPage = () => {
 	const [createForm, setCreateForm] = useState({
 		name: "",
 		description: "",
-		duty_roles: [],
 	});
 
 	// Form data for edit
 	const [editForm, setEditForm] = useState({
 		name: "",
 		description: "",
-		duty_roles: [],
 	});
 
 	// Fetch roles on mount
@@ -129,7 +117,7 @@ const JobRolesPage = () => {
 
 	// Handlers
 	const handleOpenCreate = () => {
-		setCreateForm({ name: "", description: "", duty_roles: [] });
+		setCreateForm({ name: "", description: "" });
 		setIsCreateModalOpen(true);
 	};
 
@@ -143,7 +131,6 @@ const JobRolesPage = () => {
 		setEditForm({
 			name: role.name || "",
 			description: role.description || "",
-			duty_roles: role.duty_roles || [],
 		});
 		setIsEditModalOpen(true);
 		setIsViewModalOpen(false);
@@ -171,24 +158,6 @@ const JobRolesPage = () => {
 	const handleEditFormChange = e => {
 		const { name, value } = e.target;
 		setEditForm(prev => ({ ...prev, [name]: value }));
-	};
-
-	const handleDutyRoleToggle = (roleId, isCreate = true) => {
-		if (isCreate) {
-			setCreateForm(prev => ({
-				...prev,
-				duty_roles: prev.duty_roles.includes(roleId)
-					? prev.duty_roles.filter(r => r !== roleId)
-					: [...prev.duty_roles, roleId],
-			}));
-		} else {
-			setEditForm(prev => ({
-				...prev,
-				duty_roles: prev.duty_roles.includes(roleId)
-					? prev.duty_roles.filter(r => r !== roleId)
-					: [...prev.duty_roles, roleId],
-			}));
-		}
 	};
 
 	const handleCreate = async () => {
@@ -358,27 +327,6 @@ const JobRolesPage = () => {
 						placeholder="Enter Job"
 					/>
 
-					{/* Duty Roles Checkboxes */}
-					<div>
-						<p className="text-sm font-medium text-[#28819C] mb-3">Duty Roles</p>
-						<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-							{DUTY_ROLES_OPTIONS.map(option => (
-								<label
-									key={option.id}
-									className="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-gray-800"
-								>
-									<input
-										type="checkbox"
-										checked={createForm.duty_roles.includes(option.id)}
-										onChange={() => handleDutyRoleToggle(option.id, true)}
-										className="w-4 h-4 rounded border-gray-300 text-[#28819C] focus:ring-[#28819C]"
-									/>
-									<span className="text-sm">{option.label}</span>
-								</label>
-							))}
-						</div>
-					</div>
-
 					{/* Submit Button */}
 					<Button
 						onClick={handleCreate}
@@ -407,23 +355,7 @@ const JobRolesPage = () => {
 							</div>
 						</div>
 
-						{/* Duty Rules Display */}
-						{selectedRole.duty_roles && selectedRole.duty_roles.length > 0 && (
-							<div>
-								<p className="text-sm font-medium text-[#28819C] mb-3">Duty Rules</p>
-								<div className="grid grid-cols-2 gap-2">
-									{selectedRole.duty_roles.map((rule, idx) => (
-										<div key={idx} className="flex items-center gap-2 text-gray-600">
-											<span className="w-2 h-2 rounded-full bg-[#28819C]"></span>
-											<span className="text-sm capitalize">
-												{DUTY_ROLES_OPTIONS.find(o => o.id === rule)?.label || rule}
-											</span>
-										</div>
-									))}
-								</div>
-							</div>
-						)}
-
+						
 						{/* Action Buttons */}
 						<div className="flex gap-3 pt-2">
 							<Button
@@ -460,33 +392,6 @@ const JobRolesPage = () => {
 						placeholder="Enter Job"
 					/>
 
-					{/* Duty Roles Select */}
-					<div>
-						<p className="text-sm font-medium text-[#28819C] mb-3">Duty Roles</p>
-						<div className="relative">
-							<select
-								value={editForm.duty_roles[0] || ""}
-								onChange={e => setEditForm(prev => ({ ...prev, duty_roles: [e.target.value] }))}
-								className="w-full appearance-none px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#48C1F0]/40"
-							>
-								<option value="">Select Role</option>
-								{DUTY_ROLES_OPTIONS.map(option => (
-									<option key={option.id} value={option.id}>
-										{option.label}
-									</option>
-								))}
-							</select>
-							<svg
-								className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-								width="12"
-								height="12"
-								viewBox="0 0 12 12"
-								fill="none"
-							>
-								<path d="M3 5l3 3 3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-							</svg>
-						</div>
-					</div>
 
 					{/* Submit Button */}
 					<Button

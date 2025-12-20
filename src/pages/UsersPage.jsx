@@ -270,8 +270,8 @@ const UsersPage = () => {
 		// Map user_type string to API number value
 		const userTypeMap = {
 			user: 1,
-			admin: 2,
-			super_admin: 3,
+			admin: 3,
+			super_admin: 2,
 		};
 
 		if (editingUser) {
