@@ -4,14 +4,31 @@ import api from "../api/axios";
 // Fetch AR invoices
 export const fetchARInvoices = createAsyncThunk(
 	"arInvoices/fetchAll",
-	async ({ page = 1, page_size = 20, customer_id } = {}, { rejectWithValue }) => {
+	async (
+		{
+			page = 1,
+			page_size = 20,
+			customer_id,
+			currency_id,
+			country_id,
+			approval_status,
+			date_from,
+			date_to,
+			search,
+		} = {},
+		{ rejectWithValue }
+	) => {
 		try {
 			const params = new URLSearchParams();
 			params.append("page", page);
 			params.append("page_size", page_size);
-			if (customer_id) {
-				params.append("customer_id", customer_id);
-			}
+			if (customer_id) params.append("customer_id", customer_id);
+			if (currency_id) params.append("currency_id", currency_id);
+			if (country_id) params.append("country_id", country_id);
+			if (approval_status) params.append("approval_status", approval_status);
+			if (date_from) params.append("date_from", date_from);
+			if (date_to) params.append("date_to", date_to);
+			if (search) params.append("search", search);
 
 			const response = await api.get(`/finance/invoice/ar/?${params.toString()}`);
 			const data = response.data?.data ?? response.data;

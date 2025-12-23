@@ -8,6 +8,7 @@ import PageHeader from "../components/shared/PageHeader";
 import Table from "../components/shared/Table";
 import Toolbar from "../components/shared/Toolbar";
 import ConfirmModal from "../components/shared/ConfirmModal";
+import JournalEntryDetailModal from "../components/JournalEntryDetailModal";
 import { fetchJournals, deleteJournal, postJournal, reverseJournal } from "../store/journalsSlice";
 import LoadingSpan from "../components/shared/LoadingSpan";
 import StatisticsCard from "../components/shared/StatisticsCard";
@@ -30,10 +31,13 @@ const JournalEntriesPage = () => {
 
 	// Local state
 	const [confirmDelete, setConfirmDelete] = useState(false);
-
 	const [journalToDelete, setJournalToDelete] = useState(null);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [filterStatus, setFilterStatus] = useState("");
+
+	// View modal state
+	const [viewModalOpen, setViewModalOpen] = useState(false);
+	const [selectedJournalId, setSelectedJournalId] = useState(null);
 
 	// Fetch journals on component mount
 	useEffect(() => {
@@ -196,8 +200,13 @@ const JournalEntriesPage = () => {
 
 	// Handler functions
 	const handleView = row => {
-		// Navigate to create/edit page with journal data for editing
-		navigate("/journal/create", { state: { journal: row.rawData } });
+		setSelectedJournalId(row.id);
+		setViewModalOpen(true);
+	};
+
+	const handleCloseViewModal = () => {
+		setViewModalOpen(false);
+		setSelectedJournalId(null);
 	};
 
 	const handleDelete = row => {
@@ -282,6 +291,13 @@ const JournalEntriesPage = () => {
 				pauseOnHover
 			/>
 
+			{/* View Journal Entry Modal */}
+			<JournalEntryDetailModal
+				isOpen={viewModalOpen}
+				journalId={selectedJournalId}
+				onClose={handleCloseViewModal}
+			/>
+
 			{/* Delete Confirmation Modal */}
 			<ConfirmModal
 				isOpen={confirmDelete}
@@ -331,7 +347,7 @@ const JournalEntriesPage = () => {
 						columns={columns}
 						data={journalEntries}
 						onDelete={handleDelete}
-						onEdit={handleView}
+						onView={handleView}
 						className="mb-8"
 						emptyMessage={t("journals.table.emptyMessage")}
 					/>

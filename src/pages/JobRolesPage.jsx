@@ -1,16 +1,20 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import PageHeader from "../components/shared/PageHeader";
 import Table from "../components/shared/Table";
+import Pagination from "../components/shared/Pagination";
 import SlideUpModal from "../components/shared/SlideUpModal";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import Button from "../components/shared/Button";
+import SearchInput from "../components/shared/SearchInput";
 
-import { fetchJobRoles, createJobRole, updateJobRole, deleteJobRole, clearError } from "../store/jobRolesSlice";
+import { fetchJobRoles, updateJobRole, deleteJobRole, clearError, setPage } from "../store/jobRolesSlice";
+import { BiPlus } from "react-icons/bi";
 
 // Job Roles Icon
 const JobRolesIcon = () => (
@@ -30,19 +34,22 @@ const JobRolesIcon = () => (
 
 const JobRolesPage = () => {
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	const {
 		roles = [],
 		loading,
 		error,
-		creating,
 		updating,
 		deleting,
 		actionError,
+		count,
+		page,
+		hasNext,
+		hasPrevious,
 	} = useSelector(state => state.jobRoles || {});
 
 	// Modal states
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -50,15 +57,9 @@ const JobRolesPage = () => {
 	// Selected role for view/edit/delete
 	const [selectedRole, setSelectedRole] = useState(null);
 
-	// Search and filter
+	// Search
 	const [searchTerm, setSearchTerm] = useState("");
-	const [filterJob, setFilterJob] = useState("");
-
-	// Form data for create
-	const [createForm, setCreateForm] = useState({
-		name: "",
-		description: "",
-	});
+	const [localPageSize, setLocalPageSize] = useState(20);
 
 	// Form data for edit
 	const [editForm, setEditForm] = useState({
@@ -66,10 +67,10 @@ const JobRolesPage = () => {
 		description: "",
 	});
 
-	// Fetch roles on mount
+	// Fetch roles on mount and when pagination/search changes
 	useEffect(() => {
-		dispatch(fetchJobRoles());
-	}, [dispatch]);
+		dispatch(fetchJobRoles({ page, page_size: localPageSize, search: searchTerm }));
+	}, [dispatch, page, localPageSize, searchTerm]);
 
 	// Show error toast
 	useEffect(() => {
@@ -81,44 +82,45 @@ const JobRolesPage = () => {
 
 	// Update page title
 	useEffect(() => {
-		document.title = `Job Roles - LightERP`;
+		document.title = `Responsibilities - LightERP`;
 		return () => {
 			document.title = "LightERP";
 		};
 	}, []);
 
-	// Filter roles based on search and filter
-	const filteredRoles = useMemo(() => {
-		return roles.filter(role => {
-			const matchesSearch =
-				!searchTerm ||
-				role.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				role.description?.toLowerCase().includes(searchTerm.toLowerCase());
+	// Pagination handlers
+	const handlePageChange = useCallback(
+		newPage => {
+			dispatch(setPage(newPage));
+		},
+		[dispatch]
+	);
 
-			const matchesFilter = !filterJob || role.name === filterJob;
-
-			return matchesSearch && matchesFilter;
-		});
-	}, [roles, searchTerm, filterJob]);
+	const handlePageSizeChange = useCallback(
+		newPageSize => {
+			setLocalPageSize(newPageSize);
+			dispatch(setPage(1));
+		},
+		[dispatch]
+	);
 
 	// Table columns
 	const columns = [
 		{
 			header: "Name",
 			accessor: "name",
-			render: value => <span className="font-semibold text-[#0d5f7a]">{value || "-"}</span>,
+			render: value => <span className="font-semibold text-gray-900">{value || "-"}</span>,
 		},
 		{
 			header: "Description",
 			accessor: "description",
-			render: value => value || "-",
+			render: value => <span className="text-gray-600 truncate max-w-[400px] block">{value || "-"}</span>,
 		},
 	];
 
 	// Handlers
 	const handleOpenCreate = () => {
-		setCreateForm({ name: "", description: "" });
-		setIsCreateModalOpen(true);
+		navigate("/job-roles/create");
 	};
 
 	const handleOpenView = row => {
@@ -143,16 +145,10 @@ const JobRolesPage = () => {
 	};
 
 	const handleCloseModals = () => {
-		setIsCreateModalOpen(false);
 		setIsViewModalOpen(false);
 		setIsEditModalOpen(false);
 		setIsDeleteModalOpen(false);
 		setSelectedRole(null);
-	};
-
-	const handleCreateFormChange = e => {
-		const { name, value } = e.target;
-		setCreateForm(prev => ({ ...prev, [name]: value }));
 	};
 
 	const handleEditFormChange = e => {
@@ -160,33 +156,17 @@ const JobRolesPage = () => {
 		setEditForm(prev => ({ ...prev, [name]: value }));
 	};
 
-	const handleCreate = async () => {
-		if (!createForm.name.trim()) {
-			toast.error("Job title is required");
-			return;
-		}
-
-		try {
-			await dispatch(createJobRole(createForm)).unwrap();
-			toast.success("Job role created successfully");
-			handleCloseModals();
-			dispatch(fetchJobRoles());
-		} catch {
-			// Error handled by Redux
-		}
-	};
-
 	const handleUpdate = async () => {
 		if (!editForm.name.trim()) {
-			toast.error("Job title is required");
+			toast.error("Name is required");
 			return;
 		}
 
 		try {
 			await dispatch(updateJobRole({ id: selectedRole.id, data: editForm })).unwrap();
-			toast.success("Job role updated successfully");
+			toast.success("Responsibility updated successfully");
 			handleCloseModals();
-			dispatch(fetchJobRoles());
+			dispatch(fetchJobRoles({ page, page_size: localPageSize, search: searchTerm }));
 		} catch {
 			// Error handled by Redux
 		}
@@ -195,154 +175,86 @@ const JobRolesPage = () => {
 	const handleDelete = async () => {
 		try {
 			await dispatch(deleteJobRole(selectedRole.id)).unwrap();
-			toast.success("Job role deleted successfully");
+			toast.success("Responsibility deleted successfully");
 			handleCloseModals();
+			dispatch(fetchJobRoles({ page, page_size: localPageSize, search: searchTerm }));
 		} catch {
 			// Error handled by Redux
 		}
 	};
 
-	// Get unique job names for filter
-	const jobOptions = useMemo(() => {
-		const names = [...new Set(roles.map(r => r.name).filter(Boolean))];
-		return names.map(name => ({ value: name, label: name }));
-	}, [roles]);
+	const handleSearchChange = e => {
+		setSearchTerm(e.target.value);
+		dispatch(setPage(1)); // Reset to first page on search
+	};
 
 	return (
 		<div className="min-h-screen bg-[#EEEEEE]">
 			<ToastContainer position="top-right" />
 
 			{/* Header */}
-			<PageHeader title="Job Roles" subtitle="Role Overview" icon={<JobRolesIcon />} />
+			<PageHeader title="Responsibilities" subtitle="Lorem Ipsum" icon={<JobRolesIcon />} />
 
-			<div className="p-6">
-				{/* Toolbar */}
-				<div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-					<div className="flex items-center gap-4 flex-1">
-						{/* Search */}
-						<div className="relative flex-1 max-w-md">
-							<svg
-								className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-								width="20"
-								height="20"
-								viewBox="0 0 20 20"
-								fill="none"
-							>
-								<path
-									d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-							</svg>
-							<input
-								type="text"
-								placeholder="Search bills ..."
-								value={searchTerm}
-								onChange={e => setSearchTerm(e.target.value)}
-								className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#48C1F0]/40"
-							/>
-						</div>
+			<div className="w-[95%] mx-auto px-6 py-8">
+				{/* Title and Create Button */}
+				<div className="flex items-center justify-between mb-6">
+					<h2 className="text-2xl font-bold text-[#28819C]">Responsibilities</h2>
 
-						{/* Filter by Job */}
-						<div className="relative">
-							<select
-								value={filterJob}
-								onChange={e => setFilterJob(e.target.value)}
-								className="appearance-none pl-10 pr-10 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#48C1F0]/40 min-w-[150px]"
-							>
-								<option value="">All Jobs</option>
-								{jobOptions.map(opt => (
-									<option key={opt.value} value={opt.value}>
-										{opt.label}
-									</option>
-								))}
-							</select>
-							<svg
-								className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-								width="20"
-								height="20"
-								viewBox="0 0 20 20"
-								fill="none"
-							>
-								<path
-									d="M3 6h14M6 10h8M9 14h2"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-								/>
-							</svg>
-							<svg
-								className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-								width="12"
-								height="12"
-								viewBox="0 0 12 12"
-								fill="none"
-							>
-								<path d="M3 5l3 3 3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-							</svg>
-						</div>
-					</div>
-
-					{/* Create Button */}
 					<Button
 						onClick={handleOpenCreate}
-						title="Create Job"
-						icon={
-							<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-								<path d="M8 1v14M1 8h14" stroke="white" strokeWidth="2" strokeLinecap="round" />
-							</svg>
-						}
-						className="flex items-center gap-2 px-5 py-3 bg-[#28819C] text-white rounded-xl hover:bg-[#1d6a80] transition-colors font-medium shadow-md"
+						title="Create Responsibility"
+						icon={<BiPlus className="text-xl" />}
+						className="bg-[#28819C] hover:bg-[#1d6a80] text-white"
+					/>
+				</div>
+
+				{/* Search Section */}
+				<div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+					<label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+					<SearchInput
+						value={searchTerm}
+						onChange={handleSearchChange}
+						placeholder="Search by code or name..."
+						className="max-w-full"
 					/>
 				</div>
 
 				{/* Table */}
 				<Table
 					columns={columns}
-					data={filteredRoles}
-					onEdit={handleOpenView}
-					editIcon="view"
-					emptyMessage={loading ? "Loading job roles..." : "No job roles found"}
+					data={roles}
+					onView={handleOpenView}
+					onEdit={handleOpenEdit}
+					onDelete={row => {
+						setSelectedRole(row);
+						setIsDeleteModalOpen(true);
+					}}
+					emptyMessage={loading ? "Loading responsibilities..." : "No responsibilities found"}
+				/>
+
+				{/* Pagination */}
+				<Pagination
+					currentPage={page}
+					totalCount={count}
+					pageSize={localPageSize}
+					hasNext={hasNext}
+					hasPrevious={hasPrevious}
+					onPageChange={handlePageChange}
+					onPageSizeChange={handlePageSizeChange}
 				/>
 			</div>
 
-			{/* Create Modal */}
-			<SlideUpModal isOpen={isCreateModalOpen} onClose={handleCloseModals} title="Create Job" maxWidth="600px">
-				<div className="space-y-5 p-4">
-					<FloatingLabelInput
-						label="Job Title"
-						name="name"
-						value={createForm.name}
-						onChange={handleCreateFormChange}
-						placeholder="Enter Job"
-					/>
-
-					<FloatingLabelInput
-						label="Job Description"
-						name="description"
-						value={createForm.description}
-						onChange={handleCreateFormChange}
-						placeholder="Enter Job"
-					/>
-
-					{/* Submit Button */}
-					<Button
-						onClick={handleCreate}
-						disabled={creating}
-						title={creating ? "Creating..." : "Create Job"}
-						className="w-full py-3 bg-[#28819C] text-white rounded-xl hover:bg-[#1d6a80] transition-colors font-medium disabled:opacity-50"
-					/>
-				</div>
-			</SlideUpModal>
-
 			{/* View Modal */}
-			<SlideUpModal isOpen={isViewModalOpen} onClose={handleCloseModals} title="View Job" maxWidth="600px">
+			<SlideUpModal
+				isOpen={isViewModalOpen}
+				onClose={handleCloseModals}
+				title="View Responsibility"
+				maxWidth="600px"
+			>
 				{selectedRole && (
 					<div className="space-y-5 p-4">
 						<div>
-							<p className="text-sm font-medium text-[#28819C] mb-1">Job Name</p>
+							<p className="text-sm font-medium text-[#28819C] mb-1">Name</p>
 							<div className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 text-gray-700">
 								{selectedRole.name || "-"}
 							</div>
@@ -355,7 +267,6 @@ const JobRolesPage = () => {
 							</div>
 						</div>
 
-						
 						{/* Action Buttons */}
 						<div className="flex gap-3 pt-2">
 							<Button
@@ -374,24 +285,28 @@ const JobRolesPage = () => {
 			</SlideUpModal>
 
 			{/* Edit Modal */}
-			<SlideUpModal isOpen={isEditModalOpen} onClose={handleCloseModals} title="Edit Job" maxWidth="600px">
+			<SlideUpModal
+				isOpen={isEditModalOpen}
+				onClose={handleCloseModals}
+				title="Edit Responsibility"
+				maxWidth="600px"
+			>
 				<div className="space-y-5 p-4">
 					<FloatingLabelInput
-						label="Job Title"
+						label="Name"
 						name="name"
 						value={editForm.name}
 						onChange={handleEditFormChange}
-						placeholder="Enter Job"
+						placeholder="Enter name"
 					/>
 
 					<FloatingLabelInput
-						label="Job Description"
+						label="Description"
 						name="description"
 						value={editForm.description}
 						onChange={handleEditFormChange}
-						placeholder="Enter Job"
+						placeholder="Enter description"
 					/>
-
 
 					{/* Submit Button */}
 					<Button
@@ -408,7 +323,7 @@ const JobRolesPage = () => {
 				isOpen={isDeleteModalOpen}
 				onClose={handleCloseModals}
 				onConfirm={handleDelete}
-				title="Delete Job Role"
+				title="Delete Responsibility"
 				message={`Are you sure you want to delete "${selectedRole?.name}"? This action cannot be undone.`}
 				confirmText={deleting ? "Deleting..." : "Delete"}
 				cancelText="Cancel"

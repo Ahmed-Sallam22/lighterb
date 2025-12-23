@@ -4,7 +4,7 @@ export const cardNavigationMap = {
 	Countries: "/countries",
 	"Tax Rates": "/tax-rates",
 	"Invoice Approvals": "/invoice-approvals",
-	"Journal Entries": "/journal/entries",
+	"Journal Entries": "/journal-entries",
 	"Journal Lines": "/journal/lines",
 	Customers: "/customers",
 	Suppliers: "/Suppliers",

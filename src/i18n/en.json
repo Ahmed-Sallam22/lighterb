@@ -53,7 +53,7 @@
 			"customers": "Customers",
 			"journal": "Journal",
 			"arInvoices": "AR Invoices",
-			"arPayments": "AR Payments",
+			"arPayments": "AR Receipts",
 			"apInvoices": "AP Invoices",
 			"apPayments": "AP Payments",
 			"reports": "Reports"
@@ -283,7 +283,7 @@
 		"customers": "Customers",
 		"suppliers": "Suppliers",
 		"arInvoices": "AR Invoices",
-		"arPayments": "AR Payments",
+		"arPayments": "AR Receipts",
 		"apInvoices": "AP Invoices",
 		"apPayments": "AP Payments",
 		"oneTimeSupplierInvoices": "One-Time Supplier",
@@ -1122,6 +1122,34 @@
 			"reverseInfo": "Only posted journal entries can be reversed"
 		}
 	},
+	"journalDetail": {
+		"title": "Journal Entry",
+		"loading": "Loading journal entry...",
+		"untitledEntry": "Untitled Journal Entry",
+		"entryId": "Entry ID",
+		"balanceDifference": "Balance Difference",
+		"noLines": "No journal lines found",
+		"sections": {
+			"entryInfo": "Entry Information",
+			"totalDebit": "Total Debit",
+			"totalCredit": "Total Credit",
+			"lines": "Journal Lines"
+		},
+		"fields": {
+			"date": "Date",
+			"currency": "Currency",
+			"balanced": "Is Balanced"
+		},
+		"lineTable": {
+			"id": "Line ID",
+			"type": "Type",
+			"segments": "Segments",
+			"amount": "Amount"
+		},
+		"errors": {
+			"loadFailed": "Failed to load journal entry details"
+		}
+	},
 	"journalLines": {
 		"title": "Journal Lines",
 		"subtitle": "Detailed view of old journal entry line items with filtering and analysis",
@@ -1182,11 +1210,11 @@
 	},
 	"payments": {
 		"ar": {
-			"title": "AR Payments",
+			"title": "AR Receipts",
 			"subtitle": "Receive payments from customers",
 			"createPayment": "Receive Payment",
 			"editPayment": "Edit Payment",
-			"deleteSuccess": "AR Payment deleted successfully",
+			"deleteSuccess": "AR Receipt deleted successfully",
 			"emptyMessage": "No customer payments found",
 			"customer": "Customer"
 		},
@@ -1869,8 +1897,8 @@
 		"messages": {
 			"apCreated": "AP Payment created successfully",
 			"apUpdated": "AP Payment updated successfully",
-			"arCreated": "AR Payment received successfully",
-			"arUpdated": "AR Payment updated successfully",
+			"arCreated": "AR Receipt received successfully",
+			"arUpdated": "AR Receipt updated successfully",
 			"createFailed": "Failed to create payment",
 			"updateFailed": "Failed to update payment"
 		}

@@ -14,14 +14,42 @@ export const useOneTimeSupplierInvoices = () => {
 	);
 
 	const [localPageSize, setLocalPageSize] = useState(pageSize);
+	const [filters, setFilters] = useState({
+		supplier_id: "",
+		currency_id: "",
+		country_id: "",
+		approval_status: "",
+		date_from: "",
+		date_to: "",
+		search: "",
+	});
 
 	useEffect(() => {
-		dispatch(fetchOneTimeSupplierInvoices({ page, page_size: localPageSize }));
-	}, [dispatch, page, localPageSize]);
+		const params = {
+			page,
+			page_size: localPageSize,
+		};
+		// Add non-empty filters to params
+		Object.entries(filters).forEach(([key, value]) => {
+			if (value !== "" && value !== undefined && value !== null) {
+				params[key] = value;
+			}
+		});
+		dispatch(fetchOneTimeSupplierInvoices(params));
+	}, [dispatch, page, localPageSize, filters]);
 
 	const refreshInvoices = useCallback(() => {
-		dispatch(fetchOneTimeSupplierInvoices({ page, page_size: localPageSize }));
-	}, [dispatch, page, localPageSize]);
+		const params = {
+			page,
+			page_size: localPageSize,
+		};
+		Object.entries(filters).forEach(([key, value]) => {
+			if (value !== "" && value !== undefined && value !== null) {
+				params[key] = value;
+			}
+		});
+		dispatch(fetchOneTimeSupplierInvoices(params));
+	}, [dispatch, page, localPageSize, filters]);
 
 	const handlePageChange = useCallback(
 		newPage => {
@@ -37,6 +65,27 @@ export const useOneTimeSupplierInvoices = () => {
 		},
 		[dispatch]
 	);
+
+	const handleFilterChange = useCallback(
+		(name, value) => {
+			setFilters(prev => ({ ...prev, [name]: value }));
+			dispatch(setPage(1)); // Reset to first page when filter changes
+		},
+		[dispatch]
+	);
+
+	const handleClearFilters = useCallback(() => {
+		setFilters({
+			supplier_id: "",
+			currency_id: "",
+			country_id: "",
+			approval_status: "",
+			date_from: "",
+			date_to: "",
+			search: "",
+		});
+		dispatch(setPage(1));
+	}, [dispatch]);
 
 	const deleteInvoice = async id => {
 		const result = await dispatch(deleteOneTimeSupplierInvoice(id)).unwrap();
@@ -62,6 +111,10 @@ export const useOneTimeSupplierInvoices = () => {
 		hasPrevious,
 		onPageChange: handlePageChange,
 		onPageSizeChange: handlePageSizeChange,
+		// Filters
+		filters,
+		onFilterChange: handleFilterChange,
+		onClearFilters: handleClearFilters,
 		// Actions
 		refreshInvoices,
 		deleteInvoice,

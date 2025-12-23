@@ -189,7 +189,7 @@ const CreateJournalPage = () => {
 				toast.success(t("createJournal.messages.createSuccess"));
 			}
 
-			navigate("/journal/entries");
+			navigate("/journal-entries");
 		} catch (err) {
 			const errorMessage = err?.message || err?.error || err?.detail || t("createJournal.messages.createError");
 
@@ -216,7 +216,7 @@ const CreateJournalPage = () => {
 	};
 
 	const handleCancel = () => {
-		navigate("/journal/entries");
+		navigate("/journal-entries");
 	};
 
 	const { totalDebit, totalCredit } = calculateTotals();

@@ -38,6 +38,10 @@ const APInvoicesPage = () => {
 		hasPrevious,
 		onPageChange,
 		onPageSizeChange,
+		// Filters
+		filters,
+		onFilterChange,
+		onClearFilters,
 	} = useAPInvoices();
 
 	// Component state
@@ -70,8 +74,6 @@ const APInvoicesPage = () => {
 
 	// Event handlers
 	const {
-		handleSearch,
-		handleFilter,
 		handleCreate,
 		handleEdit,
 		handleDelete,
@@ -110,10 +112,12 @@ const APInvoicesPage = () => {
 			{/* Toolbar */}
 			<div className="px-6 mt-6">
 				<InvoiceToolbarFilters
-					onSearch={handleSearch}
-					onFilter={handleFilter}
+					filters={filters}
+					onFilterChange={onFilterChange}
+					onClearFilters={onClearFilters}
 					onCreateClick={handleCreate}
 					createButtonText={t("apInvoices.toolbar.newInvoice")}
+					invoiceType="AP"
 				/>
 			</div>
 

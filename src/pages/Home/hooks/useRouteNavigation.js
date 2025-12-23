@@ -11,7 +11,7 @@ export const useRouteNavigation = (cardsData, routes) => {
 	const handleCardClick = (cardKey, currentActiveRoute) => {
 		if (currentActiveRoute === "Journal") {
 			if (cardKey === "Journal Entries") {
-				navigate("/journal/entries");
+				navigate("/journal-entries");
 			} else if (cardKey === "Journal Lines") {
 				navigate("/journal/lines");
 			}

@@ -333,7 +333,6 @@ const GLLinesSection = ({
 													? "text-gray-300 cursor-not-allowed"
 													: "text-red-500 hover:bg-red-50 hover:text-red-600"
 											}`}
-											title={t("glLines.deleteLine")}
 										/>
 									</div>
 								</div>

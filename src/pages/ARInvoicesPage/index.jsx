@@ -36,6 +36,10 @@ const ARInvoicesPage = () => {
 		hasPrevious,
 		onPageChange,
 		onPageSizeChange,
+		// Filters
+		filters,
+		onFilterChange,
+		onClearFilters,
 	} = useARInvoices();
 
 	// Component state
@@ -66,8 +70,6 @@ const ARInvoicesPage = () => {
 
 	// Event handlers
 	const {
-		handleSearch,
-		handleFilter,
 		handleCreate,
 		handleEdit,
 		handleDelete,
@@ -104,10 +106,12 @@ const ARInvoicesPage = () => {
 			{/* Toolbar */}
 			<div className="px-6 mt-6">
 				<InvoiceToolbarFilters
-					onSearch={handleSearch}
-					onFilter={handleFilter}
+					filters={filters}
+					onFilterChange={onFilterChange}
+					onClearFilters={onClearFilters}
 					onCreateClick={handleCreate}
 					createButtonText={t("arInvoices.toolbar.newInvoice")}
+					invoiceType="AR"
 				/>
 			</div>
 

@@ -1123,6 +1123,34 @@
 			"reverseInfo": "يمكن عكس القيود المرحلة فقط"
 		}
 	},
+	"journalDetail": {
+		"title": "قيد اليومية",
+		"loading": "جاري تحميل قيد اليومية...",
+		"untitledEntry": "قيد يومية بدون عنوان",
+		"entryId": "رقم القيد",
+		"balanceDifference": "فرق الرصيد",
+		"noLines": "لا توجد بنود",
+		"sections": {
+			"entryInfo": "معلومات القيد",
+			"totalDebit": "إجمالي المدين",
+			"totalCredit": "إجمالي الدائن",
+			"lines": "بنود اليومية"
+		},
+		"fields": {
+			"date": "التاريخ",
+			"currency": "العملة",
+			"balanced": "متوازن"
+		},
+		"lineTable": {
+			"id": "رقم البند",
+			"type": "النوع",
+			"segments": "الشرائح",
+			"amount": "المبلغ"
+		},
+		"errors": {
+			"loadFailed": "فشل تحميل تفاصيل قيد اليومية"
+		}
+	},
 	"journalLines": {
 		"title": "بنود اليومية",
 		"subtitle": "عرض تفصيلي لبنود قيود اليومية السابقة مع التصفية والتحليل",

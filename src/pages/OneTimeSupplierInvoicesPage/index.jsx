@@ -32,6 +32,10 @@ const OneTimeSupplierInvoicesPage = () => {
 		hasPrevious,
 		onPageChange,
 		onPageSizeChange,
+		// Filters
+		filters,
+		onFilterChange,
+		onClearFilters,
 	} = useOneTimeSupplierInvoices();
 
 	// Component state
@@ -61,16 +65,6 @@ const OneTimeSupplierInvoicesPage = () => {
 	const tableColumns = buildInvoiceTableColumns(t("oneTimeSupplierInvoices.table.supplier"), t);
 
 	// Event handlers
-	const handleSearch = query => {
-		console.log("Search:", query);
-		// TODO: Implement search
-	};
-
-	const handleFilter = filters => {
-		console.log("Filter:", filters);
-		// TODO: Implement filtering
-	};
-
 	const handleCreate = () => {
 		navigate(PAGE_CONFIG.quickActionPath);
 	};
@@ -140,10 +134,12 @@ const OneTimeSupplierInvoicesPage = () => {
 			{/* Toolbar */}
 			<div className="px-6 mt-6">
 				<InvoiceToolbarFilters
-					onSearch={handleSearch}
-					onFilter={handleFilter}
+					filters={filters}
+					onFilterChange={onFilterChange}
+					onClearFilters={onClearFilters}
 					onCreateClick={handleCreate}
 					createButtonText={t("oneTimeSupplierInvoices.toolbar.newInvoice")}
+					invoiceType="OTS"
 				/>
 			</div>
 

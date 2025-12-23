@@ -26,7 +26,7 @@ const ARInvoicesPage = lazy(() => import("./pages/ARInvoicesPage"));
 const APInvoicesPage = lazy(() => import("./pages/APInvoicesPage"));
 const OneTimeSupplierInvoicesPage = lazy(() => import("./pages/OneTimeSupplierInvoicesPage"));
 const JournalEntriesPage = lazy(() => import("./pages/JournalEntriesPage"));
-const JournalLinesPage = lazy(() => import("./pages/JournalLinesPage"));
+// const JournalLinesPage = lazy(() => import("./pages/JournalLinesPage"));
 const CreateJournalPage = lazy(() => import("./pages/CreateJournalPage"));
 const SegmentsPage = lazy(() => import("./pages/SegmentsPage"));
 const CurrencyPage = lazy(() => import("./pages/CurrencyPage"));
@@ -48,6 +48,7 @@ const ChangePasswordPage = lazy(() => import("./pages/ChangePasswordPage"));
 const Requisitions = lazy(() => import("./pages/Requisitions"));
 const AssetsPage = lazy(() => import("./pages/Assets"));
 const JobRolesPage = lazy(() => import("./pages/JobRolesPage"));
+const CreateJobRolePage = lazy(() => import("./pages/CreateJobRolePage"));
 const UsersPage = lazy(() => import("./pages/UsersPage"));
 
 const App = () => {
@@ -90,13 +91,13 @@ const App = () => {
 						<Route index element={<Home />} />
 						<Route path="dashboard" element={<Home />} />
 						<Route path="quick-actions/:actionId" element={<QuickActionDetail />} />
-						<Route path="ar-payments" element={<ARPaymentsPage />} />
+						<Route path="ar-receipts" element={<ARPaymentsPage />} />
 						<Route path="ap-payments" element={<APPaymentsPage />} />
 						<Route path="ar-invoices" element={<ARInvoicesPage />} />
 						<Route path="ap-invoices" element={<APInvoicesPage />} />
 						<Route path="one-time-supplier-invoices" element={<OneTimeSupplierInvoicesPage />} />
-						<Route path="journal/entries" element={<JournalEntriesPage />} />
-						<Route path="journal/lines" element={<JournalLinesPage />} />
+						<Route path="journal-entries" element={<JournalEntriesPage />} />
+						{/* <Route path="journal-entries/:journalEntryId/journal-lines" element={<JournalLinesPage />} /> */}
 						<Route path="journal/create" element={<CreateJournalPage />} />
 						<Route path="segments" element={<SegmentsPage />} />
 						<Route path="assets" element={<AssetsPage />} />
@@ -113,6 +114,7 @@ const App = () => {
 						<Route path="procurement/approvals/:instanceId" element={<ProcurementApprovalDetail />} />
 						<Route path="procurement/catalog" element={<ProcurementCatalog />} />
 						<Route path="job-roles" element={<JobRolesPage />} />
+						<Route path="job-roles/create" element={<CreateJobRolePage />} />
 						<Route path="approval-workflow" element={<ApprovalWorkflow />} />
 						<Route path="users" element={<UsersPage />} />
 					</Route>
