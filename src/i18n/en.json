@@ -53,7 +53,7 @@
 			"customers": "Customers",
 			"journal": "Journal",
 			"arInvoices": "AR Invoices",
-			"arPayments": "AR Receipts",
+			"arReceipts": "AR Receipts",
 			"apInvoices": "AP Invoices",
 			"apPayments": "AP Payments",
 			"reports": "Reports"
@@ -283,7 +283,7 @@
 		"customers": "Customers",
 		"suppliers": "Suppliers",
 		"arInvoices": "AR Invoices",
-		"arPayments": "AR Receipts",
+		"arReceipts": "AR Receipts",
 		"apInvoices": "AP Invoices",
 		"apPayments": "AP Payments",
 		"oneTimeSupplierInvoices": "One-Time Supplier",
@@ -538,6 +538,7 @@
 			"priority": "Priority",
 			"prType": "PR Type",
 			"businessJustification": "Business Justification",
+			"createRequisition": "Create Requisition",
 			"description": "Description",
 			"checkBudget": "Check Budget",
 			"lineItems": "Line Items",
@@ -1513,6 +1514,10 @@
 			"requisitions": {
 				"title": "Requisitions",
 				"description": "Purchase Requests & Approvals"
+			},
+			"UOM": {
+				"title": "Units of Measure",
+				"description": "Manage UoM & Conversions"
 			},
 			"prToPo": {
 				"title": "PR to PO",

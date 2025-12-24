@@ -11,7 +11,7 @@ export const getSidebarLinks = (t, user) => {
 		{ label: t("sidebar.customers"), path: "/customers", icon: <MdPeople className={iconBase} /> },
 		{ label: t("sidebar.suppliers"), path: "/suppliers", icon: <MdShoppingCart className={iconBase} /> },
 		{ label: t("sidebar.arInvoices"), path: "/ar-invoices", icon: <FaCreditCard className={iconBase} /> },
-		{ label: t("sidebar.arPayments"), path: "/ar-receipts", icon: <FaFileInvoiceDollar className={iconBase} /> },
+		{ label: t("sidebar.arReceipts"), path: "/ar-receipts", icon: <FaFileInvoiceDollar className={iconBase} /> },
 		{ label: t("sidebar.apInvoices"), path: "/ap-invoices", icon: <FaFileAlt className={iconBase} /> },
 		{ label: t("sidebar.apPayments"), path: "/ap-payments", icon: <FaCreditCard className={iconBase} /> },
 		{

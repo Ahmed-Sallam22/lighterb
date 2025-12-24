@@ -151,6 +151,35 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 
 	const invoiceTotalAmount = invoiceSubtotal + invoiceTaxAmount;
 
+	// Automatically manage CREDIT line to match invoice total
+	useEffect(() => {
+		if (invoiceTotalAmount > 0) {
+			const creditLineId = "auto-credit-line";
+			const existingCreditLine = glLines.find(line => line.id === creditLineId);
+
+			if (existingCreditLine) {
+				// Update existing CREDIT line amount
+				if (parseFloat(existingCreditLine.amount) !== invoiceTotalAmount) {
+					setGLLines(prev =>
+						prev.map(line =>
+							line.id === creditLineId ? { ...line, amount: invoiceTotalAmount.toFixed(2) } : line
+						)
+					);
+				}
+			} else {
+				// Create default CREDIT line
+				const newCreditLine = {
+					id: creditLineId,
+					type: "CREDIT",
+					amount: invoiceTotalAmount.toFixed(2),
+					segments: [],
+					isAutoCredit: true, // Flag to identify this as the auto-managed CREDIT line
+				};
+				setGLLines(prev => [newCreditLine, ...prev]);
+			}
+		}
+	}, [invoiceTotalAmount, glLines]);
+
 	// Get selected currency code for formatting
 	const selectedCurrency = currencies.find(c => c.id === parseInt(invoiceForm.currency));
 	const currencyCode = selectedCurrency?.code || "AED";
@@ -681,6 +710,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 					onGlEntryChange={setGlEntry}
 					showGlEntryHeader={false}
 					title=""
+					invoiceTotal={invoiceTotalAmount}
 				/>
 
 				{/* Invoice Total vs GL Total Comparison */}

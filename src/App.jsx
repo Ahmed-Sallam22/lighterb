@@ -20,7 +20,7 @@ const PageLoader = () => (
 // Lazy load all pages for better performance
 const Home = lazy(() => import("./pages/Home"));
 const QuickActionDetail = lazy(() => import("./pages/QuickActionDetail"));
-const ARPaymentsPage = lazy(() => import("./pages/ARPaymentsPage"));
+const ARReceiptsPage = lazy(() => import("./pages/ARReceiptsPage"));
 const APPaymentsPage = lazy(() => import("./pages/APPaymentsPage"));
 const ARInvoicesPage = lazy(() => import("./pages/ARInvoicesPage"));
 const APInvoicesPage = lazy(() => import("./pages/APInvoicesPage"));
@@ -91,7 +91,7 @@ const App = () => {
 						<Route index element={<Home />} />
 						<Route path="dashboard" element={<Home />} />
 						<Route path="quick-actions/:actionId" element={<QuickActionDetail />} />
-						<Route path="ar-receipts" element={<ARPaymentsPage />} />
+						<Route path="ar-receipts" element={<ARReceiptsPage />} />
 						<Route path="ap-payments" element={<APPaymentsPage />} />
 						<Route path="ar-invoices" element={<ARInvoicesPage />} />
 						<Route path="ap-invoices" element={<APInvoicesPage />} />

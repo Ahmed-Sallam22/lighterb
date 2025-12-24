@@ -40,6 +40,7 @@ const GLLinesSection = ({
 	showGlEntryHeader = true,
 	title = "GL Lines",
 	className = "",
+	invoiceTotal = 0,
 }) => {
 	const { t, i18n } = useTranslation();
 	const isRtl = i18n.dir() === "rtl";
@@ -86,9 +87,12 @@ const GLLinesSection = ({
 
 	// Add a new line
 	const handleAddLine = () => {
+		// Check if CREDIT line already exists
+		const hasCreditLine = lines.some(line => line.type === "CREDIT");
+
 		const newLine = {
 			id: Date.now(),
-			type: "",
+			type: hasCreditLine ? "DEBIT" : "", // Default to DEBIT if CREDIT exists
 			amount: "",
 			segments: segmentTypes.map(st => ({
 				segment_type_id: st.id,
@@ -100,6 +104,14 @@ const GLLinesSection = ({
 
 	// Remove a line
 	const handleRemoveLine = lineId => {
+		// Find the line to check if it's an auto-credit line or locked line
+		const lineToRemove = lines.find(line => line.id === lineId);
+
+		// Prevent removing auto-credit lines or locked lines
+		if (lineToRemove?.isAutoCredit || lineToRemove?.isLocked) {
+			return;
+		}
+
 		if (lines.length > 1) {
 			onChange(lines.filter(line => line.id !== lineId));
 		}
@@ -277,13 +289,29 @@ const GLLinesSection = ({
 											name={`type-${line.id}`}
 											value={line.type}
 											onChange={e => handleLineChange(line.id, "type", e.target.value)}
-											className="w-full h-11 px-3 pe-8 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-[#48C1F0] cursor-pointer"
+											disabled={line.isAutoCredit || line.isLocked}
+											className={`w-full h-11 px-3 pe-8 text-sm text-gray-700 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-[#48C1F0] ${
+												line.isAutoCredit || line.isLocked
+													? "bg-gray-100 cursor-not-allowed"
+													: "bg-white cursor-pointer"
+											}`}
 										>
-											{typeOptions.map(opt => (
-												<option key={opt.value} value={opt.value}>
-													{opt.label}
-												</option>
-											))}
+											{typeOptions
+												.filter(opt => {
+													// If this line is not the current CREDIT line and a CREDIT already exists, hide CREDIT option
+													if (opt.value === "CREDIT" && line.type !== "CREDIT") {
+														const hasCreditLine = lines.some(
+															l => l.type === "CREDIT" && l.id !== line.id
+														);
+														return !hasCreditLine;
+													}
+													return true;
+												})
+												.map(opt => (
+													<option key={opt.value} value={opt.value}>
+														{opt.label}
+													</option>
+												))}
 										</select>
 										<FaChevronDown className="absolute top-1/2 end-3 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
 									</div>
@@ -296,7 +324,12 @@ const GLLinesSection = ({
 											value={line.amount}
 											onChange={e => handleLineChange(line.id, "amount", e.target.value)}
 											placeholder={t("glLines.amount")}
-											className="w-full h-11 px-3 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-[#48C1F0]"
+											readOnly={line.isAutoCredit || line.isLocked}
+											className={`w-full h-11 px-3 text-sm text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-[#48C1F0] ${
+												line.isAutoCredit || line.isLocked
+													? "bg-gray-100 cursor-not-allowed"
+													: "bg-white"
+											}`}
 										/>
 									</div>
 
@@ -309,7 +342,12 @@ const GLLinesSection = ({
 													name={`segment-${line.id}-${st.id}`}
 													value={getSegmentValue(line, st.id)}
 													onChange={e => handleSegmentChange(line.id, st.id, e.target.value)}
-													className="w-full h-11 px-3 pe-8 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-[#48C1F0] cursor-pointer"
+													disabled={line.isLocked}
+													className={`w-full h-11 px-3 pe-8 text-sm text-gray-700 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-[#48C1F0] ${
+														line.isLocked
+															? "bg-gray-100 cursor-not-allowed"
+															: "bg-white cursor-pointer"
+													}`}
 												>
 													{options.map(opt => (
 														<option key={opt.value} value={opt.value}>
@@ -326,10 +364,10 @@ const GLLinesSection = ({
 									<div className="flex justify-center pt-2">
 										<Button
 											onClick={() => handleRemoveLine(line.id)}
-											disabled={lines.length <= 1}
+											disabled={lines.length <= 1 || line.isAutoCredit || line.isLocked}
 											icon={<FaTrash className="w-4 h-4" />}
 											className={`bg-transparent shadow-none hover:shadow-none p-2 rounded-lg transition-colors ${
-												lines.length <= 1
+												lines.length <= 1 || line.isAutoCredit || line.isLocked
 													? "text-gray-300 cursor-not-allowed"
 													: "text-red-500 hover:bg-red-50 hover:text-red-600"
 											}`}
@@ -346,9 +384,12 @@ const GLLinesSection = ({
 					onClick={handleAddLine}
 					title={t("glLines.addLine")}
 					icon={<FaPlus className="w-3 h-3" />}
-					className={`shadow-none hover:shadow-none mt-4 flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors ${
-						isRtl ? "flex-row-reverse" : ""
-					}`}
+					disabled={!invoiceTotal || invoiceTotal <= 0}
+					className={`shadow-none hover:shadow-none mt-4 flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+						!invoiceTotal || invoiceTotal <= 0
+							? "text-gray-400 bg-gray-100 border border-gray-200 cursor-not-allowed"
+							: "text-gray-700 bg-gray-50 border border-gray-300 hover:bg-gray-100"
+					} ${isRtl ? "flex-row-reverse" : ""}`}
 				/>
 			</div>
 		</div>
@@ -367,6 +408,8 @@ GLLinesSection.propTypes = {
 					segment_code: PropTypes.string,
 				})
 			),
+			isLocked: PropTypes.bool,
+			isAutoCredit: PropTypes.bool,
 		})
 	).isRequired,
 	onChange: PropTypes.func.isRequired,
@@ -379,6 +422,7 @@ GLLinesSection.propTypes = {
 	showGlEntryHeader: PropTypes.bool,
 	title: PropTypes.string,
 	className: PropTypes.string,
+	invoiceTotal: PropTypes.number,
 };
 
 export default GLLinesSection;

@@ -1,4 +1,4 @@
-const ARPaymentIcon = () => (
+const ARReceiptIcon = () => (
 	<svg width="28" height="25" viewBox="0 0 28 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<g opacity="0.5">
 			<path
@@ -13,4 +13,4 @@ const ARPaymentIcon = () => (
 	</svg>
 );
 
-export default ARPaymentIcon;
+export default ARReceiptIcon;

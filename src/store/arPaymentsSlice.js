@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/axios";
 
-// Fetch AR payments
+// Fetch AR receipts
 export const fetchARPayments = createAsyncThunk(
 	"arPayments/fetchAll",
 	async (
@@ -47,13 +47,13 @@ export const fetchARPayments = createAsyncThunk(
 				error.response?.data?.error ||
 				error.response?.data?.detail ||
 				error.message ||
-				"Failed to fetch AR payments";
+				"Failed to fetch AR receipts";
 			return rejectWithValue(errorMessage);
 		}
 	}
 );
 
-// Fetch single AR payment details
+// Fetch single AR receipt details
 export const fetchARPaymentDetails = createAsyncThunk(
 	"arPayments/fetchDetails",
 	async (id, { rejectWithValue }) => {
@@ -93,7 +93,7 @@ export const fetchARPaymentDetails = createAsyncThunk(
 	}
 );
 
-// Create AR payment
+// Create AR receipt
 export const createARPayment = createAsyncThunk("arPayments/create", async (paymentData, { rejectWithValue }) => {
 	try {
 		const response = await api.post("/finance/payments/", paymentData);
@@ -113,15 +113,15 @@ export const createARPayment = createAsyncThunk("arPayments/create", async (paym
 				errorMessage = fieldErrors;
 			} else {
 				errorMessage =
-					errorData.message || errorData.error || errorData.detail || "Failed to create AR payment";
+					errorData.message || errorData.error || errorData.detail || "Failed to create AR receipt";
 			}
 			return rejectWithValue(errorMessage);
 		}
-		return rejectWithValue(error.message || "Failed to create AR payment");
+		return rejectWithValue(error.message || "Failed to create AR receipt");
 	}
 });
 
-// Post AR payment
+// Post AR receipt
 export const postARPayment = createAsyncThunk("arPayments/post", async (id, { rejectWithValue }) => {
 	try {
 		const response = await api.post(`/finance/payments/${id}/post/`);
@@ -132,12 +132,12 @@ export const postARPayment = createAsyncThunk("arPayments/post", async (id, { re
 			error.response?.data?.error ||
 			error.response?.data?.detail ||
 			error.message ||
-			"Failed to post AR payment";
+			"Failed to post AR receipt";
 		return rejectWithValue(errorMessage);
 	}
 });
 
-// Submit AR payment for approval
+// Submit AR receipt for approval
 export const submitARPaymentForApproval = createAsyncThunk(
 	"arPayments/submitForApproval",
 	async (id, { rejectWithValue }) => {
@@ -156,7 +156,7 @@ export const submitARPaymentForApproval = createAsyncThunk(
 	}
 );
 
-// Post AR payment to GL
+// Post AR receipt to GL
 export const postARPaymentToGL = createAsyncThunk("arPayments/postToGL", async (id, { rejectWithValue }) => {
 	try {
 		const response = await api.post(`/finance/payments/${id}/post-to-gl/`);
@@ -172,7 +172,7 @@ export const postARPaymentToGL = createAsyncThunk("arPayments/postToGL", async (
 	}
 });
 
-// Update AR payment
+// Update AR receipt
 export const updateARPayment = createAsyncThunk("arPayments/update", async ({ id, data }, { rejectWithValue }) => {
 	try {
 		const response = await api.put(`/finance/payments/${id}/`, data);
@@ -192,15 +192,15 @@ export const updateARPayment = createAsyncThunk("arPayments/update", async ({ id
 				errorMessage = fieldErrors;
 			} else {
 				errorMessage =
-					errorData.message || errorData.error || errorData.detail || "Failed to update AR payment";
+					errorData.message || errorData.error || errorData.detail || "Failed to update AR receipt";
 			}
 			return rejectWithValue(errorMessage);
 		}
-		return rejectWithValue(error.message || "Failed to update AR payment");
+		return rejectWithValue(error.message || "Failed to update AR receipt");
 	}
 });
 
-// Delete AR payment
+// Delete AR receipt
 export const deleteARPayment = createAsyncThunk("arPayments/delete", async (id, { rejectWithValue }) => {
 	try {
 		await api.delete(`/finance/payments/${id}/`);
@@ -211,7 +211,7 @@ export const deleteARPayment = createAsyncThunk("arPayments/delete", async (id, 
 			error.response?.data?.error ||
 			error.response?.data?.detail ||
 			error.message ||
-			"Failed to delete AR payment";
+			"Failed to delete AR receipt";
 		return rejectWithValue(errorMessage);
 	}
 });
@@ -244,7 +244,7 @@ const arPaymentsSlice = createSlice({
 	},
 	extraReducers: builder => {
 		builder
-			// Fetch AR payments
+			// Fetch AR receipts
 			.addCase(fetchARPayments.pending, state => {
 				state.loading = true;
 				state.error = null;
@@ -275,7 +275,7 @@ const arPaymentsSlice = createSlice({
 				state.detailsLoading = false;
 				state.error = action.payload;
 			})
-			// Create AR payment
+			// Create AR receipt
 			.addCase(createARPayment.pending, state => {
 				state.loading = true;
 				state.error = null;
@@ -288,7 +288,7 @@ const arPaymentsSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			})
-			// Update AR payment
+			// Update AR receipt
 			.addCase(updateARPayment.pending, state => {
 				state.loading = true;
 				state.error = null;
@@ -304,7 +304,7 @@ const arPaymentsSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			})
-			// Delete AR payment
+			// Delete AR receipt
 			.addCase(deleteARPayment.pending, state => {
 				state.loading = true;
 				state.error = null;
@@ -317,7 +317,7 @@ const arPaymentsSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			})
-			// Post AR payment
+			// Post AR receipt
 			.addCase(postARPayment.pending, state => {
 				state.loading = true;
 				state.error = null;

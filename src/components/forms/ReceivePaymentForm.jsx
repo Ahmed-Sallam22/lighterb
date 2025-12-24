@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import FloatingLabelInput from "../shared/FloatingLabelInput";
 import FloatingLabelSelect from "../shared/FloatingLabelSelect";
+import GLLinesSection from "../shared/GLLinesSection";
+import api from "../../api/axios";
 import { fetchCurrencies } from "../../store/currenciesSlice";
 import { fetchCustomers } from "../../store/customersSlice";
 import { fetchARInvoices } from "../../store/arInvoicesSlice";
-import { fetchSegmentTypes, fetchSegmentValues } from "../../store/segmentsSlice";
+import { fetchSegmentTypes } from "../../store/segmentsSlice";
 import { createARPayment, updateARPayment } from "../../store/arPaymentsSlice";
 import { FaTrash, FaPlus, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
@@ -22,7 +24,7 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 	const { customers } = useSelector(state => state.customers);
 	const { invoices: arInvoices } = useSelector(state => state.arInvoices);
 	const { loading } = useSelector(state => state.arPayments);
-	const { types: segmentTypes = [], values: segmentValues = [] } = useSelector(state => state.segments);
+	const { types: segmentTypes = [] } = useSelector(state => state.segments);
 
 	// Check if we're in edit mode
 	const editPayment = editPaymentData || location.state?.payment;
@@ -57,7 +59,6 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 		dispatch(fetchCurrencies({ page_size: 100 }));
 		dispatch(fetchCustomers({ page_size: 100 }));
 		dispatch(fetchSegmentTypes());
-		dispatch(fetchSegmentValues({ node_type: "child", page_size: 1000 }));
 	}, [dispatch]);
 
 	// Fetch invoices when customer is selected
@@ -148,17 +149,6 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 		label: `#${invoice.invoice_id}`,
 	}));
 
-	// Get segment options for a specific segment type
-	const getSegmentOptions = segmentTypeId => {
-		if (!segmentTypeId) return [];
-		return segmentValues
-			.filter(seg => seg.segment_type === segmentTypeId && seg.node_type === "child")
-			.map(seg => ({
-				value: seg.code,
-				label: `${seg.code} - ${seg.name || seg.alias || ""}`,
-			}));
-	};
-
 	// Handlers
 	const handleChange = e => {
 		const { name, value } = e.target;
@@ -177,58 +167,60 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 
 	const handleAllocationChange = (allocationId, field, value) => {
 		setAllocations(prev => prev.map(a => (a.id === allocationId ? { ...a, [field]: value } : a)));
-	};
 
-	const handleAddGLLine = () => {
-		const newLine = {
-			id: Date.now(),
-			type: "",
-			amount: "",
-			segments: segmentTypes.map(st => ({
-				segment_type_id: st.id,
-				segment_code: "",
-			})),
-		};
-		setGlLines(prev => [...prev, newLine]);
-	};
-
-	const handleRemoveGLLine = lineId => {
-		if (glLines.length > 1) {
-			setGlLines(prev => prev.filter(l => l.id !== lineId));
+		// When invoice_id changes, fetch invoice details and populate GL line
+		if (field === "invoice_id" && value) {
+			fetchInvoiceAndPopulateGLLine(value);
 		}
 	};
 
-	const handleGLLineChange = (lineId, field, value) => {
-		setGlLines(prev => prev.map(line => (line.id === lineId ? { ...line, [field]: value } : line)));
-	};
+	// Fetch invoice details and create locked DEBIT line from invoice's CREDIT line
+	const fetchInvoiceAndPopulateGLLine = useCallback(
+		async invoiceId => {
+			try {
+				const response = await api.get(`/finance/invoice/ar/${invoiceId}/`);
+				const invoiceData = response.data?.data || response.data;
 
-	const handleSegmentChange = (lineId, segmentTypeId, segmentCode) => {
-		setGlLines(prev =>
-			prev.map(line => {
-				if (line.id === lineId) {
-					const existingIndex = (line.segments || []).findIndex(s => s.segment_type_id === segmentTypeId);
-					let updatedSegments;
-					if (existingIndex !== -1) {
-						updatedSegments = line.segments.map(s =>
-							s.segment_type_id === segmentTypeId ? { ...s, segment_code: segmentCode } : s
-						);
-					} else {
-						updatedSegments = [
-							...(line.segments || []),
-							{ segment_type_id: segmentTypeId, segment_code: segmentCode },
-						];
+				if (invoiceData?.journal_entry?.lines) {
+					// Find CREDIT lines from the invoice
+					const creditLines = invoiceData.journal_entry.lines.filter(line => line.type === "CREDIT");
+
+					if (creditLines.length > 0) {
+						// Create locked DEBIT lines from the invoice's CREDIT lines
+						const lockedDebitLines = creditLines.map((creditLine, idx) => ({
+							id: `locked-${invoiceId}-${idx}`,
+							type: "DEBIT",
+							amount: creditLine.amount,
+							isLocked: true,
+							segments: (creditLine.segments || []).map(seg => {
+								// Map segment_type_name to segment_type_id using segmentTypes
+								const segmentType = segmentTypes.find(
+									st => st.name === seg.segment_type_name || st.segment_name === seg.segment_type_name
+								);
+								return {
+									segment_type_id: segmentType?.id || seg.segment_type_id || seg.segment_type,
+									segment_code: seg.segment_code,
+								};
+							}),
+						}));
+
+						// Replace or add locked lines (remove previous locked lines first)
+						setGlLines(prev => {
+							const nonLockedLines = prev.filter(line => !line.isLocked);
+							// If only one empty line exists, replace it with locked lines
+							if (nonLockedLines.length === 1 && !nonLockedLines[0].type && !nonLockedLines[0].amount) {
+								return lockedDebitLines;
+							}
+							return [...lockedDebitLines, ...nonLockedLines];
+						});
 					}
-					return { ...line, segments: updatedSegments };
 				}
-				return line;
-			})
-		);
-	};
-
-	const getSegmentValue = (line, segmentTypeId) => {
-		const segment = (line.segments || []).find(s => s.segment_type_id === segmentTypeId);
-		return segment?.segment_code || "";
-	};
+			} catch (error) {
+				console.error("Failed to fetch invoice details:", error);
+			}
+		},
+		[segmentTypes]
+	);
 
 	const handleCancel = () => {
 		if (onCancel) {
@@ -425,144 +417,15 @@ const ReceivePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 				</button>
 
 				{isGLEntryOpen && (
-					<div className="space-y-4">
-						{/* GL Entry Header */}
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-							<FloatingLabelInput
-								label={t("paymentForm.glDate")}
-								name="gl_date"
-								type="date"
-								value={glEntry.date}
-								onChange={e => setGlEntry(prev => ({ ...prev, date: e.target.value }))}
-							/>
-							<FloatingLabelSelect
-								label={t("paymentForm.currency")}
-								name="gl_currency_id"
-								value={glEntry.currency_id}
-								onChange={e => setGlEntry(prev => ({ ...prev, currency_id: e.target.value }))}
-								options={currencyOptions}
-								placeholder={t("paymentForm.select")}
-							/>
-						</div>
-						<FloatingLabelInput
-							label={t("paymentForm.description")}
-							name="memo"
-							value={glEntry.memo}
-							onChange={e => setGlEntry(prev => ({ ...prev, memo: e.target.value }))}
-							placeholder={t("paymentForm.memoPlaceholder")}
-						/>
-
-						{/* GL Lines */}
-						<div>
-							<h4 className="text-sm font-medium text-gray-600 mb-3">{t("paymentForm.glLines")}</h4>
-							<div className="bg-white rounded-lg border border-gray-200 overflow-hidden overflow-x-auto">
-								{/* GL Lines Header */}
-								<div
-									className="grid gap-3 px-4 py-3 bg-gray-50 border-b border-gray-200 min-w-[700px]"
-									style={{
-										gridTemplateColumns: `120px 150px ${segmentTypes
-											.map(() => "1fr")
-											.join(" ")} 60px`,
-									}}
-								>
-									<span className="text-xs font-medium text-gray-600">{t("paymentForm.type")}</span>
-									<span className="text-xs font-medium text-gray-600">{t("paymentForm.amount")}</span>
-									{segmentTypes.map(st => (
-										<span key={st.id} className="text-xs font-medium text-gray-600">
-											{st.name || `Segment ${st.id}`}
-										</span>
-									))}
-									<span className="text-xs font-medium text-gray-600 text-center">
-										{t("paymentForm.actions")}
-									</span>
-								</div>
-
-								{/* GL Lines Body */}
-								<div className="divide-y divide-gray-100 min-w-[700px]">
-									{glLines.map(line => (
-										<div
-											key={line.id}
-											className="grid gap-3 px-4 py-3 items-center"
-											style={{
-												gridTemplateColumns: `120px 150px ${segmentTypes
-													.map(() => "1fr")
-													.join(" ")} 60px`,
-											}}
-										>
-											{/* Type */}
-											<div className="relative">
-												<select
-													value={line.type}
-													onChange={e => handleGLLineChange(line.id, "type", e.target.value)}
-													className="w-full h-10 px-3 pr-8 text-sm bg-white border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
-												>
-													<option value="">{t("paymentForm.selectType")}</option>
-													<option value="DEBIT">DEBIT</option>
-													<option value="CREDIT">CREDIT</option>
-												</select>
-												<FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
-											</div>
-
-											{/* Amount */}
-											<input
-												type="number"
-												step="0.01"
-												value={line.amount}
-												onChange={e => handleGLLineChange(line.id, "amount", e.target.value)}
-												placeholder={t("paymentForm.amount")}
-												className="w-full h-10 px-3 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
-											/>
-
-											{/* Segment Columns */}
-											{segmentTypes.map(st => {
-												const options = getSegmentOptions(st.id);
-												return (
-													<div key={`${line.id}-${st.id}`} className="relative">
-														<select
-															value={getSegmentValue(line, st.id)}
-															onChange={e =>
-																handleSegmentChange(line.id, st.id, e.target.value)
-															}
-															className="w-full h-10 px-3 pr-8 text-sm bg-white border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-transparent"
-														>
-															<option value="">{t("paymentForm.selectAccount")}</option>
-															{options.map(opt => (
-																<option key={opt.value} value={opt.value}>
-																	{opt.label}
-																</option>
-															))}
-														</select>
-														<FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
-													</div>
-												);
-											})}
-
-											{/* Delete */}
-											<div className="flex justify-center">
-												<button
-													type="button"
-													onClick={() => handleRemoveGLLine(line.id)}
-													disabled={glLines.length === 1}
-													className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-												>
-													<FaTrash className="w-4 h-4" />
-												</button>
-											</div>
-										</div>
-									))}
-								</div>
-							</div>
-
-							<button
-								type="button"
-								onClick={handleAddGLLine}
-								className="mt-3 flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-							>
-								<FaPlus className="w-3 h-3" />
-								{t("paymentForm.addLine")}
-							</button>
-						</div>
-					</div>
+					<GLLinesSection
+						lines={glLines}
+						onChange={setGlLines}
+						glEntry={glEntry}
+						onGlEntryChange={setGlEntry}
+						showGlEntryHeader={true}
+						title=""
+						invoiceTotal={1} // Always allow adding lines in payments
+					/>
 				)}
 			</div>
 

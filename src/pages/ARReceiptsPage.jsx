@@ -24,10 +24,10 @@ import {
 import { fetchCustomers } from "../store/customersSlice";
 import { fetchCurrencies } from "../store/currenciesSlice";
 import LoadingSpan from "../components/shared/LoadingSpan";
-import ARPaymentIcon from "../assets/icons/ARPaymentIcon";
+import ARReceiptIcon from "../assets/icons/ARReceiptIcon";
 import ReceivePaymentForm from "../components/forms/ReceivePaymentForm";
 
-const ARPaymentsPage = () => {
+const ARReceiptsPage = () => {
 	const { t, i18n } = useTranslation();
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
@@ -399,7 +399,7 @@ const ARPaymentsPage = () => {
 	return (
 		<div className="min-h-screen bg-gray-50">
 			{/* Page Header */}
-			<PageHeader icon={<ARPaymentIcon />} title={t("payments.ar.title")} subtitle={t("payments.ar.subtitle")} />
+			<PageHeader icon={<ARReceiptIcon />} title={t("payments.ar.title")} subtitle={t("payments.ar.subtitle")} />
 
 			{/* Action Bar with Create Button */}
 			<div className="px-6 mt-6">
@@ -569,4 +569,4 @@ const ARPaymentsPage = () => {
 	);
 };
 
-export default ARPaymentsPage;
+export default ARReceiptsPage;

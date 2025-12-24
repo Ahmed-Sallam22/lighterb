@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/shared/PageHeader';
+import { TbRulerMeasure } from "react-icons/tb";
 
 const HeaderIcon = () => (
 	<div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/30 flex items-center justify-center shadow-lg">
@@ -68,42 +69,9 @@ const cardConfigs = [
 				/>
 			</svg>
 		),
+		path: '/requisitions',
 	},
-	{
-		key: 'prToPo',
-		icon: (
-			<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<path
-					d="M26.666 5L33.3327 11.6667L26.666 18.3333"
-					stroke="#9810FA"
-					strokeWidth="3.33333"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
-				<path
-					d="M33.3327 11.667H6.66602"
-					stroke="#9810FA"
-					strokeWidth="3.33333"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
-				<path
-					d="M13.3327 35.0003L6.66602 28.3337L13.3327 21.667"
-					stroke="#9810FA"
-					strokeWidth="3.33333"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
-				<path
-					d="M6.66602 28.333H33.3327"
-					stroke="#9810FA"
-					strokeWidth="3.33333"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
-			</svg>
-		),
-	},
+	
 	{
 		key: 'purchaseOrders',
 		icon: (
@@ -168,25 +136,11 @@ const cardConfigs = [
 		),
 	},
 	{
-		key: 'approvals',
-		path: '/procurement/approvals',
+		key: 'UOM',
+		path: '/uom',
 		icon: (
-			<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<path
-					d="M36.3357 16.6662C37.0968 20.4017 36.5544 24.2852 34.7987 27.6691C33.0431 31.0531 30.1805 33.7329 26.6882 35.2617C23.1959 36.7905 19.285 37.0758 15.6078 36.0701C11.9306 35.0644 8.70931 32.8285 6.48111 29.7352C4.25292 26.6419 3.15252 22.8782 3.36343 19.0718C3.57433 15.2654 5.08379 11.6463 7.64007 8.81811C10.1964 5.98991 13.645 4.12355 17.4108 3.53025C21.1766 2.93695 25.032 3.65259 28.334 5.55783"
-					stroke="#009689"
-					strokeWidth="3.33333"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
-				<path
-					d="M15 18.3337L20 23.3337L36.6667 6.66699"
-					stroke="#009689"
-					strokeWidth="3.33333"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
-			</svg>
+			<TbRulerMeasure size={26}/>
+
 		),
 	},
 	{

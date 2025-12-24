@@ -407,7 +407,7 @@ function NewRequisition({ onClose, onSubmit }) {
 				/>
 				<Button
 					type="submit"
-					title={t('requisitions.newRequisition.createAsset')}
+					title={t('requisitions.newRequisition.createRequisition')}
 					className="px-6 py-2.5 bg-[#28819C] text-white rounded-lg hover:bg-[#206b82] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 					disabled={isSubmitting}
 				/>

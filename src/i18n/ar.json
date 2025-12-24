@@ -53,7 +53,7 @@
 			"customers": "العملاء",
 			"journal": "اليومية",
 			"arInvoices": "فواتير المبيعات",
-			"arPayments": "مدفوعات المبيعات",
+			"arReceipts": "إيصالات المبيعات",
 			"apInvoices": "فواتير الشراء",
 			"apPayments": "مدفوعات الشراء",
 			"reports": "التقارير"
@@ -283,7 +283,7 @@
 		"customers": "العملاء",
 		"suppliers": "الموردون",
 		"arInvoices": "فواتير المبيعات",
-		"arPayments": "مدفوعات المبيعات",
+		"arReceipts": "إيصالات المبيعات",
 		"apInvoices": "فواتير الشراء",
 		"apPayments": "مدفوعات الشراء",
 		"oneTimeSupplierInvoices": "مورد لمرة واحدة",
@@ -559,6 +559,7 @@
 			"additionalNotes": "ملاحظات إضافية",
 			"cancel": "إلغاء",
 			"createAsset": "إنشاء الأصل",
+			"createRequisition": "إنشاء الطلب",
 			"selectCostCenter": "اختر مركز التكلفة",
 			"selectProject": "اختر المشروع",
 			"selectPriority": "اختر الأولوية",
@@ -1211,12 +1212,12 @@
 	},
 	"payments": {
 		"ar": {
-			"title": "مدفوعات المبيعات",
+			"title": "إيصالات المبيعات",
 			"subtitle": "استلام المدفوعات من العملاء",
 			"createPayment": "استلام دفعة",
 			"editPayment": "تعديل الدفعة",
-			"deleteSuccess": "تم حذف دفعة المبيعات بنجاح",
-			"emptyMessage": "لم يتم العثور على مدفوعات عملاء",
+			"deleteSuccess": "تم حذف إيصال المبيعات بنجاح",
+			"emptyMessage": "لم يتم العثور على إيصالات العملاء",
 			"customer": "العميل"
 		},
 		"ap": {
@@ -1518,6 +1519,10 @@
 			"prToPo": {
 				"title": "تحويل الطلب لأمر شراء",
 				"description": "إنشاء أوامر شراء من الطلبات"
+			},
+			"UOM": {
+				"title": "وحدات القياس",
+				"description": "إدارة وحدات القياس"
 			},
 			"purchaseOrders": {
 				"title": "أوامر الشراء",
@@ -1898,8 +1903,8 @@
 		"messages": {
 			"apCreated": "تم إنشاء دفعة الموردين بنجاح",
 			"apUpdated": "تم تحديث دفعة الموردين بنجاح",
-			"arCreated": "تم استلام دفعة العملاء بنجاح",
-			"arUpdated": "تم تحديث دفعة العملاء بنجاح",
+			"arCreated": "تم استلام إيصال العملاء بنجاح",
+			"arUpdated": "تم تحديث إيصال العملاء بنجاح",
 			"createFailed": "فشل في إنشاء الدفعة",
 			"updateFailed": "فشل في تحديث الدفعة"
 		}
