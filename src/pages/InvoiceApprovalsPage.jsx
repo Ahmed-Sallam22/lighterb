@@ -14,12 +14,21 @@ import {
 	fetchARPendingApprovals,
 	fetchOTSPendingApprovals,
 	fetchPaymentPendingApprovals,
+	fetchAllProcurementPendingApprovals,
+	fetchCatalogPRPendingApprovals,
+	fetchNonCatalogPRPendingApprovals,
+	fetchServicePRPendingApprovals,
+	fetchPOPendingApprovals,
 	createInvoiceApproval,
 	updateInvoiceApproval,
 	deleteInvoiceApproval,
 	approveInvoice,
 	rejectInvoice,
 	delegateInvoice,
+	approveProcurementPR,
+	rejectProcurementPR,
+	approvePO,
+	rejectPO,
 } from "../store/invoiceApprovalsSlice";
 import { fetchARInvoices } from "../store/arInvoicesSlice";
 import { fetchAPInvoices } from "../store/apInvoicesSlice";
@@ -32,6 +41,7 @@ import Tabs from "../components/shared/Tabs";
 import InvoiceIcon from "../assets/icons/InvoiceIcon";
 import { IoIosCheckmarkCircleOutline, IoMdCloseCircleOutline } from "react-icons/io";
 import { MdAccessTime } from "react-icons/md";
+import { FiPackage } from "react-icons/fi";
 import InvoiceApprovalForm from "../components/forms/InvoiceApprovalForm";
 import { useNavigate } from "react-router";
 
@@ -46,14 +56,22 @@ const InvoiceApprovalsPage = () => {
 		arPendingApprovals,
 		otsPendingApprovals,
 		paymentPendingApprovals,
+		procurementPendingApprovals,
+		catalogPRPendingApprovals,
+		nonCatalogPRPendingApprovals,
+		servicePRPendingApprovals,
+		poPendingApprovals,
 		loading,
 	} = useSelector(state => state.invoiceApprovals);
 	const { invoices: arInvoices } = useSelector(state => state.arInvoices);
 	const { invoices: apInvoices } = useSelector(state => state.apInvoices);
 
+	// Main tab to separate Invoices/Payments from Procurement
+	const [mainTab, setMainTab] = useState("invoices");
 	const [activeTab, setActiveTab] = useState("all");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedType, setSelectedType] = useState("all");
+	const [selectedProcurementType, setSelectedProcurementType] = useState("all");
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
@@ -62,6 +80,8 @@ const InvoiceApprovalsPage = () => {
 	const [deleteId, setDeleteId] = useState(null);
 	const [actionId, setActionId] = useState(null);
 	const [actionInvoiceType, setActionInvoiceType] = useState(null);
+	const [actionPRType, setActionPRType] = useState(null);
+	const [actionPOId, setActionPOId] = useState(null);
 	const [formData, setFormData] = useState({
 		invoice_type: "",
 		invoice_id: "",
@@ -79,6 +99,8 @@ const InvoiceApprovalsPage = () => {
 		dispatch(fetchAPInvoices());
 		// Fetch pending approvals from all endpoints
 		dispatch(fetchAllPendingApprovals());
+		dispatch(fetchAllProcurementPendingApprovals());
+		dispatch(fetchPOPendingApprovals());
 	}, [dispatch]);
 
 	// Refetch based on selected type filter
@@ -95,6 +117,19 @@ const InvoiceApprovalsPage = () => {
 			dispatch(fetchPaymentPendingApprovals());
 		}
 	}, [dispatch, selectedType]);
+
+	// Refetch based on selected procurement type filter
+	useEffect(() => {
+		if (selectedProcurementType === "all") {
+			dispatch(fetchAllProcurementPendingApprovals());
+		} else if (selectedProcurementType === "Catalog") {
+			dispatch(fetchCatalogPRPendingApprovals());
+		} else if (selectedProcurementType === "NonCatalog") {
+			dispatch(fetchNonCatalogPRPendingApprovals());
+		} else if (selectedProcurementType === "Service") {
+			dispatch(fetchServicePRPendingApprovals());
+		}
+	}, [dispatch, selectedProcurementType]);
 
 	// Update available invoices when invoice type changes
 	useEffect(() => {
@@ -147,32 +182,94 @@ const InvoiceApprovalsPage = () => {
 		setIsDelegateModalOpen(true);
 	};
 
+	// Procurement approval handlers
+	const handleProcurementApprove = (prId, prType) => {
+		setActionId(prId);
+		setActionPRType(prType);
+		setActionComments("");
+		setIsApproveModalOpen(true);
+	};
+
+	const handleProcurementReject = (prId, prType) => {
+		setActionId(prId);
+		setActionPRType(prType);
+		setActionComments("");
+		setIsRejectModalOpen(true);
+	};
+
+	// PO approval handlers
+	const handlePOApprove = poId => {
+		setActionPOId(poId);
+		setActionComments("");
+		setIsApproveModalOpen(true);
+	};
+
+	const handlePOReject = poId => {
+		setActionPOId(poId);
+		setActionComments("");
+		setIsRejectModalOpen(true);
+	};
+
 	const confirmApprove = async () => {
 		try {
-			await dispatch(
-				approveInvoice({
-					id: actionId,
-					invoiceType: actionInvoiceType,
-					comment: actionComments,
-				})
-			).unwrap();
-			toast.success(t("invoiceApprovals.messages.approveSuccess"));
+			// Check if this is a PO approval
+			if (actionPOId) {
+				await dispatch(
+					approvePO({
+						id: actionPOId,
+						comments: actionComments,
+					})
+				).unwrap();
+				toast.success(t("invoiceApprovals.messages.poApproveSuccess"));
+				dispatch(fetchPOPendingApprovals());
+				// Check if this is a procurement approval
+			} else if (actionPRType) {
+				await dispatch(
+					approveProcurementPR({
+						id: actionId,
+						prType: actionPRType,
+						comments: actionComments,
+					})
+				).unwrap();
+				toast.success(t("invoiceApprovals.messages.procurementApproveSuccess"));
+				// Refresh procurement list
+				if (selectedProcurementType === "all") {
+					dispatch(fetchAllProcurementPendingApprovals());
+				} else if (selectedProcurementType === "Catalog") {
+					dispatch(fetchCatalogPRPendingApprovals());
+				} else if (selectedProcurementType === "NonCatalog") {
+					dispatch(fetchNonCatalogPRPendingApprovals());
+				} else if (selectedProcurementType === "Service") {
+					dispatch(fetchServicePRPendingApprovals());
+				}
+			} else {
+				await dispatch(
+					approveInvoice({
+						id: actionId,
+						invoiceType: actionInvoiceType,
+						comment: actionComments,
+					})
+				).unwrap();
+				toast.success(t("invoiceApprovals.messages.approveSuccess"));
+				// Refresh the invoice list
+				if (selectedType === "all") {
+					dispatch(fetchAllPendingApprovals());
+				} else if (selectedType === "AP Invoice") {
+					dispatch(fetchAPPendingApprovals());
+				} else if (selectedType === "AR Invoice") {
+					dispatch(fetchARPendingApprovals());
+				} else if (selectedType === "OTS Invoice") {
+					dispatch(fetchOTSPendingApprovals());
+				} else if (selectedType === "Payment") {
+					dispatch(fetchPaymentPendingApprovals());
+				}
+			}
 			setIsApproveModalOpen(false);
 			setActionId(null);
 			setActionInvoiceType(null);
+			setActionPRType(null);
+			setActionPOId(null);
 			setActionComments("");
-			// Refresh the list
-			if (selectedType === "all") {
-				dispatch(fetchAllPendingApprovals());
-			} else if (selectedType === "AP Invoice") {
-				dispatch(fetchAPPendingApprovals());
-			} else if (selectedType === "AR Invoice") {
-				dispatch(fetchARPendingApprovals());
-			} else if (selectedType === "OTS Invoice") {
-				dispatch(fetchOTSPendingApprovals());
-			} else if (selectedType === "Payment") {
-				dispatch(fetchPaymentPendingApprovals());
-			}
 		} catch (error) {
 			toast.error(error || t("invoiceApprovals.messages.approveError"));
 		}
@@ -180,30 +277,64 @@ const InvoiceApprovalsPage = () => {
 
 	const confirmReject = async () => {
 		try {
-			await dispatch(
-				rejectInvoice({
-					id: actionId,
-					invoiceType: actionInvoiceType,
-					comment: actionComments,
-				})
-			).unwrap();
-			toast.success(t("invoiceApprovals.messages.rejectSuccess"));
+			// Check if this is a PO rejection
+			if (actionPOId) {
+				await dispatch(
+					rejectPO({
+						id: actionPOId,
+						comments: actionComments,
+					})
+				).unwrap();
+				toast.success(t("invoiceApprovals.messages.poRejectSuccess"));
+				dispatch(fetchPOPendingApprovals());
+				// Check if this is a procurement rejection
+			} else if (actionPRType) {
+				await dispatch(
+					rejectProcurementPR({
+						id: actionId,
+						prType: actionPRType,
+						comments: actionComments,
+					})
+				).unwrap();
+				toast.success(t("invoiceApprovals.messages.procurementRejectSuccess"));
+				// Refresh procurement list
+				if (selectedProcurementType === "all") {
+					dispatch(fetchAllProcurementPendingApprovals());
+				} else if (selectedProcurementType === "Catalog") {
+					dispatch(fetchCatalogPRPendingApprovals());
+				} else if (selectedProcurementType === "NonCatalog") {
+					dispatch(fetchNonCatalogPRPendingApprovals());
+				} else if (selectedProcurementType === "Service") {
+					dispatch(fetchServicePRPendingApprovals());
+				}
+			} else {
+				await dispatch(
+					rejectInvoice({
+						id: actionId,
+						invoiceType: actionInvoiceType,
+						comment: actionComments,
+					})
+				).unwrap();
+				toast.success(t("invoiceApprovals.messages.rejectSuccess"));
+				// Refresh the invoice list
+				if (selectedType === "all") {
+					dispatch(fetchAllPendingApprovals());
+				} else if (selectedType === "AP Invoice") {
+					dispatch(fetchAPPendingApprovals());
+				} else if (selectedType === "AR Invoice") {
+					dispatch(fetchARPendingApprovals());
+				} else if (selectedType === "OTS Invoice") {
+					dispatch(fetchOTSPendingApprovals());
+				} else if (selectedType === "Payment") {
+					dispatch(fetchPaymentPendingApprovals());
+				}
+			}
 			setIsRejectModalOpen(false);
 			setActionId(null);
 			setActionInvoiceType(null);
+			setActionPRType(null);
+			setActionPOId(null);
 			setActionComments("");
-			// Refresh the list
-			if (selectedType === "all") {
-				dispatch(fetchAllPendingApprovals());
-			} else if (selectedType === "AP Invoice") {
-				dispatch(fetchAPPendingApprovals());
-			} else if (selectedType === "AR Invoice") {
-				dispatch(fetchARPendingApprovals());
-			} else if (selectedType === "OTS Invoice") {
-				dispatch(fetchOTSPendingApprovals());
-			} else if (selectedType === "Payment") {
-				dispatch(fetchPaymentPendingApprovals());
-			}
 		} catch (error) {
 			toast.error(error || t("invoiceApprovals.messages.rejectError"));
 		}
@@ -363,7 +494,80 @@ const InvoiceApprovalsPage = () => {
 	// Use pending approvals data
 	const displayApprovals = mappedApprovals;
 
-	// Calculate counts for tabs
+	// Get procurement pending approvals based on selected type
+	const getProcurementPendingApprovalsData = () => {
+		if (selectedProcurementType === "all") {
+			return procurementPendingApprovals || [];
+		} else if (selectedProcurementType === "Catalog") {
+			return catalogPRPendingApprovals || [];
+		} else if (selectedProcurementType === "NonCatalog") {
+			return nonCatalogPRPendingApprovals || [];
+		} else if (selectedProcurementType === "Service") {
+			return servicePRPendingApprovals || [];
+		}
+		return procurementPendingApprovals || [];
+	};
+
+	const mappedProcurementApprovals = getProcurementPendingApprovalsData().map(pr => ({
+		id: pr.pr_id,
+		prId: pr.pr_id,
+		prNumber: pr.pr_number,
+		type:
+			pr.pr_type === "CATALOG"
+				? t("invoiceApprovals.procurement.catalog")
+				: pr.pr_type === "NON_CATALOG"
+				? t("invoiceApprovals.procurement.nonCatalog")
+				: t("invoiceApprovals.procurement.service"),
+		prType: pr.pr_type, // Raw PR type for API calls
+		date: pr.date ? new Date(pr.date).toLocaleDateString() : t("invoiceApprovals.form.na"),
+		requiredDate: pr.required_date
+			? new Date(pr.required_date).toLocaleDateString()
+			: t("invoiceApprovals.form.na"),
+		requesterName: pr.requester_name || t("invoiceApprovals.form.na"),
+		requesterDepartment: pr.requester_department || t("invoiceApprovals.form.na"),
+		status:
+			pr.status === "PENDING_APPROVAL"
+				? "Pending"
+				: pr.status === "APPROVED"
+				? "Approved"
+				: pr.status === "REJECTED"
+				? "Rejected"
+				: "Pending",
+		priority: pr.priority || t("invoiceApprovals.form.na"),
+		total: pr.total ? `${pr.total}` : t("invoiceApprovals.form.na"),
+		itemCount: pr.item_count || pr.service_count || 0,
+		rawData: pr,
+	}));
+
+	const displayProcurementApprovals = mappedProcurementApprovals;
+
+	// Map PO pending approvals
+	const mappedPOApprovals = (poPendingApprovals || []).map(po => ({
+		id: po.po_id,
+		poId: po.po_id,
+		poNumber: po.po_number,
+		type: po.po_type,
+		date: po.po_date ? new Date(po.po_date).toLocaleDateString() : t("invoiceApprovals.form.na"),
+		supplierName: po.supplier_name || t("invoiceApprovals.form.na"),
+		total: po.total ? `${po.currency || ""} ${po.total}` : t("invoiceApprovals.form.na"),
+		currentStage: po.current_stage || t("invoiceApprovals.form.na"),
+		status:
+			po.status === "SUBMITTED" || po.workflow_status === "in_progress"
+				? "Pending"
+				: po.status === "APPROVED"
+				? "Approved"
+				: po.status === "REJECTED"
+				? "Rejected"
+				: "Pending",
+		canApprove: po.can_approve || false,
+		workflowId: po.workflow_id,
+		assignmentId: po.assignment_id,
+		rawData: po,
+	}));
+
+	const displayPOApprovals = mappedPOApprovals;
+
+	// Calculate counts for invoice tabs
 	const getCounts = () => {
 		return {
 			all: displayApprovals.length,
@@ -373,7 +577,29 @@ const InvoiceApprovalsPage = () => {
 		};
 	};
 
+	// Calculate counts for procurement tabs
+	const getProcurementCounts = () => {
+		return {
+			all: displayProcurementApprovals.length,
+			approved: displayProcurementApprovals.filter(a => a.status === "Approved").length,
+			pending: displayProcurementApprovals.filter(a => a.status === "Pending").length,
+			rejected: displayProcurementApprovals.filter(a => a.status === "Rejected").length,
+		};
+	};
+
+	// Calculate counts for PO tabs
+	const getPOCounts = () => {
+		return {
+			all: displayPOApprovals.length,
+			approved: displayPOApprovals.filter(a => a.status === "Approved").length,
+			pending: displayPOApprovals.filter(a => a.status === "Pending").length,
+			rejected: displayPOApprovals.filter(a => a.status === "Rejected").length,
+		};
+	};
+
 	const counts = getCounts();
+	const procurementCounts = getProcurementCounts();
+	const poCounts = getPOCounts();
 
 	// Statistics cards data
 	const statsCards = [
@@ -522,6 +748,245 @@ const InvoiceApprovalsPage = () => {
 		{ id: "rejected", label: t("invoiceApprovals.tabs.rejected"), count: counts.rejected },
 	];
 
+	// Procurement table columns
+	const procurementColumns = [
+		{
+			header: t("invoiceApprovals.procurement.table.type"),
+			accessor: "type",
+			width: "140px",
+			render: value => <span className="font-semibold text-gray-900">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.procurement.table.prNumber"),
+			accessor: "prNumber",
+			width: "150px",
+			render: value => <span className="font-semibold text-[#28819C]">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.procurement.table.requester"),
+			accessor: "requesterName",
+			render: value => <span className="text-gray-900">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.procurement.table.department"),
+			accessor: "requesterDepartment",
+			render: value => <span className="text-gray-700">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.procurement.table.total"),
+			accessor: "total",
+			render: value => <span className="text-gray-900 font-semibold">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.procurement.table.priority"),
+			accessor: "priority",
+			width: "100px",
+			render: value => (
+				<span
+					className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
+						value === "URGENT"
+							? "bg-red-100 text-red-800"
+							: value === "HIGH"
+							? "bg-orange-100 text-orange-800"
+							: value === "MEDIUM"
+							? "bg-yellow-100 text-yellow-800"
+							: "bg-gray-100 text-gray-800"
+					}`}
+				>
+					{t(`invoiceApprovals.procurement.priority.${value?.toLowerCase() || "low"}`)}
+				</span>
+			),
+		},
+		{
+			header: t("invoiceApprovals.procurement.table.status"),
+			accessor: "status",
+			width: "120px",
+			render: value => (
+				<span
+					className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+						value === "Approved"
+							? "bg-green-100 text-green-800"
+							: value === "Pending"
+							? "bg-yellow-100 text-yellow-800"
+							: value === "Rejected"
+							? "bg-red-100 text-red-800"
+							: "bg-gray-100 text-gray-800"
+					}`}
+				>
+					{t(`invoiceApprovals.table.statusValues.${value.toLowerCase()}`)}
+				</span>
+			),
+		},
+		{
+			header: t("invoiceApprovals.procurement.table.date"),
+			accessor: "date",
+			width: "120px",
+			render: value => <span className="text-gray-700">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.table.actions"),
+			accessor: "id",
+			width: "200px",
+			render: (value, row) => (
+				<div className="flex gap-2 flex-wrap justify-center">
+					{row.status === "Pending" && (
+						<>
+							<Button
+								onClick={() => handleProcurementApprove(row.prId, row.prType)}
+								title={t("invoiceApprovals.actions.approve")}
+								className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium shadow-none hover:shadow-none"
+							/>
+							<Button
+								onClick={() => handleProcurementReject(row.prId, row.prType)}
+								title={t("invoiceApprovals.actions.reject")}
+								className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-medium shadow-none hover:shadow-none"
+							/>
+						</>
+					)}
+				</div>
+			),
+		},
+	];
+
+	// Procurement tabs
+	const procurementTabs = [
+		{ id: "all", label: t("invoiceApprovals.tabs.all"), count: procurementCounts.all },
+		{ id: "approved", label: t("invoiceApprovals.tabs.approved"), count: procurementCounts.approved },
+		{ id: "pending", label: t("invoiceApprovals.tabs.pending"), count: procurementCounts.pending },
+		{ id: "rejected", label: t("invoiceApprovals.tabs.rejected"), count: procurementCounts.rejected },
+	];
+
+	// PO tabs
+	const poTabs = [
+		{ id: "all", label: t("invoiceApprovals.tabs.all"), count: poCounts.all },
+		{ id: "approved", label: t("invoiceApprovals.tabs.approved"), count: poCounts.approved },
+		{ id: "pending", label: t("invoiceApprovals.tabs.pending"), count: poCounts.pending },
+		{ id: "rejected", label: t("invoiceApprovals.tabs.rejected"), count: poCounts.rejected },
+	];
+
+	// PO table columns
+	const poColumns = [
+		{
+			header: t("invoiceApprovals.po.table.poNumber"),
+			accessor: "poNumber",
+			width: "150px",
+			render: value => <span className="font-semibold text-[#28819C]">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.po.table.type"),
+			accessor: "type",
+			width: "120px",
+			render: value => <span className="font-medium text-gray-900">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.po.table.supplier"),
+			accessor: "supplierName",
+			render: value => <span className="text-gray-900">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.po.table.total"),
+			accessor: "total",
+			render: value => <span className="text-gray-900 font-semibold">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.po.table.currentStage"),
+			accessor: "currentStage",
+			render: value => <span className="text-gray-700">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.po.table.status"),
+			accessor: "status",
+			width: "120px",
+			render: value => (
+				<span
+					className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+						value === "Approved"
+							? "bg-green-100 text-green-800"
+							: value === "Pending"
+							? "bg-yellow-100 text-yellow-800"
+							: value === "Rejected"
+							? "bg-red-100 text-red-800"
+							: "bg-gray-100 text-gray-800"
+					}`}
+				>
+					{t(`invoiceApprovals.table.statusValues.${value.toLowerCase()}`)}
+				</span>
+			),
+		},
+		{
+			header: t("invoiceApprovals.po.table.date"),
+			accessor: "date",
+			width: "120px",
+			render: value => <span className="text-gray-700">{value}</span>,
+		},
+		{
+			header: t("invoiceApprovals.table.actions"),
+			accessor: "id",
+			width: "200px",
+			render: (value, row) => (
+				<div className="flex gap-2 flex-wrap justify-center">
+					{row.status === "Pending" && row.canApprove && (
+						<>
+							<Button
+								onClick={() => handlePOApprove(row.poId)}
+								title={t("invoiceApprovals.actions.approve")}
+								className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium shadow-none hover:shadow-none"
+							/>
+							<Button
+								onClick={() => handlePOReject(row.poId)}
+								title={t("invoiceApprovals.actions.reject")}
+								className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-medium shadow-none hover:shadow-none"
+							/>
+						</>
+					)}
+				</div>
+			),
+		},
+	];
+
+	// Filter PO data based on active tab and search
+	const getFilteredPOData = () => {
+		let filtered = displayPOApprovals;
+
+		// Filter by tab (status)
+		if (activeTab !== "all") {
+			filtered = filtered.filter(item => item.status.toLowerCase() === activeTab.toLowerCase());
+		}
+
+		// Filter by search
+		if (searchQuery) {
+			filtered = filtered.filter(
+				item =>
+					item.poNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+					item.supplierName?.toLowerCase().includes(searchQuery.toLowerCase())
+			);
+		}
+
+		return filtered;
+	};
+
+	// Filter procurement data based on active tab and search
+	const getFilteredProcurementData = () => {
+		let filtered = displayProcurementApprovals;
+
+		// Filter by tab (status)
+		if (activeTab !== "all") {
+			filtered = filtered.filter(item => item.status.toLowerCase() === activeTab.toLowerCase());
+		}
+
+		// Filter by search
+		if (searchQuery) {
+			filtered = filtered.filter(
+				item =>
+					item.prNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+					item.requesterName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+					item.requesterDepartment?.toLowerCase().includes(searchQuery.toLowerCase())
+			);
+		}
+
+		return filtered;
+	};
+
 	const filterOptions = useMemo(
 		() => [
 			{ value: "all", label: t("invoiceApprovals.actions.filterAllTypes") },
@@ -532,6 +997,35 @@ const InvoiceApprovalsPage = () => {
 		],
 		[t]
 	);
+
+	const procurementFilterOptions = useMemo(
+		() => [
+			{ value: "all", label: t("invoiceApprovals.actions.filterAllTypes") },
+			{ value: "Catalog", label: t("invoiceApprovals.procurement.catalog") },
+			{ value: "NonCatalog", label: t("invoiceApprovals.procurement.nonCatalog") },
+			{ value: "Service", label: t("invoiceApprovals.procurement.service") },
+		],
+		[t]
+	);
+
+	// Main tabs to separate Invoices/Payments from Procurement and PO
+	const mainTabs = [
+		{
+			id: "invoices",
+			label: t("invoiceApprovals.mainTabs.invoicesPayments"),
+			count: counts.all,
+		},
+		{
+			id: "procurement",
+			label: t("invoiceApprovals.mainTabs.procurement"),
+			count: procurementCounts.all,
+		},
+		{
+			id: "po",
+			label: t("invoiceApprovals.mainTabs.purchaseOrders"),
+			count: poCounts.all,
+		},
+	];
 
 	const navigate = useNavigate();
 
@@ -559,36 +1053,137 @@ const InvoiceApprovalsPage = () => {
 								onChange={e => setSearchQuery(e.target.value)}
 							/>
 						</div>
-						{/* Type Filter */}
-
-						<FloatingLabelSelect
-							label={t("invoiceApprovals.actions.filterByType")}
-							value={selectedType}
-							onChange={e => setSelectedType(e.target.value)}
-							options={filterOptions}
-							className="w-48"
-						/>
+						{/* Type Filter - changes based on main tab */}
+						{mainTab === "invoices" && (
+							<FloatingLabelSelect
+								label={t("invoiceApprovals.actions.filterByType")}
+								value={selectedType}
+								onChange={e => setSelectedType(e.target.value)}
+								options={filterOptions}
+								className="w-48"
+							/>
+						)}
+						{mainTab === "procurement" && (
+							<FloatingLabelSelect
+								label={t("invoiceApprovals.actions.filterByType")}
+								value={selectedProcurementType}
+								onChange={e => setSelectedProcurementType(e.target.value)}
+								options={procurementFilterOptions}
+								className="w-48"
+							/>
+						)}
 					</div>
 				</div>
 
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-					{statsCards.map((card, index) => (
-						<StatisticsCard value={card.count} title={card.title} icon={card.icon} key={index} />
-					))}
-				</div>
-
-				{/* Reusable Tabs Component */}
+				{/* Main Tabs - Invoices/Payments vs Procurement */}
 				<div className="mb-6">
-					<Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+					<Tabs tabs={mainTabs} activeTab={mainTab} onTabChange={setMainTab} />
 				</div>
 
-				{/* Table */}
-				<Table
-					columns={columns}
-					data={getFilteredData()}
-					onDelete={row => (row.status === "Pending" ? handleDelete(row) : null)}
-					showActions={row => row.status === "Pending"}
-				/>
+				{/* Conditional content based on main tab */}
+				{mainTab === "invoices" && (
+					<>
+						{/* Statistics Cards for Invoices */}
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+							{statsCards.map((card, index) => (
+								<StatisticsCard value={card.count} title={card.title} icon={card.icon} key={index} />
+							))}
+						</div>
+
+						{/* Status Tabs */}
+						<div className="mb-6">
+							<Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+						</div>
+
+						{/* Invoice Table */}
+						<Table
+							columns={columns}
+							data={getFilteredData()}
+							onDelete={row => (row.status === "Pending" ? handleDelete(row) : null)}
+							showActions={row => row.status === "Pending"}
+						/>
+					</>
+				)}
+
+				{mainTab === "procurement" && (
+					<>
+						{/* Statistics Cards for Procurement */}
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+							<StatisticsCard
+								value={procurementCounts.all}
+								title={t("invoiceApprovals.stats.totals")}
+								icon={<FiPackage size={35} color="#28819C" />}
+							/>
+							<StatisticsCard
+								value={procurementCounts.approved}
+								title={t("invoiceApprovals.stats.approved")}
+								icon={<IoIosCheckmarkCircleOutline color="green" size={35} />}
+							/>
+							<StatisticsCard
+								value={procurementCounts.pending}
+								title={t("invoiceApprovals.stats.pending")}
+								icon={<MdAccessTime color="#FFC043" size={35} />}
+							/>
+							<StatisticsCard
+								value={procurementCounts.rejected}
+								title={t("invoiceApprovals.stats.rejected")}
+								icon={<IoMdCloseCircleOutline color="red" size={35} />}
+							/>
+						</div>
+
+						{/* Status Tabs */}
+						<div className="mb-6">
+							<Tabs tabs={procurementTabs} activeTab={activeTab} onTabChange={setActiveTab} />
+						</div>
+
+						{/* Procurement Table */}
+						<Table
+							columns={procurementColumns}
+							data={getFilteredProcurementData()}
+							showActions={row => row.status === "Pending"}
+						/>
+					</>
+				)}
+
+				{mainTab === "po" && (
+					<>
+						{/* Statistics Cards for PO */}
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+							<StatisticsCard
+								value={poCounts.all}
+								title={t("invoiceApprovals.stats.totals")}
+								icon={<FiPackage size={35} color="#28819C" />}
+							/>
+							<StatisticsCard
+								value={poCounts.approved}
+								title={t("invoiceApprovals.stats.approved")}
+								icon={<IoIosCheckmarkCircleOutline color="green" size={35} />}
+							/>
+							<StatisticsCard
+								value={poCounts.pending}
+								title={t("invoiceApprovals.stats.pending")}
+								icon={<MdAccessTime color="#FFC043" size={35} />}
+							/>
+							<StatisticsCard
+								value={poCounts.rejected}
+								title={t("invoiceApprovals.stats.rejected")}
+								icon={<IoMdCloseCircleOutline color="red" size={35} />}
+							/>
+						</div>
+
+						{/* Status Tabs */}
+						<div className="mb-6">
+							<Tabs tabs={poTabs} activeTab={activeTab} onTabChange={setActiveTab} />
+						</div>
+
+						{/* PO Table */}
+						<Table
+							columns={poColumns}
+							data={getFilteredPOData()}
+							showActions={row => row.status === "Pending" && row.canApprove}
+						/>
+					</>
+				)}
 			</div>
 
 			{/* Create/Edit Modal */}
@@ -648,11 +1243,25 @@ const InvoiceApprovalsPage = () => {
 					setIsApproveModalOpen(false);
 					setActionId(null);
 					setActionInvoiceType(null);
+					setActionPRType(null);
+					setActionPOId(null);
 					setActionComments("");
 				}}
 				onConfirm={confirmApprove}
-				title={t("invoiceApprovals.modals.approveTitle")}
-				message={t("invoiceApprovals.modals.approveMessage")}
+				title={
+					actionPOId
+						? t("invoiceApprovals.modals.approvePOTitle")
+						: actionPRType
+						? t("invoiceApprovals.modals.approvePRTitle")
+						: t("invoiceApprovals.modals.approveTitle")
+				}
+				message={
+					actionPOId
+						? t("invoiceApprovals.modals.approvePOMessage")
+						: actionPRType
+						? t("invoiceApprovals.modals.approvePRMessage")
+						: t("invoiceApprovals.modals.approveMessage")
+				}
 				confirmText={t("invoiceApprovals.actions.approve")}
 				confirmColor="green"
 				showTextarea
@@ -669,11 +1278,25 @@ const InvoiceApprovalsPage = () => {
 					setIsRejectModalOpen(false);
 					setActionId(null);
 					setActionInvoiceType(null);
+					setActionPRType(null);
+					setActionPOId(null);
 					setActionComments("");
 				}}
 				onConfirm={confirmReject}
-				title={t("invoiceApprovals.modals.rejectTitle")}
-				message={t("invoiceApprovals.modals.rejectMessage")}
+				title={
+					actionPOId
+						? t("invoiceApprovals.modals.rejectPOTitle")
+						: actionPRType
+						? t("invoiceApprovals.modals.rejectPRTitle")
+						: t("invoiceApprovals.modals.rejectTitle")
+				}
+				message={
+					actionPOId
+						? t("invoiceApprovals.modals.rejectPOMessage")
+						: actionPRType
+						? t("invoiceApprovals.modals.rejectPRMessage")
+						: t("invoiceApprovals.modals.rejectMessage")
+				}
 				confirmText={t("invoiceApprovals.actions.reject")}
 				confirmColor="red"
 				showTextarea

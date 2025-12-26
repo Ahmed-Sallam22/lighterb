@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
 
 import PageHeader from "../components/shared/PageHeader";
 import Card from "../components/shared/Card";
@@ -108,6 +109,7 @@ const Checkbox = ({ checked, onChange, disabled }) => (
 const CreateJobRolePage = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const { t } = useTranslation();
 
 	const { pages = [], pagesLoading, creating, actionError } = useSelector(state => state.jobRoles || {});
 
@@ -130,11 +132,11 @@ const CreateJobRolePage = () => {
 
 	// Update page title
 	useEffect(() => {
-		document.title = "Create Responsibility - LightERP";
+		document.title = `${t("jobRoles.modals.createTitle")} - LightERP`;
 		return () => {
 			document.title = "LightERP";
 		};
-	}, []);
+	}, [t]);
 
 	// Show error toast
 	useEffect(() => {
@@ -145,8 +147,8 @@ const CreateJobRolePage = () => {
 	}, [actionError, dispatch]);
 
 	const tabs = [
-		{ id: "general", label: "General" },
-		{ id: "functions", label: "Functions" },
+		{ id: "general", label: t("jobRoles.tabs.general") },
+		{ id: "functions", label: t("jobRoles.tabs.functions") },
 	];
 
 	const handleFormChange = e => {
@@ -165,7 +167,7 @@ const CreateJobRolePage = () => {
 	const handleSubmit = async () => {
 		// Validate required fields
 		if (!formData.name.trim()) {
-			toast.error("Name is required");
+			toast.error(t("jobRoles.form.nameRequired"));
 			return;
 		}
 
@@ -177,7 +179,7 @@ const CreateJobRolePage = () => {
 
 		try {
 			await dispatch(createJobRoleWithPages(payload)).unwrap();
-			toast.success("Responsibility created successfully");
+			toast.success(t("jobRoles.messages.created"));
 			navigate("/job-roles");
 		} catch {
 			// Error handled by Redux
@@ -195,22 +197,26 @@ const CreateJobRolePage = () => {
 			<ToastContainer position="top-right" />
 
 			{/* Header */}
-			<PageHeader title="Responsibilities" subtitle="Create Responsibility" icon={<JobRolesIcon />} />
+			<PageHeader
+				title={t("jobRoles.title")}
+				subtitle={t("jobRoles.modals.createTitle")}
+				icon={<JobRolesIcon />}
+			/>
 
 			<div className="max-w-6xl mx-auto mt-5 pb-10 px-6 space-y-5">
 				{/* Header with Cancel and Create buttons */}
 				<div className="flex justify-between items-center">
-					<h1 className="text-2xl font-bold text-[#28819C]">Create Responsibility</h1>
+					<h1 className="text-2xl font-bold text-[#28819C]">{t("jobRoles.modals.createTitle")}</h1>
 					<div className="flex gap-3">
 						<Button
 							onClick={handleCancel}
-							title="Cancel"
+							title={t("jobRoles.actions.cancel")}
 							className="bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 shadow-none"
 						/>
 						<Button
 							onClick={handleSubmit}
 							disabled={creating}
-							title={creating ? "Creating..." : "Create"}
+							title={creating ? t("jobRoles.actions.creating") : t("jobRoles.actions.create")}
 							className="bg-[#28819C] hover:bg-[#1d6a80] text-white"
 						/>
 					</div>
@@ -224,22 +230,24 @@ const CreateJobRolePage = () => {
 					<Card>
 						<div className="grid grid-cols-1 gap-6 p-2">
 							<FloatingLabelInput
-								label="Name"
+								label={t("jobRoles.form.name")}
 								name="name"
 								value={formData.name}
 								onChange={handleFormChange}
 								required
-								placeholder="Enter responsibility name"
+								placeholder={t("jobRoles.form.namePlaceholder")}
 							/>
 							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+								<label className="block text-sm font-medium text-gray-700 mb-2">
+									{t("jobRoles.form.description")}
+								</label>
 								<textarea
 									name="description"
 									value={formData.description}
 									onChange={handleFormChange}
 									rows={4}
 									className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-[#48C1F0] resize-none"
-									placeholder="Enter description..."
+									placeholder={t("jobRoles.form.descriptionPlaceholder")}
 								/>
 							</div>
 						</div>
@@ -250,8 +258,8 @@ const CreateJobRolePage = () => {
 					<Card>
 						<div className="p-2">
 							<div className="mb-4">
-								<h3 className="text-lg font-semibold text-gray-900">Pages</h3>
-								<p className="text-sm text-gray-500">Select a page to manage permissions</p>
+								<h3 className="text-lg font-semibold text-gray-900">{t("jobRoles.functions.title")}</h3>
+								<p className="text-sm text-gray-500">{t("jobRoles.functions.subtitle")}</p>
 							</div>
 
 							{pagesLoading ? (
@@ -259,7 +267,7 @@ const CreateJobRolePage = () => {
 									<div className="w-8 h-8 border-4 border-[#28819C] border-t-transparent rounded-full animate-spin"></div>
 								</div>
 							) : pages.length === 0 ? (
-								<div className="text-center py-12 text-gray-500">No pages available</div>
+								<div className="text-center py-12 text-gray-500">{t("jobRoles.functions.noPages")}</div>
 							) : (
 								<div className="space-y-2">
 									{pages.map(page => {

@@ -7,11 +7,6 @@ export const getCardsData = t => ({
 			key: "Journal Entries",
 		},
 		{
-			title: t("home.cards.journalLines.title"),
-			description: t("home.cards.journalLines.description"),
-			key: "Journal Lines",
-		},
-		{
 			title: t("home.cards.accountsReceivable.title"),
 			description: t("home.cards.accountsReceivable.description"),
 			key: "Accounts Receivable",
@@ -97,18 +92,18 @@ export const getCardsData = t => ({
 			key: "Depreciation",
 		},
 	],
-	Procurement: [
-		{
-			title: t("home.cards.procurementDashboard.title"),
-			description: t("home.cards.procurementDashboard.description"),
-			key: "Procurement Dashboard",
-		},
-		{
-			title: t("home.cards.procurement.title"),
-			description: t("home.cards.procurement.description"),
-			key: "Procurement",
-		},
-	],
+	// Procurement: [
+	// 	{
+	// 		title: t("home.cards.procurementDashboard.title"),
+	// 		description: t("home.cards.procurementDashboard.description"),
+	// 		key: "Procurement Dashboard",
+	// 	},
+	// 	{
+	// 		title: t("home.cards.procurement.title"),
+	// 		description: t("home.cards.procurement.description"),
+	// 		key: "Procurement",
+	// 	},
+	// ],
 	Accounts: [
 		{
 			title: t("home.cards.chartOfAccounts.title"),
@@ -147,16 +142,5 @@ export const getCardsData = t => ({
 			key: "Financial Reports",
 		},
 	],
-	Journal: [
-		{
-			title: t("home.cards.journalEntries.title"),
-			description: t("home.cards.journalEntries.description"),
-			key: "Journal Entries",
-		},
-		{
-			title: t("home.cards.journalLines.title"),
-			description: t("home.cards.journalLines.description"),
-			key: "Journal Lines",
-		},
-	],
+	
 });

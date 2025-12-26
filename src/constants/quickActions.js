@@ -1,5 +1,10 @@
 export const QUICK_ACTIONS = [
 	{
+		id: "create-requisition",
+		labelKey: "home.quickActionsList.createRequisition.label",
+		descriptionKey: "home.quickActionsList.createRequisition.description",
+	},
+	{
 		id: "create-ar-invoice",
 		labelKey: "home.quickActionsList.createArInvoice.label",
 		descriptionKey: "home.quickActionsList.createArInvoice.description",

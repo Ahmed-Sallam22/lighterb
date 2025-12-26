@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { FiDollarSign, FiPlus, FiSearch } from "react-icons/fi";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdAccessTime } from "react-icons/md";
@@ -9,60 +12,91 @@ import PageHeader from "../components/shared/PageHeader";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import RequisitionsHeadIcon from "../ui/icons/RequisitionsHeadIcon";
 import DoneIcon from "../ui/icons/DoneIcon";
-import NewRequisition from "../components/forms/NewRequisitionForm";
 import SlideUpModal from "../components/shared/SlideUpModal";
 import StatisticsCard from "../components/shared/StatisticsCard";
 import SearchInput from "../components/shared/SearchInput";
 import RequisitionCard from "../components/RequisitionCard";
-import BrowseCatalog from "../components/BrowseCatalog";
+// import BrowseCatalog from "../components/BrowseCatalog";
 import Button from "../components/shared/Button";
 import Tabs from "../components/shared/Tabs";
-import { requisitionsData } from "../dummyData/requisitionsData";
 import LoadingSpan from "../components/shared/LoadingSpan";
+import ConfirmModal from "../components/shared/ConfirmModal";
+import Pagination from "../components/shared/Pagination";
+import RequisitionDetailsModal from "../components/shared/RequisitionDetailsModal";
+import {
+	fetchAllRequisitions,
+	deleteRequisition,
+	submitForApproval,
+	clearError,
+	setPage,
+} from "../store/requisitionsSlice";
 
 // Static options - move outside component
 const STATUS_OPTIONS = [
 	{ value: "all", label: "requisitions.filters.allStatuses" },
-	{ value: "posted", label: "requisitions.filters.posted" },
-	{ value: "draft", label: "requisitions.filters.draft" },
-	{ value: "pending", label: "requisitions.filters.pending" },
-	{ value: "approved", label: "requisitions.filters.approved" },
+	{ value: "DRAFT", label: "requisitions.filters.draft" },
+	{ value: "PENDING_APPROVAL", label: "requisitions.filters.pending" },
+	{ value: "APPROVED", label: "requisitions.filters.approved" },
+	{ value: "REJECTED", label: "requisitions.filters.rejected" },
 ];
 
 const TAB_CONFIG = [
-	{ id: "myPRs", key: "myPRs" },
-	{ id: "pending", key: "pendingApproval" },
 	{ id: "allPRs", key: "allPRs" },
+	{ id: "catalog", key: "catalog" },
+	{ id: "nonCatalog", key: "nonCatalog" },
+	{ id: "service", key: "service" },
 ];
 
 const RequisitionsPage = () => {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
+	const isRtl = i18n.dir() === "rtl";
+	const navigate = useNavigate();
+	const dispatch = useDispatch();
+
+	// Redux state
+	const {
+		requisitions,
+		loading,
+		error,
+		actionError,
+		deleting,
+		submitting,
+		count,
+		catalogCount,
+		nonCatalogCount,
+		serviceCount,
+		page,
+		pageSize,
+		hasNext,
+		hasPrevious,
+	} = useSelector(state => state.requisitions);
 
 	// Modal states
-	const [isNewReqModalOpen, setIsNewReqModalOpen] = useState(false);
-	const [isBrowseCatalogModalOpen, setIsBrowseCatalogModalOpen] = useState(false);
+	// const [isBrowseCatalogModalOpen, setIsBrowseCatalogModalOpen] = useState(false);
+	const [deleteModal, setDeleteModal] = useState({ isOpen: false, requisition: null });
+	const [viewModal, setViewModal] = useState({ isOpen: false, requisition: null });
 
-	// Data states
-	const [requisitions, setRequisitions] = useState(requisitionsData);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(null);
+	// Local page size state
+	const [localPageSize, setLocalPageSize] = useState(pageSize || 20);
 
 	// Filter states
 	const [filters, setFilters] = useState({
 		search: "",
 		status: "all",
 	});
+	const [searchDebounce, setSearchDebounce] = useState("");
 
 	const [activeTab, setActiveTab] = useState("allPRs");
 
-	// Memoize tabs with translations
+	// Memoize tabs with translations and counts
 	const tabs = useMemo(
-		() =>
-			TAB_CONFIG.map(tab => ({
-				id: tab.id,
-				label: t(`requisitions.tabs.${tab.key}`),
-			})),
-		[t]
+		() => [
+			{ id: "allPRs", label: t("requisitions.tabs.allPRs"), count: count },
+			{ id: "catalog", label: t("requisitions.tabs.catalog"), count: catalogCount },
+			{ id: "nonCatalog", label: t("requisitions.tabs.nonCatalog"), count: nonCatalogCount },
+			{ id: "service", label: t("requisitions.tabs.service"), count: serviceCount },
+		],
+		[t, count, catalogCount, nonCatalogCount, serviceCount]
 	);
 
 	// Memoize status options with translations
@@ -78,18 +112,20 @@ const RequisitionsPage = () => {
 	// Calculate statistics from actual data
 	const statistics = useMemo(() => {
 		const totalValue = requisitions.reduce((sum, r) => {
-			const amount = parseFloat(r.totalAmount) || 0;
+			const amount = parseFloat(r.total) || 0;
 			return sum + amount;
 		}, 0);
 
-		const stats = {
-			total: requisitions.length,
-			pending: requisitions.filter(r => r.status === "pending").length,
-			approved: requisitions.filter(r => r.status === "approved").length,
-			totalValue: totalValue,
+		const pending = requisitions.filter(r => r.status === "PENDING_APPROVAL").length;
+		const approved = requisitions.filter(r => r.status === "APPROVED").length;
+
+		return {
+			total: count,
+			pending,
+			approved,
+			totalValue,
 		};
-		return stats;
-	}, [requisitions]);
+	}, [requisitions, count]);
 
 	// Memoize stat cards configuration
 	const statCards = useMemo(
@@ -126,117 +162,134 @@ const RequisitionsPage = () => {
 		[t, statistics]
 	);
 
-	// Filter requisitions based on search, status, and active tab
+	// Filter requisitions based on active tab (client-side filtering for tab)
 	const filteredRequisitions = useMemo(() => {
-		return requisitions.filter(req => {
-			// Search filter
-			const matchesSearch =
-				!filters.search ||
-				req.id?.toLowerCase().includes(filters.search.toLowerCase()) ||
-				req.description?.toLowerCase().includes(filters.search.toLowerCase()) ||
-				req.createdBy?.toLowerCase().includes(filters.search.toLowerCase());
+		if (activeTab === "allPRs") return requisitions;
 
-			// Status filter
-			const matchesStatus = filters.status === "all" || req.status === filters.status;
+		const tabTypeMap = {
+			catalog: "Catalog",
+			nonCatalog: "Non-Catalog",
+			service: "Service",
+		};
 
-			// Tab filter
-			let matchesTab = true;
-			if (activeTab === "myPRs") {
-				// Assuming there's a currentUserId or isOwner property
-				matchesTab = req.isOwner || req.createdBy === "currentUser";
-			} else if (activeTab === "pending") {
-				matchesTab = req.status === "pending";
-			}
-			// 'allPRs' shows everything
+		return requisitions.filter(req => req.pr_type === tabTypeMap[activeTab]);
+	}, [requisitions, activeTab]);
 
-			return matchesSearch && matchesStatus && matchesTab;
-		});
-	}, [requisitions, filters, activeTab]);
+	// Debounce search
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setSearchDebounce(filters.search);
+		}, 500);
+		return () => clearTimeout(timer);
+	}, [filters.search]);
+
+	// Fetch requisitions on mount and when filters change
+	useEffect(() => {
+		dispatch(
+			fetchAllRequisitions({
+				page,
+				page_size: localPageSize,
+				status: filters.status,
+				search: searchDebounce,
+			})
+		);
+	}, [dispatch, page, localPageSize, filters.status, searchDebounce]);
 
 	// Handle errors
 	useEffect(() => {
 		if (error) {
 			toast.error(error, { autoClose: 5000 });
-			setError(null); // Clear error after showing
+			dispatch(clearError());
 		}
-	}, [error]);
+	}, [error, dispatch]);
 
-	// Fetch requisitions (placeholder for real API call)
 	useEffect(() => {
-		const fetchRequisitions = async () => {
-			setLoading(true);
-			try {
-				// TODO: Replace with actual API call
-				// const data = await api.getRequisitions();
-				// setRequisitions(data);
-
-				// Simulating API delay
-				await new Promise(resolve => setTimeout(resolve, 500));
-				setRequisitions(requisitionsData);
-			} catch (err) {
-				setError(t("requisitions.errors.fetchFailed"));
-				console.error("Error fetching requisitions:", err);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchRequisitions();
-	}, [t]);
+		if (actionError) {
+			toast.error(actionError, { autoClose: 5000 });
+			dispatch(clearError());
+		}
+	}, [actionError, dispatch]);
 
 	// Handlers
-	const handleFilterChange = useCallback((name, value) => {
-		setFilters(prev => ({ ...prev, [name]: value }));
-	}, []);
+	const handleFilterChange = useCallback(
+		(name, value) => {
+			setFilters(prev => ({ ...prev, [name]: value }));
+			dispatch(setPage(1)); // Reset to first page when filters change
+		},
+		[dispatch]
+	);
 
 	const handleViewRequisition = useCallback(requisition => {
-		// TODO: Navigate to requisition detail page or open modal
-		console.log("Viewing requisition:", requisition);
+		setViewModal({ isOpen: true, requisition });
+	}, []);
+
+	const handleCloseViewModal = useCallback(() => {
+		setViewModal({ isOpen: false, requisition: null });
 	}, []);
 
 	const handleEditRequisition = useCallback(requisition => {
-		// TODO: Open edit modal with requisition data
+		// TODO: Navigate to edit page
 		console.log("Editing requisition:", requisition);
 	}, []);
 
+	const handleDeleteClick = useCallback(requisition => {
+		setDeleteModal({ isOpen: true, requisition });
+	}, []);
+
+	const handleConfirmDelete = useCallback(async () => {
+		if (!deleteModal.requisition) return;
+
+		try {
+			await dispatch(
+				deleteRequisition({
+					prType: deleteModal.requisition.pr_type,
+					id: deleteModal.requisition.pr_id,
+				})
+			).unwrap();
+
+			toast.success(t("requisitions.messages.deleteSuccess"));
+			setDeleteModal({ isOpen: false, requisition: null });
+		} catch {
+			// Error handled by Redux
+		}
+	}, [deleteModal.requisition, dispatch, t]);
+
 	const handleSubmitRequisition = useCallback(
-		requisition => {
-			// TODO: Submit requisition for approval
-			console.log("Submitting requisition:", requisition);
-			toast.success(t("requisitions.messages.submitSuccess"));
-		},
-		[t]
-	);
-
-	const handleCreateRequisition = useCallback(
-		async requisitionData => {
+		async requisition => {
 			try {
-				// TODO: API call to create requisition
-				// const newReq = await api.createRequisition(requisitionData);
+				await dispatch(
+					submitForApproval({
+						prType: requisition.pr_type,
+						id: requisition.pr_id,
+					})
+				).unwrap();
 
-				const newReq = {
-					id: `PR-${Date.now()}`,
-					...requisitionData,
-					status: "draft",
-					createdAt: new Date().toISOString(),
-					isOwner: true,
-				};
-
-				setRequisitions(prev => [newReq, ...prev]);
-				toast.success(t("requisitions.messages.createSuccess"));
-				setIsNewReqModalOpen(false);
-			} catch (err) {
-				toast.error(t("requisitions.errors.createFailed"));
-				console.error("Error creating requisition:", err);
-				throw err;
+				toast.success(t("requisitions.messages.submitSuccess"));
+			} catch {
+				// Error handled by Redux
 			}
 		},
-		[t]
+		[dispatch, t]
 	);
 
 	const handleTabChange = useCallback(tabId => {
 		setActiveTab(tabId);
 	}, []);
+
+	const handlePageChange = useCallback(
+		newPage => {
+			dispatch(setPage(newPage));
+		},
+		[dispatch]
+	);
+
+	const handlePageSizeChange = useCallback(
+		newPageSize => {
+			setLocalPageSize(newPageSize);
+			dispatch(setPage(1)); // Reset to first page when page size changes
+		},
+		[dispatch]
+	);
 
 	return (
 		<div className="min-h-screen bg-[#EEEEEE]">
@@ -253,15 +306,15 @@ const RequisitionsPage = () => {
 					<h1 className="text-3xl font-semibold text-[#28819C]">{t("requisitions.title")}</h1>
 					<div className="flex items-center gap-4">
 						<Button
-							onClick={() => setIsNewReqModalOpen(true)}
+							onClick={() => navigate("/create-requisition")}
 							icon={<FiPlus className="text-xl" />}
 							title={t("requisitions.createRequisition")}
 						/>
-						<Button
+						{/* <Button
 							onClick={() => setIsBrowseCatalogModalOpen(true)}
 							icon={<FiSearch className="text-xl" />}
 							title={t("requisitions.browseCatalog.title")}
-						/>
+						/> */}
 					</div>
 				</div>
 
@@ -315,30 +368,35 @@ const RequisitionsPage = () => {
 						<div className="space-y-4">
 							{filteredRequisitions.map(requisition => (
 								<RequisitionCard
-									key={requisition.id}
+									key={`${requisition.pr_type}-${requisition.pr_id}`}
 									requisition={requisition}
 									onView={handleViewRequisition}
 									onEdit={handleEditRequisition}
 									onSubmit={handleSubmitRequisition}
+									onDelete={handleDeleteClick}
 									t={t}
+									submitting={submitting}
 								/>
 							))}
 						</div>
 					)}
+
+					{/* Pagination */}
+					{!loading && count > 0 && (
+						<Pagination
+							currentPage={page}
+							totalCount={count}
+							pageSize={localPageSize}
+							hasNext={hasNext}
+							hasPrevious={hasPrevious}
+							onPageChange={handlePageChange}
+							onPageSizeChange={handlePageSizeChange}
+						/>
+					)}
 				</div>
 			</div>
 
-			{/* New Requisition Modal */}
-			<SlideUpModal
-				isOpen={isNewReqModalOpen}
-				onClose={() => setIsNewReqModalOpen(false)}
-				title={t("requisitions.newRequisition.title")}
-				maxWidth="1000px"
-			>
-				<NewRequisition onClose={() => setIsNewReqModalOpen(false)} onSubmit={handleCreateRequisition} />
-			</SlideUpModal>
-
-			{/* Browse Catalog Modal */}
+			{/* Browse Catalog Modal
 			<SlideUpModal
 				isOpen={isBrowseCatalogModalOpen}
 				onClose={() => setIsBrowseCatalogModalOpen(false)}
@@ -346,7 +404,44 @@ const RequisitionsPage = () => {
 				maxWidth="1000px"
 			>
 				<BrowseCatalog onClose={() => setIsBrowseCatalogModalOpen(false)} />
-			</SlideUpModal>
+			</SlideUpModal> */}
+
+			{/* Requisition Details Modal */}
+			<RequisitionDetailsModal
+				isOpen={viewModal.isOpen}
+				requisitionId={viewModal.requisition?.pr_id}
+				prType={viewModal.requisition?.pr_type}
+				onClose={handleCloseViewModal}
+			/>
+
+			{/* Delete Confirmation Modal */}
+			<ConfirmModal
+				isOpen={deleteModal.isOpen}
+				onClose={() => setDeleteModal({ isOpen: false, requisition: null })}
+				onConfirm={handleConfirmDelete}
+				title={t("requisitions.modals.deleteTitle")}
+				message={t("requisitions.modals.deleteMessage", {
+					prNumber: deleteModal.requisition?.pr_number || deleteModal.requisition?.pr_id,
+				})}
+				confirmText={deleting ? t("requisitions.actions.deleting") : t("requisitions.actions.delete")}
+				cancelText={t("requisitions.actions.cancel")}
+				isLoading={deleting}
+				variant="danger"
+			/>
+
+			{/* Toast Container */}
+			<ToastContainer
+				position={isRtl ? "top-left" : "top-right"}
+				autoClose={3000}
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick
+				rtl={isRtl}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="light"
+			/>
 		</div>
 	);
 };

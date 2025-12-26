@@ -46,10 +46,16 @@ const ForgetPasswordPage = lazy(() => import("./pages/ForgetPasswordPage"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const ChangePasswordPage = lazy(() => import("./pages/ChangePasswordPage"));
 const Requisitions = lazy(() => import("./pages/Requisitions"));
+const CreateRequisitionPage = lazy(() => import("./pages/CreateRequisitionPage"));
 const AssetsPage = lazy(() => import("./pages/Assets"));
 const JobRolesPage = lazy(() => import("./pages/JobRolesPage"));
 const CreateJobRolePage = lazy(() => import("./pages/CreateJobRolePage"));
 const UsersPage = lazy(() => import("./pages/UsersPage"));
+const UOMPage = lazy(() => import("./pages/UOMPage"));
+const CreatePoPage = lazy(() => import("./pages/CreatePoPage"));
+const PoPage = lazy(() => import("./pages/POPage"));
+const Receiving = lazy(() => import("./pages/ReceivingPage"));
+const CreateGRNPage = lazy(() => import("./pages/CreateGRNPage"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -104,19 +110,25 @@ const App = () => {
 						<Route path="currency" element={<CurrencyPage />} />
 						<Route path="countries" element={<CountryPage />} />
 						<Route path="tax-rates" element={<TaxRatesPage />} />
-						<Route path="invoice-approvals" element={<InvoiceApprovalsPage />} />
+						<Route path="approvals" element={<InvoiceApprovalsPage />} />
 						<Route path="customers" element={<CustomersPage />} />
 						<Route path="suppliers" element={<SuppliersPage />} />
 						<Route path="reports" element={<ReportsPage />} />
 						<Route path="procurement" element={<ProcurementDashboard />} />
 						<Route path="procurement/approvals" element={<ProcurementApprovals />} />
 						<Route path="requisitions" element={<Requisitions />} />
+						<Route path="create-requisition" element={<CreateRequisitionPage />} />
 						<Route path="procurement/approvals/:instanceId" element={<ProcurementApprovalDetail />} />
 						<Route path="procurement/catalog" element={<ProcurementCatalog />} />
 						<Route path="job-roles" element={<JobRolesPage />} />
 						<Route path="job-roles/create" element={<CreateJobRolePage />} />
 						<Route path="approval-workflow" element={<ApprovalWorkflow />} />
 						<Route path="users" element={<UsersPage />} />
+						<Route path="uom" element={<UOMPage />} />
+						<Route path="procurement/po" element={<PoPage />} />\
+						<Route path="procurement/po/create" element={<CreatePoPage />} />
+						<Route path="procurement/receiving-grn" element={<Receiving />} />
+						<Route path="procurement/receiving-grn/create" element={<CreateGRNPage />} />
 					</Route>
 				</Routes>
 			</Suspense>

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
 
 import PageHeader from "../components/shared/PageHeader";
 import Table from "../components/shared/Table";
@@ -35,6 +36,7 @@ const JobRolesIcon = () => (
 const JobRolesPage = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
+	const { t } = useTranslation();
 
 	const {
 		roles = [],
@@ -82,11 +84,11 @@ const JobRolesPage = () => {
 
 	// Update page title
 	useEffect(() => {
-		document.title = `Responsibilities - LightERP`;
+		document.title = `${t("jobRoles.title")} - LightERP`;
 		return () => {
 			document.title = "LightERP";
 		};
-	}, []);
+	}, [t]);
 
 	// Pagination handlers
 	const handlePageChange = useCallback(
@@ -107,12 +109,12 @@ const JobRolesPage = () => {
 	// Table columns
 	const columns = [
 		{
-			header: "Name",
+			header: t("jobRoles.table.name"),
 			accessor: "name",
 			render: value => <span className="font-semibold text-gray-900">{value || "-"}</span>,
 		},
 		{
-			header: "Description",
+			header: t("jobRoles.table.description"),
 			accessor: "description",
 			render: value => <span className="text-gray-600 truncate max-w-[400px] block">{value || "-"}</span>,
 		},
@@ -158,13 +160,13 @@ const JobRolesPage = () => {
 
 	const handleUpdate = async () => {
 		if (!editForm.name.trim()) {
-			toast.error("Name is required");
+			toast.error(t("jobRoles.form.nameRequired"));
 			return;
 		}
 
 		try {
 			await dispatch(updateJobRole({ id: selectedRole.id, data: editForm })).unwrap();
-			toast.success("Responsibility updated successfully");
+			toast.success(t("jobRoles.messages.updated"));
 			handleCloseModals();
 			dispatch(fetchJobRoles({ page, page_size: localPageSize, search: searchTerm }));
 		} catch {
@@ -175,7 +177,7 @@ const JobRolesPage = () => {
 	const handleDelete = async () => {
 		try {
 			await dispatch(deleteJobRole(selectedRole.id)).unwrap();
-			toast.success("Responsibility deleted successfully");
+			toast.success(t("jobRoles.messages.deleted"));
 			handleCloseModals();
 			dispatch(fetchJobRoles({ page, page_size: localPageSize, search: searchTerm }));
 		} catch {
@@ -193,16 +195,16 @@ const JobRolesPage = () => {
 			<ToastContainer position="top-right" />
 
 			{/* Header */}
-			<PageHeader title="Responsibilities" subtitle="Lorem Ipsum" icon={<JobRolesIcon />} />
+			<PageHeader title={t("jobRoles.title")} subtitle={t("jobRoles.subtitle")} icon={<JobRolesIcon />} />
 
 			<div className="w-[95%] mx-auto px-6 py-8">
 				{/* Title and Create Button */}
 				<div className="flex items-center justify-between mb-6">
-					<h2 className="text-2xl font-bold text-[#28819C]">Responsibilities</h2>
+					<h2 className="text-2xl font-bold text-[#28819C]">{t("jobRoles.title")}</h2>
 
 					<Button
 						onClick={handleOpenCreate}
-						title="Create Responsibility"
+						title={t("jobRoles.addRole")}
 						icon={<BiPlus className="text-xl" />}
 						className="bg-[#28819C] hover:bg-[#1d6a80] text-white"
 					/>
@@ -210,11 +212,11 @@ const JobRolesPage = () => {
 
 				{/* Search Section */}
 				<div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-					<label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+					<label className="block text-sm font-medium text-gray-700 mb-2">{t("jobRoles.search")}</label>
 					<SearchInput
 						value={searchTerm}
 						onChange={handleSearchChange}
-						placeholder="Search by code or name..."
+						placeholder={t("jobRoles.searchPlaceholder")}
 						className="max-w-full"
 					/>
 				</div>
@@ -229,7 +231,7 @@ const JobRolesPage = () => {
 						setSelectedRole(row);
 						setIsDeleteModalOpen(true);
 					}}
-					emptyMessage={loading ? "Loading responsibilities..." : "No responsibilities found"}
+					emptyMessage={loading ? t("jobRoles.table.loading") : t("jobRoles.table.emptyMessage")}
 				/>
 
 				{/* Pagination */}
@@ -248,20 +250,20 @@ const JobRolesPage = () => {
 			<SlideUpModal
 				isOpen={isViewModalOpen}
 				onClose={handleCloseModals}
-				title="View Responsibility"
+				title={t("jobRoles.modals.viewTitle")}
 				maxWidth="600px"
 			>
 				{selectedRole && (
 					<div className="space-y-5 p-4">
 						<div>
-							<p className="text-sm font-medium text-[#28819C] mb-1">Name</p>
+							<p className="text-sm font-medium text-[#28819C] mb-1">{t("jobRoles.form.name")}</p>
 							<div className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 text-gray-700">
 								{selectedRole.name || "-"}
 							</div>
 						</div>
 
 						<div>
-							<p className="text-sm font-medium text-[#28819C] mb-1">Description</p>
+							<p className="text-sm font-medium text-[#28819C] mb-1">{t("jobRoles.form.description")}</p>
 							<div className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 text-gray-700">
 								{selectedRole.description || "-"}
 							</div>
@@ -271,12 +273,12 @@ const JobRolesPage = () => {
 						<div className="flex gap-3 pt-2">
 							<Button
 								onClick={() => handleOpenEdit(selectedRole)}
-								title="Edit"
+								title={t("jobRoles.actions.edit")}
 								className="flex-1 py-3 bg-[#28819C] text-white rounded-xl hover:bg-[#1d6a80] transition-colors font-medium"
 							/>
 							<Button
 								onClick={() => handleOpenDelete(selectedRole)}
-								title="Delete"
+								title={t("jobRoles.actions.delete")}
 								className="shadow-none hover:shadow-none flex-1 py-3 bg-white text-red-600 border border-red-300 rounded-xl hover:bg-red-50 transition-colors font-medium"
 							/>
 						</div>
@@ -288,31 +290,31 @@ const JobRolesPage = () => {
 			<SlideUpModal
 				isOpen={isEditModalOpen}
 				onClose={handleCloseModals}
-				title="Edit Responsibility"
+				title={t("jobRoles.modals.editTitle")}
 				maxWidth="600px"
 			>
 				<div className="space-y-5 p-4">
 					<FloatingLabelInput
-						label="Name"
+						label={t("jobRoles.form.name")}
 						name="name"
 						value={editForm.name}
 						onChange={handleEditFormChange}
-						placeholder="Enter name"
+						placeholder={t("jobRoles.form.namePlaceholder")}
 					/>
 
 					<FloatingLabelInput
-						label="Description"
+						label={t("jobRoles.form.description")}
 						name="description"
 						value={editForm.description}
 						onChange={handleEditFormChange}
-						placeholder="Enter description"
+						placeholder={t("jobRoles.form.descriptionPlaceholder")}
 					/>
 
 					{/* Submit Button */}
 					<Button
 						onClick={handleUpdate}
 						disabled={updating}
-						title={updating ? "Saving..." : "Save Changes"}
+						title={updating ? t("jobRoles.actions.saving") : t("jobRoles.actions.update")}
 						className="w-full py-3 bg-[#28819C] text-white rounded-xl hover:bg-[#1d6a80] transition-colors font-medium disabled:opacity-50"
 					/>
 				</div>
@@ -323,10 +325,10 @@ const JobRolesPage = () => {
 				isOpen={isDeleteModalOpen}
 				onClose={handleCloseModals}
 				onConfirm={handleDelete}
-				title="Delete Responsibility"
-				message={`Are you sure you want to delete "${selectedRole?.name}"? This action cannot be undone.`}
-				confirmText={deleting ? "Deleting..." : "Delete"}
-				cancelText="Cancel"
+				title={t("jobRoles.modals.deleteTitle")}
+				message={t("jobRoles.modals.deleteMessage", { name: selectedRole?.name })}
+				confirmText={deleting ? t("jobRoles.actions.deleting") : t("jobRoles.actions.delete")}
+				cancelText={t("jobRoles.actions.cancel")}
 				loading={deleting}
 				confirmColor="red"
 			/>

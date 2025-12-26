@@ -5,7 +5,7 @@ export const getHomeRoutes = t => [
 	// { name: t("home.routes.accounts"), key: "Accounts", path: "/accounts" },
 	{ name: t("home.routes.suppliers"), key: "Suppliers", path: "/suppliers" },
 	{ name: t("home.routes.customers"), key: "Customers", path: "/customers" },
-	{ name: t("home.routes.journal"), key: "Journal", path: "/journal" },
+	{ name: t("home.routes.journal"), key: "Journal", path: "/journal-entries" },
 	{ name: t("home.routes.arInvoices"), key: "AR Invoices", path: "/ar-invoices" },
 	{ name: t("home.routes.arReceipts"), key: "AR Receipts", path: "/ar-receipts" },
 	{ name: t("home.routes.apInvoices"), key: "AP Invoices", path: "/ap-invoices" },

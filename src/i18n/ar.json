@@ -3,6 +3,10 @@
 		"title": "لنبدأ مع",
 		"quickActions": "الإجراءات السريعة",
 		"quickActionsList": {
+			"createRequisition": {
+				"label": "إنشاء طلب شراء",
+				"description": "إنشاء طلب شراء جديد للسلع أو الخدمات."
+			},
 			"createArInvoice": {
 				"label": "إنشاء فاتورة مبيعات",
 				"description": "إنشاء فاتورة مبيعات للعملاء مع تفاصيل الفوترة المطلوبة."
@@ -504,11 +508,16 @@
 		"createRequisition": "إنشاء طلب شراء",
 		"view": "عرض",
 		"edit": "تعديل",
+		"delete": "حذف",
 		"submitForApproval": "إرسال للموافقة",
-		"requiredDate": "تاريخ الطلب",
+		"submitting": "جارٍ الإرسال...",
+		"requiredDate": "التاريخ المطلوب",
+		"requester": "مقدم الطلب",
+		"department": "القسم",
 		"costCenter": "مركز التكلفة",
 		"totalAmount": "المبلغ الإجمالي",
 		"createdDate": "تاريخ الإنشاء",
+		"items": "البنود",
 		"createNewRequisition": "إنشاء طلب شراء جديد",
 		"searchPlaceholder": "البحث برقم الطلب أو اسم مقدم الطلب...",
 		"noRequisitionsFound": "لم يتم العثور على طلبات شراء",
@@ -516,13 +525,28 @@
 			"allStatuses": "جميع الحالات",
 			"posted": "تم الإرسال",
 			"draft": "مسودة",
-			"pending": "قيد الانتظار",
-			"approved": "تمت الموافقة"
+			"pending": "في انتظار الموافقة",
+			"approved": "تمت الموافقة",
+			"rejected": "مرفوض"
+		},
+		"status": {
+			"draft": "مسودة",
+			"pending": "في انتظار الموافقة",
+			"approved": "تمت الموافقة",
+			"rejected": "مرفوض"
+		},
+		"prTypes": {
+			"catalog": "كتالوج",
+			"nonCatalog": "غير كتالوج",
+			"service": "خدمة"
 		},
 		"tabs": {
 			"myPRs": "طلباتي",
 			"pendingApproval": "في انتظار موافقتي",
-			"allPRs": "جميع الطلبات"
+			"allPRs": "جميع الطلبات",
+			"catalog": "كتالوج",
+			"nonCatalog": "غير كتالوج",
+			"service": "خدمة"
 		},
 		"stats": {
 			"totalPRs": "إجمالي الطلبات",
@@ -530,8 +554,68 @@
 			"approved": "تمت الموافقة",
 			"totalValue": "القيمة الإجمالية"
 		},
+		"actions": {
+			"delete": "حذف",
+			"deleting": "جارٍ الحذف...",
+			"cancel": "إلغاء"
+		},
+		"modals": {
+			"deleteTitle": "حذف طلب الشراء",
+			"deleteMessage": "هل أنت متأكد من حذف طلب الشراء \"{{prNumber}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء طلب الشراء بنجاح",
+			"updateSuccess": "تم تحديث طلب الشراء بنجاح",
+			"deleteSuccess": "تم حذف طلب الشراء بنجاح",
+			"submitSuccess": "تم إرسال طلب الشراء للموافقة بنجاح"
+		},
+		"errors": {
+			"fetchFailed": "فشل في جلب طلبات الشراء",
+			"createFailed": "فشل في إنشاء طلب الشراء",
+			"deleteFailed": "فشل في حذف طلب الشراء",
+			"submitFailed": "فشل في إرسال طلب الشراء للموافقة",
+			"loadFailed": "فشل في تحميل تفاصيل طلب الشراء"
+		},
+		"details": {
+			"title": "تفاصيل طلب الشراء",
+			"prInfo": "معلومات طلب الشراء",
+			"prNumber": "رقم الطلب",
+			"date": "التاريخ",
+			"requiredDate": "التاريخ المطلوب",
+			"prType": "نوع الطلب",
+			"requesterInfo": "معلومات مقدم الطلب",
+			"requesterName": "اسم مقدم الطلب",
+			"department": "القسم",
+			"email": "البريد الإلكتروني",
+			"statusInfo": "معلومات الحالة",
+			"status": "الحالة",
+			"priority": "الأولوية",
+			"total": "المبلغ الإجمالي",
+			"descriptionNotes": "الوصف والملاحظات",
+			"description": "الوصف",
+			"notes": "الملاحظات",
+			"lineItems": "بنود الطلب",
+			"itemName": "اسم البند",
+			"itemDescription": "الوصف",
+			"quantity": "الكمية",
+			"uom": "وحدة القياس",
+			"unitPrice": "سعر الوحدة",
+			"totalPrice": "السعر الإجمالي",
+			"grandTotal": "المجموع الكلي",
+			"noItems": "لا توجد بنود",
+			"approvalHistory": "سجل الموافقات",
+			"submittedAt": "تاريخ الإرسال",
+			"approvedAt": "تاريخ الموافقة",
+			"approvedBy": "الموافق",
+			"rejectedAt": "تاريخ الرفض",
+			"rejectedBy": "الرافض",
+			"rejectionReason": "سبب الرفض",
+			"createdAt": "تاريخ الإنشاء",
+			"updatedAt": "آخر تحديث"
+		},
 		"newRequisition": {
 			"title": "طلب شراء جديد",
+			"subtitle": "إنشاء طلب شراء جديد للسلع أو الخدمات",
 			"requisitionDetails": "تفاصيل الطلب",
 			"assetNumber": "رقم الأصل",
 			"costCenter": "مركز التكلفة",
@@ -977,8 +1061,13 @@
 		}
 	},
 	"invoiceApprovals": {
-		"title": "اعتمادات الفواتير",
-		"subtitle": "مراجعة واعتماد الفواتير المعلقة",
+		"title": "اعتمادات",
+		"subtitle": "مراجعة واعتماد المعاملات المعلقة",
+		"mainTabs": {
+			"invoicesPayments": "الفواتير والمدفوعات",
+			"procurement": "المشتريات",
+			"purchaseOrders": "أوامر الشراء"
+		},
 		"actions": {
 			"createApproval": "إنشاء اعتماد",
 			"searchPlaceholder": "بحث...",
@@ -1032,16 +1121,58 @@
 				"rejected": "مرفوض"
 			}
 		},
+		"procurement": {
+			"catalog": "طلب شراء كتالوج",
+			"nonCatalog": "طلب شراء غير كتالوج",
+			"service": "طلب شراء خدمات",
+			"table": {
+				"type": "النوع",
+				"prNumber": "رقم الطلب",
+				"requester": "مقدم الطلب",
+				"department": "القسم",
+				"total": "الإجمالي",
+				"priority": "الأولوية",
+				"status": "الحالة",
+				"date": "التاريخ",
+				"requiredDate": "التاريخ المطلوب",
+				"itemCount": "العناصر"
+			},
+			"priority": {
+				"urgent": "عاجل",
+				"high": "عالي",
+				"medium": "متوسط",
+				"low": "منخفض"
+			}
+		},
+		"po": {
+			"table": {
+				"poNumber": "رقم أمر الشراء",
+				"type": "النوع",
+				"supplier": "المورد",
+				"total": "الإجمالي",
+				"currentStage": "المرحلة الحالية",
+				"status": "الحالة",
+				"date": "التاريخ"
+			}
+		},
 		"modals": {
 			"createTitle": "إنشاء اعتماد فاتورة",
 			"editTitle": "تعديل اعتماد فاتورة",
 			"deleteTitle": "حذف اعتماد الفاتورة",
 			"approveTitle": "اعتماد الفاتورة",
 			"rejectTitle": "رفض الفاتورة",
+			"approvePRTitle": "اعتماد طلب الشراء",
+			"rejectPRTitle": "رفض طلب الشراء",
+			"approvePOTitle": "اعتماد أمر الشراء",
+			"rejectPOTitle": "رفض أمر الشراء",
 			"delegateTitle": "تفويض اعتماد الفاتورة",
 			"deleteMessage": "هل أنت متأكد من أنك تريد حذف اعتماد الفاتورة هذا؟ لا يمكن التراجع عن هذا الإجراء.",
 			"approveMessage": "هل أنت متأكد من اعتماد هذه الفاتورة؟ يمكنك إضافة تعليقات اختيارية أدناه.",
 			"rejectMessage": "هل أنت متأكد من رفض هذه الفاتورة؟ يرجى ذكر سبب الرفض.",
+			"approvePRMessage": "هل أنت متأكد من اعتماد طلب الشراء هذا؟ يمكنك إضافة تعليقات اختيارية أدناه.",
+			"rejectPRMessage": "هل أنت متأكد من رفض طلب الشراء هذا؟ يرجى ذكر سبب الرفض.",
+			"approvePOMessage": "هل أنت متأكد من اعتماد أمر الشراء هذا؟ يمكنك إضافة تعليقات اختيارية أدناه.",
+			"rejectPOMessage": "هل أنت متأكد من رفض أمر الشراء هذا؟ يرجى ذكر سبب الرفض.",
 			"delegateMessage": "اختر مستخدمًا لتفويض اعتماد هذه الفاتورة إليه.",
 			"commentsLabel": "تعليقات (اختياري)",
 			"rejectionReasonLabel": "سبب الرفض",
@@ -1069,7 +1200,15 @@
 			"rejectError": "فشل رفض الفاتورة",
 			"delegateError": "فشل تفويض الفاتورة",
 			"saveError": "فشل حفظ اعتماد الفاتورة",
-			"selectUser": "يرجى اختيار مستخدم للتفويض إليه"
+			"selectUser": "يرجى اختيار مستخدم للتفويض إليه",
+			"procurementApproveSuccess": "تم اعتماد طلب الشراء بنجاح",
+			"procurementRejectSuccess": "تم رفض طلب الشراء بنجاح",
+			"procurementApproveError": "فشل اعتماد طلب الشراء",
+			"procurementRejectError": "فشل رفض طلب الشراء",
+			"poApproveSuccess": "تم اعتماد أمر الشراء بنجاح",
+			"poRejectSuccess": "تم رفض أمر الشراء بنجاح",
+			"poApproveError": "فشل اعتماد أمر الشراء",
+			"poRejectError": "فشل رفض أمر الشراء"
 		}
 	},
 	"journals": {
@@ -2224,6 +2363,539 @@
 			"message": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
 			"confirm": "حذف",
 			"cancel": "إلغاء"
+		}
+	},
+	"jobRoles": {
+		"title": "الأدوار الوظيفية",
+		"subtitle": "إدارة أدوار المستخدمين وصلاحيات الوصول",
+		"searchPlaceholder": "البحث بالكود أو الاسم...",
+		"addRole": "إنشاء دور وظيفي",
+		"table": {
+			"name": "الاسم",
+			"description": "الوصف",
+			"loading": "جارٍ تحميل الأدوار الوظيفية...",
+			"emptyMessage": "لم يتم العثور على أدوار وظيفية"
+		},
+		"actions": {
+			"create": "إنشاء",
+			"update": "تحديث",
+			"delete": "حذف",
+			"cancel": "إلغاء",
+			"edit": "تعديل",
+			"saving": "جارٍ الحفظ...",
+			"creating": "جارٍ الإنشاء...",
+			"deleting": "جارٍ الحذف..."
+		},
+		"form": {
+			"name": "الاسم",
+			"namePlaceholder": "أدخل اسم الدور الوظيفي",
+			"description": "الوصف",
+			"descriptionPlaceholder": "أدخل الوصف...",
+			"nameRequired": "الاسم مطلوب"
+		},
+		"modals": {
+			"viewTitle": "عرض الدور الوظيفي",
+			"editTitle": "تعديل الدور الوظيفي",
+			"createTitle": "إنشاء دور وظيفي",
+			"deleteTitle": "حذف الدور الوظيفي",
+			"deleteMessage": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+		},
+		"messages": {
+			"created": "تم إنشاء الدور الوظيفي بنجاح",
+			"updated": "تم تحديث الدور الوظيفي بنجاح",
+			"deleted": "تم حذف الدور الوظيفي بنجاح"
+		},
+		"tabs": {
+			"general": "عام",
+			"functions": "الوظائف"
+		},
+		"functions": {
+			"title": "الصفحات",
+			"subtitle": "اختر صفحة لإدارة الصلاحيات",
+			"noPages": "لا توجد صفحات متاحة",
+			"functionsCount": "{{count}} وظيفة"
+		},
+		"search": "بحث"
+	},
+	"uom": {
+		"title": "وحدات القياس",
+		"subtitle": "إدارة وحدات القياس لعناصر المشتريات",
+		"searchPlaceholder": "البحث عن الوحدات...",
+		"types": {
+			"quantity": "كمية",
+			"weight": "وزن",
+			"length": "طول",
+			"area": "مساحة",
+			"volume": "حجم"
+		},
+		"filters": {
+			"allTypes": "جميع الأنواع",
+			"allStatus": "جميع الحالات",
+			"active": "نشط",
+			"inactive": "غير نشط"
+		},
+		"actions": {
+			"add": "إضافة وحدة قياس",
+			"create": "إنشاء",
+			"update": "تحديث",
+			"delete": "حذف",
+			"cancel": "إلغاء",
+			"saving": "جارٍ الحفظ...",
+			"deleting": "جارٍ الحذف..."
+		},
+		"table": {
+			"code": "الرمز",
+			"name": "الاسم",
+			"type": "النوع",
+			"active": "نشط",
+			"emptyMessage": "لم يتم العثور على وحدات قياس"
+		},
+		"form": {
+			"code": "رمز الوحدة",
+			"codePlaceholder": "مثال: EACH",
+			"name": "اسم الوحدة",
+			"namePlaceholder": "مثال: قطعة",
+			"type": "نوع الوحدة",
+			"selectType": "اختر النوع",
+			"description": "الوصف",
+			"descriptionPlaceholder": "أدخل الوصف...",
+			"isActive": "نشط"
+		},
+		"modals": {
+			"addTitle": "إضافة وحدة قياس",
+			"editTitle": "تعديل وحدة قياس",
+			"deleteTitle": "حذف وحدة قياس",
+			"deleteMessage": "هل أنت متأكد من حذف \"{{name}}\" ({{code}})؟ لا يمكن التراجع عن هذا الإجراء."
+		},
+		"validation": {
+			"codeRequired": "رمز الوحدة مطلوب",
+			"codeMaxLength": "رمز الوحدة يجب ألا يتجاوز 10 أحرف",
+			"nameRequired": "اسم الوحدة مطلوب",
+			"typeRequired": "نوع الوحدة مطلوب"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء وحدة القياس بنجاح",
+			"updateSuccess": "تم تحديث وحدة القياس بنجاح",
+			"deleteSuccess": "تم حذف وحدة القياس بنجاح",
+			"activated": "تم تفعيل {{code}}",
+			"deactivated": "تم إلغاء تفعيل {{code}}",
+			"updateActiveError": "فشل تحديث الحالة"
+		},
+		"stats": {
+			"total": "إجمالي الوحدات",
+			"active": "نشط",
+			"inactive": "غير نشط"
+		}
+	},
+	"catalog": {
+		"title": "كتالوج المشتريات",
+		"subtitle": "إدارة عناصر الكتالوج للمشتريات",
+		"searchPlaceholder": "البحث عن العناصر...",
+		"actions": {
+			"add": "إضافة عنصر",
+			"create": "إنشاء",
+			"update": "تحديث",
+			"delete": "حذف",
+			"cancel": "إلغاء",
+			"saving": "جارٍ الحفظ...",
+			"deleting": "جارٍ الحذف..."
+		},
+		"table": {
+			"code": "الرمز",
+			"name": "الاسم",
+			"description": "الوصف",
+			"emptyMessage": "لم يتم العثور على عناصر في الكتالوج"
+		},
+		"form": {
+			"code": "رمز العنصر",
+			"codePlaceholder": "مثال: LAPTOP01",
+			"name": "اسم العنصر",
+			"namePlaceholder": "مثال: Dell Latitude 5520",
+			"description": "الوصف",
+			"descriptionPlaceholder": "أدخل وصف العنصر..."
+		},
+		"modals": {
+			"addTitle": "إضافة عنصر للكتالوج",
+			"editTitle": "تعديل عنصر الكتالوج",
+			"deleteTitle": "حذف عنصر الكتالوج",
+			"deleteMessage": "هل أنت متأكد من حذف \"{{name}}\" ({{code}})؟ لا يمكن التراجع عن هذا الإجراء."
+		},
+		"validation": {
+			"codeRequired": "رمز العنصر مطلوب",
+			"codeMaxLength": "رمز العنصر يجب ألا يتجاوز 20 حرفاً",
+			"nameRequired": "اسم العنصر مطلوب"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء عنصر الكتالوج بنجاح",
+			"updateSuccess": "تم تحديث عنصر الكتالوج بنجاح",
+			"deleteSuccess": "تم حذف عنصر الكتالوج بنجاح"
+		},
+		"stats": {
+			"total": "إجمالي العناصر",
+			"available": "العناصر المتاحة",
+			"lastUpdated": "آخر تحديث"
+		}
+	},
+	"createRequisition": {
+		"title": "إنشاء طلب شراء",
+		"subtitle": "إنشاء طلب شراء جديد",
+		"tabs": {
+			"generalInfo": "المعلومات العامة",
+			"lineItems": "بنود الطلب"
+		},
+		"form": {
+			"prType": "نوع الطلب",
+			"priority": "الأولوية",
+			"selectPriority": "اختر الأولوية",
+			"date": "التاريخ",
+			"requiredDate": "التاريخ المطلوب",
+			"requesterName": "اسم مقدم الطلب",
+			"requesterNamePlaceholder": "أدخل اسم مقدم الطلب",
+			"requesterDepartment": "قسم مقدم الطلب",
+			"requesterDepartmentPlaceholder": "أدخل القسم",
+			"requesterEmail": "بريد مقدم الطلب",
+			"requesterEmailPlaceholder": "أدخل البريد الإلكتروني",
+			"description": "الوصف",
+			"descriptionPlaceholder": "أدخل وصف الطلب",
+			"notes": "ملاحظات",
+			"notesPlaceholder": "أدخل ملاحظات إضافية",
+			"selectUOM": "اختر وحدة القياس",
+			"selectCatalogItem": "اختر عنصر الكتالوج"
+		},
+		"priorities": {
+			"low": "منخفضة",
+			"medium": "متوسطة",
+			"high": "عالية",
+			"urgent": "عاجلة"
+		},
+		"prTypes": {
+			"selectType": "اختر نوع الطلب",
+			"catalog": "كتالوج",
+			"nonCatalog": "غير كتالوج",
+			"service": "خدمة"
+		},
+		"lineItems": {
+			"title": "بنود الطلب",
+			"addItem": "إضافة بند",
+			"item": "البند",
+			"itemName": "اسم البند",
+			"itemNamePlaceholder": "أدخل اسم البند",
+			"catalogItem": "عنصر الكتالوج",
+			"itemDescription": "وصف البند",
+			"itemDescriptionPlaceholder": "أدخل وصف البند",
+			"quantity": "الكمية",
+			"uom": "وحدة القياس",
+			"estimatedPrice": "السعر التقديري للوحدة",
+			"notes": "ملاحظات",
+			"notesPlaceholder": "أدخل ملاحظات البند",
+			"lineTotal": "إجمالي البند",
+			"totalEstimatedAmount": "المبلغ التقديري الإجمالي"
+		},
+		"actions": {
+			"cancel": "إلغاء",
+			"create": "إنشاء الطلب",
+			"creating": "جارٍ الإنشاء..."
+		},
+		"validation": {
+			"dateRequired": "التاريخ مطلوب",
+			"requiredDateRequired": "التاريخ المطلوب مطلوب",
+			"requesterNameRequired": "اسم مقدم الطلب مطلوب",
+			"requesterDepartmentRequired": "قسم مقدم الطلب مطلوب",
+			"requesterEmailRequired": "بريد مقدم الطلب مطلوب",
+			"invalidEmail": "الرجاء إدخال بريد إلكتروني صحيح",
+			"priorityRequired": "الأولوية مطلوبة",
+			"prTypeRequired": "نوع الطلب مطلوب",
+			"selectPrTypeFirst": "الرجاء اختيار نوع الطلب أولاً لإضافة البنود",
+			"descriptionRequired": "الوصف مطلوب",
+			"itemNameRequired": "اسم البند مطلوب",
+			"quantityRequired": "الكمية يجب أن تكون أكبر من 0",
+			"uomRequired": "وحدة القياس مطلوبة",
+			"priceRequired": "السعر التقديري يجب أن يكون أكبر من 0",
+			"catalogItemRequired": "عنصر الكتالوج مطلوب لنوع الكتالوج",
+			"checkGeneralInfo": "الرجاء مراجعة تبويب المعلومات العامة للأخطاء",
+			"checkLineItems": "الرجاء مراجعة تبويب بنود الطلب للأخطاء"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء الطلب بنجاح"
+		}
+	},
+	"createGRN": {
+		"title": "إنشاء إذن استلام بضاعة",
+		"pageTitle": "استلام البضائع",
+		"tabs": {
+			"general": "البيانات العامة",
+			"lines": "البنود"
+		},
+		"form": {
+			"purchaseOrder": "أمر الشراء",
+			"selectPO": "اختر أمر الشراء",
+			"receiptDate": "تاريخ الاستلام",
+			"supplier": "المورد",
+			"grnType": "نوع إذن الاستلام",
+			"currency": "العملة",
+			"totalAmount": "المبلغ الإجمالي",
+			"notes": "ملاحظات"
+		},
+		"lines": {
+			"title": "بنود أمر الشراء",
+			"subtitle": "اختر البنود من أمر الشراء للاستلام",
+			"noItems": "لا توجد بنود متاحة للاستلام",
+			"ordered": "المطلوب",
+			"received": "المستلم",
+			"remaining": "المتبقي",
+			"quantityToReceive": "الكمية للاستلام",
+			"quantityPlaceholder": "أدخل الكمية للاستلام",
+			"lineNotes": "ملاحظات البند",
+			"lineNotesPlaceholder": "أدخل ملاحظات لهذا البند",
+			"unitOfMeasure": "وحدة القياس",
+			"unitPrice": "سعر الوحدة",
+			"selectedItems": "البنود المختارة",
+			"totalQuantity": "الكمية الإجمالية"
+		},
+		"actions": {
+			"cancel": "إلغاء",
+			"create": "إنشاء إذن الاستلام",
+			"creating": "جارٍ الإنشاء..."
+		},
+		"validation": {
+			"poRequired": "أمر الشراء مطلوب",
+			"receiptDateRequired": "تاريخ الاستلام مطلوب",
+			"itemsRequired": "الرجاء اختيار بند واحد على الأقل",
+			"quantityNegative": "الكمية لا يمكن أن تكون سالبة",
+			"quantityExceedsRemaining": "الكمية تتجاوز الكمية المتبقية",
+			"checkGeneral": "الرجاء مراجعة تبويب البيانات العامة للأخطاء",
+			"checkLines": "الرجاء مراجعة تبويب البنود للأخطاء"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء إذن استلام البضاعة بنجاح",
+			"createError": "فشل في إنشاء إذن استلام البضاعة",
+			"fetchPOsError": "فشل في جلب أوامر الشراء المتاحة",
+			"fetchPODetailsError": "فشل في جلب تفاصيل أمر الشراء",
+			"loadingPODetails": "جارٍ تحميل تفاصيل أمر الشراء..."
+		}
+	},
+	"createPO": {
+		"title": "إنشاء أمر شراء",
+		"pageTitle": "أوامر الشراء",
+		"tabs": {
+			"general": "البيانات العامة",
+			"lines": "البنود"
+		},
+		"form": {
+			"poType": "نوع أمر الشراء",
+			"selectPoType": "اختر نوع أمر الشراء",
+			"supplier": "المورد",
+			"selectSupplier": "اختر المورد",
+			"currency": "العملة",
+			"selectCurrency": "اختر العملة",
+			"poDate": "تاريخ أمر الشراء",
+			"requiredDate": "التاريخ المطلوب",
+			"notes": "ملاحظات"
+		},
+		"poTypes": {
+			"catalog": "كتالوج",
+			"nonCatalog": "غير كتالوج",
+			"service": "خدمة"
+		},
+		"lines": {
+			"title": "بنود طلبات الشراء",
+			"subtitle": "اختر البنود من طلبات الشراء لتضمينها في أمر الشراء هذا",
+			"noItems": "لا توجد بنود متاحة لنوع أمر الشراء المحدد",
+			"remainingQty": "الكمية المتبقية",
+			"quantity": "الكمية",
+			"quantityPlaceholder": "أدخل الكمية",
+			"unitPrice": "سعر الوحدة",
+			"unitPricePlaceholder": "أدخل سعر الوحدة",
+			"lineNotes": "ملاحظات البند",
+			"lineNotesPlaceholder": "أدخل ملاحظات لهذا البند",
+			"lineTotal": "إجمالي البند",
+			"selectedItems": "البنود المختارة",
+			"totalAmount": "المبلغ الإجمالي"
+		},
+		"actions": {
+			"cancel": "إلغاء",
+			"create": "إنشاء أمر الشراء",
+			"creating": "جارٍ الإنشاء..."
+		},
+		"validation": {
+			"poTypeRequired": "نوع أمر الشراء مطلوب",
+			"supplierRequired": "المورد مطلوب",
+			"currencyRequired": "العملة مطلوبة",
+			"poDateRequired": "تاريخ أمر الشراء مطلوب",
+			"requiredDateRequired": "التاريخ المطلوب مطلوب",
+			"itemsRequired": "الرجاء اختيار بند واحد على الأقل",
+			"quantityRequired": "الكمية يجب أن تكون أكبر من 0",
+			"unitPriceRequired": "سعر الوحدة يجب أن يكون أكبر من 0",
+			"checkGeneral": "الرجاء مراجعة تبويب البيانات العامة للأخطاء",
+			"checkLines": "الرجاء مراجعة تبويب البنود للأخطاء",
+			"reasonRequired": "سبب الإلغاء مطلوب"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء أمر الشراء بنجاح",
+			"createError": "فشل في إنشاء أمر الشراء",
+			"fetchItemsError": "فشل في جلب بنود طلبات الشراء"
+		}
+	},
+	"poPage": {
+		"title": "أوامر الشراء",
+		"subtitle": "إدارة أوامر الشراء والمشتريات",
+		"filters": {
+			"search": "بحث",
+			"searchPlaceholder": "البحث برقم أمر الشراء، المورد...",
+			"status": "الحالة",
+			"allStatuses": "جميع الحالات"
+		},
+		"statuses": {
+			"draft": "مسودة",
+			"submitted": "مقدم",
+			"approved": "معتمد",
+			"rejected": "مرفوض",
+			"confirmed": "مؤكد",
+			"partiallyreceived": "مستلم جزئياً",
+			"received": "مستلم",
+			"cancelled": "ملغى"
+		},
+		"table": {
+			"poNumber": "رقم أمر الشراء",
+			"poDate": "تاريخ أمر الشراء",
+			"poType": "النوع",
+			"supplier": "المورد",
+			"currency": "العملة",
+			"totalAmount": "المبلغ الإجمالي",
+			"itemCount": "البنود",
+			"status": "الحالة",
+			"loading": "جارٍ تحميل أوامر الشراء...",
+			"emptyMessage": "لم يتم العثور على أوامر شراء"
+		},
+		"actions": {
+			"create": "إنشاء أمر شراء",
+			"delete": "حذف",
+			"deleting": "جارٍ الحذف...",
+			"cancel": "إلغاء",
+			"close": "إغلاق",
+			"submitForApproval": "إرسال للاعتماد",
+			"submitting": "جارٍ الإرسال...",
+			"confirm": "تأكيد",
+			"confirming": "جارٍ التأكيد...",
+			"cancelPO": "إلغاء أمر الشراء",
+			"cancelling": "جارٍ الإلغاء..."
+		},
+		"modal": {
+			"viewTitle": "تفاصيل أمر الشراء",
+			"deleteTitle": "حذف أمر الشراء",
+			"deleteMessage": "هل أنت متأكد من حذف \"{{poNumber}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"submitTitle": "إرسال للاعتماد",
+			"submitMessage": "هل أنت متأكد من إرسال أمر الشراء \"{{poNumber}}\" للاعتماد؟",
+			"confirmTitle": "تأكيد أمر الشراء",
+			"confirmMessage": "هل أنت متأكد من تأكيد أمر الشراء \"{{poNumber}}\"؟",
+			"cancelTitle": "إلغاء أمر الشراء",
+			"cancelMessage": "هل أنت متأكد من إلغاء أمر الشراء \"{{poNumber}}\"؟",
+			"cancellationReason": "سبب الإلغاء",
+			"cancellationReasonPlaceholder": "الرجاء إدخال سبب إلغاء أمر الشراء",
+			"poNumber": "رقم أمر الشراء",
+			"poDate": "تاريخ أمر الشراء",
+			"status": "الحالة",
+			"poType": "نوع أمر الشراء",
+			"supplier": "المورد",
+			"currency": "العملة",
+			"sourcePRs": "طلبات الشراء المصدر",
+			"description": "الوصف",
+			"items": "البنود",
+			"itemName": "اسم البند",
+			"quantity": "الكمية",
+			"unitPrice": "سعر الوحدة",
+			"lineTotal": "إجمالي البند",
+			"subtotal": "المجموع الفرعي",
+			"tax": "الضريبة",
+			"total": "الإجمالي",
+			"createdAt": "تاريخ الإنشاء",
+			"updatedAt": "تاريخ التحديث"
+		},
+		"messages": {
+			"fetchError": "فشل في جلب أوامر الشراء",
+			"fetchDetailsError": "فشل في جلب تفاصيل أمر الشراء",
+			"deleted": "تم حذف أمر الشراء بنجاح",
+			"deleteError": "فشل في حذف أمر الشراء",
+			"submitted": "تم إرسال أمر الشراء للاعتماد بنجاح",
+			"submitError": "فشل في إرسال أمر الشراء للاعتماد",
+			"confirmed": "تم تأكيد أمر الشراء بنجاح",
+			"confirmError": "فشل في تأكيد أمر الشراء",
+			"cancelled": "تم إلغاء أمر الشراء بنجاح",
+			"cancelError": "فشل في إلغاء أمر الشراء"
+		}
+	},
+	"receivingPage": {
+		"title": "استلام البضائع",
+		"subtitle": "إدارة إيصالات استلام البضائع",
+		"filters": {
+			"search": "بحث",
+			"searchPlaceholder": "البحث برقم إذن الاستلام، المورد، الصنف...",
+			"receiptType": "نوع الاستلام",
+			"allTypes": "جميع الأنواع"
+		},
+		"receiptTypes": {
+			"standard": "قياسي",
+			"return": "مرتجع",
+			"gift": "هدية"
+		},
+		"table": {
+			"grnNumber": "رقم إذن الاستلام",
+			"receiptDate": "تاريخ الاستلام",
+			"poNumber": "رقم أمر الشراء",
+			"grnType": "النوع",
+			"supplier": "المورد",
+			"totalAmount": "المبلغ الإجمالي",
+			"lineCount": "البنود",
+			"giftCount": "الهدايا",
+			"loading": "جارٍ تحميل إيصالات الاستلام...",
+			"emptyMessage": "لم يتم العثور على إيصالات استلام"
+		},
+		"actions": {
+			"create": "إنشاء إذن استلام",
+			"delete": "حذف",
+			"deleting": "جارٍ الحذف...",
+			"cancel": "إلغاء",
+			"close": "إغلاق"
+		},
+		"modal": {
+			"viewTitle": "تفاصيل إذن استلام البضاعة",
+			"deleteTitle": "حذف إذن استلام البضاعة",
+			"deleteMessage": "هل أنت متأكد من حذف \"{{grnNumber}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"grnNumber": "رقم إذن الاستلام",
+			"receiptDate": "تاريخ الاستلام",
+			"grnType": "نوع إذن الاستلام",
+			"poNumber": "رقم أمر الشراء",
+			"supplier": "المورد",
+			"receivedBy": "تم الاستلام بواسطة",
+			"notes": "ملاحظات",
+			"lines": "البنود",
+			"itemName": "اسم الصنف",
+			"quantityOrdered": "الكمية المطلوبة",
+			"quantityReceived": "الكمية المستلمة",
+			"unitPrice": "سعر الوحدة",
+			"lineTotal": "إجمالي البند",
+			"isGift": "هدية",
+			"gift": "هدية",
+			"receiptSummary": "ملخص الاستلام",
+			"totalLines": "إجمالي البنود",
+			"regularLines": "البنود العادية",
+			"giftLines": "بنود الهدايا",
+			"totalItemsReceived": "إجمالي الأصناف المستلمة",
+			"totalAmount": "المبلغ الإجمالي",
+			"poCompletionStatus": "حالة اكتمال أمر الشراء",
+			"totalPOLines": "إجمالي بنود أمر الشراء",
+			"fullyReceivedLines": "مستلمة بالكامل",
+			"partiallyReceivedLines": "مستلمة جزئياً",
+			"pendingLines": "معلقة",
+			"completionPercentage": "نسبة الاكتمال",
+			"createdAt": "تاريخ الإنشاء",
+			"createdBy": "أنشئ بواسطة"
+		},
+		"messages": {
+			"fetchError": "فشل في جلب إيصالات الاستلام",
+			"fetchDetailsError": "فشل في جلب تفاصيل إذن الاستلام",
+			"deleted": "تم حذف إذن استلام البضاعة بنجاح",
+			"deleteError": "فشل في حذف إذن استلام البضاعة"
 		}
 	}
 }

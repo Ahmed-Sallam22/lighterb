@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
-import PageHeader from '../components/shared/PageHeader';
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
+import PageHeader from "../components/shared/PageHeader";
 import { TbRulerMeasure } from "react-icons/tb";
 
 const HeaderIcon = () => (
@@ -29,7 +29,7 @@ const IconBubble = ({ colors, children }) => (
 // Define keys and static assets here, text is removed
 const cardConfigs = [
 	{
-		key: 'requisitions',
+		key: "requisitions",
 		icon: (
 			<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path
@@ -69,11 +69,11 @@ const cardConfigs = [
 				/>
 			</svg>
 		),
-		path: '/requisitions',
+		path: "/requisitions",
 	},
-	
+
 	{
-		key: 'purchaseOrders',
+		key: "purchaseOrders",
 		icon: (
 			<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path
@@ -99,9 +99,10 @@ const cardConfigs = [
 				/>
 			</svg>
 		),
+		path: "/procurement/po",
 	},
 	{
-		key: 'receiving',
+		key: "receiving",
 		icon: (
 			<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path
@@ -134,19 +135,17 @@ const cardConfigs = [
 				/>
 			</svg>
 		),
+		path: "/procurement/receiving-grn",
 	},
 	{
-		key: 'UOM',
-		path: '/uom',
-		icon: (
-			<TbRulerMeasure size={26}/>
-
-		),
+		key: "UOM",
+		path: "/uom",
+		icon: <TbRulerMeasure size={26} />,
 	},
 	{
-		key: 'catalog',
-		colors: ['#06b6d4', '#22d3ee'],
-		path: '/procurement/catalog',
+		key: "catalog",
+		colors: ["#06b6d4", "#22d3ee"],
+		path: "/procurement/catalog",
 		icon: (
 			<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path
@@ -190,13 +189,13 @@ const cardConfigs = [
 
 const ProcurementDashboard = () => {
 	const { t, i18n } = useTranslation();
-	const isRtl = i18n.dir() === 'rtl';
+	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		document.title = t('procurementDashboard.metaTitle');
+		document.title = t("procurementDashboard.metaTitle");
 		return () => {
-			document.title = 'LightERP';
+			document.title = "LightERP";
 		};
 	}, [t]);
 
@@ -210,8 +209,8 @@ const ProcurementDashboard = () => {
 		<div className="min-h-screen bg-[#f3f4f6]">
 			<PageHeader
 				icon={<HeaderIcon />}
-				title={t('procurementDashboard.title')}
-				subtitle={t('procurementDashboard.subtitle')}
+				title={t("procurementDashboard.title")}
+				subtitle={t("procurementDashboard.subtitle")}
 			/>
 
 			<div className="max-w-6xl mx-auto  mt-6">
@@ -224,7 +223,7 @@ const ProcurementDashboard = () => {
 								tabIndex={0}
 								onClick={() => handleCardClick(card.path)}
 								onKeyDown={e => {
-									if (e.key === 'Enter' || e.key === ' ') {
+									if (e.key === "Enter" || e.key === " ") {
 										e.preventDefault();
 										handleCardClick(card.path);
 									}
@@ -239,14 +238,14 @@ const ProcurementDashboard = () => {
 									{t(`procurementDashboard.cards.${card.key}.description`)}
 								</p>
 								<div className="mt-6 flex items-center gap-2 text-sm font-semibold text-[#28819C] opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-									<span>{t('procurementDashboard.open')}</span>
+									<span>{t("procurementDashboard.open")}</span>
 									<svg
 										width="14"
 										height="14"
 										viewBox="0 0 14 14"
 										fill="none"
 										xmlns="http://www.w3.org/2000/svg"
-										className={isRtl ? 'rotate-180' : ''}
+										className={isRtl ? "rotate-180" : ""}
 									>
 										<path
 											d="M3 7H11"

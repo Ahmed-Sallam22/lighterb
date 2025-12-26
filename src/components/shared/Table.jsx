@@ -83,7 +83,7 @@ const TableRow = memo(
 				</td>
 			))}
 
-			{(onView || onEdit || onDelete || customActions) && (
+			{(onView || onEdit || onDelete ) && (
 				<td className="px-6 py-4" style={{ textAlign: "center" }}>
 					{!showActions ||
 					showActions(row) ||

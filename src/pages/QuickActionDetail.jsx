@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { QuickActionsIcon } from "../components/shared/QuickActionsPanel";
 import PageHeader from "../components/shared/PageHeader";
 import InvoiceForm from "../components/forms/InvoiceForm";
@@ -11,13 +11,20 @@ import { QUICK_ACTIONS, getQuickActionById } from "../constants/quickActions";
 
 const QuickActionDetail = () => {
 	const { actionId } = useParams();
+	const navigate = useNavigate();
 
 	const action = useMemo(() => getQuickActionById(actionId) || QUICK_ACTIONS[0], [actionId]);
 
 	useEffect(() => {
+		// Redirect to create requisition page if action is create-requisition
+		if (action?.id === "create-requisition") {
+			navigate("/create-requisition");
+			return;
+		}
+
 		const pageTitle = action?.label ? `Light ERP | ${action.label}` : "Light ERP | Quick Actions";
 		document.title = pageTitle;
-	}, [action?.id, action?.label]);
+	}, [action?.id, action?.label, navigate]);
 
 	// Determine which form to display based on action ID
 	const renderFormContent = () => {

@@ -252,6 +252,204 @@ export const delegateInvoice = createAsyncThunk(
 	}
 );
 
+// Fetch pending Catalog PR approvals
+export const fetchCatalogPRPendingApprovals = createAsyncThunk(
+	"invoiceApprovals/fetchCatalogPRPendingApprovals",
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await api.get("/procurement/pr/catalog/pending-approvals/");
+			console.log("Catalog PR Pending Approvals Response:", response);
+			const results = response.data?.data?.results || response.data?.results || response.data?.data || [];
+			const dataArray = Array.isArray(results) ? results : [];
+			return dataArray.map(item => ({ ...item, pr_type: "CATALOG" }));
+		} catch (error) {
+			console.error("Catalog PR Pending Approvals Error:", error.response?.data || error.message);
+			return rejectWithValue(
+				error.response?.data?.message ||
+					error.response?.data?.detail ||
+					"Failed to fetch Catalog PR pending approvals"
+			);
+		}
+	}
+);
+
+// Fetch pending PO approvals
+export const fetchPOPendingApprovals = createAsyncThunk(
+	"invoiceApprovals/fetchPOPendingApprovals",
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await api.get("/procurement/po/pending-approvals/");
+			console.log("PO Pending Approvals Response:", response);
+			const results = response.data?.data?.results || response.data?.results || response.data?.data || [];
+			const dataArray = Array.isArray(results) ? results : [];
+			return dataArray;
+		} catch (error) {
+			console.error("PO Pending Approvals Error:", error.response?.data || error.message);
+			return rejectWithValue(
+				error.response?.data?.message || error.response?.data?.detail || "Failed to fetch PO pending approvals"
+			);
+		}
+	}
+);
+
+// Approve PO using approval-action endpoint
+export const approvePO = createAsyncThunk(
+	"invoiceApprovals/approvePO",
+	async ({ id, comments }, { rejectWithValue }) => {
+		try {
+			const response = await api.post(`/procurement/po/${id}/approval-action/`, {
+				action: "approve",
+				comments: comments || "Approved",
+			});
+			return { ...response.data, id };
+		} catch (error) {
+			return rejectWithValue(
+				error.response?.data?.message || error.response?.data?.detail || "Failed to approve PO"
+			);
+		}
+	}
+);
+
+// Reject PO using approval-action endpoint
+export const rejectPO = createAsyncThunk("invoiceApprovals/rejectPO", async ({ id, comments }, { rejectWithValue }) => {
+	try {
+		const response = await api.post(`/procurement/po/${id}/approval-action/`, {
+			action: "REJECT",
+			comments: comments || "Rejected",
+		});
+		return { ...response.data, id };
+	} catch (error) {
+		return rejectWithValue(error.response?.data?.message || error.response?.data?.detail || "Failed to reject PO");
+	}
+});
+
+// Fetch pending Non-Catalog PR approvals
+export const fetchNonCatalogPRPendingApprovals = createAsyncThunk(
+	"invoiceApprovals/fetchNonCatalogPRPendingApprovals",
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await api.get("/procurement/pr/non-catalog/pending-approvals/");
+			console.log("Non-Catalog PR Pending Approvals Response:", response);
+			const results = response.data?.data?.results || response.data?.results || response.data?.data || [];
+			const dataArray = Array.isArray(results) ? results : [];
+			return dataArray.map(item => ({ ...item, pr_type: "NON_CATALOG" }));
+		} catch (error) {
+			console.error("Non-Catalog PR Pending Approvals Error:", error.response?.data || error.message);
+			return rejectWithValue(
+				error.response?.data?.message ||
+					error.response?.data?.detail ||
+					"Failed to fetch Non-Catalog PR pending approvals"
+			);
+		}
+	}
+);
+
+// Fetch pending Service PR approvals
+export const fetchServicePRPendingApprovals = createAsyncThunk(
+	"invoiceApprovals/fetchServicePRPendingApprovals",
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await api.get("/procurement/pr/service/pending-approvals/");
+			console.log("Service PR Pending Approvals Response:", response);
+			const results = response.data?.data?.results || response.data?.results || response.data?.data || [];
+			const dataArray = Array.isArray(results) ? results : [];
+			return dataArray.map(item => ({ ...item, pr_type: "SERVICE" }));
+		} catch (error) {
+			console.error("Service PR Pending Approvals Error:", error.response?.data || error.message);
+			return rejectWithValue(
+				error.response?.data?.message ||
+					error.response?.data?.detail ||
+					"Failed to fetch Service PR pending approvals"
+			);
+		}
+	}
+);
+
+// Fetch all pending procurement approvals (combines Catalog, Non-Catalog, Service)
+export const fetchAllProcurementPendingApprovals = createAsyncThunk(
+	"invoiceApprovals/fetchAllProcurementPendingApprovals",
+	async (_, { dispatch, rejectWithValue }) => {
+		try {
+			const [catalogResult, nonCatalogResult, serviceResult] = await Promise.allSettled([
+				dispatch(fetchCatalogPRPendingApprovals()).unwrap(),
+				dispatch(fetchNonCatalogPRPendingApprovals()).unwrap(),
+				dispatch(fetchServicePRPendingApprovals()).unwrap(),
+			]);
+
+			console.log("All procurement pending results:", { catalogResult, nonCatalogResult, serviceResult });
+
+			const catalogData = catalogResult.status === "fulfilled" ? catalogResult.value : [];
+			const nonCatalogData = nonCatalogResult.status === "fulfilled" ? nonCatalogResult.value : [];
+			const serviceData = serviceResult.status === "fulfilled" ? serviceResult.value : [];
+
+			const combined = [...catalogData, ...nonCatalogData, ...serviceData];
+			console.log("Combined procurement pending approvals:", combined);
+			return combined;
+		} catch (_error) {
+			console.error("fetchAllProcurementPendingApprovals error:", _error);
+			return rejectWithValue("Failed to fetch procurement pending approvals");
+		}
+	}
+);
+
+// Approve procurement PR using approval-action endpoint
+export const approveProcurementPR = createAsyncThunk(
+	"invoiceApprovals/approveProcurementPR",
+	async ({ id, prType, comments }, { rejectWithValue }) => {
+		try {
+			let endpoint;
+			if (prType === "CATALOG") {
+				endpoint = `/procurement/pr/catalog/${id}/approval-action/`;
+			} else if (prType === "NON_CATALOG") {
+				endpoint = `/procurement/pr/non-catalog/${id}/approval-action/`;
+			} else if (prType === "SERVICE") {
+				endpoint = `/procurement/pr/service/${id}/approval-action/`;
+			} else {
+				endpoint = `/procurement/pr/catalog/${id}/approval-action/`;
+			}
+
+			const response = await api.post(endpoint, {
+				action: "approve",
+				comments: comments || "Approved",
+			});
+			return { ...response.data, id, prType };
+		} catch (error) {
+			return rejectWithValue(
+				error.response?.data?.message || error.response?.data?.detail || "Failed to approve procurement request"
+			);
+		}
+	}
+);
+
+// Reject procurement PR using approval-action endpoint
+export const rejectProcurementPR = createAsyncThunk(
+	"invoiceApprovals/rejectProcurementPR",
+	async ({ id, prType, comments }, { rejectWithValue }) => {
+		try {
+			let endpoint;
+			if (prType === "CATALOG") {
+				endpoint = `/procurement/pr/catalog/${id}/approval-action/`;
+			} else if (prType === "NON_CATALOG") {
+				endpoint = `/procurement/pr/non-catalog/${id}/approval-action/`;
+			} else if (prType === "SERVICE") {
+				endpoint = `/procurement/pr/service/${id}/approval-action/`;
+			} else {
+				endpoint = `/procurement/pr/catalog/${id}/approval-action/`;
+			}
+
+			const response = await api.post(endpoint, {
+				action: "reject",
+				comments: comments || "Rejected",
+			});
+			return { ...response.data, id, prType };
+		} catch (error) {
+			return rejectWithValue(
+				error.response?.data?.message || error.response?.data?.detail || "Failed to reject procurement request"
+			);
+		}
+	}
+);
+
 const invoiceApprovalsSlice = createSlice({
 	name: "invoiceApprovals",
 	initialState: {
@@ -261,6 +459,13 @@ const invoiceApprovalsSlice = createSlice({
 		arPendingApprovals: [],
 		otsPendingApprovals: [],
 		paymentPendingApprovals: [],
+		// Procurement approvals
+		procurementPendingApprovals: [],
+		catalogPRPendingApprovals: [],
+		nonCatalogPRPendingApprovals: [],
+		servicePRPendingApprovals: [],
+		// PO approvals
+		poPendingApprovals: [],
 		loading: false,
 		error: null,
 	},
@@ -419,6 +624,131 @@ const invoiceApprovalsSlice = createSlice({
 				}
 			})
 			.addCase(delegateInvoice.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			// Fetch Catalog PR pending approvals
+			.addCase(fetchCatalogPRPendingApprovals.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchCatalogPRPendingApprovals.fulfilled, (state, action) => {
+				state.loading = false;
+				state.catalogPRPendingApprovals = action.payload;
+			})
+			.addCase(fetchCatalogPRPendingApprovals.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			// Fetch Non-Catalog PR pending approvals
+			.addCase(fetchNonCatalogPRPendingApprovals.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchNonCatalogPRPendingApprovals.fulfilled, (state, action) => {
+				state.loading = false;
+				state.nonCatalogPRPendingApprovals = action.payload;
+			})
+			.addCase(fetchNonCatalogPRPendingApprovals.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			// Fetch Service PR pending approvals
+			.addCase(fetchServicePRPendingApprovals.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchServicePRPendingApprovals.fulfilled, (state, action) => {
+				state.loading = false;
+				state.servicePRPendingApprovals = action.payload;
+			})
+			.addCase(fetchServicePRPendingApprovals.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			// Fetch all procurement pending approvals
+			.addCase(fetchAllProcurementPendingApprovals.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchAllProcurementPendingApprovals.fulfilled, (state, action) => {
+				state.loading = false;
+				state.procurementPendingApprovals = action.payload;
+			})
+			.addCase(fetchAllProcurementPendingApprovals.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			// Approve procurement PR
+			.addCase(approveProcurementPR.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(approveProcurementPR.fulfilled, (state, action) => {
+				state.loading = false;
+				// Remove the approved PR from the pending list
+				state.procurementPendingApprovals = state.procurementPendingApprovals.filter(
+					pr => pr.pr_id !== action.payload.id
+				);
+			})
+			.addCase(approveProcurementPR.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			// Reject procurement PR
+			.addCase(rejectProcurementPR.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(rejectProcurementPR.fulfilled, (state, action) => {
+				state.loading = false;
+				// Remove the rejected PR from the pending list
+				state.procurementPendingApprovals = state.procurementPendingApprovals.filter(
+					pr => pr.pr_id !== action.payload.id
+				);
+			})
+			.addCase(rejectProcurementPR.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			// Fetch PO pending approvals
+			.addCase(fetchPOPendingApprovals.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchPOPendingApprovals.fulfilled, (state, action) => {
+				state.loading = false;
+				state.poPendingApprovals = action.payload;
+			})
+			.addCase(fetchPOPendingApprovals.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			// Approve PO
+			.addCase(approvePO.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(approvePO.fulfilled, (state, action) => {
+				state.loading = false;
+				// Remove the approved PO from the pending list
+				state.poPendingApprovals = state.poPendingApprovals.filter(po => po.po_id !== action.payload.id);
+			})
+			.addCase(approvePO.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			// Reject PO
+			.addCase(rejectPO.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(rejectPO.fulfilled, (state, action) => {
+				state.loading = false;
+				// Remove the rejected PO from the pending list
+				state.poPendingApprovals = state.poPendingApprovals.filter(po => po.po_id !== action.payload.id);
+			})
+			.addCase(rejectPO.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

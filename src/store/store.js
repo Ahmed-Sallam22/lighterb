@@ -21,6 +21,10 @@ import countriesReducer from "./countriesSlice";
 import authReducer from "./authSlice";
 import workflowTemplatesReducer from "./workflowTemplatesSlice";
 import usersReducer from "./usersSlice";
+import uomReducer from "./uomSlice";
+import requisitionsReducer from "./requisitionsSlice";
+import poReducer from "./poSlice";
+import grnReducer from "./grnSlice";
 
 export const store = configureStore({
 	reducer: {
@@ -46,6 +50,10 @@ export const store = configureStore({
 		countries: countriesReducer,
 		workflowTemplates: workflowTemplatesReducer,
 		users: usersReducer,
+		uom: uomReducer,
+		requisitions: requisitionsReducer,
+		po: poReducer,
+		grn: grnReducer,
 	},
 });
 

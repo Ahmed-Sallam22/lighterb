@@ -207,7 +207,9 @@ const JournalEntryDetailModal = ({ isOpen, journalId, onClose }) => {
 																	: "bg-green-100 text-green-800"
 															}`}
 														>
-															{line.type}
+															{line.type === "DEBIT"
+																? t("glLines.debit")
+																: t("glLines.credit")}
 														</span>
 													</td>
 													<td className="px-4 py-3">

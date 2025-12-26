@@ -312,7 +312,9 @@ const OneTimeSupplierInvoiceDetailsModal = ({ isOpen, invoiceId, onClose }) => {
 																	: "bg-green-100 text-green-800"
 															}`}
 														>
-															{line.type}
+															{line.type === "DEBIT"
+																? t("glLines.debit")
+																: t("glLines.credit")}
 														</span>
 													</td>
 													<td className="px-5 py-3 text-sm text-right font-mono font-semibold text-gray-800">
