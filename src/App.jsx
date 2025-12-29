@@ -56,6 +56,12 @@ const CreatePoPage = lazy(() => import("./pages/CreatePoPage"));
 const PoPage = lazy(() => import("./pages/POPage"));
 const Receiving = lazy(() => import("./pages/ReceivingPage"));
 const CreateGRNPage = lazy(() => import("./pages/CreateGRNPage"));
+const WorkStructurePage = lazy(() => import("./pages/WorkStructurePage"));
+const EnterpriseAndBusinessGroupsPage = lazy(() => import("./pages/EnterpriseAndBusinessGroupsPage"));
+const DepartmentsPage = lazy(() => import("./pages/DepartmentsPage"));
+const GradesAndRatesPage = lazy(() => import("./pages/GradesAndRatesPage"));
+const LocationsPage = lazy(() => import("./pages/LocationsPage"));
+const PositionsPage = lazy(() => import("./pages/PositionsPage"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -89,9 +95,9 @@ const App = () => {
 					<Route
 						path="/"
 						element={
-							<AuthGuard>
-								<MainLayout />
-							</AuthGuard>
+							// <AuthGuard>
+							<MainLayout />
+							// </AuthGuard>
 						}
 					>
 						<Route index element={<Home />} />
@@ -129,6 +135,15 @@ const App = () => {
 						<Route path="procurement/po/create" element={<CreatePoPage />} />
 						<Route path="procurement/receiving-grn" element={<Receiving />} />
 						<Route path="procurement/receiving-grn/create" element={<CreateGRNPage />} />
+						<Route path="work-structure" element={<WorkStructurePage />} />
+						<Route
+							path="enterprise-business-groups"
+							element={<EnterpriseAndBusinessGroupsPage />}
+						/>
+						<Route path="departments" element={<DepartmentsPage />} />
+						<Route path="grades-and-rates" element={<GradesAndRatesPage />} />
+						<Route path="locations" element={<LocationsPage />} />
+						<Route path="positions" element={<PositionsPage />} />
 					</Route>
 				</Routes>
 			</Suspense>

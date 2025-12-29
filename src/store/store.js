@@ -25,6 +25,12 @@ import uomReducer from "./uomSlice";
 import requisitionsReducer from "./requisitionsSlice";
 import poReducer from "./poSlice";
 import grnReducer from "./grnSlice";
+import locationsReducer from "./locationsSlice";
+import enterprisesReducer from "./enterprisesSlice";
+import businessGroupsReducer from "./businessGroupsSlice";
+import departmentsReducer from "./departmentsSlice";
+import gradesReducer from "./gradesSlice";
+import positionsReducer from "./positionsSlice";
 
 export const store = configureStore({
 	reducer: {
@@ -54,6 +60,12 @@ export const store = configureStore({
 		requisitions: requisitionsReducer,
 		po: poReducer,
 		grn: grnReducer,
+		locations: locationsReducer,
+		enterprises: enterprisesReducer,
+		businessGroups: businessGroupsReducer,
+		departments: departmentsReducer,
+		grades: gradesReducer,
+		positions: positionsReducer,
 	},
 });
 

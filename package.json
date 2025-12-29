@@ -12,6 +12,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.10.1",
     "@tailwindcss/vite": "^4.1.17",
+    "@xyflow/react": "^12.10.0",
     "axios": "^1.13.2",
     "i18next": "^25.7.1",
     "prop-types": "^15.8.1",

@@ -464,7 +464,30 @@
 		"scrollRight": "Scroll right",
 		"yes": "Yes",
 		"no": "No",
-		"cancel": "Cancel"
+		"cancel": "Cancel",
+		"save": "Save",
+		"saving": "Saving...",
+		"create": "Create",
+		"update": "Update",
+		"delete": "Delete",
+		"edit": "Edit",
+		"view": "View",
+		"close": "Close",
+		"active": "Active",
+		"inactive": "Inactive",
+		"required": "This field is required",
+		"error": "An error occurred",
+		"success": "Operation successful",
+		"loading": "Loading...",
+		"refresh": "Refresh"
+	},
+	"history": {
+		"title": "History - {{name}}",
+		"viewHistory": "View History",
+		"noHistory": "No history records found",
+		"current": "Current",
+		"rates": "Rate History",
+		"fetchError": "Failed to fetch history"
 	},
 	"glLines": {
 		"title": "GL Lines",
@@ -2896,6 +2919,435 @@
 			"fetchDetailsError": "Failed to fetch GRN details",
 			"deleted": "Goods Receipt Note deleted successfully",
 			"deleteError": "Failed to delete Goods Receipt Note"
+		}
+	},
+	"workStructure": {
+		"title": "Work Structure",
+		"subtitle": "Manage organizational structure and hierarchies",
+		"total": "Total",
+		"cards": {
+			"businessGroups": {
+				"title": "Enterprise & Business Groups",
+				"description": "Manage enterprise structure and business groups"
+			},
+			"locations": {
+				"title": "Locations",
+				"description": "Configure office locations and addresses"
+			},
+			"departments": {
+				"title": "Departments",
+				"description": "Define organizational departments and hierarchy"
+			},
+			"positions": {
+				"title": "Positions",
+				"description": "Maintain position catalog and reporting lines"
+			},
+			"gradesRates": {
+				"title": "Grades & Rates",
+				"description": "Set up compensation grades and salary ranges"
+			}
+		}
+	},
+	"locations": {
+		"title": "Locations",
+		"subtitle": "Physical work locations",
+		"addLocation": "Add Location",
+		"createLocation": "Create Location",
+		"searchPlaceholder": "Search locations...",
+		"table": {
+			"name": "Name",
+			"code": "Code",
+			"addressDetails": "Address Details",
+			"country": "Country",
+			"enterprise": "Enterprise",
+			"businessGroup": "Business Group",
+			"status": "Status",
+			"emptyMessage": "No locations found"
+		},
+		"form": {
+			"name": "Name",
+			"code": "Code",
+			"addressDetails": "Address Details",
+			"country": "Country",
+			"enterprise": "Enterprise",
+			"businessGroup": "Business Group",
+			"selectEnterprise": "Select Enterprise",
+			"selectBusinessGroup": "Select Business Group",
+			"enterpriseOrBgRequired": "Enterprise or Business Group is required"
+		},
+		"modal": {
+			"createTitle": "Create Location",
+			"editTitle": "Edit Location"
+		},
+		"messages": {
+			"createSuccess": "Location created successfully",
+			"updateSuccess": "Location updated successfully",
+			"deleteSuccess": "Location deleted successfully"
+		},
+		"deleteModal": {
+			"title": "Delete Location",
+			"message": "Are you sure you want to delete this location? This action cannot be undone."
+		}
+	},
+	"enterpriseBusinessGroups": {
+		"title": "Enterprise & Business Groups",
+		"subtitle": "Defines the top-level organizational structure",
+		"tabs": {
+			"businessGroups": "Business Groups",
+			"enterprise": "Enterprise"
+		},
+		"table": {
+			"emptyMessage": "No data found"
+		},
+		"form": {
+			"status": "Status",
+			"description": "Description",
+			"nameRequired": "Name is required",
+			"startDate": "Start Date",
+			"endDate": "End Date"
+		},
+		"modal": {
+			"update": "Update"
+		},
+		"messages": {
+			"saveError": "Failed to save",
+			"deleteError": "Failed to delete"
+		},
+		"deleteModal": {
+			"title": "Delete Item",
+			"message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
+		},
+		"businessGroups": {
+			"title": "Business Groups",
+			"createBusinessGroup": "Create Business Group",
+			"table": {
+				"groupName": "Group Name",
+				"groupCode": "Group Code",
+				"enterprise": "Enterprise",
+				"startDate": "Start Date",
+				"endDate": "End Date",
+				"status": "Status"
+			},
+			"form": {
+				"groupName": "Group Name",
+				"groupCode": "Group Code",
+				"enterprise": "Enterprise",
+				"selectEnterprise": "Select Enterprise",
+				"startDate": "Start Date",
+				"endDate": "End Date"
+			},
+			"modal": {
+				"createTitle": "Create Business Group",
+				"editTitle": "Edit Business Group",
+				"create": "Create Business Group"
+			},
+			"messages": {
+				"created": "Business Group created successfully",
+				"updated": "Business Group updated successfully",
+				"deleted": "Business Group deleted successfully"
+			},
+			"deleteModal": {
+				"title": "Delete Business Group",
+				"message": "Are you sure you want to delete this business group? This action cannot be undone."
+			}
+		},
+		"enterprise": {
+			"title": "Enterprise",
+			"createEnterprise": "Create Enterprise",
+			"table": {
+				"name": "Name",
+				"code": "Code",
+				"startDate": "Start Date",
+				"endDate": "End Date",
+				"status": "Status"
+			},
+			"form": {
+				"name": "Name",
+				"code": "Code",
+				"startDate": "Start Date",
+				"endDate": "End Date"
+			},
+			"modal": {
+				"createTitle": "Create Enterprise",
+				"editTitle": "Edit Enterprise",
+				"create": "Create Enterprise"
+			},
+			"messages": {
+				"created": "Enterprise created successfully",
+				"updated": "Enterprise updated successfully",
+				"deleted": "Enterprise deleted successfully"
+			},
+			"deleteModal": {
+				"title": "Delete Enterprise",
+				"message": "Are you sure you want to delete this enterprise? This action cannot be undone."
+			}
+		}
+	},
+	"departments": {
+		"title": "Departments",
+		"subtitle": "Define organizational departments and hierarchy",
+		"createDepartment": "Create Department",
+		"searchPlaceholder": "Search...",
+		"viewMode": {
+			"table": "Table",
+			"tree": "Tree"
+		},
+		"tree": {
+			"viewDetails": "View Details",
+			"noData": "No department hierarchy found. Select a business group to view the tree.",
+			"selectBusinessGroup": "Select a business group to view the department hierarchy"
+		},
+		"filters": {
+			"status": "Status",
+			"businessGroup": "Business Groups",
+			"allStatus": "All Status"
+		},
+		"table": {
+			"code": "Department Code",
+			"name": "Name",
+			"status": "Status",
+			"businessGroup": "Business Groups",
+			"location": "Location",
+			"parentDepartment": "Parent Department",
+			"effectiveStartDate": "Effective Start Date",
+			"effectiveEndDate": "Effective End Date",
+			"emptyMessage": "No departments found"
+		},
+		"form": {
+			"code": "Code (Optional)",
+			"codeOptional": "Optional",
+			"name": "Department Name",
+			"businessGroup": "Business Group",
+			"selectBusinessGroup": "Select Business Group",
+			"location": "Location",
+			"selectLocation": "Select Location",
+			"parentDepartment": "Parent Department",
+			"selectParent": "Select Parent Department",
+			"effectiveStartDate": "Effective Start Date",
+			"effectiveEndDate": "Effective End Date",
+			"nameRequired": "Department name is required",
+			"effectiveStartDateRequired": "Effective start date is required",
+			"locationRequired": "Location is required"
+		},
+		"modal": {
+			"createTitle": "Create Department",
+			"editTitle": "Edit Department",
+			"create": "Create Department",
+			"update": "Update Department"
+		},
+		"messages": {
+			"created": "Department created successfully",
+			"updated": "Department updated successfully",
+			"deleted": "Department deleted successfully",
+			"saveError": "Failed to save department",
+			"deleteError": "Failed to delete department"
+		},
+		"deleteModal": {
+			"title": "Delete Department",
+			"message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
+		}
+	},
+	"gradesAndRates": {
+		"title": "Grades & Rates",
+		"subtitle": "Defines grading structure and compensation rates",
+		"tabs": {
+			"grades": "Grades",
+			"gradeRates": "Grade Rates"
+		},
+		"table": {
+			"emptyMessage": "No data found"
+		},
+		"form": {
+			"status": "Status",
+			"description": "Description",
+			"startDate": "Effective Start Date",
+			"endDate": "Effective End Date",
+			"startDateRequired": "Start date is required"
+		},
+		"modal": {
+			"update": "Update"
+		},
+		"messages": {
+			"saveError": "Failed to save",
+			"deleteError": "Failed to delete"
+		},
+		"deleteModal": {
+			"title": "Delete Item",
+			"message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
+		},
+		"grades": {
+			"title": "Grades",
+			"createGrade": "Create Grade",
+			"table": {
+				"name": "Name",
+				"code": "Code",
+				"businessGroup": "Business Group",
+				"startDate": "Start Date",
+				"endDate": "End Date",
+				"ratesCount": "Rates",
+				"status": "Status",
+				"emptyMessage": "No grades found"
+			},
+			"form": {
+				"name": "Name",
+				"code": "Code",
+				"businessGroup": "Business Group",
+				"selectBusinessGroup": "Select Business Group",
+				"codeAutoGenerated": "Auto-generated if empty",
+				"nameRequired": "Name is required",
+				"businessGroupRequired": "Business Group is required"
+			},
+			"modal": {
+				"createTitle": "Create Grade",
+				"editTitle": "Edit Grade",
+				"create": "Create Grade"
+			},
+			"messages": {
+				"created": "Grade created successfully",
+				"updated": "Grade updated successfully",
+				"deleted": "Grade deleted successfully"
+			}
+		},
+		"gradeRates": {
+			"title": "Grade Rates",
+			"createGradeRate": "Add Rate",
+			"table": {
+				"rateType": "Rate Type",
+				"rateCode": "Rate Code",
+				"currency": "Currency",
+				"amount": "Amount",
+				"startDate": "Start Date",
+				"endDate": "End Date",
+				"status": "Status",
+				"emptyMessage": "No rates found for this grade"
+			},
+			"form": {
+				"rateType": "Rate Type",
+				"rateTypeCode": "Rate Type Code",
+				"currency": "Currency",
+				"selectCurrency": "Select Currency",
+				"rateTypeLabel": "Amount Type",
+				"fixedAmount": "Fixed Amount",
+				"rangeAmount": "Range (Min-Max)",
+				"minAmount": "Minimum Amount",
+				"maxAmount": "Maximum Amount",
+				"rateTypeRequired": "Rate type code is required",
+				"currencyRequired": "Currency is required",
+				"minAmountRequired": "Minimum amount is required",
+				"maxAmountRequired": "Maximum amount is required",
+				"fixedAmountRequired": "Fixed amount is required"
+			},
+			"modal": {
+				"createTitle": "Add Grade Rate",
+				"editTitle": "Edit Grade Rate",
+				"create": "Add Rate"
+			},
+			"messages": {
+				"created": "Grade Rate created successfully",
+				"updated": "Grade Rate updated successfully",
+				"deleted": "Grade Rate deleted successfully"
+			}
+		}
+	},
+	"positions": {
+		"title": "Position",
+		"subtitle": "Specific job roles within a department",
+		"createPosition": "Create Position",
+		"searchPlaceholder": "Search positions...",
+		"table": {
+			"name": "Name",
+			"code": "Code",
+			"department": "Department",
+			"location": "Location",
+			"grade": "Grade",
+			"reportsTo": "Reports To",
+			"startDate": "Start Date",
+			"endDate": "End Date",
+			"status": "Status",
+			"emptyMessage": "No positions found"
+		},
+		"form": {
+			"name": "Name",
+			"code": "Code",
+			"department": "Department",
+			"location": "Location",
+			"grade": "Grade",
+			"reportsTo": "Reports To",
+			"selectDepartment": "Select Department",
+			"selectLocation": "Select Location",
+			"selectGrade": "Select Grade",
+			"selectReportsTo": "Select Reports To",
+			"startDate": "Start Date",
+			"endDate": "End Date",
+			"status": "Status",
+			"description": "Description",
+			"nameRequired": "Name is required",
+			"startDateRequired": "Start date is required"
+		},
+		"modal": {
+			"createTitle": "Create Position",
+			"editTitle": "Edit Position",
+			"create": "Create Position",
+			"update": "Update Position"
+		},
+		"messages": {
+			"created": "Position created successfully",
+			"updated": "Position updated successfully",
+			"deleted": "Position deleted successfully",
+			"saveError": "Failed to save position",
+			"deleteError": "Failed to delete position"
+		},
+		"deleteModal": {
+			"title": "Delete Position",
+			"message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
+		}
+	},
+	"errors": {
+		"generic": "An error occurred. Please try again.",
+		"network": "Network error. Please check your connection.",
+		"server": "Server error. Please try again later.",
+		"required": "This field is required.",
+		"alreadyExists": "This value already exists.",
+		"invalidCodeFormat": "Invalid code format. Use uppercase letters, numbers, and underscores only.",
+		"invalidFormat": "Invalid format.",
+		"notFound": "The requested resource was not found.",
+		"permissionDenied": "You do not have permission to perform this action.",
+		"invalidDate": "Invalid date format.",
+		"mustBePositive": "Value must be greater than zero.",
+		"tooLong": "Value exceeds maximum length.",
+		"tooShort": "Value is too short.",
+		"invalidEmail": "Please enter a valid email address.",
+		"cannotDelete": "Cannot delete. This item is in use.",
+		"invalidDateRange": "End date must be after start date.",
+		"fields": {
+			"code": "Code",
+			"name": "Name",
+			"description": "Description",
+			"status": "Status",
+			"enterprise": "Enterprise",
+			"business_group": "Business Group",
+			"department": "Department",
+			"location": "Location",
+			"grade": "Grade",
+			"position": "Position",
+			"country": "Country",
+			"currency": "Currency",
+			"address_details": "Address Details",
+			"effective_start_date": "Effective Start Date",
+			"effective_end_date": "Effective End Date",
+			"reports_to": "Reports To",
+			"rate_type_code": "Rate Type",
+			"fixed_amount": "Fixed Amount",
+			"min_amount": "Minimum Amount",
+			"max_amount": "Maximum Amount"
 		}
 	}
 }

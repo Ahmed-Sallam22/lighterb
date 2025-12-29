@@ -464,7 +464,30 @@
 		"scrollRight": "التمرير لليمين",
 		"yes": "نعم",
 		"no": "لا",
-		"cancel": "إلغاء"
+		"cancel": "إلغاء",
+		"save": "حفظ",
+		"saving": "جاري الحفظ...",
+		"create": "إنشاء",
+		"update": "تحديث",
+		"delete": "حذف",
+		"edit": "تعديل",
+		"view": "عرض",
+		"close": "إغلاق",
+		"active": "نشط",
+		"inactive": "غير نشط",
+		"required": "هذا الحقل مطلوب",
+		"error": "حدث خطأ",
+		"success": "تمت العملية بنجاح",
+		"loading": "جاري التحميل...",
+		"refresh": "تحديث"
+	},
+	"history": {
+		"title": "السجل - {{name}}",
+		"viewHistory": "عرض السجل",
+		"noHistory": "لم يتم العثور على سجلات",
+		"current": "الحالي",
+		"rates": "سجل المعدلات",
+		"fetchError": "فشل في جلب السجل"
 	},
 	"glLines": {
 		"title": "خطوط دفتر الأستاذ",
@@ -2896,6 +2919,518 @@
 			"fetchDetailsError": "فشل في جلب تفاصيل إذن الاستلام",
 			"deleted": "تم حذف إذن استلام البضاعة بنجاح",
 			"deleteError": "فشل في حذف إذن استلام البضاعة"
+		}
+	},
+	"workStructure": {
+		"title": "الهيكل الوظيفي",
+		"subtitle": "إدارة الهيكل التنظيمي والتسلسلات الإدارية",
+		"total": "الإجمالي",
+		"cards": {
+			"businessGroups": {
+				"title": "المؤسسات ومجموعات الأعمال",
+				"description": "إدارة هيكل المؤسسة ومجموعات الأعمال"
+			},
+			"locations": {
+				"title": "المواقع",
+				"description": "تكوين مواقع المكاتب والعناوين"
+			},
+			"departments": {
+				"title": "الأقسام",
+				"description": "تحديد الأقسام التنظيمية والتسلسل الإداري"
+			},
+			"positions": {
+				"title": "الوظائف",
+				"description": "صيانة دليل الوظائف وخطوط التبعية"
+			},
+			"gradesRates": {
+				"title": "الدرجات والمعدلات",
+				"description": "إعداد درجات التعويض ونطاقات الرواتب"
+			}
+		}
+	},
+	"locations": {
+		"title": "المواقع",
+		"subtitle": "إدارة مواقع المكاتب والعناوين",
+		"addLocation": "إضافة موقع",
+		"createLocation": "إنشاء موقع",
+		"searchPlaceholder": "البحث في المواقع...",
+		"table": {
+			"name": "الاسم",
+			"code": "الرمز",
+			"addressDetails": "تفاصيل العنوان",
+			"country": "الدولة",
+			"enterprise": "المؤسسة",
+			"businessGroup": "مجموعة الأعمال",
+			"status": "الحالة",
+			"actions": "الإجراءات",
+			"emptyMessage": "لا توجد مواقع"
+		},
+		"form": {
+			"name": "الاسم",
+			"namePlaceholder": "أدخل اسم الموقع",
+			"code": "الرمز",
+			"codePlaceholder": "أدخل رمز الموقع",
+			"addressDetails": "تفاصيل العنوان",
+			"addressDetailsPlaceholder": "أدخل تفاصيل العنوان",
+			"country": "الدولة",
+			"countryPlaceholder": "أدخل الدولة",
+			"enterprise": "المؤسسة",
+			"businessGroup": "مجموعة الأعمال",
+			"selectEnterprise": "اختر المؤسسة",
+			"selectBusinessGroup": "اختر مجموعة الأعمال",
+			"enterpriseOrBgRequired": "المؤسسة أو مجموعة الأعمال مطلوبة",
+			"status": "الحالة",
+			"description": "الوصف",
+			"descriptionPlaceholder": "أدخل الوصف"
+		},
+		"modal": {
+			"createTitle": "إضافة موقع جديد",
+			"editTitle": "تعديل الموقع"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء الموقع بنجاح",
+			"updateSuccess": "تم تحديث الموقع بنجاح",
+			"deleteSuccess": "تم حذف الموقع بنجاح",
+			"createError": "فشل في إنشاء الموقع",
+			"updateError": "فشل في تحديث الموقع",
+			"deleteError": "فشل في حذف الموقع"
+		},
+		"deleteModal": {
+			"title": "حذف الموقع",
+			"message": "هل أنت متأكد من حذف هذا الموقع؟ لا يمكن التراجع عن هذا الإجراء."
+		}
+	},
+	"enterpriseBusinessGroups": {
+		"title": "المؤسسات ومجموعات الأعمال",
+		"subtitle": "إدارة هيكل المؤسسة ومجموعات الأعمال",
+		"tabs": {
+			"businessGroups": "مجموعات الأعمال",
+			"enterprise": "المؤسسة"
+		},
+		"table": {
+			"emptyMessage": "لا توجد بيانات"
+		},
+		"form": {
+			"status": "الحالة",
+			"description": "الوصف",
+			"nameRequired": "الاسم مطلوب",
+			"startDate": "تاريخ البداية",
+			"endDate": "تاريخ النهاية"
+		},
+		"modal": {
+			"update": "تحديث"
+		},
+		"messages": {
+			"saveError": "فشل في الحفظ",
+			"deleteError": "فشل في الحذف"
+		},
+		"deleteModal": {
+			"title": "حذف العنصر",
+			"message": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"confirm": "حذف",
+			"cancel": "إلغاء"
+		},
+		"businessGroups": {
+			"title": "مجموعات الأعمال",
+			"createBusinessGroup": "إنشاء مجموعة أعمال",
+			"addBusinessGroup": "إضافة مجموعة أعمال",
+			"table": {
+				"groupName": "اسم المجموعة",
+				"groupCode": "رمز المجموعة",
+				"enterprise": "المؤسسة",
+				"startDate": "تاريخ البداية",
+				"endDate": "تاريخ النهاية",
+				"status": "الحالة",
+				"actions": "الإجراءات"
+			},
+			"form": {
+				"groupName": "اسم المجموعة",
+				"groupNamePlaceholder": "أدخل اسم المجموعة",
+				"groupCode": "رمز المجموعة",
+				"groupCodePlaceholder": "أدخل رمز المجموعة",
+				"enterprise": "المؤسسة",
+				"selectEnterprise": "اختر المؤسسة",
+				"startDate": "تاريخ البداية",
+				"endDate": "تاريخ النهاية",
+				"status": "الحالة",
+				"description": "الوصف",
+				"descriptionPlaceholder": "أدخل الوصف"
+			},
+			"modal": {
+				"createTitle": "إضافة مجموعة أعمال جديدة",
+				"editTitle": "تعديل مجموعة الأعمال",
+				"create": "إنشاء مجموعة أعمال"
+			},
+			"messages": {
+				"created": "تم إنشاء مجموعة الأعمال بنجاح",
+				"updated": "تم تحديث مجموعة الأعمال بنجاح",
+				"deleted": "تم حذف مجموعة الأعمال بنجاح",
+				"createSuccess": "تم إنشاء مجموعة الأعمال بنجاح",
+				"updateSuccess": "تم تحديث مجموعة الأعمال بنجاح",
+				"deleteSuccess": "تم حذف مجموعة الأعمال بنجاح",
+				"createError": "فشل في إنشاء مجموعة الأعمال",
+				"updateError": "فشل في تحديث مجموعة الأعمال",
+				"deleteError": "فشل في حذف مجموعة الأعمال"
+			},
+			"deleteModal": {
+				"title": "حذف مجموعة الأعمال",
+				"message": "هل أنت متأكد من حذف مجموعة الأعمال هذه؟ لا يمكن التراجع عن هذا الإجراء."
+			}
+		},
+		"enterprise": {
+			"addEnterprise": "إضافة مؤسسة",
+			"table": {
+				"name": "الاسم",
+				"code": "الرمز",
+				"startDate": "تاريخ البداية",
+				"endDate": "تاريخ النهاية",
+				"status": "الحالة",
+				"actions": "الإجراءات"
+			},
+			"form": {
+				"name": "الاسم",
+				"namePlaceholder": "أدخل اسم المؤسسة",
+				"code": "الرمز",
+				"codePlaceholder": "أدخل رمز المؤسسة",
+				"startDate": "تاريخ البداية",
+				"endDate": "تاريخ النهاية",
+				"status": "الحالة",
+				"description": "الوصف",
+				"descriptionPlaceholder": "أدخل الوصف"
+			},
+			"modal": {
+				"createTitle": "إضافة مؤسسة جديدة",
+				"editTitle": "تعديل المؤسسة",
+				"create": "إنشاء مؤسسة"
+			},
+			"messages": {
+				"created": "تم إنشاء المؤسسة بنجاح",
+				"updated": "تم تحديث المؤسسة بنجاح",
+				"deleted": "تم حذف المؤسسة بنجاح",
+				"createSuccess": "تم إنشاء المؤسسة بنجاح",
+				"updateSuccess": "تم تحديث المؤسسة بنجاح",
+				"deleteSuccess": "تم حذف المؤسسة بنجاح",
+				"createError": "فشل في إنشاء المؤسسة",
+				"updateError": "فشل في تحديث المؤسسة",
+				"deleteError": "فشل في حذف المؤسسة"
+			},
+			"deleteModal": {
+				"title": "حذف المؤسسة",
+				"message": "هل أنت متأكد من حذف هذه المؤسسة؟ لا يمكن التراجع عن هذا الإجراء."
+			}
+		}
+	},
+	"departments": {
+		"title": "الأقسام",
+		"subtitle": "إدارة الأقسام التنظيمية",
+		"createDepartment": "إنشاء قسم",
+		"searchPlaceholder": "بحث...",
+		"viewMode": {
+			"table": "جدول",
+			"tree": "شجرة"
+		},
+		"tree": {
+			"viewDetails": "عرض التفاصيل",
+			"noData": "لم يتم العثور على هيكل الأقسام. اختر مجموعة أعمال لعرض الشجرة.",
+			"selectBusinessGroup": "اختر مجموعة أعمال لعرض هيكل الأقسام"
+		},
+		"filters": {
+			"search": "بحث",
+			"searchPlaceholder": "ابحث عن اسم القسم أو الرمز...",
+			"status": "الحالة",
+			"allStatus": "جميع الحالات",
+			"active": "نشط",
+			"inactive": "غير نشط",
+			"businessGroup": "مجموعة الأعمال",
+			"allBusinessGroups": "جميع المجموعات"
+		},
+		"table": {
+			"code": "رمز القسم",
+			"name": "الاسم",
+			"status": "الحالة",
+			"businessGroup": "مجموعة الأعمال",
+			"location": "الموقع",
+			"parentDepartment": "القسم الرئيسي",
+			"effectiveStartDate": "تاريخ البداية الفعلي",
+			"effectiveEndDate": "تاريخ النهاية الفعلي",
+			"emptyMessage": "لا توجد أقسام",
+			"actions": "الإجراءات"
+		},
+		"form": {
+			"code": "الرمز (اختياري)",
+			"codeOptional": "اختياري",
+			"name": "اسم القسم",
+			"businessGroup": "مجموعة الأعمال",
+			"selectBusinessGroup": "اختر مجموعة الأعمال",
+			"location": "الموقع",
+			"selectLocation": "اختر الموقع",
+			"parentDepartment": "القسم الرئيسي",
+			"selectParent": "اختر القسم الرئيسي",
+			"effectiveStartDate": "تاريخ البداية الفعلي",
+			"effectiveEndDate": "تاريخ النهاية الفعلي",
+			"nameRequired": "اسم القسم مطلوب",
+			"effectiveStartDateRequired": "تاريخ البداية الفعلي مطلوب",
+			"locationRequired": "الموقع مطلوب"
+		},
+		"modal": {
+			"createTitle": "إضافة قسم جديد",
+			"editTitle": "تعديل القسم",
+			"create": "إنشاء القسم",
+			"update": "تحديث القسم"
+		},
+		"messages": {
+			"created": "تم إنشاء القسم بنجاح",
+			"updated": "تم تحديث القسم بنجاح",
+			"deleted": "تم حذف القسم بنجاح",
+			"saveError": "فشل في حفظ القسم",
+			"deleteError": "فشل في حذف القسم"
+		},
+		"deleteModal": {
+			"title": "حذف القسم",
+			"message": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"confirm": "حذف",
+			"cancel": "إلغاء"
+		}
+	},
+	"gradesAndRates": {
+		"title": "الدرجات والمعدلات",
+		"subtitle": "إدارة درجات التعويض ومعدلات الرواتب",
+		"tabs": {
+			"grades": "الدرجات",
+			"gradeRates": "معدلات الدرجات"
+		},
+		"table": {
+			"emptyMessage": "لا توجد بيانات"
+		},
+		"form": {
+			"status": "الحالة",
+			"description": "الوصف",
+			"startDate": "تاريخ البداية الفعلي",
+			"endDate": "تاريخ النهاية الفعلي",
+			"startDateRequired": "تاريخ البداية مطلوب"
+		},
+		"modal": {
+			"update": "تحديث"
+		},
+		"messages": {
+			"saveError": "فشل في الحفظ",
+			"deleteError": "فشل في الحذف"
+		},
+		"deleteModal": {
+			"title": "حذف العنصر",
+			"message": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"confirm": "حذف",
+			"cancel": "إلغاء"
+		},
+		"grades": {
+			"title": "الدرجات",
+			"createGrade": "إنشاء درجة",
+			"addGrade": "إضافة درجة",
+			"table": {
+				"name": "الاسم",
+				"code": "الرمز",
+				"businessGroup": "مجموعة الأعمال",
+				"startDate": "تاريخ البداية",
+				"endDate": "تاريخ النهاية",
+				"ratesCount": "المعدلات",
+				"status": "الحالة",
+				"emptyMessage": "لا توجد درجات",
+				"actions": "الإجراءات"
+			},
+			"form": {
+				"name": "الاسم",
+				"namePlaceholder": "أدخل اسم الدرجة",
+				"code": "الرمز",
+				"codePlaceholder": "أدخل رمز الدرجة",
+				"businessGroup": "مجموعة الأعمال",
+				"selectBusinessGroup": "اختر مجموعة الأعمال",
+				"codeAutoGenerated": "يتم إنشاؤه تلقائياً إذا كان فارغاً",
+				"nameRequired": "الاسم مطلوب",
+				"businessGroupRequired": "مجموعة الأعمال مطلوبة",
+				"startDate": "تاريخ البداية",
+				"endDate": "تاريخ النهاية",
+				"status": "الحالة",
+				"description": "الوصف",
+				"descriptionPlaceholder": "أدخل الوصف"
+			},
+			"modal": {
+				"createTitle": "إنشاء درجة",
+				"editTitle": "تعديل الدرجة",
+				"create": "إنشاء درجة"
+			},
+			"messages": {
+				"created": "تم إنشاء الدرجة بنجاح",
+				"updated": "تم تحديث الدرجة بنجاح",
+				"deleted": "تم حذف الدرجة بنجاح",
+				"createSuccess": "تم إنشاء الدرجة بنجاح",
+				"updateSuccess": "تم تحديث الدرجة بنجاح",
+				"deleteSuccess": "تم حذف الدرجة بنجاح",
+				"createError": "فشل في إنشاء الدرجة",
+				"updateError": "فشل في تحديث الدرجة",
+				"deleteError": "فشل في حذف الدرجة"
+			},
+			"deleteModal": {
+				"title": "حذف الدرجة",
+				"message": "هل أنت متأكد من حذف هذه الدرجة؟ لا يمكن التراجع عن هذا الإجراء."
+			}
+		},
+		"gradeRates": {
+			"title": "معدلات الدرجة",
+			"createGradeRate": "إضافة معدل",
+			"addGradeRate": "إضافة معدل درجة",
+			"table": {
+				"rateType": "نوع المعدل",
+				"rateCode": "رمز المعدل",
+				"currency": "العملة",
+				"amount": "المبلغ",
+				"startDate": "تاريخ البداية",
+				"endDate": "تاريخ النهاية",
+				"status": "الحالة",
+				"emptyMessage": "لا توجد معدلات لهذه الدرجة",
+				"actions": "الإجراءات"
+			},
+			"form": {
+				"rateType": "نوع المعدل",
+				"rateTypeCode": "رمز نوع المعدل",
+				"rateTypePlaceholder": "أدخل نوع المعدل",
+				"currency": "العملة",
+				"currencyPlaceholder": "اختر العملة",
+				"selectCurrency": "اختر العملة",
+				"rateTypeLabel": "نوع المبلغ",
+				"fixedAmount": "مبلغ ثابت",
+				"rangeAmount": "نطاق (أدنى-أقصى)",
+				"minAmount": "الحد الأدنى",
+				"maxAmount": "الحد الأقصى",
+				"amount": "المبلغ",
+				"amountPlaceholder": "أدخل المبلغ",
+				"rateTypeRequired": "رمز نوع المعدل مطلوب",
+				"currencyRequired": "العملة مطلوبة",
+				"minAmountRequired": "الحد الأدنى مطلوب",
+				"maxAmountRequired": "الحد الأقصى مطلوب",
+				"fixedAmountRequired": "المبلغ الثابت مطلوب",
+				"startDate": "تاريخ البداية",
+				"endDate": "تاريخ النهاية",
+				"status": "الحالة",
+				"description": "الوصف",
+				"descriptionPlaceholder": "أدخل الوصف"
+			},
+			"modal": {
+				"createTitle": "إضافة معدل درجة",
+				"editTitle": "تعديل معدل الدرجة",
+				"create": "إضافة معدل"
+			},
+			"messages": {
+				"created": "تم إنشاء معدل الدرجة بنجاح",
+				"updated": "تم تحديث معدل الدرجة بنجاح",
+				"deleted": "تم حذف معدل الدرجة بنجاح",
+				"createSuccess": "تم إنشاء معدل الدرجة بنجاح",
+				"updateSuccess": "تم تحديث معدل الدرجة بنجاح",
+				"deleteSuccess": "تم حذف معدل الدرجة بنجاح",
+				"createError": "فشل في إنشاء معدل الدرجة",
+				"updateError": "فشل في تحديث معدل الدرجة",
+				"deleteError": "فشل في حذف معدل الدرجة"
+			},
+			"deleteModal": {
+				"title": "حذف معدل الدرجة",
+				"message": "هل أنت متأكد من حذف معدل الدرجة هذا؟ لا يمكن التراجع عن هذا الإجراء."
+			}
+		}
+	},
+	"positions": {
+		"title": "الوظائف",
+		"subtitle": "إدارة الوظائف والمناصب",
+		"addPosition": "إضافة وظيفة",
+		"createPosition": "إنشاء وظيفة",
+		"searchPlaceholder": "البحث في الوظائف...",
+		"table": {
+			"name": "الاسم",
+			"code": "الرمز",
+			"department": "القسم",
+			"location": "الموقع",
+			"grade": "الدرجة",
+			"reportsTo": "يتبع إلى",
+			"startDate": "تاريخ البداية",
+			"endDate": "تاريخ النهاية",
+			"status": "الحالة",
+			"actions": "الإجراءات",
+			"emptyMessage": "لا توجد وظائف"
+		},
+		"form": {
+			"name": "الاسم",
+			"namePlaceholder": "أدخل اسم الوظيفة",
+			"code": "الرمز",
+			"codePlaceholder": "أدخل رمز الوظيفة",
+			"department": "القسم",
+			"location": "الموقع",
+			"grade": "الدرجة",
+			"reportsTo": "يتبع إلى",
+			"selectDepartment": "اختر القسم",
+			"selectLocation": "اختر الموقع",
+			"selectGrade": "اختر الدرجة",
+			"selectReportsTo": "اختر المسؤول",
+			"startDate": "تاريخ البداية",
+			"endDate": "تاريخ النهاية",
+			"status": "الحالة",
+			"description": "الوصف",
+			"descriptionPlaceholder": "أدخل الوصف",
+			"nameRequired": "الاسم مطلوب",
+			"startDateRequired": "تاريخ البداية مطلوب"
+		},
+		"modal": {
+			"createTitle": "إضافة وظيفة جديدة",
+			"editTitle": "تعديل الوظيفة"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء الوظيفة بنجاح",
+			"updateSuccess": "تم تحديث الوظيفة بنجاح",
+			"deleteSuccess": "تم حذف الوظيفة بنجاح",
+			"createError": "فشل في إنشاء الوظيفة",
+			"updateError": "فشل في تحديث الوظيفة",
+			"deleteError": "فشل في حذف الوظيفة"
+		},
+		"deleteModal": {
+			"title": "حذف الوظيفة",
+			"message": "هل أنت متأكد من حذف هذه الوظيفة؟ لا يمكن التراجع عن هذا الإجراء."
+		}
+	},
+	"errors": {
+		"generic": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+		"network": "خطأ في الشبكة. يرجى التحقق من اتصالك.",
+		"server": "خطأ في الخادم. يرجى المحاولة لاحقاً.",
+		"required": "هذا الحقل مطلوب.",
+		"alreadyExists": "هذه القيمة موجودة بالفعل.",
+		"invalidCodeFormat": "صيغة الرمز غير صحيحة. استخدم الأحرف الكبيرة والأرقام والشرطات السفلية فقط.",
+		"invalidFormat": "صيغة غير صحيحة.",
+		"notFound": "لم يتم العثور على المورد المطلوب.",
+		"permissionDenied": "ليس لديك صلاحية لتنفيذ هذا الإجراء.",
+		"invalidDate": "صيغة التاريخ غير صحيحة.",
+		"mustBePositive": "يجب أن تكون القيمة أكبر من صفر.",
+		"tooLong": "القيمة تتجاوز الحد الأقصى للطول.",
+		"tooShort": "القيمة قصيرة جداً.",
+		"invalidEmail": "يرجى إدخال بريد إلكتروني صحيح.",
+		"cannotDelete": "لا يمكن الحذف. هذا العنصر قيد الاستخدام.",
+		"invalidDateRange": "يجب أن يكون تاريخ الانتهاء بعد تاريخ البداية.",
+		"fields": {
+			"code": "الرمز",
+			"name": "الاسم",
+			"description": "الوصف",
+			"status": "الحالة",
+			"enterprise": "المؤسسة",
+			"business_group": "مجموعة الأعمال",
+			"department": "القسم",
+			"location": "الموقع",
+			"grade": "الدرجة",
+			"position": "الوظيفة",
+			"country": "الدولة",
+			"currency": "العملة",
+			"address_details": "تفاصيل العنوان",
+			"effective_start_date": "تاريخ البداية",
+			"effective_end_date": "تاريخ الانتهاء",
+			"reports_to": "يتبع إلى",
+			"rate_type_code": "نوع المعدل",
+			"fixed_amount": "المبلغ الثابت",
+			"min_amount": "الحد الأدنى للمبلغ",
+			"max_amount": "الحد الأقصى للمبلغ"
 		}
 	}
 }

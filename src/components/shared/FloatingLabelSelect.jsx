@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useId, memo } from "react";
-import PropTypes from "prop-types";
-import { PiCirclesFourFill } from "react-icons/pi";
+import { createPortal } from "react-dom";
 
 const FloatingLabelSelect = memo(
 	({
@@ -21,6 +20,7 @@ const FloatingLabelSelect = memo(
 		const [isOpen, setIsOpen] = useState(false);
 		const [searchTerm, setSearchTerm] = useState("");
 		const [isFocused, setIsFocused] = useState(false);
+		const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 		const selectRef = useRef(null);
 		const searchInputRef = useRef(null);
 		const selectId = useId();
@@ -39,19 +39,38 @@ const FloatingLabelSelect = memo(
 			? options.filter(option => option.label.toString().toLowerCase().includes(searchTerm.toLowerCase()))
 			: options;
 
+		// Update dropdown position when opened
+		useEffect(() => {
+			if (isOpen && selectRef.current) {
+				const rect = selectRef.current.getBoundingClientRect();
+				setDropdownPosition({
+					top: rect.bottom + 8,
+					left: rect.left,
+					width: rect.width,
+				});
+			}
+		}, [isOpen]);
+
 		// Handle click outside to close dropdown
 		useEffect(() => {
 			const handleClickOutside = event => {
 				if (selectRef.current && !selectRef.current.contains(event.target)) {
+					// Check if click is inside the dropdown portal
+					const dropdownElement = document.querySelector('[data-dropdown-portal="true"]');
+					if (dropdownElement && dropdownElement.contains(event.target)) {
+						return; // Don't close if clicking inside dropdown
+					}
 					setIsOpen(false);
 					setSearchTerm("");
 					setIsFocused(false);
 				}
 			};
 
-			document.addEventListener("mousedown", handleClickOutside);
-			return () => document.removeEventListener("mousedown", handleClickOutside);
-		}, []);
+			if (isOpen) {
+				document.addEventListener("mousedown", handleClickOutside);
+				return () => document.removeEventListener("mousedown", handleClickOutside);
+			}
+		}, [isOpen]);
 
 		// Focus search input when dropdown opens
 		useEffect(() => {
@@ -59,6 +78,25 @@ const FloatingLabelSelect = memo(
 				searchInputRef.current.focus();
 			}
 		}, [isOpen, searchable]);
+
+		// Handle scroll to reposition dropdown
+		useEffect(() => {
+			if (isOpen) {
+				const handleScroll = () => {
+					if (selectRef.current) {
+						const rect = selectRef.current.getBoundingClientRect();
+						setDropdownPosition({
+							top: rect.bottom + 8,
+							left: rect.left,
+							width: rect.width,
+						});
+					}
+				};
+
+				window.addEventListener("scroll", handleScroll, true);
+				return () => window.removeEventListener("scroll", handleScroll, true);
+			}
+		}, [isOpen]);
 
 		const handleToggle = () => {
 			if (!disabled) {
@@ -68,12 +106,14 @@ const FloatingLabelSelect = memo(
 		};
 
 		const handleSelect = optionValue => {
-			onChange({
-				target: {
-					name,
-					value: optionValue,
-				},
-			});
+			if (onChange) {
+				onChange({
+					target: {
+						name,
+						value: optionValue,
+					},
+				});
+			}
 			setIsOpen(false);
 			setSearchTerm("");
 			setIsFocused(false);
@@ -117,14 +157,109 @@ const FloatingLabelSelect = memo(
 
 		const displayText = hasValue ? selectedLabel : isFloating ? placeholder : "";
 
+		// Dropdown content
+		const dropdownContent = isOpen && (
+			<div
+				data-dropdown-portal="true"
+				className="bg-white rounded-[18px] shadow-2xl border border-[#48C1F0]/30 max-h-64 overflow-hidden"
+				style={{
+					position: "fixed",
+					top: `${dropdownPosition.top}px`,
+					left: `${dropdownPosition.left}px`,
+					width: `${dropdownPosition.width}px`,
+					zIndex: 99999,
+				}}
+				role="listbox"
+			>
+				{searchable && (
+					<div className="p-3 border-b border-gray-200">
+						<input
+							ref={searchInputRef}
+							type="text"
+							value={searchTerm}
+							onChange={e => setSearchTerm(e.target.value)}
+							placeholder="Search..."
+							className="w-full px-4 py-2 text-sm text-[#031b28] bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#48C1F0]/50 focus:border-[#48C1F0]"
+							onClick={e => e.stopPropagation()}
+						/>
+					</div>
+				)}
+
+				{/* Options List */}
+				<div className="overflow-y-auto max-h-48 custom-scrollbar">
+					{filteredOptions.length > 0 ? (
+						filteredOptions.map((option, index) => (
+							<button
+								key={`${option.value}-${index}`}
+								type="button"
+								role="option"
+								aria-selected={option.value === value}
+								onMouseDown={e => {
+									e.preventDefault();
+									e.stopPropagation();
+									handleSelect(option.value);
+								}}
+								onClick={e => {
+									e.preventDefault();
+									e.stopPropagation();
+									handleSelect(option.value);
+								}}
+								className={`
+									w-full px-5 py-3 text-start text-base transition-colors duration-150
+									hover:bg-[#48C1F0]/10 focus:bg-[#48C1F0]/10 focus:outline-none
+									${option.value === value ? "bg-[#48C1F0]/20 text-[#031b28] font-semibold" : "text-[#031b28]"}
+								`}
+							>
+								{option.label}
+								{option.value === value && (
+									<svg
+										className="inline-block ms-2"
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+											fill="#48C1F0"
+										/>
+									</svg>
+								)}
+							</button>
+						))
+					) : (
+						<div className="px-5 py-3 text-center text-[#7A9098]">No options found</div>
+					)}
+				</div>
+
+				<style jsx>{`
+					.custom-scrollbar::-webkit-scrollbar {
+						width: 6px;
+					}
+					.custom-scrollbar::-webkit-scrollbar-track {
+						background: #f1f1f1;
+						border-radius: 10px;
+					}
+					.custom-scrollbar::-webkit-scrollbar-thumb {
+						background: #48c1f0;
+						border-radius: 10px;
+					}
+					.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+						background: #3ba8d4;
+					}
+				`}</style>
+			</div>
+		);
+
 		return (
-			<div className={`relative overflow-visible ${className}`} ref={selectRef}>
+			<div className={`relative ${className}`} ref={selectRef}>
 				<div
 					className={`
-          relative rounded-[20px] p-0.5 transition-all duration-300 overflow-visible
-          bg-gradient-to-r ${wrapperGlow}
-          ${disabled ? "opacity-70" : ""}
-        `}
+						relative rounded-[20px] p-0.5 transition-all duration-300
+						bg-gradient-to-r ${wrapperGlow}
+						${disabled ? "opacity-70" : ""}
+					`}
 				>
 					<div className="relative rounded-[18px] bg-white">
 						{/* Select Button */}
@@ -140,13 +275,13 @@ const FloatingLabelSelect = memo(
 							aria-invalid={hasError}
 							aria-describedby={errorId}
 							className={`
-              w-full bg-transparent rounded-[18px] border-none
-              px-5 py-4 min-h-10 text-sm text-[#031b28] text-start
-              focus:outline-none
-              disabled:cursor-not-allowed
-              flex items-center justify-between
-			  ${buttonClassName}
-            `}
+								w-full bg-transparent rounded-[18px] border-none
+								px-5 py-4 min-h-10 text-sm text-[#031b28] text-start
+								focus:outline-none
+								disabled:cursor-not-allowed
+								flex items-center justify-between
+								${buttonClassName}
+							`}
 						>
 							{icon && <span>{icon}</span>}
 							<span className={`transition-colors duration-200 ${buttonTextClasses}`}>{displayText}</span>
@@ -155,75 +290,14 @@ const FloatingLabelSelect = memo(
 						<label
 							htmlFor={selectId}
 							className={`
-              absolute start-4 font-semibold pointer-events-none
-              transition-all duration-200
-              ${isFloating ? "-top-3 text-xs px-3 text-gray-500" : "top-1/2 -translate-y-1/2 text-sm text-[#7A9098]"}
-              ${hasError ? "text-red-400 bg-[#40171d]" : ""}
-            `}
+								absolute start-4 font-semibold pointer-events-none
+								transition-all duration-200
+								${isFloating ? "-top-3 text-xs px-3 text-gray-500" : "top-1/2 -translate-y-1/2 text-sm text-[#7A9098]"}
+								${hasError ? "text-red-400 bg-[#40171d]" : ""}
+							`}
 						>
 							{label} {required && <span className="text-red-400">*</span>}
 						</label>
-
-						{/* Dropdown Menu */}
-						{isOpen && (
-							<div
-								className="absolute top-full start-0 end-0 mt-2 bg-white rounded-[18px] shadow-2xl border border-[#48C1F0]/30 z-9999 max-h-64 overflow-hidden"
-								role="listbox"
-							>
-								{searchable && (
-									<div className="p-3 border-b border-gray-200">
-										<input
-											ref={searchInputRef}
-											type="text"
-											value={searchTerm}
-											onChange={e => setSearchTerm(e.target.value)}
-											placeholder="Search..."
-											className="w-full px-4 py-2 text-sm text-[#031b28] bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#48C1F0]/50 focus:border-[#48C1F0]"
-											onClick={e => e.stopPropagation()}
-										/>
-									</div>
-								)}
-
-								{/* Options List */}
-								<div className="overflow-y-auto max-h-48 custom-scrollbar">
-									{filteredOptions.length > 0 ? (
-										filteredOptions.map((option, index) => (
-											<button
-												key={`${option.value}-${index}`}
-												type="button"
-												role="option"
-												aria-selected={option.value === value}
-												onClick={() => handleSelect(option.value)}
-												className={`
-                        w-full px-5 py-3 text-start text-base transition-colors duration-150
-                        hover:bg-[#48C1F0]/10 focus:bg-[#48C1F0]/10 focus:outline-none
-                        ${option.value === value ? "bg-[#48C1F0]/20 text-[#031b28] font-semibold" : "text-[#031b28]"}
-                      `}
-											>
-												{option.label}
-												{option.value === value && (
-													<svg
-														className="inline-block ms-2"
-														width="16"
-														height="16"
-														viewBox="0 0 24 24"
-														fill="none"
-														xmlns="http://www.w3.org/2000/svg"
-													>
-														<path
-															d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
-															fill="#48C1F0"
-														/>
-													</svg>
-												)}
-											</button>
-										))
-									) : (
-										<div className="px-5 py-3 text-center text-[#7A9098]">No options found</div>
-									)}
-								</div>
-							</div>
-						)}
 
 						{/* Error Message */}
 						{hasError && (
@@ -249,47 +323,12 @@ const FloatingLabelSelect = memo(
 					</div>
 				</div>
 
-				{/* Custom Scrollbar Styles */}
-				<style jsx>{`
-					.custom-scrollbar::-webkit-scrollbar {
-						width: 6px;
-					}
-					.custom-scrollbar::-webkit-scrollbar-track {
-						background: #f1f1f1;
-						border-radius: 10px;
-					}
-					.custom-scrollbar::-webkit-scrollbar-thumb {
-						background: #48c1f0;
-						border-radius: 10px;
-					}
-					.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-						background: #3ba8d4;
-					}
-				`}</style>
+				{/* Portal Dropdown */}
+				{typeof document !== "undefined" && dropdownContent && createPortal(dropdownContent, document.body)}
 			</div>
 		);
 	}
 );
 
 FloatingLabelSelect.displayName = "FloatingLabelSelect";
-
-FloatingLabelSelect.propTypes = {
-	label: PropTypes.string.isRequired,
-	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-	onChange: PropTypes.func.isRequired,
-	options: PropTypes.arrayOf(
-		PropTypes.shape({
-			label: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-			value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-		})
-	).isRequired,
-	name: PropTypes.string,
-	placeholder: PropTypes.string,
-	required: PropTypes.bool,
-	disabled: PropTypes.bool,
-	error: PropTypes.string,
-	className: PropTypes.string,
-	searchable: PropTypes.bool,
-};
-
 export default FloatingLabelSelect;
