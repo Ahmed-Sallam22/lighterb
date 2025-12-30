@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../../api/axios";
 import SlideUpModal from "../../../components/shared/SlideUpModal";
 import InvoiceStatusBadge from "./InvoiceStatusBadge";
+import { useTranslation } from "react-i18next";
 
 const InfoRow = ({ label, value }) => (
 	<div className="flex justify-between text-sm text-gray-700 py-1">
@@ -14,6 +15,8 @@ const InvoiceDetailsModal = ({ isOpen, invoiceId, type = "AP", onClose }) => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [invoice, setInvoice] = useState(null);
+
+	const {t} = useTranslation();
 
 	useEffect(() => {
 		if (!isOpen || !invoiceId) return;
