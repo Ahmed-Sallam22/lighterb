@@ -60,7 +60,8 @@
 			"arReceipts": "إيصالات المبيعات",
 			"apInvoices": "فواتير الشراء",
 			"apPayments": "مدفوعات الشراء",
-			"reports": "التقارير"
+			"reports": "التقارير",
+			"workStructure": "هيكل العمل"
 		},
 		"cards": {
 			"setup": {
@@ -3132,7 +3133,8 @@
 		"tree": {
 			"viewDetails": "عرض التفاصيل",
 			"noData": "لم يتم العثور على هيكل الأقسام. اختر مجموعة أعمال لعرض الشجرة.",
-			"selectBusinessGroup": "اختر مجموعة أعمال لعرض هيكل الأقسام"
+			"selectBusinessGroup": "اختر مجموعة أعمال لعرض هيكل الأقسام",
+			"allDepartments": "جميع الأقسام"
 		},
 		"filters": {
 			"search": "بحث",
@@ -3352,7 +3354,8 @@
 		"tree": {
 			"viewDetails": "عرض التفاصيل",
 			"noData": "لا توجد وظائف. اختر مجموعة أعمال لعرض التسلسل الهرمي.",
-			"loadingPosition": "جاري تحميل تفاصيل الوظيفة..."
+			"loadingPosition": "جاري تحميل تفاصيل الوظيفة...",
+			"allPositions": "جميع الوظائف"
 		},
 		"table": {
 			"name": "الاسم",

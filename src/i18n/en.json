@@ -60,7 +60,8 @@
 			"arReceipts": "AR Receipts",
 			"apInvoices": "AP Invoices",
 			"apPayments": "AP Payments",
-			"reports": "Reports"
+			"reports": "Reports",
+			"workStructure": "Work Structure"
 		},
 		"cards": {
 			"setup": {
@@ -3097,7 +3098,8 @@
 		"tree": {
 			"viewDetails": "View Details",
 			"noData": "No department hierarchy found. Select a business group to view the tree.",
-			"selectBusinessGroup": "Select a business group to view the department hierarchy"
+			"selectBusinessGroup": "Select a business group to view the department hierarchy",
+			"allDepartments": "All Departments"
 		},
 		"filters": {
 			"status": "Status",
@@ -3270,7 +3272,8 @@
 		"tree": {
 			"viewDetails": "View Details",
 			"noData": "No positions found. Select a business group to view the hierarchy.",
-			"loadingPosition": "Loading position details..."
+			"loadingPosition": "Loading position details...",
+			"allPositions": "All Positions"
 		},
 		"table": {
 			"name": "Name",

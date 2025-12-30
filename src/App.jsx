@@ -95,9 +95,9 @@ const App = () => {
 					<Route
 						path="/"
 						element={
-							// <AuthGuard>
-							<MainLayout />
-							// </AuthGuard>
+							<AuthGuard>
+								<MainLayout />
+							</AuthGuard>
 						}
 					>
 						<Route index element={<Home />} />
@@ -136,10 +136,7 @@ const App = () => {
 						<Route path="procurement/receiving-grn" element={<Receiving />} />
 						<Route path="procurement/receiving-grn/create" element={<CreateGRNPage />} />
 						<Route path="work-structure" element={<WorkStructurePage />} />
-						<Route
-							path="enterprise-business-groups"
-							element={<EnterpriseAndBusinessGroupsPage />}
-						/>
+						<Route path="enterprise-business-groups" element={<EnterpriseAndBusinessGroupsPage />} />
 						<Route path="departments" element={<DepartmentsPage />} />
 						<Route path="grades-and-rates" element={<GradesAndRatesPage />} />
 						<Route path="locations" element={<LocationsPage />} />
