@@ -3260,6 +3260,18 @@
 		"subtitle": "Specific job roles within a department",
 		"createPosition": "Create Position",
 		"searchPlaceholder": "Search positions...",
+		"viewMode": {
+			"table": "Table",
+			"hierarchy": "Hierarchy"
+		},
+		"filters": {
+			"businessGroup": "Business Group"
+		},
+		"tree": {
+			"viewDetails": "View Details",
+			"noData": "No positions found. Select a business group to view the hierarchy.",
+			"loadingPosition": "Loading position details..."
+		},
 		"table": {
 			"name": "Name",
 			"code": "Code",
@@ -3283,6 +3295,7 @@
 			"selectLocation": "Select Location",
 			"selectGrade": "Select Grade",
 			"selectReportsTo": "Select Reports To",
+			"selectBusinessGroup": "Select Business Group",
 			"startDate": "Start Date",
 			"endDate": "End Date",
 			"status": "Status",

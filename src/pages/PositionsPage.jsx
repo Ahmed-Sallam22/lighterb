@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
-import { HiBriefcase, HiClock } from "react-icons/hi";
+import { HiBriefcase, HiClock, HiViewList, HiShare } from "react-icons/hi";
 
 import { parseApiError } from "../utils/errorHandler";
 
@@ -16,6 +16,7 @@ import HistoryModal from "../components/shared/HistoryModal";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import Button from "../components/shared/Button";
+import PositionTreeView from "../components/PositionTreeView";
 
 import {
 	fetchPositions,
@@ -23,11 +24,13 @@ import {
 	updatePosition,
 	deletePosition,
 	fetchPositionHistory,
+	fetchPositionHierarchy,
 	setPage,
 } from "../store/positionsSlice";
 import { fetchDepartments } from "../store/departmentsSlice";
 import { fetchLocations } from "../store/locationsSlice";
 import { fetchGrades } from "../store/gradesSlice";
+import { fetchBusinessGroups } from "../store/businessGroupsSlice";
 
 const FORM_INITIAL_STATE = {
 	name: "",
@@ -45,12 +48,12 @@ const PositionsPage = () => {
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
-	const { positions, loading, count, page, hasNext, hasPrevious, creating, updating } = useSelector(
-		state => state.positions
-	);
+	const { positions, loading, count, page, hasNext, hasPrevious, creating, updating, treeData, treeLoading } =
+		useSelector(state => state.positions);
 	const { departments } = useSelector(state => state.departments);
 	const { locations } = useSelector(state => state.locations);
 	const { grades } = useSelector(state => state.grades);
+	const { businessGroups } = useSelector(state => state.businessGroups);
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingItem, setEditingItem] = useState(null);
@@ -63,10 +66,30 @@ const PositionsPage = () => {
 	const [historyData, setHistoryData] = useState([]);
 	const [historyLoading, setHistoryLoading] = useState(false);
 	const [historyItem, setHistoryItem] = useState(null);
+	const [viewMode, setViewMode] = useState("table"); // "table" or "tree"
+	const [selectedTreeBg, setSelectedTreeBg] = useState("");
 
 	useEffect(() => {
 		dispatch(fetchPositions({ page, page_size: localPageSize }));
 	}, [dispatch, page, localPageSize]);
+
+	useEffect(() => {
+		dispatch(fetchBusinessGroups({ page_size: 100 }));
+	}, [dispatch]);
+
+	// Fetch tree data when switching to tree view or when business group changes
+	useEffect(() => {
+		if (viewMode === "tree" && selectedTreeBg) {
+			dispatch(fetchPositionHierarchy(selectedTreeBg));
+		}
+	}, [dispatch, viewMode, selectedTreeBg]);
+
+	// Auto-select first business group when switching to tree view
+	useEffect(() => {
+		if (viewMode === "tree" && !selectedTreeBg && businessGroups.length > 0) {
+			setSelectedTreeBg(businessGroups[0].id);
+		}
+	}, [viewMode, selectedTreeBg, businessGroups]);
 
 	useEffect(() => {
 		dispatch(fetchDepartments({ page: 1, page_size: 100 }));
@@ -345,6 +368,35 @@ const PositionsPage = () => {
 		},
 	];
 
+	// Tree view handlers
+	const handleTreeBgChange = e => {
+		setSelectedTreeBg(e.target.value);
+	};
+
+	const handleRefreshTree = () => {
+		if (selectedTreeBg) {
+			dispatch(fetchPositionHierarchy(selectedTreeBg));
+		}
+	};
+
+	const handleTreeNodeClick = node => {
+		// Find the position in the list and open edit modal
+		const position = positions.find(p => p.id === node.id);
+		if (position) {
+			handleEdit(position);
+		} else {
+			toast.info(t("positions.tree.loadingPosition"));
+		}
+	};
+
+	const businessGroupOptions = [
+		{ value: "", label: t("positions.form.selectBusinessGroup") },
+		...businessGroups.map(bg => ({
+			value: bg.id,
+			label: bg.name,
+		})),
+	];
+
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<ToastContainer position="top-right" autoClose={3000} />
@@ -358,7 +410,34 @@ const PositionsPage = () => {
 			<div className="p-6">
 				<div className="bg-white rounded-2xl shadow-lg p-6">
 					<div className="flex justify-between items-center mb-6">
-						<h2 className="text-2xl font-bold text-[#1D7A8C]">{t("positions.title")}</h2>
+						<div className="flex items-center gap-4">
+							<h2 className="text-2xl font-bold text-[#1D7A8C]">{t("positions.title")}</h2>
+							{/* View Mode Toggle */}
+							<div className="flex items-center bg-gray-100 rounded-lg p-1">
+								<button
+									onClick={() => setViewMode("table")}
+									className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+										viewMode === "table"
+											? "bg-white text-[#1D7A8C] shadow-sm"
+											: "text-gray-600 hover:text-gray-800"
+									}`}
+								>
+									<HiViewList className="w-4 h-4" />
+									{t("positions.viewMode.table")}
+								</button>
+								<button
+									onClick={() => setViewMode("tree")}
+									className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+										viewMode === "tree"
+											? "bg-white text-[#1D7A8C] shadow-sm"
+											: "text-gray-600 hover:text-gray-800"
+									}`}
+								>
+									<HiShare className="w-4 h-4" />
+									{t("positions.viewMode.hierarchy")}
+								</button>
+							</div>
+						</div>
 						<Button
 							onClick={handleCreate}
 							icon={
@@ -376,26 +455,67 @@ const PositionsPage = () => {
 						/>
 					</div>
 
-					<Table
-						columns={columns}
-						data={positions}
-						onEdit={handleEdit}
-						onDelete={handleDeleteClick}
-						customActions={historyCustomActions}
-						emptyMessage={t("positions.table.emptyMessage")}
-					/>
+					{viewMode === "table" ? (
+						<>
+							<Table
+								columns={columns}
+								data={positions}
+								onEdit={handleEdit}
+								onDelete={handleDeleteClick}
+								customActions={historyCustomActions}
+								emptyMessage={t("positions.table.emptyMessage")}
+							/>
 
-					<div className="mt-6">
-						<Pagination
-							currentPage={page}
-							totalCount={count}
-							pageSize={localPageSize}
-							onPageChange={handlePageChange}
-							onPageSizeChange={handlePageSizeChange}
-							hasNext={hasNext}
-							hasPrevious={hasPrevious}
-						/>
-					</div>
+							<div className="mt-6">
+								<Pagination
+									currentPage={page}
+									totalCount={count}
+									pageSize={localPageSize}
+									onPageChange={handlePageChange}
+									onPageSizeChange={handlePageSizeChange}
+									hasNext={hasNext}
+									hasPrevious={hasPrevious}
+								/>
+							</div>
+						</>
+					) : (
+						<>
+							{/* Tree View Filters */}
+							<div className="flex flex-wrap gap-4 mb-6">
+								<div className="w-64">
+									<FloatingLabelSelect
+										label={t("positions.filters.businessGroup")}
+										name="tree_business_group"
+										value={selectedTreeBg}
+										onChange={handleTreeBgChange}
+										options={businessGroupOptions.filter(opt => opt.value !== "")}
+									/>
+								</div>
+								<Button
+									onClick={handleRefreshTree}
+									icon={
+										<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+											/>
+										</svg>
+									}
+									title={t("common.refresh")}
+									className="bg-gray-100 hover:bg-gray-200 text-gray-700"
+								/>
+							</div>
+
+							<PositionTreeView
+								treeData={treeData}
+								loading={treeLoading}
+								onNodeClick={handleTreeNodeClick}
+								onRefresh={handleRefreshTree}
+							/>
+						</>
+					)}
 				</div>
 			</div>
 

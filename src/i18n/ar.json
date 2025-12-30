@@ -3342,6 +3342,18 @@
 		"addPosition": "إضافة وظيفة",
 		"createPosition": "إنشاء وظيفة",
 		"searchPlaceholder": "البحث في الوظائف...",
+		"viewMode": {
+			"table": "جدول",
+			"hierarchy": "التسلسل الهرمي"
+		},
+		"filters": {
+			"businessGroup": "مجموعة الأعمال"
+		},
+		"tree": {
+			"viewDetails": "عرض التفاصيل",
+			"noData": "لا توجد وظائف. اختر مجموعة أعمال لعرض التسلسل الهرمي.",
+			"loadingPosition": "جاري تحميل تفاصيل الوظيفة..."
+		},
 		"table": {
 			"name": "الاسم",
 			"code": "الرمز",
@@ -3368,6 +3380,7 @@
 			"selectLocation": "اختر الموقع",
 			"selectGrade": "اختر الدرجة",
 			"selectReportsTo": "اختر المسؤول",
+			"selectBusinessGroup": "اختر مجموعة الأعمال",
 			"startDate": "تاريخ البداية",
 			"endDate": "تاريخ النهاية",
 			"status": "الحالة",

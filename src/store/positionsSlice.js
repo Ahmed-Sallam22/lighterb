@@ -76,6 +76,36 @@ export const fetchPositionHistory = createAsyncThunk(
 	}
 );
 
+// Fetch position hierarchy tree by business group
+export const fetchPositionHierarchy = createAsyncThunk(
+	"positions/fetchPositionHierarchy",
+	async (businessGroupId, { rejectWithValue }) => {
+		try {
+			const response = await api.get("/hr/work_structures/positions/hierarchy/", {
+				params: { bg: businessGroupId },
+			});
+			const data = response.data?.data || response.data;
+			return data || [];
+		} catch (error) {
+			return rejectWithValue(error.message || "Failed to fetch position hierarchy");
+		}
+	}
+);
+
+// Fetch direct reports for a position
+export const fetchPositionDirectReports = createAsyncThunk(
+	"positions/fetchPositionDirectReports",
+	async (positionId, { rejectWithValue }) => {
+		try {
+			const response = await api.get(`/hr/work_structures/positions/${positionId}/direct-reports/`);
+			const data = response.data?.data || response.data;
+			return data || [];
+		} catch (error) {
+			return rejectWithValue(error.message || "Failed to fetch direct reports");
+		}
+	}
+);
+
 const positionsSlice = createSlice({
 	name: "positions",
 	initialState: {
@@ -90,6 +120,10 @@ const positionsSlice = createSlice({
 		updating: false,
 		deleting: false,
 		actionError: null,
+		treeData: [],
+		treeLoading: false,
+		directReports: [],
+		directReportsLoading: false,
 	},
 	reducers: {
 		setPage: (state, action) => {
@@ -164,6 +198,32 @@ const positionsSlice = createSlice({
 			.addCase(deletePosition.rejected, (state, action) => {
 				state.deleting = false;
 				state.actionError = action.payload;
+			})
+
+			// Fetch position hierarchy
+			.addCase(fetchPositionHierarchy.pending, state => {
+				state.treeLoading = true;
+			})
+			.addCase(fetchPositionHierarchy.fulfilled, (state, action) => {
+				state.treeLoading = false;
+				state.treeData = action.payload;
+			})
+			.addCase(fetchPositionHierarchy.rejected, (state, action) => {
+				state.treeLoading = false;
+				state.error = action.payload;
+			})
+
+			// Fetch direct reports
+			.addCase(fetchPositionDirectReports.pending, state => {
+				state.directReportsLoading = true;
+			})
+			.addCase(fetchPositionDirectReports.fulfilled, (state, action) => {
+				state.directReportsLoading = false;
+				state.directReports = action.payload;
+			})
+			.addCase(fetchPositionDirectReports.rejected, (state, action) => {
+				state.directReportsLoading = false;
+				state.error = action.payload;
 			});
 	},
 });
