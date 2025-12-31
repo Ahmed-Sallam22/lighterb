@@ -31,6 +31,7 @@ import businessGroupsReducer from "./businessGroupsSlice";
 import departmentsReducer from "./departmentsSlice";
 import gradesReducer from "./gradesSlice";
 import positionsReducer from "./positionsSlice";
+import defaultCombinationsReducer from "./defaultCombinationsSlice";
 
 export const store = configureStore({
 	reducer: {
@@ -66,6 +67,7 @@ export const store = configureStore({
 		departments: departmentsReducer,
 		grades: gradesReducer,
 		positions: positionsReducer,
+		defaultCombinations: defaultCombinationsReducer,
 	},
 });
 

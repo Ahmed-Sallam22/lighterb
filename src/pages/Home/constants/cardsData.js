@@ -69,6 +69,11 @@ export const getCardsData = t => ({
 			description: t("oneTimeSupplierInvoices.subtitle"),
 			key: "One-Time Supplier Invoices",
 		},
+		{
+			title: t("defaultValues.title"),
+			description: t("defaultValues.subtitle"),
+			key: "Default Values",
+		},
 	],
 	Assets: [
 		{
@@ -142,5 +147,4 @@ export const getCardsData = t => ({
 			key: "Financial Reports",
 		},
 	],
-	
 });

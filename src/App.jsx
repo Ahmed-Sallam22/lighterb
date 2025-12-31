@@ -62,6 +62,7 @@ const DepartmentsPage = lazy(() => import("./pages/DepartmentsPage"));
 const GradesAndRatesPage = lazy(() => import("./pages/GradesAndRatesPage"));
 const LocationsPage = lazy(() => import("./pages/LocationsPage"));
 const PositionsPage = lazy(() => import("./pages/PositionsPage"));
+const DefaultValuesPage = lazy(() => import("./pages/DefaultValuesPage"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -141,6 +142,7 @@ const App = () => {
 						<Route path="grades-and-rates" element={<GradesAndRatesPage />} />
 						<Route path="locations" element={<LocationsPage />} />
 						<Route path="positions" element={<PositionsPage />} />
+						<Route path="default-values" element={<DefaultValuesPage />} />
 					</Route>
 				</Routes>
 			</Suspense>

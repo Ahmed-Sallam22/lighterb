@@ -2004,6 +2004,74 @@
 			"deleteMessage": "Are you sure you want to delete this tax rate? This action cannot be undone."
 		}
 	},
+	"defaultValues": {
+		"title": "Default Combinations",
+		"subtitle": "Configure default segment combinations for transaction types",
+		"actions": {
+			"add": "Add Default Combination",
+			"update": "Update",
+			"create": "Create",
+			"cancel": "Cancel",
+			"delete": "Delete",
+			"edit": "Edit",
+			"view": "View Details",
+			"close": "Close"
+		},
+		"table": {
+			"transactionType": "Transaction Type",
+			"segmentCombination": "Segment Combination",
+			"validationStatus": "Validation",
+			"status": "Status",
+			"updatedAt": "Last Updated",
+			"active": "Active",
+			"inactive": "Inactive",
+			"valid": "Valid",
+			"invalid": "Invalid"
+		},
+		"form": {
+			"transactionType": "Transaction Type",
+			"segmentValues": "Segment Values",
+			"selectSegment": "Select segment value",
+			"setActive": "Set as Active"
+		},
+		"options": {
+			"selectTransactionType": "Select transaction type",
+			"transactionTypes": {
+				"AP_INVOICE": "Accounts Payable Invoice",
+				"AR_INVOICE": "Accounts Receivable Invoice"
+			}
+		},
+		"filters": {
+			"allTransactionTypes": "All Transaction Types",
+			"allStatuses": "All Statuses"
+		},
+		"validation": {
+			"transactionTypeRequired": "Transaction type is required",
+			"segmentsRequired": "At least one segment value is required"
+		},
+		"messages": {
+			"createSuccess": "Default combination created successfully!",
+			"updateSuccess": "Default combination updated successfully!",
+			"deleteSuccess": "Default combination deleted successfully!",
+			"saveError": "Failed to save default combination",
+			"deleteError": "Failed to delete default combination",
+			"fetchError": "Failed to fetch default combination details",
+			"switchedToUpdate": "A default combination for this transaction type already exists. Switching to update mode."
+		},
+		"modals": {
+			"addTitle": "Add Default Combination",
+			"editTitle": "Edit Default Combination",
+			"viewTitle": "Default Combination Details",
+			"deleteTitle": "Delete Default Combination",
+			"deleteMessage": "Are you sure you want to delete this default combination? This action cannot be undone."
+		},
+		"details": {
+			"combinationId": "Combination ID",
+			"description": "Description",
+			"createdAt": "Created At",
+			"updatedAt": "Updated At"
+		}
+	},
 	"pagination": {
 		"showing": "Showing {{start}} to {{end}} of {{total}} results",
 		"rowsPerPage": "Rows per page",

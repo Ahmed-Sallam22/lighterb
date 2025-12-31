@@ -2005,6 +2005,74 @@
 			"deleteMessage": "هل أنت متأكد من أنك تريد حذف معدل الضريبة هذا؟ لا يمكن التراجع عن هذا الإجراء."
 		}
 	},
+	"defaultValues": {
+		"title": "التركيبات الافتراضية",
+		"subtitle": "تكوين تركيبات الشرائح الافتراضية لأنواع المعاملات",
+		"actions": {
+			"add": "إضافة تركيبة افتراضية",
+			"update": "تحديث",
+			"create": "إنشاء",
+			"cancel": "إلغاء",
+			"delete": "حذف",
+			"edit": "تعديل",
+			"view": "عرض التفاصيل",
+			"close": "إغلاق"
+		},
+		"table": {
+			"transactionType": "نوع المعاملة",
+			"segmentCombination": "تركيبة الشرائح",
+			"validationStatus": "التحقق",
+			"status": "الحالة",
+			"updatedAt": "آخر تحديث",
+			"active": "نشط",
+			"inactive": "غير نشط",
+			"valid": "صالح",
+			"invalid": "غير صالح"
+		},
+		"form": {
+			"transactionType": "نوع المعاملة",
+			"segmentValues": "قيم الشرائح",
+			"selectSegment": "اختر قيمة الشريحة",
+			"setActive": "تعيين كنشط"
+		},
+		"options": {
+			"selectTransactionType": "اختر نوع المعاملة",
+			"transactionTypes": {
+				"AP_INVOICE": "فاتورة الحسابات الدائنة",
+				"AR_INVOICE": "فاتورة الحسابات المدينة"
+			}
+		},
+		"filters": {
+			"allTransactionTypes": "جميع أنواع المعاملات",
+			"allStatuses": "جميع الحالات"
+		},
+		"validation": {
+			"transactionTypeRequired": "نوع المعاملة مطلوب",
+			"segmentsRequired": "مطلوب قيمة شريحة واحدة على الأقل"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء التركيبة الافتراضية بنجاح!",
+			"updateSuccess": "تم تحديث التركيبة الافتراضية بنجاح!",
+			"deleteSuccess": "تم حذف التركيبة الافتراضية بنجاح!",
+			"saveError": "فشل حفظ التركيبة الافتراضية",
+			"deleteError": "فشل حذف التركيبة الافتراضية",
+			"fetchError": "فشل جلب تفاصيل التركيبة الافتراضية",
+			"switchedToUpdate": "توجد تركيبة افتراضية لهذا النوع من المعاملات. تم التبديل إلى وضع التحديث."
+		},
+		"modals": {
+			"addTitle": "إضافة تركيبة افتراضية",
+			"editTitle": "تعديل التركيبة الافتراضية",
+			"viewTitle": "تفاصيل التركيبة الافتراضية",
+			"deleteTitle": "حذف التركيبة الافتراضية",
+			"deleteMessage": "هل أنت متأكد من أنك تريد حذف هذه التركيبة الافتراضية؟ لا يمكن التراجع عن هذا الإجراء."
+		},
+		"details": {
+			"combinationId": "معرف التركيبة",
+			"description": "الوصف",
+			"createdAt": "تاريخ الإنشاء",
+			"updatedAt": "تاريخ التحديث"
+		}
+	},
 	"pagination": {
 		"showing": "عرض {{start}} إلى {{end}} من {{total}} نتيجة",
 		"rowsPerPage": "عدد الصفوف في الصفحة",
