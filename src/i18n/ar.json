@@ -469,6 +469,7 @@
 		"save": "حفظ",
 		"saving": "جاري الحفظ...",
 		"create": "إنشاء",
+		"add": "إضافة",
 		"update": "تحديث",
 		"delete": "حذف",
 		"edit": "تعديل",
@@ -490,6 +491,160 @@
 		"rates": "سجل المعدلات",
 		"fetchError": "فشل في جلب السجل"
 	},
+	"employeeSearch": {
+		"title": "بحث الموظفين",
+		"subtitle": "عنوان قسم سيرج",
+		"searchTitle": "بحث",
+		"fields": {
+			"employeeNumber": "رقم الموظف",
+			"name": "الاسم",
+			"businessGroup": "مجموعة الأعمال",
+			"department": "القسم",
+			"status": "الحالة"
+		},
+		"placeholders": {
+			"employeeNumber": "بحث بالرقم",
+			"name": "بحث بالاسم",
+			"businessGroup": "اختر مجموعة الأعمال",
+			"department": "اختر القسم"
+		},
+		"buttons": {
+			"reset": "إعادة تعيين",
+			"search": "بحث"
+		},
+		"table": {
+			"number": "الرقم",
+			"name": "الاسم",
+			"status": "الحالة",
+			"jobTitle": "المسمى الوظيفي",
+			"department": "القسم",
+			"businessGroup": "مجموعة الأعمال",
+			"action": "الإجراء",
+			"empty": "لا توجد نتائج"
+		},
+		"actions": {
+			"view": "عرض {{name}}"
+		}
+	},
+	"profile": {
+		"title": "الملف الشخصي",
+		"subtitle": "الملف الشخصي",
+		"personalInformation": "المعلومات الشخصية",
+		"employeeNo": "رقم الموظف",
+		"status": "الحالة",
+		"primaryAssignment": "التكليف الأساسي",
+		"primary": "أساسي",
+		"tabs": {
+			"assignment": "التكليف الحالي",
+			"contacts": "جهات الاتصال",
+			"qualifications": "المؤهلات"
+		},
+		"assignment": {
+			"role": "مهندس برمجيات أول",
+			"grade": "الدرجة G7",
+			"detailsTitle": "تفاصيل التكليف",
+			"organizationTitle": "معلومات الجهة",
+			"fields": {
+				"title": "العنوان",
+				"assignmentType": "نوع التكليف",
+				"effectiveFrom": "ساري من",
+				"assignmentStatus": "حالة التكليف",
+				"businessGroup": "مجموعة الأعمال",
+				"department": "القسم",
+				"location": "الموقع",
+				"manager": "المدير"
+			},
+			"currentAssignment": "التكليف الحالي",
+			"fullTime": "دوام كامل",
+			"actions": {
+				"view": "عرض التكليف",
+				"update": "تحديث التكليف"
+			}
+		},
+		"contacts": {
+			"addressTitle": "العنوان والتواصل",
+			"familyTitle": "جهات الطوارئ / العائلة",
+			"table": {
+				"email": "البريد الإلكتروني",
+				"phone": "الهاتف",
+				"address": "العنوان",
+				"addressType": "نوع العنوان",
+				"lastUpdate": "آخر تحديث",
+				"name": "الاسم",
+				"relationship": "صلة القرابة",
+				"contactType": "نوع جهة الاتصال"
+			}
+		},
+		"qualifications": {
+			"table": {
+				"type": "النوع",
+				"qualification": "المؤهل",
+				"issuer": "الجهة المانحة",
+				"year": "السنة",
+				"status": "الحالة"
+			},
+			"statuses": {
+				"valid": "ساري",
+				"completed": "مكتمل"
+			},
+			"actions": {
+				"add": "إضافة مؤهل"
+			}
+		},
+		"modals": {
+			"updateAssignment": "تحديث التكليف",
+			"addQualification": "إضافة مؤهل",
+			"fields": {
+				"effectiveDate": "تاريخ السريان",
+				"jobTitle": "المسمى الوظيفي",
+				"businessGroup": "مجموعة الأعمال",
+				"department": "القسم",
+				"location": "الموقع",
+				"grade": "الدرجة",
+				"manager": "المدير",
+				"assignmentType": "نوع التكليف",
+				"qualificationType": "النوع",
+				"qualifications": "المؤهلات",
+				"issuer": "الجهة المانحة",
+				"year": "السنة",
+				"status": "الحالة"
+			},
+			"options": {
+				"jobTitles": {
+					"senior": "مهندس برمجيات أول",
+					"hrSpecialist": "أخصائي موارد بشرية",
+					"productManager": "مدير منتجات"
+				},
+				"locations": {
+					"headOffice": "المقر الرئيسي",
+					"branchOffice": "الفرع"
+				},
+				"grades": {
+					"g7": "الدرجة G7",
+					"g6": "الدرجة G6",
+					"g5": "الدرجة G5"
+				},
+				"managers": {
+					"mohamedHassan": "محمد حسن",
+					"sarahAdel": "سارة عادل"
+				},
+				"assignmentTypes": {
+					"fullTime": "دوام كامل",
+					"partTime": "دوام جزئي",
+					"contract": "عقد"
+				},
+				"qualificationTypes": {
+					"certificate": "شهادة",
+					"course": "دورة",
+					"degree": "درجة"
+				},
+				"qualificationStatuses": {
+					"expired": "منتهي"
+				}
+			}
+		}
+	},
+
 	"glLines": {
 		"title": "خطوط دفتر الأستاذ",
 		"subtitle": "الترحيل",

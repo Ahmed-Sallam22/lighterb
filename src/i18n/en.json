@@ -469,6 +469,7 @@
 		"save": "Save",
 		"saving": "Saving...",
 		"create": "Create",
+		"add": "Add",
 		"update": "Update",
 		"delete": "Delete",
 		"edit": "Edit",
@@ -489,6 +490,159 @@
 		"current": "Current",
 		"rates": "Rate History",
 		"fetchError": "Failed to fetch history"
+	},
+	"employeeSearch": {
+		"title": "Employee Search",
+		"subtitle": "Serge Section Header",
+		"searchTitle": "Search",
+		"fields": {
+			"employeeNumber": "Employee Number",
+			"name": "Name",
+			"businessGroup": "Business Group",
+			"department": "Department",
+			"status": "Status"
+		},
+		"placeholders": {
+			"employeeNumber": "Search by Number",
+			"name": "Search by Name",
+			"businessGroup": "Select Business Group",
+			"department": "Select Department"
+		},
+		"buttons": {
+			"reset": "Reset",
+			"search": "Search"
+		},
+		"table": {
+			"number": "NUMBER",
+			"name": "NAME",
+			"status": "STATUS",
+			"jobTitle": "JOB TITLE",
+			"department": "DEPARTMENT",
+			"businessGroup": "BUSINESS GROUP",
+			"action": "ACTION",
+			"empty": "No results found"
+		},
+		"actions": {
+			"view": "View {{name}}"
+		}
+	},
+	"profile": {
+		"title": "Profile",
+		"subtitle": "Personal Profile",
+		"personalInformation": "Personal Information",
+		"employeeNo": "Employee No",
+		"status": "Status",
+		"primaryAssignment": "Primary Assignment",
+		"primary": "Primary",
+		"tabs": {
+			"assignment": "Current Assignment",
+			"contacts": "Contacts",
+			"qualifications": "Qualifications"
+		},
+		"assignment": {
+			"role": "Senior Software Engineer",
+			"grade": "Grade G7",
+			"detailsTitle": "Assignment Details",
+			"organizationTitle": "Organization Info",
+			"fields": {
+				"title": "Title",
+				"assignmentType": "Assignment Type",
+				"effectiveFrom": "Effective From",
+				"assignmentStatus": "Assignment Status",
+				"businessGroup": "Business Group",
+				"department": "Department",
+				"location": "Location",
+				"manager": "Manager"
+			},
+			"currentAssignment": "Current Assignment",
+			"fullTime": "Full Time",
+			"actions": {
+				"view": "View Assignment",
+				"update": "Update Assignment"
+			}
+		},
+		"contacts": {
+			"addressTitle": "Address & Communication",
+			"familyTitle": "Emergency / Family Contacts",
+			"table": {
+				"email": "Email",
+				"phone": "Phone",
+				"address": "Address",
+				"addressType": "Address Type",
+				"lastUpdate": "Last Update",
+				"name": "Name",
+				"relationship": "Relationship",
+				"contactType": "Contact Type"
+			}
+		},
+		"qualifications": {
+			"table": {
+				"type": "Type",
+				"qualification": "Qualification",
+				"issuer": "Issuer",
+				"year": "Year",
+				"status": "Status"
+			},
+			"statuses": {
+				"valid": "Valid",
+				"completed": "Completed"
+			},
+			"actions": {
+				"add": "Add Qualification"
+			}
+		},
+		"modals": {
+			"updateAssignment": "Update Assignment",
+			"addQualification": "Add Qualification",
+			"fields": {
+				"effectiveDate": "Effective Date",
+				"jobTitle": "Job Title",
+				"businessGroup": "Business Group",
+				"department": "Department",
+				"location": "Location",
+				"grade": "Grade",
+				"manager": "Manager",
+				"assignmentType": "Assignment Type",
+				"qualificationType": "Type",
+				"qualifications": "Qualifications",
+				"issuer": "Issuer",
+				"year": "Year",
+				"status": "Status"
+			},
+			"options": {
+				"jobTitles": {
+					"senior": "Senior Software Engineer",
+					"hrSpecialist": "HR Specialist",
+					"productManager": "Product Manager"
+				},
+				"locations": {
+					"headOffice": "Head Office",
+					"branchOffice": "Branch Office"
+				},
+				"grades": {
+					"g7": "Grade G7",
+					"g6": "Grade G6",
+					"g5": "Grade G5"
+				},
+				"managers": {
+					"mohamedHassan": "Mohamed Hassan",
+					"sarahAdel": "Sarah Adel"
+				},
+				"assignmentTypes": {
+					"fullTime": "Full Time",
+					"partTime": "Part Time",
+					"contract": "Contract"
+				},
+				"qualificationTypes": {
+					"certificate": "Certificate",
+					"course": "Course",
+					"degree": "Degree"
+				},
+				"qualificationStatuses": {
+					"expired": "Expired"
+				}
+			}
+		}
 	},
 	"glLines": {
 		"title": "GL Lines",
