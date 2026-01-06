@@ -34,6 +34,17 @@ export const useRouteNavigation = (cardsData, routes) => {
 				navigate("/assets");
 			}
 		}
+		if (currentActiveRoute === "Fiscal Periods") {
+			if (cardKey === "AR Manage Periods") {
+				navigate("/fiscal-periods/ar");
+			} else if (cardKey === "AP Manage Periods") {
+				navigate("/fiscal-periods/ap");
+			} else if (cardKey === "GL Manage Periods") {
+				navigate("/fiscal-periods/gl");
+			} else if (cardKey === "Set Fiscal Year") {
+				navigate("/fiscal-periods");
+			}
+		}
 	};
 
 	const handleRouteClick = routeKey => {

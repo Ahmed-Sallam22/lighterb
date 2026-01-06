@@ -12,4 +12,5 @@ export const getHomeRoutes = t => [
 	{ name: t("home.routes.apPayments"), key: "AP Payments", path: "/ap-payments" },
 	// { name: t("home.routes.reports"), key: "Reports", path: "/reports" },
 	{name: t("home.routes.workStructure"), key: "Work Structure", path: "/work-structure" },
+	{name: t("home.routes.fiscalPeriods"), key: "Fiscal Periods", path: "/fiscal-periods" },
 ];

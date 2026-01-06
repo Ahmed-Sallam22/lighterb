@@ -65,6 +65,11 @@ const PositionsPage = lazy(() => import("./pages/PositionsPage"));
 const DefaultValuesPage = lazy(() => import("./pages/DefaultValuesPage"));
 const EmployeeSearchPage = lazy(() => import("./pages/EmployeeSearchPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const FiscalPeriodPage = lazy(() => import("./pages/FiscalPeriodPage"));
+const GeneratePeriodsPage = lazy(() => import("./pages/GeneratePeriodsPage"));
+const ARPeriodsPage = lazy(() => import("./pages/ARPeriodsPage"));
+const APPeriodsPage = lazy(() => import("./pages/APPeriodsPage"));
+const GLPeriodsPage = lazy(() => import("./pages/GLPeriodsPage"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -147,6 +152,11 @@ const App = () => {
 						<Route path="default-values" element={<DefaultValuesPage />} />
 						<Route path="employee-search" element={<EmployeeSearchPage />} />
 						<Route path="profile" element={<ProfilePage />} />
+						<Route path="fiscal-periods" element={<FiscalPeriodPage />} />
+						<Route path="fiscal-periods/generate" element={<GeneratePeriodsPage />} />
+						<Route path="fiscal-periods/ar" element={<ARPeriodsPage />} />
+						<Route path="fiscal-periods/ap" element={<APPeriodsPage />} />
+						<Route path="fiscal-periods/gl" element={<GLPeriodsPage />} />
 					</Route>
 				</Routes>
 			</Suspense>

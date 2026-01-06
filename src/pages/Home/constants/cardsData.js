@@ -147,4 +147,27 @@ export const getCardsData = t => ({
 			key: "Financial Reports",
 		},
 	],
+	"Fiscal Periods": [
+		{
+			title: t("home.cards.fiscalPeriods.arTitle"),
+			description: t("home.cards.fiscalPeriods.arDescription"),
+			key: "AR Manage Periods",
+		
+		}, 
+		{
+			title: t("home.cards.fiscalPeriods.apTitle"),
+			description: t("home.cards.fiscalPeriods.apDescription"),
+			key: "AP Manage Periods",
+		},
+		{
+			title: t("home.cards.fiscalPeriods.glTitle"),
+			description: t("home.cards.fiscalPeriods.glDescription"),
+			key: "GL Manage Periods",
+		},
+		{
+			title: t("home.cards.fiscalPeriods.setFiscalYear"),
+			description: t("home.cards.fiscalPeriods.setFiscalYearDescription"),
+			key: "Set Fiscal Year",
+		}
+	]
 });

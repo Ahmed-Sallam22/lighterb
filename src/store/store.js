@@ -32,6 +32,10 @@ import departmentsReducer from "./departmentsSlice";
 import gradesReducer from "./gradesSlice";
 import positionsReducer from "./positionsSlice";
 import defaultCombinationsReducer from "./defaultCombinationsSlice";
+import fiscalPeriodsReducer from "./fiscalPeriodsSlice";
+import glPeriodsReducer from "./glPeriodsSlice";
+import apPeriodsReducer from "./apPeriodsSlice";
+import arPeriodsReducer from "./arPeriodsSlice";
 
 export const store = configureStore({
 	reducer: {
@@ -68,6 +72,10 @@ export const store = configureStore({
 		grades: gradesReducer,
 		positions: positionsReducer,
 		defaultCombinations: defaultCombinationsReducer,
+		fiscalPeriods: fiscalPeriodsReducer,
+		glPeriods: glPeriodsReducer,
+		apPeriods: apPeriodsReducer,
+		arPeriods: arPeriodsReducer,
 	},
 });
 
