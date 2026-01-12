@@ -16,6 +16,7 @@ import { fetchCustomers } from "../../store/customersSlice";
 import { fetchSuppliers } from "../../store/suppliersSlice";
 import { fetchTaxRates } from "../../store/taxRatesSlice";
 import { fetchCountries } from "../../store/countriesSlice";
+import { fetchDefaultGLSegments, clearDefaultGLSegments } from "../../store/defaultCombinationsSlice";
 // Static country options with ids expected by backend
 // const countries = [
 // 	{ value: 1, code: "AE", label: "United Arab Emirates (AE)" },
@@ -48,6 +49,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 	const { taxRates } = useSelector(state => state.taxRates);
 	const { countries: fetchedCountries } = useSelector(state => state.countries);
 	const { loading: invoiceLoading } = useSelector(state => (isAPInvoice ? state.apInvoices : state.arInvoices));
+	const { defaultGLSegments } = useSelector(state => state.defaultCombinations);
 
 	const countries = fetchedCountries.map(country => ({
 		value: country.id,
@@ -81,13 +83,23 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 
 	const [goodsReceipt, setGoodsReceipt] = useState("");
 
+	// Track if default segments have been applied to avoid duplicate application
+	const [defaultSegmentsApplied, setDefaultSegmentsApplied] = useState(false);
+
 	// Fetch required data on mount
 	useEffect(() => {
 		dispatch(fetchCurrencies());
 		dispatch(fetchCustomers());
 		dispatch(fetchSuppliers());
 		dispatch(fetchCountries());
-	}, [dispatch]);
+		// Fetch default GL segments for the invoice type
+		const transactionType = isAPInvoice ? "AP_INVOICE" : "AR_INVOICE";
+		dispatch(fetchDefaultGLSegments(transactionType));
+
+		return () => {
+			dispatch(clearDefaultGLSegments());
+		};
+	}, [dispatch, isAPInvoice]);
 
 	// Fetch tax rates when country changes
 	useEffect(() => {
@@ -151,6 +163,17 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 
 	const invoiceTotalAmount = invoiceSubtotal + invoiceTaxAmount;
 
+	// Convert default GL segments from API format to GLLinesSection format
+	const getDefaultCreditSegments = () => {
+		if (!defaultGLSegments?.segments || !Array.isArray(defaultGLSegments.segments)) {
+			return [];
+		}
+		return defaultGLSegments.segments.map(seg => ({
+			segment_type_id: seg.segment_type_id,
+			segment_code: seg.segment_code,
+		}));
+	};
+
 	// Automatically manage CREDIT line to match invoice total
 	useEffect(() => {
 		if (invoiceTotalAmount > 0) {
@@ -167,18 +190,42 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 					);
 				}
 			} else {
-				// Create default CREDIT line
+				// Create default CREDIT line with default segments from API
+				const defaultSegments = getDefaultCreditSegments();
 				const newCreditLine = {
 					id: creditLineId,
 					type: "CREDIT",
 					amount: invoiceTotalAmount.toFixed(2),
-					segments: [],
+					segments: defaultSegments,
 					isAutoCredit: true, // Flag to identify this as the auto-managed CREDIT line
 				};
 				setGLLines(prev => [newCreditLine, ...prev]);
+				if (defaultSegments.length > 0) {
+					setDefaultSegmentsApplied(true);
+				}
 			}
 		}
-	}, [invoiceTotalAmount, glLines]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [invoiceTotalAmount]);
+
+	// Apply default segments to existing CREDIT line when defaultGLSegments is loaded
+	useEffect(() => {
+		if (defaultGLSegments?.segments && !defaultSegmentsApplied) {
+			const creditLineId = "auto-credit-line";
+			const existingCreditLine = glLines.find(line => line.id === creditLineId);
+
+			if (existingCreditLine && existingCreditLine.segments.length === 0) {
+				const defaultSegments = getDefaultCreditSegments();
+				if (defaultSegments.length > 0) {
+					setGLLines(prev =>
+						prev.map(line => (line.id === creditLineId ? { ...line, segments: defaultSegments } : line))
+					);
+					setDefaultSegmentsApplied(true);
+				}
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [defaultGLSegments, glLines, defaultSegmentsApplied]);
 
 	// Get selected currency code for formatting
 	const selectedCurrency = currencies.find(c => c.id === parseInt(invoiceForm.currency));

@@ -25,6 +25,7 @@ export const buildInvoiceTableData = (invoices, type = "AP") => {
 	return invoices.map(invoice => ({
 		id: invoice.invoice_id || invoice.id || invoice.number,
 		invoice: invoice.invoice_id || invoice.id || invoice.number || "-",
+		invoice_number: invoice.invoice_number || invoice.number || "-",
 		entityId: partyIdField ? invoice[partyIdField] || null : null,
 		customer: invoice[partyField] || "-",
 		date: invoice.date || invoice.invoice_date || "-",

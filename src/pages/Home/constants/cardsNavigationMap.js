@@ -12,6 +12,7 @@ export const cardNavigationMap = {
 	"Accounts Payable": "/ap-invoices",
 	"One-Time Supplier Invoices": "/one-time-supplier-invoices",
 	"Default Values": "/default-values",
+	"Payment Types": "/payment-types",
 	"AR Manage Periods": "/fiscal-periods/ar",
 	"AP Manage Periods": "/fiscal-periods/ap",
 	"GL Manage Periods": "/fiscal-periods/gl",

@@ -74,6 +74,11 @@ export const getCardsData = t => ({
 			description: t("defaultValues.subtitle"),
 			key: "Default Values",
 		},
+		{
+			title: t("home.cards.paymentTypes.title"),
+			description: t("home.cards.paymentTypes.description"),
+			key: "Payment Types",
+		},
 	],
 	Assets: [
 		{
@@ -152,8 +157,7 @@ export const getCardsData = t => ({
 			title: t("home.cards.fiscalPeriods.arTitle"),
 			description: t("home.cards.fiscalPeriods.arDescription"),
 			key: "AR Manage Periods",
-		
-		}, 
+		},
 		{
 			title: t("home.cards.fiscalPeriods.apTitle"),
 			description: t("home.cards.fiscalPeriods.apDescription"),
@@ -168,6 +172,23 @@ export const getCardsData = t => ({
 			title: t("home.cards.fiscalPeriods.setFiscalYear"),
 			description: t("home.cards.fiscalPeriods.setFiscalYearDescription"),
 			key: "Set Fiscal Year",
-		}
-	]
+		},
+	],
+	Banks: [
+		{
+			title: t("home.cards.banks.title"),
+			description: t("home.cards.banks.description"),
+			key: "Banks Manage",
+		},
+		{
+			title: t("home.cards.bankReconciliation.title"),
+			description: t("home.cards.bankReconciliation.description"),
+			key: "Bank Reconciliation",
+		},
+		{
+			title: t("home.cards.bankStatements.title"),
+			description: t("home.cards.bankStatements.description"),
+			key: "Bank Statements",
+		},
+	],
 });

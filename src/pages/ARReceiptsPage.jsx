@@ -33,7 +33,9 @@ const ARReceiptsPage = () => {
 	const dispatch = useDispatch();
 
 	// Get data from Redux
-	const { payments, loading, count, page, hasNext, hasPrevious, currentPayment } = useSelector(state => state.arPayments);
+	const { payments, loading, count, page, hasNext, hasPrevious, currentPayment } = useSelector(
+		state => state.arPayments
+	);
 	const { customers } = useSelector(state => state.customers);
 	const { currencies } = useSelector(state => state.currencies);
 
@@ -295,7 +297,7 @@ const ARReceiptsPage = () => {
 			await dispatch(fetchARPaymentDetails(payment.id)).unwrap();
 			setIsCreateModalOpen(true);
 		} catch (error) {
-			toast.error(error || 'Failed to load payment details');
+			toast.error(error || "Failed to load payment details");
 		}
 	};
 
@@ -450,7 +452,7 @@ const ARReceiptsPage = () => {
 							searchable={false}
 						/>
 					</div>
-					{/* Row 2: Currency, GL Entry Posted, buttons */}
+					{/* Row 2: Currency, Has Allocations, buttons */}
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
 						<FloatingLabelSelect
 							label={t("payments.filters.currency")}

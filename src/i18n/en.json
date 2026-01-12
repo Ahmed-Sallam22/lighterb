@@ -62,7 +62,8 @@
 			"apPayments": "AP Payments",
 			"reports": "Reports",
 			"workStructure": "Work Structure",
-			"fiscalPeriods": "Fiscal Periods"
+			"fiscalPeriods": "Fiscal Periods",
+			"banks": "Banks"
 		},
 		"cards": {
 			"setup": {
@@ -190,6 +191,22 @@
 				"glDescription": "Define and manage fiscal periods for the general ledger.",
 				"setFiscalYear": "Set Fiscal Year",
 				"setFiscalYearDescription": "Establish the fiscal year for financial reporting and accounting."
+			},
+			"paymentTypes": {
+				"title": "Payment Types",
+				"description": "Manage payment methods and types"
+			},
+			"banks": {
+				"title": "Banks",
+				"description": "Manage bank accounts and details"
+			},
+			"bankReconciliation": {
+				"title": "Bank Reconciliation",
+				"description": "Match payments with bank statement lines"
+			},
+			"bankStatements": {
+				"title": "Bank Statements",
+				"description": "Manage bank Statements"
 			}
 		}
 	},
@@ -320,6 +337,7 @@
 		},
 		"table": {
 			"invoice": "Invoice",
+			"invoiceNumber": "Invoice Number",
 			"supplier": "Supplier",
 			"date": "Date",
 			"dueDate": "Due Date",
@@ -2385,6 +2403,10 @@
 		"currency": "Currency",
 		"selectCurrency": "Select Currency",
 		"exchangeRate": "Exchange Rate",
+		"paymentMethod": "Payment Method",
+		"selectPaymentMethod": "Select Payment Method",
+		"bankAccount": "Bank Account",
+		"selectBankAccount": "Select Bank Account",
 		"allocations": "Allocations (Invoices)",
 		"allocationsSubtitle": "Allocate payment amounts to invoices",
 		"addAllocation": "Add Invoice Allocation",
@@ -3874,6 +3896,609 @@
 			"openSuccess": "AR period opened successfully",
 			"closeSuccess": "AR period closed successfully",
 			"actionError": "Failed to perform action on AR period"
+		}
+	},
+	"banks": {
+		"title": "Banks",
+		"subtitle": "Manage banking institutions and financial partners",
+		"pageTitle": "Banks",
+		"addBank": "Add Bank",
+		"emptyMessage": "No banks found",
+		"filters": {
+			"country": "Country",
+			"status": "Status",
+			"allCountries": "All Countries",
+			"allStatuses": "All Statuses",
+			"active": "Active",
+			"inactive": "Inactive",
+			"clear": "Clear Filters"
+		},
+		"table": {
+			"bankName": "Bank Name",
+			"bankCode": "Bank Code",
+			"country": "Country",
+			"swiftCode": "SWIFT Code",
+			"totalBranches": "Branches",
+			"totalAccounts": "Accounts",
+			"branches": "Branches",
+			"accounts": "Accounts",
+			"active": "Active"
+		},
+		"form": {
+			"bankName": "Bank Name",
+			"bankCode": "Bank Code",
+			"country": "Country",
+			"swiftCode": "SWIFT Code",
+			"routingNumber": "Routing Number",
+			"website": "Website",
+			"contactEmail": "Contact Email",
+			"contactPhone": "Contact Phone",
+			"notes": "Notes",
+			"active": "Active"
+		},
+		"modal": {
+			"titleAdd": "Add New Bank",
+			"titleEdit": "Edit Bank",
+			"save": "Save",
+			"saving": "Saving...",
+			"cancel": "Cancel"
+		},
+		"validation": {
+			"bankNameRequired": "Bank name is required",
+			"bankCodeRequired": "Bank code is required",
+			"countryRequired": "Country is required"
+		},
+		"messages": {
+			"createSuccess": "Bank created successfully",
+			"updateSuccess": "Bank updated successfully",
+			"deleteSuccess": "Bank deleted successfully",
+			"saveError": "Failed to save bank",
+			"deleteError": "Failed to delete bank",
+			"activated": "Bank activated successfully",
+			"deactivated": "Bank deactivated successfully",
+			"updateError": "Failed to update bank status"
+		},
+		"deleteConfirm": {
+			"title": "Delete Bank",
+			"message": "Are you sure you want to delete the bank \"{{name}}\"? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
+		}
+	},
+	"bankDetails": {
+		"title": "Bank Details",
+		"subtitle": "View and manage bank branches and accounts",
+		"backToBanks": "Back to Banks",
+		"tabs": {
+			"branches": "Branches",
+			"accounts": "Bank Accounts"
+		},
+		"header": {
+			"bankName": "Bank Name",
+			"country": "Country",
+			"swiftCode": "SWIFT Code",
+			"statistics": "Statistics",
+			"branches": "Branches",
+			"accounts": "Accounts"
+		},
+		"status": {
+			"active": "Active",
+			"inactive": "Inactive",
+			"frozen": "Frozen"
+		},
+		"branchesSection": {
+			"title": "Bank Branches",
+			"addBranch": "Add Branch"
+		},
+		"accountsSection": {
+			"title": "Bank Accounts",
+			"addAccount": "Add Account"
+		},
+		"branchTable": {
+			"branchName": "Branch Name",
+			"branchCode": "Branch Code",
+			"city": "City",
+			"country": "Country",
+			"totalAccounts": "Accounts",
+			"active": "Active"
+		},
+		"accountTable": {
+			"accountNumber": "Account Number",
+			"accountName": "Account Name",
+			"accountType": "Type",
+			"branch": "Branch",
+			"currency": "Currency",
+			"currentBalance": "Balance",
+			"active": "Active",
+			"frozen": "Frozen",
+			"status": "Status"
+		},
+		"accountTypes": {
+			"current": "Current",
+			"savings": "Savings",
+			"fixed_deposit": "Fixed Deposit",
+			"loan": "Loan",
+			"overdraft": "Overdraft"
+		},
+		"branchModal": {
+			"titleAdd": "Add New Branch",
+			"titleEdit": "Edit Branch"
+		},
+		"branchForm": {
+			"branchName": "Branch Name",
+			"branchCode": "Branch Code",
+			"address": "Address",
+			"city": "City",
+			"state": "State/Province",
+			"postalCode": "Postal Code",
+			"country": "Country",
+			"swiftCode": "SWIFT Code",
+			"contactPhone": "Contact Phone",
+			"contactEmail": "Contact Email",
+			"managerName": "Manager Name",
+			"notes": "Notes",
+			"active": "Active"
+		},
+		"accountModal": {
+			"titleAdd": "Add New Account",
+			"titleEdit": "Edit Account"
+		},
+		"accountForm": {
+			"accountNumber": "Account Number",
+			"accountName": "Account Name",
+			"accountType": "Account Type",
+			"transactionType": "Transaction Type",
+			"selectTransactionType": "Select Transaction Type",
+			"bankTransfer": "Bank Transfer",
+			"cash": "Cash",
+			"check": "Check",
+			"branch": "Branch",
+			"currency": "Currency",
+			"openingBalance": "Opening Balance",
+			"openingDate": "Opening Date",
+			"iban": "IBAN",
+			"cashGLSegments": "Cash GL Segments",
+			"cashClearingGLSegments": "Cash Clearing GL Segments",
+			"selectSegment": "Select...",
+			"glCombinations": "GL Combinations",
+			"cashGLCombination": "Cash GL Combination",
+			"cashClearingGLCombination": "Cash Clearing GL Combination",
+			"glCombinationPlaceholder": "Enter GL Combination ID",
+			"description": "Description",
+			"active": "Active",
+			"frozen": "Frozen"
+		},
+		"balanceModal": {
+			"title": "Update Account Balance",
+			"account": "Account",
+			"currentBalance": "Current Balance",
+			"amount": "Amount",
+			"transactionType": "Transaction Type",
+			"increase": "Increase",
+			"decrease": "Decrease",
+			"description": "Description",
+			"update": "Update Balance"
+		},
+		"viewAccountModal": {
+			"title": "Account Details",
+			"bank": "Bank"
+		},
+		"accountActions": {
+			"updateBalance": "Update Balance",
+			"freezeUnfreeze": "Freeze/Unfreeze"
+		},
+		"modal": {
+			"save": "Save",
+			"saving": "Saving...",
+			"cancel": "Cancel"
+		},
+		"validation": {
+			"branchNameRequired": "Branch name is required",
+			"branchCodeRequired": "Branch code is required",
+			"countryRequired": "Country is required",
+			"accountNumberRequired": "Account number is required",
+			"accountNameRequired": "Account name is required",
+			"branchRequired": "Branch is required",
+			"currencyRequired": "Currency is required"
+		},
+		"messages": {
+			"branchActivated": "Branch activated successfully",
+			"branchDeactivated": "Branch deactivated successfully",
+			"branchUpdateError": "Failed to update branch status",
+			"branchCreateSuccess": "Branch created successfully",
+			"branchUpdateSuccess": "Branch updated successfully",
+			"branchDeleteSuccess": "Branch deleted successfully",
+			"branchSaveError": "Failed to save branch",
+			"branchDeleteError": "Failed to delete branch",
+			"accountActivated": "Account activated successfully",
+			"accountDeactivated": "Account deactivated successfully",
+			"accountUpdateError": "Failed to update account status",
+			"accountCreateSuccess": "Account created successfully",
+			"accountUpdateSuccess": "Account updated successfully",
+			"accountDeleteSuccess": "Account deleted successfully",
+			"accountSaveError": "Failed to save account",
+			"accountDeleteError": "Failed to delete account",
+			"accountFrozen": "Account frozen successfully",
+			"accountUnfrozen": "Account unfrozen successfully",
+			"freezeError": "Failed to freeze/unfreeze account",
+			"balanceUpdateSuccess": "Balance updated successfully",
+			"balanceUpdateError": "Failed to update balance",
+			"invalidAmount": "Please enter a valid amount",
+			"noBranchesForAccount": "Please create a branch first before adding accounts"
+		},
+		"deleteBranchConfirm": {
+			"title": "Delete Branch",
+			"message": "Are you sure you want to delete the branch \"{{name}}\"? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
+		},
+		"deleteAccountConfirm": {
+			"title": "Delete Account",
+			"message": "Are you sure you want to delete the account \"{{name}}\"? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
+		}
+	},
+	"paymentTypes": {
+		"title": "Payment Types",
+		"subtitle": "Manage payment methods and types for financial transactions",
+		"pageTitle": "Payment Types",
+		"addPaymentType": "Add Payment Type",
+		"emptyMessage": "No payment types found",
+		"filters": {
+			"status": "Status",
+			"allStatus": "All Statuses",
+			"active": "Active",
+			"inactive": "Inactive"
+		},
+		"table": {
+			"methodName": "Method Name",
+			"methodCode": "Method Code",
+			"enableReconcile": "Enable Reconcile",
+			"active": "Active"
+		},
+		"form": {
+			"methodCode": "Method Code",
+			"methodName": "Method Name",
+			"description": "Description",
+			"enableReconcile": "Enable Reconcile",
+			"active": "Active"
+		},
+		"modal": {
+			"titleAdd": "Add New Payment Type",
+			"titleEdit": "Edit Payment Type",
+			"save": "Save",
+			"saving": "Saving...",
+			"cancel": "Cancel"
+		},
+		"viewModal": {
+			"title": "Payment Type Details",
+			"createdAt": "Created At",
+			"updatedAt": "Updated At",
+			"close": "Close"
+		},
+		"validation": {
+			"codeRequired": "Method code is required",
+			"nameRequired": "Method name is required"
+		},
+		"messages": {
+			"createSuccess": "Payment type created successfully",
+			"updateSuccess": "Payment type updated successfully",
+			"deleteSuccess": "Payment type deleted successfully",
+			"saveError": "Failed to save payment type",
+			"deleteError": "Failed to delete payment type",
+			"activated": "Payment type activated successfully",
+			"deactivated": "Payment type deactivated successfully",
+			"updateActiveError": "Failed to update payment type status",
+			"updateError": "Failed to update payment type",
+			"fetchError": "Failed to fetch payment type details"
+		},
+		"deleteConfirm": {
+			"title": "Delete Payment Type",
+			"message": "Are you sure you want to delete the payment type \"{{name}}\"? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
+		}
+	},
+	"bankStatements": {
+		"title": "Bank Statements",
+		"subtitle": "Manage and import bank statements for reconciliation",
+		"pageTitle": "Bank Statements",
+		"addStatement": "Add Statement",
+		"manageFiles": "Manage Files",
+		"emptyMessage": "No bank statements found",
+		"filters": {
+			"bankAccount": "Bank Account",
+			"allAccounts": "All Accounts",
+			"reconciliationStatus": "Status",
+			"dateFrom": "From Date",
+			"dateTo": "To Date"
+		},
+		"reconciliationStatus": {
+			"": "All Statuses",
+			"unreconciled": "Unreconciled",
+			"partially_reconciled": "Partially Reconciled",
+			"reconciled": "Reconciled",
+			"pending": "Pending"
+		},
+		"table": {
+			"statementNumber": "Statement #",
+			"bankAccount": "Bank Account",
+			"statementDate": "Statement Date",
+			"period": "Period",
+			"openingBalance": "Opening Balance",
+			"closingBalance": "Closing Balance",
+			"lines": "Lines",
+			"reconciliationStatus": "Status"
+		},
+		"form": {
+			"bankAccount": "Bank Account",
+			"statementNumber": "Statement Number",
+			"statementDate": "Statement Date",
+			"fromDate": "From Date",
+			"toDate": "To Date",
+			"openingBalance": "Opening Balance",
+			"closingBalance": "Closing Balance",
+			"transactionCount": "Transaction Count",
+			"totalDebits": "Total Debits",
+			"totalCredits": "Total Credits",
+			"importFileName": "Import File Name"
+		},
+		"modal": {
+			"titleAdd": "Add New Statement",
+			"titleEdit": "Edit Statement",
+			"save": "Save",
+			"saving": "Saving...",
+			"cancel": "Cancel"
+		},
+		"validation": {
+			"bankAccountRequired": "Bank account is required",
+			"statementNumberRequired": "Statement number is required",
+			"statementDateRequired": "Statement date is required",
+			"fromDateRequired": "From date is required",
+			"toDateRequired": "To date is required"
+		},
+		"messages": {
+			"createSuccess": "Statement created successfully",
+			"updateSuccess": "Statement updated successfully",
+			"deleteSuccess": "Statement deleted successfully",
+			"saveError": "Failed to save statement",
+			"deleteError": "Failed to delete statement",
+			"templateDownloaded": "Template downloaded successfully",
+			"templateDownloadError": "Failed to download template",
+			"invalidFileType": "Invalid file type. Please select an Excel or CSV file.",
+			"selectFile": "Please select a file to import",
+			"selectBankAccount": "Please select a bank account",
+			"previewError": "Failed to validate import file",
+			"importSuccess": "Statement imported successfully",
+			"importError": "Failed to import statement"
+		},
+		"deleteConfirm": {
+			"title": "Delete Statement",
+			"message": "Are you sure you want to delete statement \"{{number}}\"? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
+		},
+		"actions": {
+			"viewLines": "View Lines"
+		},
+		"manageFilesModal": {
+			"title": "Manage Files",
+			"downloadTemplate": "Download Template",
+			"downloadTemplateDesc": "Download an Excel template to prepare your bank statement data for import.",
+			"downloading": "Downloading...",
+			"downloadBtn": "Download Template",
+			"or": "OR",
+			"importFile": "Import Statement",
+			"importFileDesc": "Upload an Excel or CSV file with bank statement data to import.",
+			"selectBankAccount": "Select Bank Account",
+			"clickToUpload": "Click to select a file",
+			"acceptedFormats": "Accepted formats: .xlsx, .xls, .csv",
+			"validating": "Validating...",
+			"validateAndPreview": "Validate & Preview",
+			"previewTitle": "Import Preview",
+			"fromDate": "From Date",
+			"toDate": "To Date",
+			"transactionCount": "Transactions",
+			"totalDebits": "Total Debits",
+			"totalCredits": "Total Credits",
+			"linesPreview": "Lines Preview",
+			"date": "Date",
+			"description": "Description",
+			"amount": "Amount",
+			"andMore": "...and {{count}} more lines",
+			"back": "Back",
+			"importing": "Importing...",
+			"confirmImport": "Confirm Import",
+			"importingStatement": "Importing statement..."
+		}
+	},
+	"statementLines": {
+		"title": "Statement Lines",
+		"subtitle": "View and manage bank statement transaction lines",
+		"pageTitle": "Transaction Lines",
+		"backToStatements": "Back to Statements",
+		"emptyMessage": "No statement lines found",
+		"filters": {
+			"transactionType": "Transaction Type",
+			"reconciliationStatus": "Status"
+		},
+		"transactionType": {
+			"": "All Types",
+			"credit": "Credit",
+			"debit": "Debit"
+		},
+		"reconciliationStatus": {
+			"": "All Statuses",
+			"unreconciled": "Unreconciled",
+			"reconciled": "Reconciled"
+		},
+		"table": {
+			"lineNumber": "Line #",
+			"transactionDate": "Trans. Date",
+			"valueDate": "Value Date",
+			"transactionType": "Type",
+			"amount": "Amount",
+			"referenceNumber": "Reference",
+			"description": "Description",
+			"reconciliationStatus": "Status"
+		},
+		"statementInfo": {
+			"title": "Statement Information",
+			"statementNumber": "Statement #",
+			"bankAccount": "Bank Account",
+			"period": "Period",
+			"openingBalance": "Opening Balance",
+			"closingBalance": "Closing Balance",
+			"lineCount": "Lines"
+		},
+		"viewModal": {
+			"title": "Line Details",
+			"statementInfo": "Statement Information",
+			"statementNumber": "Statement Number",
+			"statementDate": "Statement Date",
+			"bankAccount": "Bank Account",
+			"lineNumber": "Line Number",
+			"transactionType": "Transaction Type",
+			"transactionDate": "Transaction Date",
+			"valueDate": "Value Date",
+			"amount": "Amount",
+			"balanceAfter": "Balance After",
+			"referenceNumber": "Reference Number",
+			"reconciliationStatus": "Reconciliation Status",
+			"description": "Description",
+			"matchedPayment": "Matched Payment",
+			"reconciledDate": "Reconciled Date",
+			"reconciledBy": "Reconciled By",
+			"notes": "Notes",
+			"createdAt": "Created",
+			"updatedAt": "Updated",
+			"close": "Close"
+		},
+		"messages": {
+			"fetchError": "Failed to fetch line details",
+			"deleteSuccess": "Line deleted successfully",
+			"deleteError": "Failed to delete line"
+		},
+		"deleteConfirm": {
+			"title": "Delete Statement Line",
+			"message": "Are you sure you want to delete line #{{lineNumber}}? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
+		}
+	},
+	"matches": {
+		"title": "Bank Reconciliation Matches",
+		"subtitle": "Manage payment and statement line matching for bank reconciliation",
+		"pageTitle": "Reconciliation Matches",
+		"createReconciliation": "Create Reconciliation",
+		"emptyMessage": "No matches found",
+		"filters": {
+			"matchStatus": "Match Status",
+			"matchType": "Match Type",
+			"allStatuses": "All Statuses",
+			"allTypes": "All Types"
+		},
+		"matchStatus": {
+			"matched": "Matched",
+			"partial": "Partial",
+			"unmatched": "Unmatched",
+			"pending": "Pending"
+		},
+		"matchType": {
+			"auto": "Automatic",
+			"manual": "Manual",
+			"suggested": "Suggested"
+		},
+		"table": {
+			"id": "ID",
+			"statementLine": "Statement Line",
+			"payment": "Payment",
+			"matchStatus": "Status",
+			"matchType": "Type",
+			"confidenceScore": "Confidence",
+			"discrepancy": "Discrepancy",
+			"matchedBy": "Matched By",
+			"matchedAt": "Matched At"
+		},
+		"editModal": {
+			"title": "Edit Match",
+			"matchStatus": "Match Status",
+			"notes": "Notes",
+			"save": "Save Changes",
+			"saving": "Saving...",
+			"cancel": "Cancel"
+		},
+		"viewModal": {
+			"title": "Match Details",
+			"matchInfo": "Match Information",
+			"id": "Match ID",
+			"matchStatus": "Match Status",
+			"matchType": "Match Type",
+			"confidenceScore": "Confidence Score",
+			"discrepancyAmount": "Discrepancy Amount",
+			"matchedBy": "Matched By",
+			"matchedAt": "Matched At",
+			"statementLineDetails": "Bank Statement Line Details",
+			"statementNumber": "Statement Number",
+			"lineNumber": "Line Number",
+			"transactionType": "Transaction Type",
+			"amount": "Amount",
+			"transactionDate": "Transaction Date",
+			"valueDate": "Value Date",
+			"referenceNumber": "Reference Number",
+			"description": "Description",
+			"reconciliationStatus": "Reconciliation Status",
+			"reconciledDate": "Reconciled Date",
+			"reconciledBy": "Reconciled By",
+			"paymentDetails": "Payment Details",
+			"paymentId": "Payment ID",
+			"paymentDate": "Payment Date",
+			"paymentType": "Payment Type",
+			"businessPartner": "Business Partner",
+			"currency": "Currency",
+			"approvalStatus": "Approval Status",
+			"paymentReconciliationStatus": "Payment Reconciliation Status",
+			"notes": "Notes",
+			"close": "Close",
+			"noData": "No data available"
+		},
+		"reconcileModal": {
+			"title": "Create Reconciliation",
+			"payments": "Payments",
+			"paymentsDesc": "Select an unreconciled payment to match",
+			"noPayments": "No unreconciled payments available",
+			"statementLines": "Bank Statement Lines",
+			"statementLinesDesc": "Select an unreconciled statement line to match",
+			"noStatementLines": "No unreconciled statement lines available",
+			"matchDetails": "Match Details",
+			"confidenceScore": "Confidence Score (0-1)",
+			"discrepancyAmount": "Discrepancy Amount",
+			"notes": "Notes",
+			"notesPlaceholder": "Add any notes about this reconciliation...",
+			"selectedSummary": "Selected Items",
+			"payment": "Payment",
+			"statementLine": "Statement Line",
+			"match": "Match",
+			"matching": "Matching...",
+			"cancel": "Cancel"
+		},
+		"messages": {
+			"createSuccess": "Match created successfully",
+			"createError": "Failed to create match",
+			"updateSuccess": "Match updated successfully",
+			"updateError": "Failed to update match",
+			"deleteSuccess": "Match deleted successfully",
+			"deleteError": "Failed to delete match",
+			"fetchError": "Failed to fetch match details",
+			"selectPayment": "Please select a payment",
+			"selectStatementLine": "Please select a statement line"
+		},
+		"deleteConfirm": {
+			"title": "Delete Match",
+			"message": "Are you sure you want to delete match #{{id}}? This action cannot be undone.",
+			"confirm": "Delete",
+			"cancel": "Cancel"
 		}
 	}
 }

@@ -36,6 +36,13 @@ import fiscalPeriodsReducer from "./fiscalPeriodsSlice";
 import glPeriodsReducer from "./glPeriodsSlice";
 import apPeriodsReducer from "./apPeriodsSlice";
 import arPeriodsReducer from "./arPeriodsSlice";
+import banksReducer from "./banksSlice";
+import branchesReducer from "./branchesSlice";
+import bankAccountsReducer from "./bankAccountsSlice";
+import paymentTypesReducer from "./paymentTypesSlice";
+import bankStatementsReducer from "./bankStatementsSlice";
+import statementLinesReducer from "./statementLinesSlice";
+import matchesReducer from "./matchesSlice";
 
 export const store = configureStore({
 	reducer: {
@@ -76,6 +83,13 @@ export const store = configureStore({
 		glPeriods: glPeriodsReducer,
 		apPeriods: apPeriodsReducer,
 		arPeriods: arPeriodsReducer,
+		banks: banksReducer,
+		branches: branchesReducer,
+		bankAccounts: bankAccountsReducer,
+		paymentTypes: paymentTypesReducer,
+		bankStatements: bankStatementsReducer,
+		statementLines: statementLinesReducer,
+		matches: matchesReducer,
 	},
 });
 

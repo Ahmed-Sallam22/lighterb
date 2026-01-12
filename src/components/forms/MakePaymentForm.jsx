@@ -11,6 +11,8 @@ import { fetchCurrencies } from "../../store/currenciesSlice";
 import { fetchSuppliers } from "../../store/suppliersSlice";
 import { fetchAPInvoices } from "../../store/apInvoicesSlice";
 import { fetchSegmentTypes } from "../../store/segmentsSlice";
+import { fetchPaymentTypes } from "../../store/paymentTypesSlice";
+import { fetchBankAccounts } from "../../store/bankAccountsSlice";
 import { createAPPayment, updateAPPayment } from "../../store/apPaymentsSlice";
 import { FaTrash, FaPlus, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
@@ -25,6 +27,8 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 	const { invoices: apInvoices } = useSelector(state => state.apInvoices);
 	const { loading } = useSelector(state => state.apPayments);
 	const { types: segmentTypes = [] } = useSelector(state => state.segments);
+	const { paymentTypes } = useSelector(state => state.paymentTypes);
+	const { accounts: bankAccounts } = useSelector(state => state.bankAccounts);
 
 	// Check if we're in edit mode
 	const editPayment = editPaymentData || location.state?.payment;
@@ -40,6 +44,8 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 		business_partner_id: "",
 		currency_id: "",
 		exchange_rate: "",
+		payment_method_id: "",
+		bank_account_id: "",
 	});
 
 	// Allocations state
@@ -59,7 +65,17 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 		dispatch(fetchCurrencies({ page_size: 100 }));
 		dispatch(fetchSuppliers({ page_size: 100 }));
 		dispatch(fetchSegmentTypes());
+		dispatch(fetchPaymentTypes({ page: 1, page_size: 100, is_active: true }));
 	}, [dispatch]);
+
+	// Fetch bank accounts when currency changes
+	useEffect(() => {
+		if (paymentForm.currency_id) {
+			dispatch(
+				fetchBankAccounts({ page: 1, page_size: 100, is_active: true, currency: paymentForm.currency_id })
+			);
+		}
+	}, [dispatch, paymentForm.currency_id]);
 
 	// Fetch invoices when supplier is selected
 	useEffect(() => {
@@ -82,6 +98,8 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 				business_partner_id: editPayment.business_partner_id || editPayment.supplier || "",
 				currency_id: editPayment.currency_id || editPayment.currency || "",
 				exchange_rate: editPayment.exchange_rate || "1.0000",
+				payment_method_id: editPayment.payment_method_id || editPayment.payment_method || "",
+				bank_account_id: editPayment.bank_account_id || editPayment.bank_account || "",
 			});
 
 			if (editPayment.allocations && Array.isArray(editPayment.allocations)) {
@@ -139,7 +157,17 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 
 	const invoiceOptions = (apInvoices || []).map(invoice => ({
 		value: invoice.invoice_id,
-		label: `#${invoice.invoice_id}`,
+		label: `#${invoice.invoice_number}`,
+	}));
+
+	const paymentMethodOptions = (paymentTypes || []).map(method => ({
+		value: method.id,
+		label: `${method.payment_method_code} - ${method.payment_method_name}` || `Payment Method #${method.id}`,
+	}));
+
+	const bankAccountOptions = (bankAccounts || []).map(account => ({
+		value: account.id,
+		label: account.account_name || account.account_number || `Account #${account.id}`,
 	}));
 
 	// Handlers
@@ -253,6 +281,8 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 			business_partner_id: parseInt(paymentForm.business_partner_id),
 			currency_id: parseInt(paymentForm.currency_id),
 			exchange_rate: paymentForm.exchange_rate || "1.0000",
+			payment_method_id: paymentForm.payment_method_id ? parseInt(paymentForm.payment_method_id) : null,
+			bank_account_id: paymentForm.bank_account_id ? parseInt(paymentForm.bank_account_id) : null,
 			allocations: validAllocations.map(a => ({
 				invoice_id: parseInt(a.invoice_id),
 				amount_allocated: parseFloat(a.amount_allocated).toFixed(2),
@@ -324,6 +354,23 @@ const MakePaymentForm = ({ onCancel, onSuccess, editPaymentData }) => {
 						value={paymentForm.exchange_rate}
 						onChange={handleChange}
 						placeholder="1.0000"
+					/>
+					<FloatingLabelSelect
+						label={t("paymentForm.paymentMethod")}
+						name="payment_method_id"
+						value={paymentForm.payment_method_id}
+						onChange={handleChange}
+						options={paymentMethodOptions}
+						placeholder={t("paymentForm.selectPaymentMethod")}
+					/>
+					<FloatingLabelSelect
+						label={t("paymentForm.bankAccount")}
+						name="bank_account_id"
+						value={paymentForm.bank_account_id}
+						onChange={handleChange}
+						options={bankAccountOptions}
+						placeholder={t("paymentForm.selectBankAccount")}
+						disabled={!paymentForm.currency_id}
 					/>
 				</div>
 			</div>

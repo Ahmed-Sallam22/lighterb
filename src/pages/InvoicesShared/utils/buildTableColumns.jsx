@@ -8,6 +8,11 @@ export const buildInvoiceTableColumns = (customerLabel = "Customer", t) => [
 		render: value => <span className="font-semibold text-blue-600">{value}</span>,
 	},
 	{
+		header: t("apInvoices.table.invoiceNumber"),
+		accessor: "invoice_number",
+		render: value => <span className="text-gray-700">{value}</span>,
+	},
+	{
 		header: customerLabel,
 		accessor: "customer",
 	},

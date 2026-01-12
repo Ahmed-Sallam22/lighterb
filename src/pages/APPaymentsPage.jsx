@@ -33,7 +33,9 @@ const APPaymentsPage = () => {
 	const dispatch = useDispatch();
 
 	// Get data from Redux
-	const { payments, loading, count, page, hasNext, hasPrevious, currentPayment, detailsLoading } = useSelector(state => state.apPayments);
+	const { payments, loading, count, page, hasNext, hasPrevious, currentPayment, detailsLoading } = useSelector(
+		state => state.apPayments
+	);
 	const { suppliers } = useSelector(state => state.suppliers);
 	const { currencies } = useSelector(state => state.currencies);
 
@@ -295,7 +297,7 @@ const APPaymentsPage = () => {
 			await dispatch(fetchAPPaymentDetails(payment.id)).unwrap();
 			setIsCreateModalOpen(true);
 		} catch (error) {
-			toast.error(error || 'Failed to load payment details');
+			toast.error(error || "Failed to load payment details");
 		}
 	};
 

@@ -38,6 +38,7 @@ const GLLinesSection = ({
 	glEntry = {},
 	onGlEntryChange,
 	showGlEntryHeader = true,
+	showTypeAndAmount = true,
 	title = "GL Lines",
 	className = "",
 	invoiceTotal = 0,
@@ -233,25 +234,29 @@ const GLLinesSection = ({
 							<div
 								className="grid gap-3 p-3 bg-gray-50 border-b border-gray-200 rounded-t-lg"
 								style={{
-									gridTemplateColumns: `150px 150px ${segmentTypes
-										.map(() => "minmax(180px, 1fr)")
-										.join(" ")} 60px`,
+									gridTemplateColumns: showTypeAndAmount
+										? `150px 150px ${segmentTypes.map(() => "minmax(180px, 1fr)").join(" ")} 60px`
+										: `${segmentTypes.map(() => "minmax(180px, 1fr)").join(" ")} 60px`,
 								}}
 							>
-								<div
-									className={`text-sm font-medium text-gray-600 ${
-										isRtl ? "text-right" : "text-left"
-									}`}
-								>
-									{t("glLines.type")}
-								</div>
-								<div
-									className={`text-sm font-medium text-gray-600 ${
-										isRtl ? "text-right" : "text-left"
-									}`}
-								>
-									{t("glLines.amount")}
-								</div>
+								{showTypeAndAmount && (
+									<>
+										<div
+											className={`text-sm font-medium text-gray-600 ${
+												isRtl ? "text-right" : "text-left"
+											}`}
+										>
+											{t("glLines.type")}
+										</div>
+										<div
+											className={`text-sm font-medium text-gray-600 ${
+												isRtl ? "text-right" : "text-left"
+											}`}
+										>
+											{t("glLines.amount")}
+										</div>
+									</>
+								)}
 								{segmentTypes.map(st => (
 									<div
 										key={st.id}
@@ -277,61 +282,67 @@ const GLLinesSection = ({
 										index !== lines.length - 1 ? "border-b border-gray-100" : ""
 									}`}
 									style={{
-										gridTemplateColumns: `150px 150px ${segmentTypes
-											.map(() => "minmax(180px, 1fr)")
-											.join(" ")} 60px`,
+										gridTemplateColumns: showTypeAndAmount
+											? `150px 150px ${segmentTypes
+													.map(() => "minmax(180px, 1fr)")
+													.join(" ")} 60px`
+											: `${segmentTypes.map(() => "minmax(180px, 1fr)").join(" ")} 60px`,
 										minHeight: "70px",
 									}}
 								>
 									{/* Type Select */}
-									<div className="relative">
-										<select
-											name={`type-${line.id}`}
-											value={line.type}
-											onChange={e => handleLineChange(line.id, "type", e.target.value)}
-											disabled={line.isAutoCredit || line.isLocked}
-											className={`w-full h-11 px-3 pe-8 text-sm text-gray-700 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-[#48C1F0] ${
-												line.isAutoCredit || line.isLocked
-													? "bg-gray-100 cursor-not-allowed"
-													: "bg-white cursor-pointer"
-											}`}
-										>
-											{typeOptions
-												.filter(opt => {
-													// If this line is not the current CREDIT line and a CREDIT already exists, hide CREDIT option
-													if (opt.value === "CREDIT" && line.type !== "CREDIT") {
-														const hasCreditLine = lines.some(
-															l => l.type === "CREDIT" && l.id !== line.id
-														);
-														return !hasCreditLine;
-													}
-													return true;
-												})
-												.map(opt => (
-													<option key={opt.value} value={opt.value}>
-														{opt.label}
-													</option>
-												))}
-										</select>
-										<FaChevronDown className="absolute top-1/2 end-3 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
-									</div>
+									{showTypeAndAmount && (
+										<div className="relative">
+											<select
+												name={`type-${line.id}`}
+												value={line.type}
+												onChange={e => handleLineChange(line.id, "type", e.target.value)}
+												disabled={line.isAutoCredit || line.isLocked}
+												className={`w-full h-11 px-3 pe-8 text-sm text-gray-700 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-[#48C1F0] ${
+													line.isAutoCredit || line.isLocked
+														? "bg-gray-100 cursor-not-allowed"
+														: "bg-white cursor-pointer"
+												}`}
+											>
+												{typeOptions
+													.filter(opt => {
+														// If this line is not the current CREDIT line and a CREDIT already exists, hide CREDIT option
+														if (opt.value === "CREDIT" && line.type !== "CREDIT") {
+															const hasCreditLine = lines.some(
+																l => l.type === "CREDIT" && l.id !== line.id
+															);
+															return !hasCreditLine;
+														}
+														return true;
+													})
+													.map(opt => (
+														<option key={opt.value} value={opt.value}>
+															{opt.label}
+														</option>
+													))}
+											</select>
+											<FaChevronDown className="absolute top-1/2 end-3 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+										</div>
+									)}
 
 									{/* Amount Input */}
-									<div>
-										<input
-											type="number"
-											name={`amount-${line.id}`}
-											value={line.amount}
-											onChange={e => handleLineChange(line.id, "amount", e.target.value)}
-											placeholder={t("glLines.amount")}
-											readOnly={line.isAutoCredit || line.isLocked}
-											className={`w-full h-11 px-3 text-sm text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-[#48C1F0] ${
-												line.isAutoCredit || line.isLocked
-													? "bg-gray-100 cursor-not-allowed"
-													: "bg-white"
-											}`}
-										/>
-									</div>
+									{showTypeAndAmount && (
+										<div>
+											<input
+												type="number"
+												name={`amount-${line.id}`}
+												value={line.amount}
+												onChange={e => handleLineChange(line.id, "amount", e.target.value)}
+												placeholder={t("glLines.amount")}
+												readOnly={line.isAutoCredit || line.isLocked}
+												className={`w-full h-11 px-3 text-sm text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48C1F0] focus:border-[#48C1F0] ${
+													line.isAutoCredit || line.isLocked
+														? "bg-gray-100 cursor-not-allowed"
+														: "bg-white"
+												}`}
+											/>
+										</div>
+									)}
 
 									{/* Segment Type Columns */}
 									{segmentTypes.map(st => {
@@ -384,9 +395,9 @@ const GLLinesSection = ({
 					onClick={handleAddLine}
 					title={t("glLines.addLine")}
 					icon={<FaPlus className="w-3 h-3" />}
-					disabled={!invoiceTotal || invoiceTotal <= 0}
+					disabled={showTypeAndAmount && (!invoiceTotal || invoiceTotal <= 0)}
 					className={`shadow-none hover:shadow-none mt-4 flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-						!invoiceTotal || invoiceTotal <= 0
+						showTypeAndAmount && (!invoiceTotal || invoiceTotal <= 0)
 							? "text-gray-400 bg-gray-100 border border-gray-200 cursor-not-allowed"
 							: "text-gray-700 bg-gray-50 border border-gray-300 hover:bg-gray-100"
 					} ${isRtl ? "flex-row-reverse" : ""}`}
@@ -420,6 +431,7 @@ GLLinesSection.propTypes = {
 	}),
 	onGlEntryChange: PropTypes.func,
 	showGlEntryHeader: PropTypes.bool,
+	showTypeAndAmount: PropTypes.bool,
 	title: PropTypes.string,
 	className: PropTypes.string,
 	invoiceTotal: PropTypes.number,

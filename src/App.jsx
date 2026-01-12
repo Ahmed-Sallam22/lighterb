@@ -70,6 +70,12 @@ const GeneratePeriodsPage = lazy(() => import("./pages/GeneratePeriodsPage"));
 const ARPeriodsPage = lazy(() => import("./pages/ARPeriodsPage"));
 const APPeriodsPage = lazy(() => import("./pages/APPeriodsPage"));
 const GLPeriodsPage = lazy(() => import("./pages/GLPeriodsPage"));
+const BanksPage = lazy(() => import("./pages/BanksPage"));
+const BankDetailsPage = lazy(() => import("./pages/BankDetailsPage"));
+const PaymentTypesPage = lazy(() => import("./pages/PaymentTypesPage"));
+const BankStatementsPage = lazy(() => import("./pages/BankStatementsPage"));
+const BankStatementLinesPage = lazy(() => import("./pages/BankStatementLinesPage"));
+const MatchedStatementLinePage = lazy(() => import("./pages/MatchedStatementLinePage"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -157,6 +163,12 @@ const App = () => {
 						<Route path="fiscal-periods/ar" element={<ARPeriodsPage />} />
 						<Route path="fiscal-periods/ap" element={<APPeriodsPage />} />
 						<Route path="fiscal-periods/gl" element={<GLPeriodsPage />} />
+						<Route path="banks" element={<BanksPage />} />
+						<Route path="banks/:bankId" element={<BankDetailsPage />} />
+						<Route path="payment-types" element={<PaymentTypesPage />} />
+						<Route path="bank-statements" element={<BankStatementsPage />} />
+						<Route path="bank-statements/:statementId/lines" element={<BankStatementLinesPage />} />
+						<Route path="matched-statement-lines" element={<MatchedStatementLinePage />} />
 					</Route>
 				</Routes>
 			</Suspense>

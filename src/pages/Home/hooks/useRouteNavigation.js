@@ -45,6 +45,16 @@ export const useRouteNavigation = (cardsData, routes) => {
 				navigate("/fiscal-periods");
 			}
 		}
+
+		if (currentActiveRoute === "Banks") {
+			if (cardKey === "Banks Manage") {
+				navigate("/banks");
+			} else if (cardKey === "Bank Reconciliation") {
+				navigate("/matched-statement-lines");
+			} else if (cardKey === "Bank Statements") {
+				navigate("/bank-statements");
+			}
+		}
 	};
 
 	const handleRouteClick = routeKey => {

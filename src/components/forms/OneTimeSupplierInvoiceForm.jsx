@@ -12,6 +12,7 @@ import Button from "../shared/Button";
 import { createOneTimeSupplierInvoice } from "../../store/oneTimeSupplierInvoicesSlice";
 import { fetchCurrencies } from "../../store/currenciesSlice";
 import { fetchCountries } from "../../store/countriesSlice";
+import { fetchDefaultGLSegments, clearDefaultGLSegments } from "../../store/defaultCombinationsSlice";
 
 const OneTimeSupplierInvoiceForm = () => {
 	const navigate = useNavigate();
@@ -20,6 +21,7 @@ const OneTimeSupplierInvoiceForm = () => {
 	const { currencies } = useSelector(state => state.currencies);
 	const { countries: fetchedCountries } = useSelector(state => state.countries);
 	const { loading: invoiceLoading } = useSelector(state => state.oneTimeSupplierInvoices);
+	const { defaultGLSegments } = useSelector(state => state.defaultCombinations);
 
 	const countries = fetchedCountries.map(country => ({
 		value: country.id,
@@ -54,10 +56,19 @@ const OneTimeSupplierInvoiceForm = () => {
 		memo: "",
 	});
 
+	// Track if default segments have been applied
+	const [defaultSegmentsApplied, setDefaultSegmentsApplied] = useState(false);
+
 	// Fetch required data on mount
 	useEffect(() => {
 		dispatch(fetchCurrencies());
 		dispatch(fetchCountries());
+		// Fetch default GL segments for AP_INVOICE
+		dispatch(fetchDefaultGLSegments("AP_INVOICE"));
+
+		return () => {
+			dispatch(clearDefaultGLSegments());
+		};
 	}, [dispatch]);
 
 	// Sync glEntry date and currency with invoice form
@@ -93,6 +104,17 @@ const OneTimeSupplierInvoiceForm = () => {
 
 	const invoiceTotalAmount = invoiceSubtotal + invoiceTaxAmount;
 
+	// Convert default GL segments from API format to GLLinesSection format
+	const getDefaultCreditSegments = () => {
+		if (!defaultGLSegments?.segments || !Array.isArray(defaultGLSegments.segments)) {
+			return [];
+		}
+		return defaultGLSegments.segments.map(seg => ({
+			segment_type_id: seg.segment_type_id,
+			segment_code: seg.segment_code,
+		}));
+	};
+
 	// Automatically manage CREDIT line to match invoice total
 	useEffect(() => {
 		if (invoiceTotalAmount > 0) {
@@ -109,18 +131,42 @@ const OneTimeSupplierInvoiceForm = () => {
 					);
 				}
 			} else {
-				// Create default CREDIT line
+				// Create default CREDIT line with default segments
+				const defaultSegments = getDefaultCreditSegments();
 				const newCreditLine = {
 					id: creditLineId,
 					type: "CREDIT",
 					amount: invoiceTotalAmount.toFixed(2),
-					segments: [],
-					isAutoCredit: true, // Flag to identify this as the auto-managed CREDIT line
+					segments: defaultSegments,
+					isAutoCredit: true,
 				};
 				setGLLines(prev => [newCreditLine, ...prev]);
+				if (defaultSegments.length > 0) {
+					setDefaultSegmentsApplied(true);
+				}
 			}
 		}
-	}, [invoiceTotalAmount, glLines]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [invoiceTotalAmount]);
+
+	// Apply default segments to existing CREDIT line when defaultGLSegments is loaded
+	useEffect(() => {
+		if (defaultGLSegments?.segments && !defaultSegmentsApplied) {
+			const creditLineId = "auto-credit-line";
+			const existingCreditLine = glLines.find(line => line.id === creditLineId);
+
+			if (existingCreditLine && existingCreditLine.segments.length === 0) {
+				const defaultSegments = getDefaultCreditSegments();
+				if (defaultSegments.length > 0) {
+					setGLLines(prev =>
+						prev.map(line => (line.id === creditLineId ? { ...line, segments: defaultSegments } : line))
+					);
+					setDefaultSegmentsApplied(true);
+				}
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [defaultGLSegments, glLines, defaultSegmentsApplied]);
 
 	// Get selected currency code for formatting
 	const selectedCurrency = currencies.find(c => c.id === parseInt(invoiceForm.currency));

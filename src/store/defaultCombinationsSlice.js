@@ -82,11 +82,27 @@ export const deleteDefaultCombination = createAsyncThunk(
 	}
 );
 
+// Fetch default GL segments for a specific transaction type (AR_INVOICE, AP_INVOICE, etc.)
+export const fetchDefaultGLSegments = createAsyncThunk(
+	"defaultCombinations/fetchGLSegments",
+	async (transactionType, { rejectWithValue }) => {
+		try {
+			const response = await api.get(
+				`/finance/default-combinations/gl-segments/?transaction_type=${transactionType}`
+			);
+			return response.data?.data || response.data;
+		} catch (error) {
+			return rejectWithValue(error.response?.data || "Failed to fetch default GL segments");
+		}
+	}
+);
+
 const defaultCombinationsSlice = createSlice({
 	name: "defaultCombinations",
 	initialState: {
 		combinations: [],
 		selectedCombination: null,
+		defaultGLSegments: null,
 		loading: false,
 		error: null,
 	},
@@ -96,6 +112,9 @@ const defaultCombinationsSlice = createSlice({
 		},
 		clearSelectedCombination: state => {
 			state.selectedCombination = null;
+		},
+		clearDefaultGLSegments: state => {
+			state.defaultGLSegments = null;
 		},
 	},
 	extraReducers: builder => {
@@ -176,8 +195,23 @@ const defaultCombinationsSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			});
+
+		// Fetch Default GL Segments
+		builder
+			.addCase(fetchDefaultGLSegments.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchDefaultGLSegments.fulfilled, (state, action) => {
+				state.loading = false;
+				state.defaultGLSegments = action.payload;
+			})
+			.addCase(fetchDefaultGLSegments.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			});
 	},
 });
 
-export const { clearError, clearSelectedCombination } = defaultCombinationsSlice.actions;
+export const { clearError, clearSelectedCombination, clearDefaultGLSegments } = defaultCombinationsSlice.actions;
 export default defaultCombinationsSlice.reducer;

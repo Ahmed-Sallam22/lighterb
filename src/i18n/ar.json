@@ -62,7 +62,8 @@
 			"apPayments": "مدفوعات الشراء",
 			"reports": "التقارير",
 			"workStructure": "هيكل العمل",
-			"fiscalPeriods": "الفترات المالية"
+			"fiscalPeriods": "الفترات المالية",
+			"banks": "البنوك"
 		},
 		"cards": {
 			"setup": {
@@ -190,6 +191,22 @@
 				"glDescription": "تعريف وإدارة الفترات المالية الخاصة بدفتر الأستاذ العام.",
 				"setFiscalYear": "تحديد السنة المالية",
 				"setFiscalYearDescription": "تعيين السنة المالية لأغراض التقارير المالية والمحاسبية."
+			},
+			"paymentTypes": {
+				"title": "أنواع الدفع",
+				"description": "إدارة طرق وأنواع الدفع"
+			},
+			"banks": {
+				"title": "البنوك",
+				"description": "إدارة الحسابات البنكية والتفاصيل"
+			},
+			"bankReconciliation": {
+				"title": "التسوية البنكية",
+				"description": "مطابقة المدفوعات مع سطور كشف الحساب البنكي"
+			},
+			"bankStatements": {
+				"title": "كشوفات البنك",
+				"description": "إدارة كشوفات البنك "
 			}
 		}
 	},
@@ -320,6 +337,7 @@
 		},
 		"table": {
 			"invoice": "الفاتورة",
+			"invoiceNumber": "رقم الفاتورة",
 			"supplier": "المورد",
 			"date": "التاريخ",
 			"dueDate": "تاريخ الاستحقاق",
@@ -2387,6 +2405,10 @@
 		"currency": "العملة",
 		"selectCurrency": "اختر العملة",
 		"exchangeRate": "سعر الصرف",
+		"paymentMethod": "طريقة الدفع",
+		"selectPaymentMethod": "اختر طريقة الدفع",
+		"bankAccount": "الحساب البنكي",
+		"selectBankAccount": "اختر الحساب البنكي",
 		"allocations": "التخصيصات (الفواتير)",
 		"allocationsSubtitle": "تخصيص مبالغ الدفع للفواتير",
 		"addAllocation": "إضافة تخصيص فاتورة",
@@ -3958,6 +3980,609 @@
 			"openSuccess": "تم فتح فترة الحسابات المدينة بنجاح",
 			"closeSuccess": "تم إغلاق فترة الحسابات المدينة بنجاح",
 			"actionError": "فشل في تنفيذ الإجراء على فترة الحسابات المدينة"
+		}
+	},
+	"banks": {
+		"title": "البنوك",
+		"subtitle": "إدارة المؤسسات المصرفية والشركاء الماليين",
+		"pageTitle": "البنوك",
+		"addBank": "إضافة بنك",
+		"emptyMessage": "لا توجد بنوك",
+		"filters": {
+			"country": "الدولة",
+			"status": "الحالة",
+			"allCountries": "جميع الدول",
+			"allStatuses": "جميع الحالات",
+			"active": "نشط",
+			"inactive": "غير نشط",
+			"clear": "مسح الفلاتر"
+		},
+		"table": {
+			"bankName": "اسم البنك",
+			"bankCode": "رمز البنك",
+			"country": "الدولة",
+			"swiftCode": "رمز سويفت",
+			"totalBranches": "الفروع",
+			"totalAccounts": "الحسابات",
+			"branches": "الفروع",
+			"accounts": "الحسابات",
+			"active": "نشط"
+		},
+		"form": {
+			"bankName": "اسم البنك",
+			"bankCode": "رمز البنك",
+			"country": "الدولة",
+			"swiftCode": "رمز سويفت",
+			"routingNumber": "رقم التوجيه",
+			"website": "الموقع الإلكتروني",
+			"contactEmail": "البريد الإلكتروني",
+			"contactPhone": "رقم الهاتف",
+			"notes": "ملاحظات",
+			"active": "نشط"
+		},
+		"modal": {
+			"titleAdd": "إضافة بنك جديد",
+			"titleEdit": "تعديل البنك",
+			"save": "حفظ",
+			"saving": "جاري الحفظ...",
+			"cancel": "إلغاء"
+		},
+		"validation": {
+			"bankNameRequired": "اسم البنك مطلوب",
+			"bankCodeRequired": "رمز البنك مطلوب",
+			"countryRequired": "الدولة مطلوبة"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء البنك بنجاح",
+			"updateSuccess": "تم تحديث البنك بنجاح",
+			"deleteSuccess": "تم حذف البنك بنجاح",
+			"saveError": "فشل في حفظ البنك",
+			"deleteError": "فشل في حذف البنك",
+			"activated": "تم تفعيل البنك بنجاح",
+			"deactivated": "تم إلغاء تفعيل البنك بنجاح",
+			"updateError": "فشل في تحديث حالة البنك"
+		},
+		"deleteConfirm": {
+			"title": "حذف البنك",
+			"message": "هل أنت متأكد من حذف البنك \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"confirm": "حذف",
+			"cancel": "إلغاء"
+		}
+	},
+	"bankDetails": {
+		"title": "تفاصيل البنك",
+		"subtitle": "عرض وإدارة فروع وحسابات البنك",
+		"backToBanks": "العودة للبنوك",
+		"tabs": {
+			"branches": "الفروع",
+			"accounts": "الحسابات البنكية"
+		},
+		"header": {
+			"bankName": "اسم البنك",
+			"country": "الدولة",
+			"swiftCode": "رمز سويفت",
+			"statistics": "الإحصائيات",
+			"branches": "فروع",
+			"accounts": "حسابات"
+		},
+		"status": {
+			"active": "نشط",
+			"inactive": "غير نشط",
+			"frozen": "مجمد"
+		},
+		"branchesSection": {
+			"title": "فروع البنك",
+			"addBranch": "إضافة فرع"
+		},
+		"accountsSection": {
+			"title": "الحسابات البنكية",
+			"addAccount": "إضافة حساب"
+		},
+		"branchTable": {
+			"branchName": "اسم الفرع",
+			"branchCode": "رمز الفرع",
+			"city": "المدينة",
+			"country": "الدولة",
+			"totalAccounts": "الحسابات",
+			"active": "نشط"
+		},
+		"accountTable": {
+			"accountNumber": "رقم الحساب",
+			"accountName": "اسم الحساب",
+			"accountType": "النوع",
+			"branch": "الفرع",
+			"currency": "العملة",
+			"currentBalance": "الرصيد",
+			"active": "نشط",
+			"frozen": "مجمد",
+			"status": "الحالة"
+		},
+		"accountTypes": {
+			"current": "جاري",
+			"savings": "توفير",
+			"fixed_deposit": "وديعة ثابتة",
+			"loan": "قرض",
+			"overdraft": "سحب على المكشوف"
+		},
+		"branchModal": {
+			"titleAdd": "إضافة فرع جديد",
+			"titleEdit": "تعديل الفرع"
+		},
+		"branchForm": {
+			"branchName": "اسم الفرع",
+			"branchCode": "رمز الفرع",
+			"address": "العنوان",
+			"city": "المدينة",
+			"state": "الولاية/المحافظة",
+			"postalCode": "الرمز البريدي",
+			"country": "الدولة",
+			"swiftCode": "رمز سويفت",
+			"contactPhone": "رقم الهاتف",
+			"contactEmail": "البريد الإلكتروني",
+			"managerName": "اسم المدير",
+			"notes": "ملاحظات",
+			"active": "نشط"
+		},
+		"accountModal": {
+			"titleAdd": "إضافة حساب جديد",
+			"titleEdit": "تعديل الحساب"
+		},
+		"accountForm": {
+			"accountNumber": "رقم الحساب",
+			"accountName": "اسم الحساب",
+			"accountType": "نوع الحساب",
+			"transactionType": "نوع المعاملة",
+			"selectTransactionType": "اختر نوع المعاملة",
+			"bankTransfer": "تحويل بنكي",
+			"cash": "نقدي",
+			"check": "شيك",
+			"branch": "الفرع",
+			"currency": "العملة",
+			"openingBalance": "الرصيد الافتتاحي",
+			"openingDate": "تاريخ الافتتاح",
+			"iban": "رقم الآيبان",
+			"cashGLSegments": "قطاعات دفتر الأستاذ للنقدية",
+			"cashClearingGLSegments": "قطاعات مقاصة النقدية",
+			"selectSegment": "اختر...",
+			"glCombinations": "تركيبات دفتر الأستاذ",
+			"cashGLCombination": "تركيبة النقدية",
+			"cashClearingGLCombination": "تركيبة مقاصة النقدية",
+			"glCombinationPlaceholder": "أدخل معرف تركيبة GL",
+			"description": "الوصف",
+			"active": "نشط",
+			"frozen": "مجمد"
+		},
+		"balanceModal": {
+			"title": "تحديث رصيد الحساب",
+			"account": "الحساب",
+			"currentBalance": "الرصيد الحالي",
+			"amount": "المبلغ",
+			"transactionType": "نوع المعاملة",
+			"increase": "زيادة",
+			"decrease": "نقصان",
+			"description": "الوصف",
+			"update": "تحديث الرصيد"
+		},
+		"viewAccountModal": {
+			"title": "تفاصيل الحساب",
+			"bank": "البنك"
+		},
+		"accountActions": {
+			"updateBalance": "تحديث الرصيد",
+			"freezeUnfreeze": "تجميد/إلغاء التجميد"
+		},
+		"modal": {
+			"save": "حفظ",
+			"saving": "جاري الحفظ...",
+			"cancel": "إلغاء"
+		},
+		"validation": {
+			"branchNameRequired": "اسم الفرع مطلوب",
+			"branchCodeRequired": "رمز الفرع مطلوب",
+			"countryRequired": "الدولة مطلوبة",
+			"accountNumberRequired": "رقم الحساب مطلوب",
+			"accountNameRequired": "اسم الحساب مطلوب",
+			"branchRequired": "الفرع مطلوب",
+			"currencyRequired": "العملة مطلوبة"
+		},
+		"messages": {
+			"branchActivated": "تم تفعيل الفرع بنجاح",
+			"branchDeactivated": "تم إلغاء تفعيل الفرع بنجاح",
+			"branchUpdateError": "فشل في تحديث حالة الفرع",
+			"branchCreateSuccess": "تم إنشاء الفرع بنجاح",
+			"branchUpdateSuccess": "تم تحديث الفرع بنجاح",
+			"branchDeleteSuccess": "تم حذف الفرع بنجاح",
+			"branchSaveError": "فشل في حفظ الفرع",
+			"branchDeleteError": "فشل في حذف الفرع",
+			"accountActivated": "تم تفعيل الحساب بنجاح",
+			"accountDeactivated": "تم إلغاء تفعيل الحساب بنجاح",
+			"accountUpdateError": "فشل في تحديث حالة الحساب",
+			"accountCreateSuccess": "تم إنشاء الحساب بنجاح",
+			"accountUpdateSuccess": "تم تحديث الحساب بنجاح",
+			"accountDeleteSuccess": "تم حذف الحساب بنجاح",
+			"accountSaveError": "فشل في حفظ الحساب",
+			"accountDeleteError": "فشل في حذف الحساب",
+			"accountFrozen": "تم تجميد الحساب بنجاح",
+			"accountUnfrozen": "تم إلغاء تجميد الحساب بنجاح",
+			"freezeError": "فشل في تجميد/إلغاء تجميد الحساب",
+			"balanceUpdateSuccess": "تم تحديث الرصيد بنجاح",
+			"balanceUpdateError": "فشل في تحديث الرصيد",
+			"invalidAmount": "يرجى إدخال مبلغ صحيح",
+			"noBranchesForAccount": "يرجى إنشاء فرع أولاً قبل إضافة الحسابات"
+		},
+		"deleteBranchConfirm": {
+			"title": "حذف الفرع",
+			"message": "هل أنت متأكد من حذف الفرع \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"confirm": "حذف",
+			"cancel": "إلغاء"
+		},
+		"deleteAccountConfirm": {
+			"title": "حذف الحساب",
+			"message": "هل أنت متأكد من حذف الحساب \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"confirm": "حذف",
+			"cancel": "إلغاء"
+		}
+	},
+	"paymentTypes": {
+		"title": "أنواع الدفع",
+		"subtitle": "إدارة طرق وأنواع الدفع للمعاملات المالية",
+		"pageTitle": "أنواع الدفع",
+		"addPaymentType": "إضافة نوع دفع",
+		"emptyMessage": "لا توجد أنواع دفع",
+		"filters": {
+			"status": "الحالة",
+			"allStatus": "جميع الحالات",
+			"active": "نشط",
+			"inactive": "غير نشط"
+		},
+		"table": {
+			"methodName": "اسم الطريقة",
+			"methodCode": "رمز الطريقة",
+			"enableReconcile": "تفعيل التسوية",
+			"active": "نشط"
+		},
+		"form": {
+			"methodCode": "رمز الطريقة",
+			"methodName": "اسم الطريقة",
+			"description": "الوصف",
+			"enableReconcile": "تفعيل التسوية",
+			"active": "نشط"
+		},
+		"modal": {
+			"titleAdd": "إضافة نوع دفع جديد",
+			"titleEdit": "تعديل نوع الدفع",
+			"save": "حفظ",
+			"saving": "جاري الحفظ...",
+			"cancel": "إلغاء"
+		},
+		"viewModal": {
+			"title": "تفاصيل نوع الدفع",
+			"createdAt": "تاريخ الإنشاء",
+			"updatedAt": "تاريخ التحديث",
+			"close": "إغلاق"
+		},
+		"validation": {
+			"codeRequired": "رمز الطريقة مطلوب",
+			"nameRequired": "اسم الطريقة مطلوب"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء نوع الدفع بنجاح",
+			"updateSuccess": "تم تحديث نوع الدفع بنجاح",
+			"deleteSuccess": "تم حذف نوع الدفع بنجاح",
+			"saveError": "فشل في حفظ نوع الدفع",
+			"deleteError": "فشل في حذف نوع الدفع",
+			"activated": "تم تفعيل نوع الدفع بنجاح",
+			"deactivated": "تم إلغاء تفعيل نوع الدفع بنجاح",
+			"updateActiveError": "فشل في تحديث حالة نوع الدفع",
+			"updateError": "فشل في تحديث نوع الدفع",
+			"fetchError": "فشل في جلب تفاصيل نوع الدفع"
+		},
+		"deleteConfirm": {
+			"title": "حذف نوع الدفع",
+			"message": "هل أنت متأكد من حذف نوع الدفع \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"confirm": "حذف",
+			"cancel": "إلغاء"
+		}
+	},
+	"bankStatements": {
+		"title": "كشوف الحسابات البنكية",
+		"subtitle": "إدارة واستيراد كشوف الحسابات البنكية للمطابقة",
+		"pageTitle": "كشوف الحسابات البنكية",
+		"addStatement": "إضافة كشف حساب",
+		"manageFiles": "إدارة الملفات",
+		"emptyMessage": "لا توجد كشوف حسابات بنكية",
+		"filters": {
+			"bankAccount": "الحساب البنكي",
+			"allAccounts": "جميع الحسابات",
+			"reconciliationStatus": "الحالة",
+			"dateFrom": "من تاريخ",
+			"dateTo": "إلى تاريخ"
+		},
+		"reconciliationStatus": {
+			"": "جميع الحالات",
+			"unreconciled": "غير مطابق",
+			"partially_reconciled": "مطابق جزئياً",
+			"reconciled": "مطابق",
+			"pending": "معلق"
+		},
+		"table": {
+			"statementNumber": "رقم الكشف",
+			"bankAccount": "الحساب البنكي",
+			"statementDate": "تاريخ الكشف",
+			"period": "الفترة",
+			"openingBalance": "الرصيد الافتتاحي",
+			"closingBalance": "الرصيد الختامي",
+			"lines": "السطور",
+			"reconciliationStatus": "الحالة"
+		},
+		"form": {
+			"bankAccount": "الحساب البنكي",
+			"statementNumber": "رقم الكشف",
+			"statementDate": "تاريخ الكشف",
+			"fromDate": "من تاريخ",
+			"toDate": "إلى تاريخ",
+			"openingBalance": "الرصيد الافتتاحي",
+			"closingBalance": "الرصيد الختامي",
+			"transactionCount": "عدد العمليات",
+			"totalDebits": "إجمالي المدين",
+			"totalCredits": "إجمالي الدائن",
+			"importFileName": "اسم ملف الاستيراد"
+		},
+		"modal": {
+			"titleAdd": "إضافة كشف حساب جديد",
+			"titleEdit": "تعديل كشف الحساب",
+			"save": "حفظ",
+			"saving": "جاري الحفظ...",
+			"cancel": "إلغاء"
+		},
+		"validation": {
+			"bankAccountRequired": "الحساب البنكي مطلوب",
+			"statementNumberRequired": "رقم الكشف مطلوب",
+			"statementDateRequired": "تاريخ الكشف مطلوب",
+			"fromDateRequired": "تاريخ البداية مطلوب",
+			"toDateRequired": "تاريخ النهاية مطلوب"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء الكشف بنجاح",
+			"updateSuccess": "تم تحديث الكشف بنجاح",
+			"deleteSuccess": "تم حذف الكشف بنجاح",
+			"saveError": "فشل في حفظ الكشف",
+			"deleteError": "فشل في حذف الكشف",
+			"templateDownloaded": "تم تنزيل النموذج بنجاح",
+			"templateDownloadError": "فشل في تنزيل النموذج",
+			"invalidFileType": "نوع ملف غير صالح. يرجى اختيار ملف Excel أو CSV.",
+			"selectFile": "يرجى اختيار ملف للاستيراد",
+			"selectBankAccount": "يرجى اختيار حساب بنكي",
+			"previewError": "فشل في التحقق من ملف الاستيراد",
+			"importSuccess": "تم استيراد الكشف بنجاح",
+			"importError": "فشل في استيراد الكشف"
+		},
+		"deleteConfirm": {
+			"title": "حذف الكشف",
+			"message": "هل أنت متأكد من حذف الكشف \"{{number}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+			"confirm": "حذف",
+			"cancel": "إلغاء"
+		},
+		"actions": {
+			"viewLines": "عرض السطور"
+		},
+		"manageFilesModal": {
+			"title": "إدارة الملفات",
+			"downloadTemplate": "تنزيل النموذج",
+			"downloadTemplateDesc": "تنزيل نموذج Excel لإعداد بيانات كشف الحساب البنكي للاستيراد.",
+			"downloading": "جاري التنزيل...",
+			"downloadBtn": "تنزيل النموذج",
+			"or": "أو",
+			"importFile": "استيراد كشف حساب",
+			"importFileDesc": "تحميل ملف Excel أو CSV يحتوي على بيانات كشف الحساب البنكي للاستيراد.",
+			"selectBankAccount": "اختر الحساب البنكي",
+			"clickToUpload": "انقر لاختيار ملف",
+			"acceptedFormats": "الصيغ المقبولة: .xlsx, .xls, .csv",
+			"validating": "جاري التحقق...",
+			"validateAndPreview": "التحقق والمعاينة",
+			"previewTitle": "معاينة الاستيراد",
+			"fromDate": "من تاريخ",
+			"toDate": "إلى تاريخ",
+			"transactionCount": "العمليات",
+			"totalDebits": "إجمالي المدين",
+			"totalCredits": "إجمالي الدائن",
+			"linesPreview": "معاينة السطور",
+			"date": "التاريخ",
+			"description": "الوصف",
+			"amount": "المبلغ",
+			"andMore": "...و {{count}} سطور أخرى",
+			"back": "رجوع",
+			"importing": "جاري الاستيراد...",
+			"confirmImport": "تأكيد الاستيراد",
+			"importingStatement": "جاري استيراد الكشف..."
+		}
+	},
+	"statementLines": {
+		"title": "سطور الكشف",
+		"subtitle": "عرض وإدارة سطور عمليات كشف الحساب البنكي",
+		"pageTitle": "سطور العمليات",
+		"backToStatements": "العودة إلى الكشوف",
+		"emptyMessage": "لا توجد سطور للكشف",
+		"filters": {
+			"transactionType": "نوع العملية",
+			"reconciliationStatus": "الحالة"
+		},
+		"transactionType": {
+			"": "جميع الأنواع",
+			"credit": "دائن",
+			"debit": "مدين"
+		},
+		"reconciliationStatus": {
+			"": "جميع الحالات",
+			"unreconciled": "غير مطابق",
+			"reconciled": "مطابق"
+		},
+		"table": {
+			"lineNumber": "رقم السطر",
+			"transactionDate": "تاريخ العملية",
+			"valueDate": "تاريخ القيمة",
+			"transactionType": "النوع",
+			"amount": "المبلغ",
+			"referenceNumber": "المرجع",
+			"description": "الوصف",
+			"reconciliationStatus": "الحالة"
+		},
+		"statementInfo": {
+			"title": "معلومات الكشف",
+			"statementNumber": "رقم الكشف",
+			"bankAccount": "الحساب البنكي",
+			"period": "الفترة",
+			"openingBalance": "الرصيد الافتتاحي",
+			"closingBalance": "الرصيد الختامي",
+			"lineCount": "السطور"
+		},
+		"viewModal": {
+			"title": "تفاصيل السطر",
+			"statementInfo": "معلومات الكشف",
+			"statementNumber": "رقم الكشف",
+			"statementDate": "تاريخ الكشف",
+			"bankAccount": "الحساب البنكي",
+			"lineNumber": "رقم السطر",
+			"transactionType": "نوع العملية",
+			"transactionDate": "تاريخ العملية",
+			"valueDate": "تاريخ القيمة",
+			"amount": "المبلغ",
+			"balanceAfter": "الرصيد بعد العملية",
+			"referenceNumber": "رقم المرجع",
+			"reconciliationStatus": "حالة المطابقة",
+			"description": "الوصف",
+			"matchedPayment": "الدفعة المطابقة",
+			"reconciledDate": "تاريخ المطابقة",
+			"reconciledBy": "تمت المطابقة بواسطة",
+			"notes": "ملاحظات",
+			"createdAt": "تاريخ الإنشاء",
+			"updatedAt": "تاريخ التحديث",
+			"close": "إغلاق"
+		},
+		"messages": {
+			"fetchError": "فشل في جلب تفاصيل السطر",
+			"deleteSuccess": "تم حذف السطر بنجاح",
+			"deleteError": "فشل في حذف السطر"
+		},
+		"deleteConfirm": {
+			"title": "حذف سطر الكشف",
+			"message": "هل أنت متأكد من حذف السطر #{{lineNumber}}؟ لا يمكن التراجع عن هذا الإجراء.",
+			"confirm": "حذف",
+			"cancel": "إلغاء"
+		}
+	},
+	"matches": {
+		"title": "مطابقات التسوية البنكية",
+		"subtitle": "إدارة مطابقة المدفوعات وسطور كشف الحساب للتسوية البنكية",
+		"pageTitle": "مطابقات التسوية",
+		"createReconciliation": "إنشاء تسوية",
+		"emptyMessage": "لا توجد مطابقات",
+		"filters": {
+			"matchStatus": "حالة المطابقة",
+			"matchType": "نوع المطابقة",
+			"allStatuses": "جميع الحالات",
+			"allTypes": "جميع الأنواع"
+		},
+		"matchStatus": {
+			"matched": "مطابق",
+			"partial": "جزئي",
+			"unmatched": "غير مطابق",
+			"pending": "قيد الانتظار"
+		},
+		"matchType": {
+			"auto": "تلقائي",
+			"manual": "يدوي",
+			"suggested": "مقترح"
+		},
+		"table": {
+			"id": "المعرف",
+			"statementLine": "سطر الكشف",
+			"payment": "الدفعة",
+			"matchStatus": "الحالة",
+			"matchType": "النوع",
+			"confidenceScore": "نسبة الثقة",
+			"discrepancy": "الفرق",
+			"matchedBy": "مطابق بواسطة",
+			"matchedAt": "تاريخ المطابقة"
+		},
+		"editModal": {
+			"title": "تعديل المطابقة",
+			"matchStatus": "حالة المطابقة",
+			"notes": "ملاحظات",
+			"save": "حفظ التغييرات",
+			"saving": "جاري الحفظ...",
+			"cancel": "إلغاء"
+		},
+		"viewModal": {
+			"title": "تفاصيل المطابقة",
+			"matchInfo": "معلومات المطابقة",
+			"id": "معرّف المطابقة",
+			"matchStatus": "حالة المطابقة",
+			"matchType": "نوع المطابقة",
+			"confidenceScore": "نسبة الثقة",
+			"discrepancyAmount": "مبلغ الفرق",
+			"matchedBy": "مطابق بواسطة",
+			"matchedAt": "تاريخ المطابقة",
+			"statementLineDetails": "تفاصيل سطر كشف الحساب البنكي",
+			"statementNumber": "رقم الكشف",
+			"lineNumber": "رقم السطر",
+			"transactionType": "نوع العملية",
+			"amount": "المبلغ",
+			"transactionDate": "تاريخ العملية",
+			"valueDate": "تاريخ القيمة",
+			"referenceNumber": "رقم المرجع",
+			"description": "الوصف",
+			"reconciliationStatus": "حالة المطابقة",
+			"reconciledDate": "تاريخ المطابقة",
+			"reconciledBy": "مطابق بواسطة",
+			"paymentDetails": "تفاصيل الدفعة",
+			"paymentId": "معرّف الدفعة",
+			"paymentDate": "تاريخ الدفعة",
+			"paymentType": "نوع الدفعة",
+			"businessPartner": "شريك العمل",
+			"currency": "العملة",
+			"approvalStatus": "حالة الموافقة",
+			"paymentReconciliationStatus": "حالة تسوية الدفعة",
+			"notes": "ملاحظات",
+			"close": "إغلاق",
+			"noData": "لا توجد بيانات متاحة"
+		},
+		"reconcileModal": {
+			"title": "إنشاء تسوية",
+			"payments": "المدفوعات",
+			"paymentsDesc": "اختر دفعة غير مطابقة للمطابقة",
+			"noPayments": "لا توجد دفعات غير مطابقة متاحة",
+			"statementLines": "سطور كشف الحساب البنكي",
+			"statementLinesDesc": "اختر سطر كشف غير مطابق للمطابقة",
+			"noStatementLines": "لا توجد سطور كشف غير مطابقة متاحة",
+			"matchDetails": "تفاصيل المطابقة",
+			"confidenceScore": "نسبة الثقة (0-1)",
+			"discrepancyAmount": "مبلغ الفرق",
+			"notes": "ملاحظات",
+			"notesPlaceholder": "أضف أي ملاحظات حول هذه التسوية...",
+			"selectedSummary": "العناصر المحددة",
+			"payment": "الدفعة",
+			"statementLine": "سطر الكشف",
+			"match": "مطابقة",
+			"matching": "جاري المطابقة...",
+			"cancel": "إلغاء"
+		},
+		"messages": {
+			"createSuccess": "تم إنشاء المطابقة بنجاح",
+			"createError": "فشل في إنشاء المطابقة",
+			"updateSuccess": "تم تحديث المطابقة بنجاح",
+			"updateError": "فشل في تحديث المطابقة",
+			"deleteSuccess": "تم حذف المطابقة بنجاح",
+			"deleteError": "فشل في حذف المطابقة",
+			"fetchError": "فشل في جلب تفاصيل المطابقة",
+			"selectPayment": "يرجى اختيار دفعة",
+			"selectStatementLine": "يرجى اختيار سطر كشف"
+		},
+		"deleteConfirm": {
+			"title": "حذف المطابقة",
+			"message": "هل أنت متأكد من حذف المطابقة #{{id}}؟ لا يمكن التراجع عن هذا الإجراء.",
+			"confirm": "حذف",
+			"cancel": "إلغاء"
 		}
 	}
 }
