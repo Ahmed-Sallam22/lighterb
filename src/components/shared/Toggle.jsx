@@ -1,12 +1,13 @@
 import PropTypes from "prop-types";
 import { useLocale } from "../../hooks/useLocale";
+import {twMerge} from "tailwind-merge";
 
-const Toggle = ({ label, checked, onChange, disabled = false, direction }) => {
+const Toggle = ({ label, checked, onChange, disabled = false, direction, className }) => {
 	// Detect direction automatically if not passed
 	const { locale } = useLocale();
 	const isRTL = direction ? direction === "rtl" : locale === "AR";
 	return (
-		<div className="rounded-2xl px-6 py-4">
+		<div className={twMerge(`rounded-2xl px-6 py-4`, className)}>
 			<div className="flex items-center justify-between">
 				<span className="text-[15px] font-semibold text-[#1F2B3B]">{label}</span>
 

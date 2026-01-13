@@ -110,7 +110,7 @@ const SlideUpModal = ({
 					</div>
 				</div>
 
-				<div className={`px-6 py-3 overflow-scroll  max-h-[calc(90vh-4.5rem)] ${childrenClassName}`}>
+				<div className={`px-6 py-3 overflow-auto  max-h-[calc(90vh-4.5rem)] ${childrenClassName}`}>
 					{children}
 				</div>
 			</div>

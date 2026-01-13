@@ -1,45 +1,86 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { HiOutlineUser } from "react-icons/hi";
+import {
+	HiOutlineUser,
+	HiOutlineEye,
+	HiOutlinePencilAlt,
+	HiOutlineChevronDown,
+	HiOutlineCheck,
+	HiOutlineBookmark,
+} from "react-icons/hi";
 
 import PageHeader from "../components/shared/PageHeader";
 import Button from "../components/shared/Button";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import SlideUpModal from "../components/shared/SlideUpModal";
+import Toggle from "../components/shared/Toggle";
 import { fetchBusinessGroups } from "../store/businessGroupsSlice";
 import { fetchDepartments } from "../store/departmentsSlice";
+import userImage from "../assets/userimage.png";
 
-const ASSIGNMENT_INITIAL_STATE = {
-	effectiveDate: "",
-	jobTitle: "",
-	businessGroup: "",
-	department: "",
-	location: "",
-	grade: "",
-	manager: "",
-	assignmentType: "",
-};
+const ASSIGNMENT_DATA = [
+	{ id: 1, title: "Current Assignment", type: "Full Time", effectiveFrom: "01 Jan 2023", status: "active" },
+	{ id: 2, title: "Current Assignment", type: "Full Time", effectiveFrom: "01 Jan 2023", status: "inactive" },
+	{ id: 3, title: "Current Assignment", type: "Full Time", effectiveFrom: "01 Jan 2023", status: "active" },
+	{ id: 4, title: "Current Assignment", type: "Full Time", effectiveFrom: "01 Jan 2023", status: "active" },
+];
+
+const QUALIFICATION_DATA = [
+	{ id: 1, type: "Certificate", qualification: "PMP", issuer: "PMI", year: "2022", status: "valid" },
+	{ id: 2, type: "Course", qualification: "Leadership Skills", issuer: "AUC", year: "2021", status: "completed" },
+];
+
+const COMPETENCIES_LIST = [
+	{ id: 1, name: "Negotiation", selected: true, level: "beginner" },
+	{ id: 2, name: "Leadership", selected: false, level: "" },
+	{ id: 3, name: "Time Management", selected: false, level: "" },
+	{ id: 4, name: "Customer Service", selected: false, level: "" },
+	{ id: 5, name: "Data Analysis", selected: false, level: "" },
+	{ id: 6, name: "Teamwork", selected: true, level: "intermediate" },
+	{ id: 7, name: "Communication", selected: true, level: "advanced" },
+];
 
 const QUALIFICATION_INITIAL_STATE = {
-	type: "",
-	qualification: "",
-	issuer: "",
-	year: "",
-	status: "",
+	qualificationTitle: "",
+	qualificationType: "",
+	status: true,
+	titleOther: "",
+	gradeScore: "",
+	awardingEntity: "",
+	studyStartDate: "",
+	studyEndDate: "",
+	awardedDate: "",
+	projectedCompletion: "",
+	completionPercentage: 0,
 };
 
 const ProfilePage = () => {
 	const { t } = useTranslation();
 	const dispatch = useDispatch();
-	const { businessGroups = [] } = useSelector(state => state.businessGroups || {});
-	const { departments = [] } = useSelector(state => state.departments || {});
+	useSelector(state => state.businessGroups || {});
+	useSelector(state => state.departments || {});
 	const [activeTab, setActiveTab] = useState("assignment");
-	const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState(false);
+
+	// Assignment modals
+	const [isViewAssignmentModalOpen, setIsViewAssignmentModalOpen] = useState(false);
+	const [isEditAssignmentModalOpen, setIsEditAssignmentModalOpen] = useState(false);
+	const [selectedAssignment, setSelectedAssignment] = useState(null);
+	const [editAssignmentForm, setEditAssignmentForm] = useState({
+		title: "",
+		assignmentType: "",
+		effectiveFrom: "",
+		status: true,
+	});
+
+	// Qualification modal
 	const [isQualificationModalOpen, setIsQualificationModalOpen] = useState(false);
-	const [assignmentForm, setAssignmentForm] = useState(ASSIGNMENT_INITIAL_STATE);
 	const [qualificationForm, setQualificationForm] = useState(QUALIFICATION_INITIAL_STATE);
+	const [competencies, setCompetencies] = useState(COMPETENCIES_LIST);
+	const [isCompetenciesOpen, setIsCompetenciesOpen] = useState(false);
+	const [activeLevelDropdown, setActiveLevelDropdown] = useState(null);
+	const levelDropdownRef = React.useRef(null);
 
 	useEffect(() => {
 		document.title = `${t("profile.title")} - LightERP`;
@@ -53,85 +94,33 @@ const ProfilePage = () => {
 		dispatch(fetchDepartments({ page: 1, page_size: 100 }));
 	}, [dispatch]);
 
+	// Close level dropdown when clicking outside
+	useEffect(() => {
+		if (activeLevelDropdown === null) return;
+
+		const handleClickOutside = event => {
+			if (levelDropdownRef.current && !levelDropdownRef.current.contains(event.target)) {
+				setActiveLevelDropdown(null);
+			}
+		};
+
+		// Use a small delay to avoid immediate closure
+		const timeoutId = setTimeout(() => {
+			document.addEventListener("mousedown", handleClickOutside);
+		}, 0);
+
+		return () => {
+			clearTimeout(timeoutId);
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [activeLevelDropdown]);
+
 	const tabItems = [
 		{ id: "assignment", label: t("profile.tabs.assignment") },
 		{ id: "contacts", label: t("profile.tabs.contacts") },
 		{ id: "qualifications", label: t("profile.tabs.qualifications") },
+		{ id: "organization", label: t("profile.tabs.organization") },
 	];
-
-	const jobTitleOptions = useMemo(
-		() => [
-			{ value: "", label: t("profile.modals.fields.jobTitle") },
-			{ value: "senior_software_engineer", label: t("profile.modals.options.jobTitles.senior") },
-			{ value: "hr_specialist", label: t("profile.modals.options.jobTitles.hrSpecialist") },
-			{ value: "product_manager", label: t("profile.modals.options.jobTitles.productManager") },
-		],
-		[t]
-	);
-
-	const getOptionValue = value => (value === null || value === undefined ? "" : String(value));
-	const getBusinessGroupKey = businessGroup =>
-		getOptionValue(businessGroup?.id ?? businessGroup?.code ?? businessGroup?.name);
-	const getDepartmentKey = department =>
-		getOptionValue(department?.id ?? department?.code ?? department?.name);
-
-	const businessGroupOptions = useMemo(() => {
-		return [
-			{ value: "", label: "Business Group" },
-			...businessGroups.map(group => ({
-				value: getBusinessGroupKey(group),
-				label: group.name || group.code || "Unnamed Business Group",
-			})),
-		];
-	}, [businessGroups]);
-
-	const departmentOptions = useMemo(() => {
-		const selectedGroup = assignmentForm.businessGroup;
-		const filteredDepartments = selectedGroup
-			? departments.filter(department => {
-					const groupId = getOptionValue(
-						department?.business_group ?? department?.business_group_id ?? department?.business_group?.id
-					);
-					return groupId === selectedGroup;
-			  })
-			: departments;
-
-		return [
-			{ value: "", label: "Department" },
-			...filteredDepartments.map(department => ({
-				value: getDepartmentKey(department),
-				label: department.name || department.code || "Unnamed Department",
-			})),
-		];
-	}, [departments, assignmentForm.businessGroup]);
-
-	const locationOptions = useMemo(
-		() => [
-			{ value: "", label: t("profile.modals.fields.location") },
-			{ value: "head_office", label: t("profile.modals.options.locations.headOffice") },
-			{ value: "branch_office", label: t("profile.modals.options.locations.branchOffice") },
-		],
-		[t]
-	);
-
-	const gradeOptions = useMemo(
-		() => [
-			{ value: "", label: t("profile.modals.fields.grade") },
-			{ value: "g7", label: t("profile.modals.options.grades.g7") },
-			{ value: "g6", label: t("profile.modals.options.grades.g6") },
-			{ value: "g5", label: t("profile.modals.options.grades.g5") },
-		],
-		[t]
-	);
-
-	const managerOptions = useMemo(
-		() => [
-			{ value: "", label: t("profile.modals.fields.manager") },
-			{ value: "mohamed_hassan", label: t("profile.modals.options.managers.mohamedHassan") },
-			{ value: "sarah_adel", label: t("profile.modals.options.managers.sarahAdel") },
-		],
-		[t]
-	);
 
 	const assignmentTypeOptions = useMemo(
 		() => [
@@ -153,38 +142,86 @@ const ProfilePage = () => {
 		[t]
 	);
 
-	const qualificationStatusOptions = useMemo(
-		() => [
-			{ value: "", label: t("profile.modals.fields.status") },
-			{ value: "valid", label: t("profile.qualifications.statuses.valid") },
-			{ value: "completed", label: t("profile.qualifications.statuses.completed") },
-			{ value: "expired", label: t("profile.modals.options.qualificationStatuses.expired") },
-		],
-		[t]
-	);
-
-	const handleAssignmentChange = event => {
-		const { name, value } = event.target;
-		setAssignmentForm(prev => {
-			const nextForm = { ...prev, [name]: value };
-			if (name === "businessGroup") {
-				nextForm.department = "";
-			}
-			return nextForm;
-		});
+	const handleViewAssignment = assignment => {
+		setSelectedAssignment(assignment);
+		setIsViewAssignmentModalOpen(true);
 	};
 
-	const handleQualificationChange = event => {
-		const { name, value } = event.target;
+	const handleEditAssignment = assignment => {
+		setSelectedAssignment(assignment);
+		setEditAssignmentForm({
+			title: assignment.title,
+			type: assignment.type === "Full Time" ? "full_time" : "part_time",
+			effectiveFrom: "",
+			status: assignment.status,
+		});
+		setIsEditAssignmentModalOpen(true);
+	};
+
+	const handleQualificationChange = e => {
+		const { name, value } = e.target;
 		setQualificationForm(prev => ({ ...prev, [name]: value }));
 	};
 
-	const handleAssignmentSubmit = () => {
-		setIsAssignmentModalOpen(false);
+	const handleCompetencyToggle = id => {
+		setCompetencies(prev =>
+			prev.map(comp =>
+				comp.id === id ? { ...comp, selected: !comp.selected, level: !comp.selected ? "" : comp.level } : comp
+			)
+		);
+	};
+
+	const handleCompetencyLevelChange = (id, level) => {
+		setCompetencies(prev => prev.map(comp => (comp.id === id ? { ...comp, level, selected: true } : comp)));
+		// Keep dropdown open to allow changing level
 	};
 
 	const handleQualificationSubmit = () => {
 		setIsQualificationModalOpen(false);
+		setQualificationForm(QUALIFICATION_INITIAL_STATE);
+		setCompetencies(COMPETENCIES_LIST);
+	};
+
+	const renderStatusBadge = status => {
+		const isActive = status === "active";
+		return (
+			<span
+				className={`px-3 py-1 rounded-full text-xs font-semibold ${
+					isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
+				}`}
+			>
+				{isActive ? t("common.active") : t("common.inactive")}
+			</span>
+		);
+	};
+
+	const renderQualificationStatus = status => {
+		const statusMap = {
+			valid: { className: "bg-gray-100 text-gray-600", label: t("profile.qualifications.statuses.valid") },
+			completed: {
+				className: "bg-green-100 text-green-700",
+				label: t("profile.qualifications.statuses.completed"),
+			},
+		};
+		const statusInfo = statusMap[status] || statusMap.valid;
+		return (
+			<span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusInfo.className}`}>
+				{statusInfo.label}
+			</span>
+		);
+	};
+
+	const getLevelBadgeColor = level => {
+		switch (level.toLowerCase()) {
+			case "beginner":
+				return "bg-orange-100 text-orange-600";
+			case "intermediate":
+				return "bg-blue-100 text-blue-600";
+			case "advanced":
+				return "bg-green-100 text-green-700";
+			default:
+				return "bg-gray-100 text-gray-600";
+		}
 	};
 
 	return (
@@ -197,32 +234,43 @@ const ProfilePage = () => {
 
 			<div className="px-6 py-8">
 				<div className="grid grid-cols-1 xl:grid-cols-[260px_1fr] gap-6">
+					{/* Personal Information Sidebar */}
 					<aside className="bg-white rounded-2xl shadow-lg p-4">
-						<h3 className="text-sm font-semibold text-[#1D7A8C]">
-							{t("profile.personalInformation")}
-						</h3>
-						<div className="mt-4 rounded-xl bg-gray-100 h-40 flex items-center justify-center">
-							<div className="w-24 h-24 rounded-full bg-white shadow-inner flex items-center justify-center text-[#1D7A8C] font-bold text-2xl">
-								AA
-							</div>
+						<h3 className="text-lg font-semibold text-[#1D7A8C]">{t("profile.personalInformation")}</h3>
+						<div className="mt-4 flex items-center justify-center">
+							<img src={userImage} alt="Ahmed Ali" className="w-32 h-32 rounded-full object-cover" />
 						</div>
 						<div className="mt-4 border-t border-gray-200 pt-4">
-							<h2 className="text-lg font-bold text-gray-900">Ahmed Ali</h2>
-							<div className="mt-3 text-xs text-gray-500 space-y-2">
+							<h2 className="text-xl font-bold text-gray-900">Ahmed Ali</h2>
+							<div className="mt-3 text-sm text-gray-500 space-y-2">
 								<div className="flex items-center justify-between">
 									<span>{t("profile.employeeNo")}</span>
 									<span className="text-gray-800">100245</span>
 								</div>
 								<div className="flex items-center justify-between">
+									<span>{t("profile.hireDate")}</span>
+									<span className="text-gray-800">15-Jan-2023</span>
+								</div>
+								<div className="flex items-center justify-between">
 									<span>{t("profile.status")}</span>
-									<span className="text-green-600 font-semibold">{t("common.active")}</span>
+									<span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+										{t("common.active")}
+									</span>
 								</div>
 								<div className="flex items-center justify-between">
 									<span>{t("profile.primaryAssignment")}</span>
-									<span className="text-gray-800">{t("profile.primary")}</span>
 								</div>
 							</div>
-							<div className="mt-4 border-t border-gray-200 pt-4 text-xs text-gray-500 space-y-2">
+							<div className="mt-4 border-t border-gray-200 pt-4">
+								<p className="text-base font-semibold text-gray-900">Senior Software Engineer</p>
+								<div className="mt-2 flex items-center gap-3">
+									<span className="text-sm text-gray-600">Grade G7</span>
+									<span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+										{t("common.active")}
+									</span>
+								</div>
+							</div>
+							<div className="mt-4 border-t border-gray-200 pt-4 text-sm text-gray-500 space-y-1">
 								<p>HR Specialist</p>
 								<p>Human Resources</p>
 								<p>Corporate</p>
@@ -263,177 +311,161 @@ const ProfilePage = () => {
 						</div>
 
 						{activeTab === "assignment" && (
-							<div className="space-y-4">
-								<div className="bg-white rounded-2xl shadow-lg p-5">
-									<h3 className="text-sm font-semibold text-gray-900">
-										{t("profile.assignment.role")}
-									</h3>
-									<div className="mt-3 flex items-center gap-6 text-xs text-gray-500">
-										<span>{t("profile.assignment.grade")}</span>
-										<span className="flex items-center gap-2 text-green-600">
-											<span className="w-2 h-2 rounded-full bg-green-500"></span>
-											{t("common.active")}
-										</span>
-									</div>
-								</div>
-
-								<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-									<div className="bg-white rounded-2xl shadow-lg p-5">
-										<h4 className="text-sm font-semibold text-[#1D7A8C]">
-											{t("profile.assignment.detailsTitle")}
-										</h4>
-										<div className="mt-4 space-y-3 text-xs text-gray-500">
-											<div className="flex items-center justify-between">
-												<span>{t("profile.assignment.fields.title")}</span>
-												<span className="text-gray-900 font-medium">
-													{t("profile.assignment.currentAssignment")}
-												</span>
-											</div>
-											<div className="flex items-center justify-between">
-												<span>{t("profile.assignment.fields.assignmentType")}</span>
-												<span className="text-gray-900 font-medium">
-													{t("profile.assignment.fullTime")}
-												</span>
-											</div>
-											<div className="flex items-center justify-between">
-												<span>{t("profile.assignment.fields.effectiveFrom")}</span>
-												<span className="text-gray-900 font-medium">01 Jan 2023</span>
-											</div>
-											<div className="flex items-center justify-between">
-												<span>{t("profile.assignment.fields.assignmentStatus")}</span>
-												<span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
-													{t("common.active")}
-												</span>
-											</div>
-										</div>
-									</div>
-
-									<div className="bg-white rounded-2xl shadow-lg p-5">
-										<h4 className="text-sm font-semibold text-[#1D7A8C]">
-											{t("profile.assignment.organizationTitle")}
-										</h4>
-										<div className="mt-4 space-y-3 text-xs text-gray-500">
-											<div className="flex items-center justify-between">
-												<span>{t("profile.assignment.fields.title")}</span>
-												<span className="text-gray-900 font-medium">Organization</span>
-											</div>
-											<div className="flex items-center justify-between">
-												<span>{t("profile.assignment.fields.businessGroup")}</span>
-												<span className="text-gray-900 font-medium">Technology</span>
-											</div>
-											<div className="flex items-center justify-between">
-												<span>{t("profile.assignment.fields.department")}</span>
-												<span className="text-gray-900 font-medium">Software Development</span>
-											</div>
-											<div className="flex items-center justify-between">
-												<span>{t("profile.assignment.fields.location")}</span>
-												<span className="text-gray-900 font-medium">Head Office</span>
-											</div>
-											<div className="flex items-center justify-between">
-												<span>{t("profile.assignment.fields.manager")}</span>
-												<span className="text-gray-900 font-medium">Mohamed Hassan</span>
-											</div>
-										</div>
-									</div>
-								</div>
-
-								<div className="bg-white rounded-2xl shadow-lg p-4 flex items-center justify-end gap-3">
-									<button
-										type="button"
-										className="px-4 py-2 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-									>
-										{t("profile.assignment.actions.view")}
-									</button>
-									<Button
-										onClick={() => setIsAssignmentModalOpen(true)}
-										title={t("profile.assignment.actions.update")}
-										className="text-xs px-4 py-2"
-									/>
+							<div className="bg-white rounded-2xl shadow-lg p-6">
+								<h3 className="text-lg font-semibold text-[#1D7A8C] mb-6  pl-3">
+									{t("profile.assignment.detailsTitle")}
+								</h3>
+								<div className="overflow-x-auto">
+									<table className="w-full text-sm">
+										<thead className="bg-gray-50">
+											<tr>
+												<th className="text-left px-4 py-3 text-gray-600 font-semibold">
+													{t("profile.assignment.fields.title")}
+												</th>
+												<th className="text-left px-4 py-3 text-gray-600 font-semibold">
+													{t("profile.assignment.fields.assignmentType")}
+												</th>
+												<th className="text-left px-4 py-3 text-gray-600 font-semibold">
+													{t("profile.assignment.fields.effectiveFrom")}
+												</th>
+												<th className="text-left px-4 py-3 text-gray-600 font-semibold">
+													{t("profile.status")}
+												</th>
+												<th className="text-center px-4 py-3 text-gray-600 font-semibold">
+													{t("profile.assignment.fields.action")}
+												</th>
+											</tr>
+										</thead>
+										<tbody className="divide-y divide-gray-100">
+											{ASSIGNMENT_DATA.map(assignment => (
+												<tr key={assignment.id} className="hover:bg-gray-50">
+													<td className="px-4 py-4 text-gray-700">{assignment.title}</td>
+													<td className="px-4 py-4 text-gray-700">{assignment.type}</td>
+													<td className="px-4 py-4 text-gray-700">
+														{assignment.effectiveFrom}
+													</td>
+													<td className="px-4 py-4">
+														{renderStatusBadge(assignment.status)}
+													</td>
+													<td className="px-4 py-4">
+														<div className="flex items-center justify-center gap-2">
+															<button
+																onClick={() => handleViewAssignment(assignment)}
+																className="text-[#1D7A8C] hover:text-[#155a66] p-1"
+															>
+																<HiOutlineEye className="w-5 h-5" />
+															</button>
+															<button
+																onClick={() => handleEditAssignment(assignment)}
+																className="text-[#1D7A8C] hover:text-[#155a66] p-1"
+															>
+																<HiOutlinePencilAlt className="w-5 h-5" />
+															</button>
+														</div>
+													</td>
+												</tr>
+											))}
+										</tbody>
+									</table>
 								</div>
 							</div>
 						)}
 
 						{activeTab === "contacts" && (
 							<div className="space-y-6">
-								<div className="bg-white rounded-2xl shadow-lg p-5">
-									<h4 className="text-sm font-semibold text-[#1D7A8C]">
+								{/* Address & Communication */}
+								<div className="bg-white rounded-2xl shadow-lg p-6">
+									<h4 className="text-lg font-semibold text-[#1D7A8C] mb-6  pl-3">
 										{t("profile.contacts.addressTitle")}
 									</h4>
-									<div className="mt-4 overflow-x-auto">
-										<table className="w-full text-xs text-gray-600">
-											<thead className="bg-gray-50 text-[11px] uppercase text-gray-400">
+									<div className="overflow-x-auto">
+										<table className="w-full text-sm">
+											<thead className="bg-gray-50">
 												<tr>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.contacts.table.email")}
 													</th>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.contacts.table.phone")}
 													</th>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.contacts.table.address")}
 													</th>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.contacts.table.addressType")}
 													</th>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.contacts.table.lastUpdate")}
 													</th>
 												</tr>
 											</thead>
-											<tbody className="divide-y divide-gray-200">
-												<tr className="text-[#1D7A8C]">
-													<td className="px-3 py-3">ahmed@company.com</td>
-													<td className="px-3 py-3">01012345678</td>
-													<td className="px-3 py-3">25 Abbas El Akkad St., Nasr City, Cairo, Egypt</td>
-													<td className="px-3 py-3">Home</td>
-													<td className="px-3 py-3">01-Mar-2025</td>
+											<tbody className="divide-y divide-gray-100">
+												<tr>
+													<td className="px-4 py-4 text-[#1D7A8C] cursor-pointer hover:underline">
+														ahmed@company.com
+													</td>
+													<td className="px-4 py-4 text-[#1D7A8C] cursor-pointer hover:underline">
+														01012345678
+													</td>
+													<td className="px-4 py-4 text-[#1D7A8C] cursor-pointer hover:underline">
+														25 Abbas El Akkad St., Nasr city, Cairo, Egypt
+													</td>
+													<td className="px-4 py-4 text-[#1D7A8C] cursor-pointer hover:underline">
+														Home
+													</td>
+													<td className="px-4 py-4 text-[#1D7A8C] cursor-pointer hover:underline">
+														01-Mar-2025
+													</td>
 												</tr>
 												<tr>
-													<td className="px-3 py-3">ahmed.old@mail.com</td>
-													<td className="px-3 py-3">01198765432</td>
-													<td className="px-3 py-3">12 El Tayaran St., Heliopolis, Cairo, Egypt</td>
-													<td className="px-3 py-3">Home</td>
-													<td className="px-3 py-3">15-Jan-2022</td>
+													<td className="px-4 py-4 text-gray-700">ahmed.old@mail.com</td>
+													<td className="px-4 py-4 text-gray-700">01198765432</td>
+													<td className="px-4 py-4 text-gray-700">
+														12 El Tayaran St., Heliopolis Cairo, Egypt
+													</td>
+													<td className="px-4 py-4 text-gray-700">Home</td>
+													<td className="px-4 py-4 text-gray-700">15-Jan-2022</td>
 												</tr>
 											</tbody>
 										</table>
 									</div>
 								</div>
 
-								<div className="bg-white rounded-2xl shadow-lg p-5">
-									<h4 className="text-sm font-semibold text-[#1D7A8C]">
+								{/* Emergency / Family Contacts */}
+								<div className="bg-white rounded-2xl shadow-lg p-6">
+									<h4 className="text-lg font-semibold text-[#1D7A8C] mb-6  pl-3">
 										{t("profile.contacts.familyTitle")}
 									</h4>
-									<div className="mt-4 overflow-x-auto">
-										<table className="w-full text-xs text-gray-600">
-											<thead className="bg-gray-50 text-[11px] uppercase text-gray-400">
+									<div className="overflow-x-auto">
+										<table className="w-full text-sm">
+											<thead className="bg-gray-50">
 												<tr>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.contacts.table.name")}
 													</th>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.contacts.table.phone")}
 													</th>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.contacts.table.relationship")}
 													</th>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.contacts.table.contactType")}
 													</th>
 												</tr>
 											</thead>
-											<tbody className="divide-y divide-gray-200">
+											<tbody className="divide-y divide-gray-100">
 												<tr>
-													<td className="px-3 py-3">Mona Ahmed</td>
-													<td className="px-3 py-3">01055544321</td>
-													<td className="px-3 py-3">Wife</td>
-													<td className="px-3 py-3">Family</td>
+													<td className="px-4 py-4 text-gray-700">Mona Ahmed</td>
+													<td className="px-4 py-4 text-gray-700">01055544321</td>
+													<td className="px-4 py-4 text-gray-700">Wife</td>
+													<td className="px-4 py-4 text-gray-700">Family</td>
 												</tr>
 												<tr>
-													<td className="px-3 py-3">Ali Ahmed</td>
-													<td className="px-3 py-3">01233322111</td>
-													<td className="px-3 py-3">Brother</td>
-													<td className="px-3 py-3">Emergency</td>
+													<td className="px-4 py-4 text-gray-700">Ali Ahmed</td>
+													<td className="px-4 py-4 text-gray-700">01233322111</td>
+													<td className="px-4 py-4 text-gray-700">Brother</td>
+													<td className="px-4 py-4 text-gray-700">Emergency</td>
 												</tr>
 											</tbody>
 										</table>
@@ -444,51 +476,63 @@ const ProfilePage = () => {
 
 						{activeTab === "qualifications" && (
 							<div className="space-y-4">
-								<div className="bg-white rounded-2xl shadow-lg p-5">
+								<div className="bg-white rounded-2xl shadow-lg p-6">
 									<div className="overflow-x-auto">
-										<table className="w-full text-xs text-gray-600">
-											<thead className="bg-gray-50 text-[11px] uppercase text-gray-400">
+										<table className="w-full text-sm">
+											<thead className="bg-gray-50">
 												<tr>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.qualifications.table.type")}
 													</th>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.qualifications.table.qualification")}
 													</th>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.qualifications.table.issuer")}
 													</th>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.qualifications.table.year")}
 													</th>
-													<th className="text-left px-3 py-2">
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
 														{t("profile.qualifications.table.status")}
+													</th>
+													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
+														{t("profile.qualifications.table.action")}
 													</th>
 												</tr>
 											</thead>
-											<tbody className="divide-y divide-gray-200">
-												<tr>
-													<td className="px-3 py-3">Certificate</td>
-													<td className="px-3 py-3">PMP</td>
-													<td className="px-3 py-3">PMI</td>
-													<td className="px-3 py-3">2022</td>
-													<td className="px-3 py-3">
-														<span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-semibold">
-															{t("profile.qualifications.statuses.valid")}
-														</span>
-													</td>
-												</tr>
-												<tr>
-													<td className="px-3 py-3">Course</td>
-													<td className="px-3 py-3">Leadership Skills</td>
-													<td className="px-3 py-3">AUC</td>
-													<td className="px-3 py-3">2021</td>
-													<td className="px-3 py-3">
-														<span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
-															{t("profile.qualifications.statuses.completed")}
-														</span>
-													</td>
-												</tr>
+											<tbody className="divide-y divide-gray-100">
+												{QUALIFICATION_DATA.map((qual, index) => (
+													<tr key={index}>
+														<td className="px-4 py-4 text-gray-700">{qual.type}</td>
+														<td className="px-4 py-4 text-gray-700">
+															{qual.qualification}
+														</td>
+														<td className="px-4 py-4 text-gray-700">{qual.issuer}</td>
+														<td className="px-4 py-4 text-gray-700">{qual.year}</td>
+														<td className="px-4 py-4">
+															{renderQualificationStatus(qual.status)}
+														</td>
+														<td className="px-4 py-4">
+															<div className="flex items-center gap-2">
+																<button
+																	type="button"
+																	className="p-1.5 text-gray-500 hover:text-[#1D7A8C] transition-colors"
+																	title="View"
+																>
+																	<HiOutlineEye className="w-5 h-5" />
+																</button>
+																<button
+																	type="button"
+																	className="p-1.5 text-gray-500 hover:text-[#1D7A8C] transition-colors"
+																	title="Edit"
+																>
+																	<HiOutlinePencilAlt className="w-5 h-5" />
+																</button>
+															</div>
+														</td>
+													</tr>
+												))}
 											</tbody>
 										</table>
 									</div>
@@ -498,10 +542,53 @@ const ProfilePage = () => {
 									<button
 										type="button"
 										onClick={() => setIsQualificationModalOpen(true)}
-										className="px-4 py-2 text-xs font-medium text-[#1D7A8C] border border-[#1D7A8C] rounded-lg hover:bg-[#1D7A8C]/5 transition-colors"
+										className="px-4 py-2 text-sm font-medium text-[#1D7A8C] border border-[#1D7A8C] rounded-lg hover:bg-[#1D7A8C]/5 transition-colors"
 									>
 										{t("profile.qualifications.actions.add")}
 									</button>
+								</div>
+							</div>
+						)}
+
+						{activeTab === "organization" && (
+							<div className="space-y-6">
+								<div className="bg-white rounded-2xl shadow-lg p-6">
+									<h4 className="text-lg font-semibold text-[#1D7A8C] mb-3">
+										{t("profile.organization.title")}
+									</h4>
+									<div className="h-px bg-gray-200 mb-6"></div>
+									<div className="space-y-4">
+										<div className="flex items-center justify-between">
+											<label className="text-sm text-gray-500 font-normal">
+												{t("profile.organization.fields.title")}
+											</label>
+											<p className="text-gray-800 font-bold">Organization</p>
+										</div>
+										<div className="flex items-center justify-between">
+											<label className="text-sm text-gray-500 font-normal">
+												{t("profile.organization.fields.businessGroup")}
+											</label>
+											<p className="text-gray-800 font-bold">Technology</p>
+										</div>
+										<div className="flex items-center justify-between">
+											<label className="text-sm text-gray-500 font-normal">
+												{t("profile.organization.fields.department")}
+											</label>
+											<p className="text-gray-800 font-bold">Software Development</p>
+										</div>
+										<div className="flex items-center justify-between">
+											<label className="text-sm text-gray-500 font-normal">
+												{t("profile.organization.fields.location")}
+											</label>
+											<p className="text-gray-800 font-bold">Head Office</p>
+										</div>
+										<div className="flex items-center justify-between">
+											<label className="text-sm text-gray-500 font-normal">
+												{t("profile.organization.fields.manager")}
+											</label>
+											<p className="text-gray-800 font-bold">Mohamed Hassan</p>
+										</div>
+									</div>
 								</div>
 							</div>
 						)}
@@ -509,77 +596,109 @@ const ProfilePage = () => {
 				</div>
 			</div>
 
+			{/* View Assignment Modal */}
 			<SlideUpModal
-				isOpen={isAssignmentModalOpen}
-				onClose={() => setIsAssignmentModalOpen(false)}
-				title={t("profile.modals.updateAssignment")}
-				maxWidth="760px"
+				isOpen={isViewAssignmentModalOpen}
+				onClose={() => setIsViewAssignmentModalOpen(false)}
+				title={t("profile.modals.viewAssignment")}
+				maxWidth="560px"
 			>
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
-					<FloatingLabelInput
-						label={t("profile.modals.fields.effectiveDate")}
-						name="effectiveDate"
-						type="date"
-						value={assignmentForm.effectiveDate}
-						onChange={handleAssignmentChange}
-					/>
-					<FloatingLabelSelect
-						label={t("profile.modals.fields.jobTitle")}
-						name="jobTitle"
-						value={assignmentForm.jobTitle}
-						onChange={handleAssignmentChange}
-						options={jobTitleOptions}
-					/>
-					<FloatingLabelSelect
-						label={t("profile.modals.fields.businessGroup")}
-						name="businessGroup"
-						value={assignmentForm.businessGroup}
-						onChange={handleAssignmentChange}
-						options={businessGroupOptions}
-					/>
-					<FloatingLabelSelect
-						label={t("profile.modals.fields.department")}
-						name="department"
-						value={assignmentForm.department}
-						onChange={handleAssignmentChange}
-						options={departmentOptions}
-					/>
-					<FloatingLabelSelect
-						label={t("profile.modals.fields.location")}
-						name="location"
-						value={assignmentForm.location}
-						onChange={handleAssignmentChange}
-						options={locationOptions}
-					/>
-					<FloatingLabelSelect
-						label={t("profile.modals.fields.grade")}
-						name="grade"
-						value={assignmentForm.grade}
-						onChange={handleAssignmentChange}
-						options={gradeOptions}
-					/>
-					<FloatingLabelSelect
-						label={t("profile.modals.fields.manager")}
-						name="manager"
-						value={assignmentForm.manager}
-						onChange={handleAssignmentChange}
-						options={managerOptions}
-					/>
-					<FloatingLabelSelect
-						label={t("profile.modals.fields.assignmentType")}
-						name="assignmentType"
-						value={assignmentForm.assignmentType}
-						onChange={handleAssignmentChange}
-						options={assignmentTypeOptions}
-					/>
-				</div>
-				<div className="flex items-center justify-end gap-3 py-4">
+				{selectedAssignment && (
+					<div className="py-4">
+						<h4 className="text-lg font-semibold text-[#1D7A8C] mb-6 underline">
+							{t("profile.modals.assignmentDetails")}
+						</h4>
+						<div className="space-y-4">
+							<div className="mb-3">
+								<p className="text-gray-800 font-medium text-base">{selectedAssignment.title}</p>
+							</div>
+							<div className="space-y-3">
+								<div className="flex items-start gap-4">
+									<label className="block text-sm text-gray-500 min-w-[140px]">
+										{t("profile.assignment.fields.title")}
+									</label>
+									<p className="text-gray-800 font-medium">{selectedAssignment.title}</p>
+								</div>
+								<div className="flex items-start gap-4">
+									<label className="block text-sm text-gray-500 min-w-[140px]">
+										{t("profile.assignment.fields.assignmentType")}
+									</label>
+									<p className="text-gray-800 font-medium">{selectedAssignment.type}</p>
+								</div>
+								<div className="flex items-start gap-4">
+									<label className="block text-sm text-gray-500 min-w-[140px]">
+										{t("profile.assignment.fields.effectiveFrom")}
+									</label>
+									<p className="text-gray-800 font-medium">{selectedAssignment.effectiveFrom}</p>
+								</div>
+								<div className="flex items-start gap-4">
+									<label className="block text-sm text-gray-500 min-w-[140px]">
+										{t("profile.assignment.fields.assignmentStatus")}
+									</label>
+									{renderStatusBadge(selectedAssignment.status)}
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
+				<div className="flex items-center justify-end gap-3 py-4 border-t border-gray-200 mt-4">
 					<Button
-						onClick={() => setIsAssignmentModalOpen(false)}
+						onClick={() => setIsViewAssignmentModalOpen(false)}
 						title={t("common.cancel")}
 						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none"
 					/>
-					<Button onClick={handleAssignmentSubmit} title={t("common.update")} className="shadow-none" />
+				</div>
+			</SlideUpModal>
+
+			{/* Edit Assignment Modal */}
+			<SlideUpModal
+				isOpen={isEditAssignmentModalOpen}
+				onClose={() => setIsEditAssignmentModalOpen(false)}
+				title={t("profile.modals.editAssignment")}
+				maxWidth="560px"
+			>
+				<div className="py-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<FloatingLabelInput
+							label={t("profile.assignment.fields.title")}
+							name="title"
+							value={editAssignmentForm.title}
+							onChange={e => setEditAssignmentForm(prev => ({ ...prev, title: e.target.value }))}
+						/>
+						<FloatingLabelSelect
+							label={t("profile.assignment.fields.assignmentType")}
+							name="assignmentType"
+							value={editAssignmentForm.type}
+							onChange={e => setEditAssignmentForm(prev => ({ ...prev, type: e.target.value }))}
+							options={assignmentTypeOptions}
+						/>
+						<FloatingLabelInput
+							label={t("profile.assignment.fields.effectiveFrom")}
+							name="effectiveFrom"
+							type="date"
+							value={editAssignmentForm.effectiveFrom}
+							onChange={e => setEditAssignmentForm(prev => ({ ...prev, effectiveFrom: e.target.value }))}
+						/>
+						<div className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-3">
+							<label className="text-sm text-gray-600">{t("profile.assignment.fields.status")}</label>
+							<Toggle
+								enabled={editAssignmentForm.status === true || editAssignmentForm.status === "active"}
+								onChange={enabled => setEditAssignmentForm(prev => ({ ...prev, status: enabled }))}
+							/>
+						</div>
+					</div>
+				</div>
+				<div className="flex items-center justify-end gap-3 py-4 border-t border-gray-200 mt-4">
+					<Button
+						onClick={() => setIsEditAssignmentModalOpen(false)}
+						title={t("common.cancel")}
+						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none"
+					/>
+					<Button
+						onClick={() => setIsEditAssignmentModalOpen(false)}
+						title={t("common.edit")}
+						className="shadow-none"
+					/>
 				</div>
 			</SlideUpModal>
 
@@ -587,43 +706,261 @@ const ProfilePage = () => {
 				isOpen={isQualificationModalOpen}
 				onClose={() => setIsQualificationModalOpen(false)}
 				title={t("profile.modals.addQualification")}
-				maxWidth="560px"
+				maxWidth="760px"
 			>
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
-					<FloatingLabelSelect
-						label={t("profile.modals.fields.qualificationType")}
-						name="type"
-						value={qualificationForm.type}
-						onChange={handleQualificationChange}
-						options={qualificationTypeOptions}
-					/>
-					<FloatingLabelInput
-						label={t("profile.modals.fields.qualifications")}
-						name="qualification"
-						value={qualificationForm.qualification}
-						onChange={handleQualificationChange}
-					/>
-					<FloatingLabelInput
-						label={t("profile.modals.fields.issuer")}
-						name="issuer"
-						value={qualificationForm.issuer}
-						onChange={handleQualificationChange}
-					/>
-					<FloatingLabelInput
-						label={t("profile.modals.fields.year")}
-						name="year"
-						type="number"
-						value={qualificationForm.year}
-						onChange={handleQualificationChange}
-					/>
-					<div className="md:col-span-2">
-						<FloatingLabelSelect
-							label={t("profile.modals.fields.status")}
-							name="status"
-							value={qualificationForm.status}
-							onChange={handleQualificationChange}
-							options={qualificationStatusOptions}
-						/>
+				<div className="py-4 space-y-6">
+					{/* Basic Information Section */}
+					<div>
+						<h4 className="text-base font-bold text-black mb-6  pl-3 flex items-center gap-2 uppercase">
+							<HiOutlineBookmark className="w-5 h-5 text-[#1D7A8C]" />
+							{t("profile.qualifications.sections.basicInfo")}
+						</h4>
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<FloatingLabelSelect
+								label={`${t("profile.qualifications.fields.qualificationTitle")} *`}
+								name="qualificationTitle"
+								value={qualificationForm.qualificationTitle}
+								onChange={handleQualificationChange}
+								options={[
+									{ value: "", label: `${t("profile.qualifications.fields.qualificationTitle")} *` },
+								]}
+								required
+							/>
+							<FloatingLabelSelect
+								label={`${t("profile.qualifications.fields.qualificationType")}`}
+								name="qualificationType"
+								value={qualificationForm.qualificationType}
+								onChange={handleQualificationChange}
+								options={qualificationTypeOptions}
+								required
+							/>
+							<div className="flex items-center justify-between bg-gray-50 rounded-xl px-2 border border-gray-200">
+								<label className="text-sm text-gray-600 font-medium">
+									{t("profile.qualifications.fields.status")} <span className="text-red-400">*</span>
+								</label>
+								<Toggle
+									enabled={qualificationForm.status === true}
+									onChange={enabled => setQualificationForm(prev => ({ ...prev, status: enabled }))}
+									className="py-2"
+								/>
+							</div>
+							<FloatingLabelInput
+								label={t("profile.qualifications.fields.titleIfOthers")}
+								name="titleOther"
+								value={qualificationForm.titleOther || ""}
+								onChange={handleQualificationChange}
+							/>
+							<FloatingLabelInput
+								label={t("profile.qualifications.fields.gradeScore")}
+								name="gradeScore"
+								value={qualificationForm.gradeScore || ""}
+								onChange={handleQualificationChange}
+							/>
+							<FloatingLabelInput
+								label={t("profile.qualifications.fields.awardingEntity")}
+								name="awardingEntity"
+								value={qualificationForm.awardingEntity}
+								onChange={handleQualificationChange}
+							/>
+						</div>
+					</div>
+
+					{/* Timeline & Progress Section */}
+					<div>
+						<h4 className="text-base font-bold text-black mb-6  pl-3 flex items-center gap-2 uppercase ">
+							<HiOutlineBookmark className="w-5 h-5 text-[#1D7A8C]" />
+							{t("profile.qualifications.sections.timeline")}
+						</h4>
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<FloatingLabelInput
+								label={t("profile.qualifications.fields.studyStartDate")}
+								name="studyStartDate"
+								type="date"
+								value={qualificationForm.studyStartDate || ""}
+								onChange={handleQualificationChange}
+							/>
+							<FloatingLabelInput
+								label={t("profile.qualifications.fields.studyEndDate")}
+								name="studyEndDate"
+								type="date"
+								value={qualificationForm.studyEndDate || ""}
+								onChange={handleQualificationChange}
+							/>
+							<FloatingLabelInput
+								label={t("profile.qualifications.fields.awardedDate")}
+								name="awardedDate"
+								type="date"
+								value={qualificationForm.awardedDate || ""}
+								onChange={handleQualificationChange}
+							/>
+							<FloatingLabelInput
+								label={t("profile.qualifications.fields.projectedCompletion")}
+								name="projectedCompletion"
+								type="date"
+								value={qualificationForm.projectedCompletion || ""}
+								onChange={handleQualificationChange}
+							/>
+						</div>
+					</div>
+
+					{/* Competencies Section */}
+					<div>
+						<button
+							type="button"
+							onClick={() => setIsCompetenciesOpen(!isCompetenciesOpen)}
+							className="w-full flex items-center justify-between text-lg font-semibold text-[#1D7A8C] mb-6  pl-3 pr-2"
+						>
+							<span className="flex items-center gap-2">
+								<svg
+									className="w-5 h-5"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
+									/>
+								</svg>
+								{t("profile.qualifications.sections.competencies")}
+							</span>
+							<HiOutlineChevronDown
+								className={`w-5 h-5 transition-transform ${isCompetenciesOpen ? "rotate-180" : ""}`}
+							/>
+						</button>
+						{isCompetenciesOpen && (
+							<div className="relative" ref={levelDropdownRef}>
+								{/* Competencies List */}
+								<div className="space-y-2 max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-lg p-4">
+									{competencies.map(comp => (
+										<div key={comp.id} className="flex items-center justify-between p-2 relative">
+											<div className="flex items-center gap-2 flex-1">
+												<span className="w-2 h-2 rounded-full bg-green-500"></span>
+												<span className="text-sm text-gray-700">{comp.name}</span>
+											</div>
+											<div className="flex items-center gap-1 relative">
+												<button
+													type="button"
+													onClick={e => {
+														e.stopPropagation();
+														const newSelected = !comp.selected;
+														setCompetencies(prev =>
+															prev.map(c =>
+																c.id === comp.id
+																	? {
+																			...c,
+																			selected: newSelected,
+																			level: newSelected ? c.level || "" : "",
+																	  }
+																	: c
+															)
+														);
+														if (!newSelected && activeLevelDropdown === comp.id) {
+															setActiveLevelDropdown(null);
+														}
+													}}
+													className={`p-1 rounded transition-colors ${
+														comp.selected ? "text-[#1D7A8C]" : "text-gray-400"
+													}`}
+												>
+													<HiOutlineCheck className="w-5 h-5" />
+												</button>
+												<button
+													type="button"
+													onClick={e => {
+														e.stopPropagation();
+														if (comp.selected) {
+															setActiveLevelDropdown(
+																activeLevelDropdown === comp.id ? null : comp.id
+															);
+														}
+													}}
+													className={`p-1 rounded transition-colors ${
+														comp.selected
+															? "text-[#1D7A8C]"
+															: "text-gray-300 cursor-not-allowed"
+													}`}
+													disabled={!comp.selected}
+												>
+													<HiOutlineChevronDown
+														className={`w-4 h-4 ${comp.selected ? "" : "opacity-50"}`}
+													/>
+												</button>
+
+												{/* Level Selection Popover */}
+												{activeLevelDropdown === comp.id && comp.selected && (
+													<div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-200 rounded-lg shadow-lg p-2 min-w-[140px]">
+														<div className="space-y-1">
+															{["Beginner", "Intermediate", "Advanced"].map(level => {
+																const levelLower = level.toLowerCase();
+																const isSelected = comp.level === levelLower;
+																return (
+																	<button
+																		key={level}
+																		type="button"
+																		onClick={e => {
+																			e.stopPropagation();
+																			handleCompetencyLevelChange(
+																				comp.id,
+																				levelLower
+																			);
+																			setActiveLevelDropdown(null);
+																		}}
+																		className={`w-full text-center px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+																			isSelected
+																				? levelLower === "beginner"
+																					? "bg-orange-100 text-orange-600"
+																					: levelLower === "intermediate"
+																					? "bg-blue-100 text-blue-600"
+																					: "bg-green-100 text-green-700"
+																				: levelLower === "beginner"
+																				? "bg-orange-100 text-orange-600 hover:bg-orange-200"
+																				: levelLower === "intermediate"
+																				? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+																				: "bg-green-100 text-green-700 hover:bg-green-200"
+																		}`}
+																	>
+																		{level}
+																	</button>
+																);
+															})}
+														</div>
+													</div>
+												)}
+											</div>
+										</div>
+									))}
+								</div>
+							</div>
+						)}
+					</div>
+
+					{/* Completion Percentage Section */}
+					<div>
+						<h4 className="text-lg font-semibold text-[#1D7A8C] mb-6  pl-3">
+							{t("profile.qualifications.sections.completion")}
+						</h4>
+						<div className="flex items-center gap-4">
+							<input
+								type="range"
+								min="0"
+								max="100"
+								value={qualificationForm.completionPercentage || 0}
+								onChange={e =>
+									setQualificationForm(prev => ({
+										...prev,
+										completionPercentage: parseInt(e.target.value),
+									}))
+								}
+								className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#1D7A8C]"
+							/>
+							<span className="text-lg font-semibold text-[#1D7A8C] min-w-[60px] text-right">
+								{qualificationForm.completionPercentage || 0}%
+							</span>
+						</div>
 					</div>
 				</div>
 				<div className="flex items-center justify-end gap-3 py-4">

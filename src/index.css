@@ -43,10 +43,8 @@ body {
 
 body.rtl * {
 	direction: rtl;
-	text-align: right;
 }
 
 body.ltr * {
 	direction: ltr;
-	text-align: left;
 }

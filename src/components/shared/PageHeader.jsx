@@ -64,7 +64,7 @@ const PageHeader = ({ icon, title, subtitle, className = "" }) => {
 			className={`relative bg-gradient-to-r from-[#031b28] via-[#0a5b79] to-[#031b28] text-white overflow-hidden py-6 ${className}`}
 		>
 			<div className="px-10 gap-6">
-				<div className="flex items-center">
+				<div className="flex items-center gap-4">
 					{icon && <div className="">{icon}</div>}
 
 					{/* Title and Subtitle */}

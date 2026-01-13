@@ -561,12 +561,14 @@
 		"personalInformation": "المعلومات الشخصية",
 		"employeeNo": "رقم الموظف",
 		"status": "الحالة",
+		"hireDate": "تاريخ التعيين",
 		"primaryAssignment": "التكليف الأساسي",
 		"primary": "أساسي",
 		"tabs": {
 			"assignment": "التكليف الحالي",
 			"contacts": "جهات الاتصال",
-			"qualifications": "المؤهلات"
+			"qualifications": "المؤهلات",
+			"organization": "الهيكل التنظيمي"
 		},
 		"assignment": {
 			"role": "مهندس برمجيات أول",
@@ -575,19 +577,36 @@
 			"organizationTitle": "معلومات الجهة",
 			"fields": {
 				"title": "العنوان",
+				"type": "نوع التكليف",
 				"assignmentType": "نوع التكليف",
 				"effectiveFrom": "ساري من",
 				"assignmentStatus": "حالة التكليف",
+				"status": "حالة التكليف",
 				"businessGroup": "مجموعة الأعمال",
 				"department": "القسم",
 				"location": "الموقع",
-				"manager": "المدير"
+				"manager": "المدير",
+				"action": "الإجراء"
 			},
 			"currentAssignment": "التكليف الحالي",
 			"fullTime": "دوام كامل",
 			"actions": {
 				"view": "عرض التكليف",
 				"update": "تحديث التكليف"
+			},
+			"statuses": {
+				"active": "نشط",
+				"inactive": "غير نشط"
+			}
+		},
+		"organization": {
+			"title": "معلومات الجهة",
+			"fields": {
+				"title": "العنوان",
+				"businessGroup": "مجموعة الأعمال",
+				"department": "القسم",
+				"location": "الموقع",
+				"manager": "المدير"
 			}
 		},
 		"contacts": {
@@ -610,11 +629,38 @@
 				"qualification": "المؤهل",
 				"issuer": "الجهة المانحة",
 				"year": "السنة",
-				"status": "الحالة"
+				"status": "الحالة",
+				"action": "الإجراء"
 			},
 			"statuses": {
 				"valid": "ساري",
-				"completed": "مكتمل"
+				"completed": "مكتمل",
+				"inProgress": "قيد التنفيذ"
+			},
+			"sections": {
+				"basicInfo": "المعلومات الأساسية",
+				"timeline": "الجدول الزمني والتقدم",
+				"competencies": "الكفاءات",
+				"completion": "نسبة الإنجاز"
+			},
+			"fields": {
+				"qualificationTitle": "عنوان المؤهل",
+				"type": "النوع",
+				"status": "الحالة",
+				"titleIfOthers": "العنوان (إذا كان أخرى)",
+				"gradeScore": "الدرجة/العلامة",
+				"awardingEntity": "الجهة المانحة",
+				"studyStartDate": "تاريخ بدء الدراسة",
+				"studyEndDate": "تاريخ انتهاء الدراسة",
+				"awardedDate": "تاريخ المنح",
+				"projectedCompletion": "تاريخ الإنجاز المتوقع",
+				"selectLevel": "اختر المستوى",
+				"qualificationType": "نوع المؤهل"
+			},
+			"levels": {
+				"beginner": "مبتدئ",
+				"intermediate": "متوسط",
+				"advanced": "متقدم"
 			},
 			"actions": {
 				"add": "إضافة مؤهل"
@@ -622,6 +668,9 @@
 		},
 		"modals": {
 			"updateAssignment": "تحديث التكليف",
+			"viewAssignment": "عرض التكليف",
+			"editAssignment": "تعديل التكليف",
+			"assignmentDetails": "تفاصيل التكليف",
 			"addQualification": "إضافة مؤهل",
 			"fields": {
 				"effectiveDate": "تاريخ السريان",
@@ -671,6 +720,118 @@
 					"expired": "منتهي"
 				}
 			}
+		}
+	},
+	"employeeDocuments": {
+		"title": "مستند الموظف",
+		"subtitle": "إدارة وتتبع مستندات الموظفين",
+		"gridTitle": "شبكة المستندات لكل موظف",
+		"table": {
+			"documentType": "نوع المستند",
+			"uploadedDate": "تاريخ الرفع",
+			"expiryDate": "تاريخ الانتهاء",
+			"status": "الحالة",
+			"actions": "الإجراءات",
+			"empty": "لا توجد مستندات"
+		},
+		"buttons": {
+			"editProfile": "تعديل الملف",
+			"uploadDocument": "رفع مستند",
+			"upload": "رفع"
+		},
+		"actions": {
+			"view": "عرض",
+			"download": "تنزيل",
+			"renewNow": "تجديد الآن"
+		},
+		"badges": {
+			"actionRequired": "يتطلب إجراء"
+		},
+		"status": {
+			"active": "نشط",
+			"expiring": "سينتهي قريبًا",
+			"expired": "منتهي",
+			"verified": "موثق",
+			"processing": "قيد المعالجة"
+		},
+		"modals": {
+			"editProfile": "تعديل الملف",
+			"uploadDocument": "رفع مستند",
+			"sections": {
+				"documentInformation": "معلومات المستند",
+				"dates": "التواريخ",
+				"statusManagement": "إدارة الحالة",
+				"visibilityValidation": "قواعد الرؤية والتحقق",
+				"documentDetails": "تفاصيل المستند",
+				"uploadFile": "رفع الملف",
+				"status": "الحالة"
+			},
+			"fields": {
+				"documentType": "نوع المستند",
+				"documentCategory": "تصنيف المستند",
+				"isMandatory": "إلزامي",
+				"requiresExpiry": "يتطلب تاريخ انتهاء",
+				"uploadedDate": "تاريخ الرفع",
+				"expiryDate": "تاريخ الانتهاء",
+				"status": "الحالة",
+				"visibleToEmployee": "مرئي للموظف",
+				"requiresApproval": "يتطلب موافقة"
+			},
+			"upload": {
+				"instructions": "انقر للرفع أو اسحب وأسقط",
+				"formats": "SVG أو PNG أو JPG أو PDF (حد أقصى 5 ميجابايت)",
+				"browse": "تصفح الملفات"
+			}
+		}
+	},
+	"absenceSummary": {
+		"title": "ملخص الغيابات",
+		"subtitle": "ملخص الغيابات · نظرة عامة",
+		"summaryTitle": "ملخص الغيابات",
+		"overview": "نظرة عامة",
+		"gridTitle": "ملخص الغيابات",
+		"cards": {
+			"annual": "إجازة سنوية",
+			"sick": "إجازة مرضية",
+			"remaining": "المتبقي",
+			"days": "يوم"
+		},
+		"listTitle": "قائمة الغيابات",
+		"table": {
+			"type": "نوع الغياب",
+			"period": "الفترة",
+			"status": "الحالة",
+			"empty": "لا توجد غيابات"
+		},
+		"status": {
+			"rejected": "مرفوض",
+			"pending": "قيد الانتظار",
+			"approved": "موافق عليه"
+		},
+		"types": {
+			"annual": "إجازة سنوية",
+			"sick": "إجازة مرضية",
+			"unpaid": "إجازة بدون راتب"
+		},
+		"buttons": {
+			"addAbsence": "إضافة غياب",
+			"add": "إضافة"
+		},
+		"modal": {
+			"title": "إضافة غياب"
+		},
+		"form": {
+			"type": "نوع الغياب",
+			"startDate": "تاريخ البدء",
+			"endDate": "تاريخ الانتهاء",
+			"reason": "السبب",
+			"required": "هذا الحقل مطلوب"
+		},
+		"conflict": {
+			"title": "تم اكتشاف تعارض في التواريخ",
+			"message": "التاريخ المحدد يتداخل مع أحداث موجودة",
+			"selectedDate": "التاريخ المحدد",
+			"timeRangeSample": "٧:٠٠ م - ١:٠٠ م"
 		}
 	},
 
@@ -4583,6 +4744,81 @@
 			"message": "هل أنت متأكد من حذف المطابقة #{{id}}؟ لا يمكن التراجع عن هذا الإجراء.",
 			"confirm": "حذف",
 			"cancel": "إلغاء"
+		}
+	},
+	"checklist": {
+		"title": "قائمة المهام",
+		"subtitle": "المستندات المطلوبة لهذا الموظف",
+		"progressTitle": "مؤشر تقدم قائمة المهام",
+		"complete": "مكتمل",
+		"tasksTitle": "المهام",
+		"searchPlaceholder": "البحث في المهام...",
+		"stats": {
+			"totalTasks": "إجمالي المهام",
+			"completed": "مكتملة",
+			"pending": "قيد الانتظار"
+		},
+		"table": {
+			"taskName": "اسم المهمة",
+			"owner": "المسؤول",
+			"dueDate": "تاريخ الاستحقاق",
+			"status": "الحالة",
+			"actions": "الإجراءات"
+		},
+		"status": {
+			"inProgress": "قيد التنفيذ",
+			"pending": "قيد الانتظار",
+			"review": "مراجعة",
+			"completed": "مكتملة"
+		},
+		"buttons": {
+			"addItem": "إضافة عنصر",
+			"add": "إضافة",
+			"edit": "تعديل"
+		},
+		"modals": {
+			"addItem": "إضافة عنصر",
+			"editItem": "تعديل عنصر",
+			"taskDetails": "تفاصيل المهمة",
+			"fields": {
+				"taskName": "اسم المهمة",
+				"description": "الوصف",
+				"owner": "المسؤول",
+				"employee": "الموظف",
+				"dueDate": "تاريخ الاستحقاق",
+				"status": "الحالة"
+			}
+		}
+	},
+	"competencies": {
+		"title": "الكفاءات",
+		"subtitle": "تسجيل مستوى إتقان جديد لملف كفاءات الموظف.",
+		"sectionTitle": "الكفاءات",
+		"table": {
+			"competency": "الكفاءة",
+			"proficiencyLevel": "مستوى الإتقان",
+			"source": "المصدر",
+			"validFrom": "صالح من",
+			"validTo": "صالح حتى",
+			"empty": "لا توجد كفاءات"
+		},
+		"buttons": {
+			"addCompetencies": "إضافة كفاءات"
+		},
+		"modal": {
+			"title": "إضافة كفاءات",
+			"sections": {
+				"competenceDetails": "تفاصيل الكفاءة",
+				"validityPeriod": "فترة الصلاحية"
+			}
+		},
+		"fields": {
+			"competence": "الكفاءة",
+			"proficiencyLevel": "مستوى الإتقان",
+			"source": "المصدر",
+			"dateFrom": "تاريخ البداية",
+			"dateTo": "تاريخ النهاية",
+			"noExpiration": "بدون انتهاء"
 		}
 	}
 }

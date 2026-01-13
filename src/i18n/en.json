@@ -561,12 +561,14 @@
 		"personalInformation": "Personal Information",
 		"employeeNo": "Employee No",
 		"status": "Status",
+		"hireDate": "Hire Date",
 		"primaryAssignment": "Primary Assignment",
 		"primary": "Primary",
 		"tabs": {
 			"assignment": "Current Assignment",
 			"contacts": "Contacts",
-			"qualifications": "Qualifications"
+			"qualifications": "Qualifications",
+			"organization": "Organization"
 		},
 		"assignment": {
 			"role": "Senior Software Engineer",
@@ -575,19 +577,36 @@
 			"organizationTitle": "Organization Info",
 			"fields": {
 				"title": "Title",
+				"type": "Assignment Type",
 				"assignmentType": "Assignment Type",
 				"effectiveFrom": "Effective From",
 				"assignmentStatus": "Assignment Status",
+				"status": "Assignment Status",
 				"businessGroup": "Business Group",
 				"department": "Department",
 				"location": "Location",
-				"manager": "Manager"
+				"manager": "Manager",
+				"action": "Action"
 			},
 			"currentAssignment": "Current Assignment",
 			"fullTime": "Full Time",
 			"actions": {
 				"view": "View Assignment",
 				"update": "Update Assignment"
+			},
+			"statuses": {
+				"active": "Active",
+				"inactive": "Inactive"
+			}
+		},
+		"organization": {
+			"title": "Organization Info",
+			"fields": {
+				"title": "Title",
+				"businessGroup": "Business Group",
+				"department": "Department",
+				"location": "Location",
+				"manager": "Manager"
 			}
 		},
 		"contacts": {
@@ -610,11 +629,38 @@
 				"qualification": "Qualification",
 				"issuer": "Issuer",
 				"year": "Year",
-				"status": "Status"
+				"status": "Status",
+				"action": "Action"
 			},
 			"statuses": {
 				"valid": "Valid",
-				"completed": "Completed"
+				"completed": "Completed",
+				"inProgress": "In Progress"
+			},
+			"sections": {
+				"basicInfo": "Basic Information",
+				"timeline": "Timeline & Progress",
+				"competencies": "Competencies",
+				"completion": "Completion Percentage"
+			},
+			"fields": {
+				"qualificationTitle": "Qualification Title",
+				"type": "Type",
+				"status": "Status",
+				"titleIfOthers": "Title (If Others)",
+				"gradeScore": "Grade/Score",
+				"awardingEntity": "Awarding Entity",
+				"studyStartDate": "Study Start Date",
+				"studyEndDate": "Study End Date",
+				"awardedDate": "Awarded Date",
+				"projectedCompletion": "Projected Completion",
+				"selectLevel": "Select Level",
+				"qualificationType": "Qualification Type"
+			},
+			"levels": {
+				"beginner": "Beginner",
+				"intermediate": "Intermediate",
+				"advanced": "Advanced"
 			},
 			"actions": {
 				"add": "Add Qualification"
@@ -622,6 +668,9 @@
 		},
 		"modals": {
 			"updateAssignment": "Update Assignment",
+			"viewAssignment": "View Assignment",
+			"editAssignment": "Edit Assignment",
+			"assignmentDetails": "Assignment Details",
 			"addQualification": "Add Qualification",
 			"fields": {
 				"effectiveDate": "Effective Date",
@@ -671,6 +720,118 @@
 					"expired": "Expired"
 				}
 			}
+		}
+	},
+	"employeeDocuments": {
+		"title": "Employee Document",
+		"subtitle": "Manage and track employee documents",
+		"gridTitle": "Document Grid per Employee",
+		"table": {
+			"documentType": "Document Type",
+			"uploadedDate": "Uploaded Date",
+			"expiryDate": "Expiry Date",
+			"status": "Status",
+			"actions": "Actions",
+			"empty": "No documents found"
+		},
+		"buttons": {
+			"editProfile": "Edit Profile",
+			"uploadDocument": "Upload Document",
+			"upload": "Upload"
+		},
+		"actions": {
+			"view": "View",
+			"download": "Download",
+			"renewNow": "Renew Now"
+		},
+		"badges": {
+			"actionRequired": "Action Required"
+		},
+		"status": {
+			"active": "Active",
+			"expiring": "Expiring Soon",
+			"expired": "Expired",
+			"verified": "Verified",
+			"processing": "Processing"
+		},
+		"modals": {
+			"editProfile": "Edit Profile",
+			"uploadDocument": "Upload Document",
+			"sections": {
+				"documentInformation": "Document Information",
+				"dates": "Dates",
+				"statusManagement": "Status Management",
+				"visibilityValidation": "Visibility & Validation Rules",
+				"documentDetails": "Document Details",
+				"uploadFile": "Upload File",
+				"status": "Status"
+			},
+			"fields": {
+				"documentType": "Document Type",
+				"documentCategory": "Document Category",
+				"isMandatory": "Is Mandatory",
+				"requiresExpiry": "Requires Expiry Date",
+				"uploadedDate": "Uploaded Date",
+				"expiryDate": "Expiry Date",
+				"status": "Status",
+				"visibleToEmployee": "Visible to Employee",
+				"requiresApproval": "Requires Approval"
+			},
+			"upload": {
+				"instructions": "Click to upload or drag and drop",
+				"formats": "SVG, PNG, JPG or PDF (max. 5MB)",
+				"browse": "Browse Files"
+			}
+		}
+	},
+	"absenceSummary": {
+		"title": "Absence Summary",
+		"subtitle": "Absence Summary · Overview",
+		"summaryTitle": "Absence Summary",
+		"overview": "Overview",
+		"gridTitle": "Absence Summary",
+		"cards": {
+			"annual": "Annual Leave",
+			"sick": "Sick Leave",
+			"remaining": "Remaining",
+			"days": "Days"
+		},
+		"listTitle": "Absence List",
+		"table": {
+			"type": "Absence Type",
+			"period": "Period",
+			"status": "Status",
+			"empty": "No absences found"
+		},
+		"status": {
+			"rejected": "Rejected",
+			"pending": "Pending",
+			"approved": "Approved"
+		},
+		"types": {
+			"annual": "Annual Leave",
+			"sick": "Sick Leave",
+			"unpaid": "Unpaid Leave"
+		},
+		"buttons": {
+			"addAbsence": "Add Absence",
+			"add": "Add"
+		},
+		"modal": {
+			"title": "Add Absence"
+		},
+		"form": {
+			"type": "Absence Type",
+			"startDate": "Start Date",
+			"endDate": "End Date",
+			"reason": "Reason",
+			"required": "This field is required"
+		},
+		"conflict": {
+			"title": "Date Conflict Detected",
+			"message": "Your selected date overlaps with existing events",
+			"selectedDate": "Selected Date",
+			"timeRangeSample": "7:00 PM - 1:00 PM"
 		}
 	},
 	"glLines": {
@@ -4499,6 +4660,81 @@
 			"message": "Are you sure you want to delete match #{{id}}? This action cannot be undone.",
 			"confirm": "Delete",
 			"cancel": "Cancel"
+		}
+	},
+	"checklist": {
+		"title": "Checklist",
+		"subtitle": "Required documents for this employee",
+		"progressTitle": "Checklist Progress Indicator",
+		"complete": "Complete",
+		"tasksTitle": "Tasks",
+		"searchPlaceholder": "Search tasks...",
+		"stats": {
+			"totalTasks": "Total Tasks",
+			"completed": "Completed",
+			"pending": "Pending"
+		},
+		"table": {
+			"taskName": "Task Name",
+			"owner": "Owner",
+			"dueDate": "Due Date",
+			"status": "Status",
+			"actions": "Actions"
+		},
+		"status": {
+			"inProgress": "In Progress",
+			"pending": "Pending",
+			"review": "Review",
+			"completed": "Completed"
+		},
+		"buttons": {
+			"addItem": "Add Item",
+			"add": "Add",
+			"edit": "Edit"
+		},
+		"modals": {
+			"addItem": "Add Item",
+			"editItem": "Edit Item",
+			"taskDetails": "Task Details",
+			"fields": {
+				"taskName": "Task Name",
+				"description": "Description",
+				"owner": "Owner",
+				"employee": "Employee",
+				"dueDate": "Due Date",
+				"status": "Status"
+			}
+		}
+	},
+	"competencies": {
+		"title": "Competencies",
+		"subtitle": "Record a new proficiency level for an employee's competence profile.",
+		"sectionTitle": "Competencies",
+		"table": {
+			"competency": "Competency",
+			"proficiencyLevel": "Proficiency Level",
+			"source": "Source",
+			"validFrom": "Valid From",
+			"validTo": "Valid To",
+			"empty": "No competencies found"
+		},
+		"buttons": {
+			"addCompetencies": "Add Competencies"
+		},
+		"modal": {
+			"title": "Add Competencies",
+			"sections": {
+				"competenceDetails": "COMPETENCE DETAILS",
+				"validityPeriod": "VALIDITY PERIOD"
+			}
+		},
+		"fields": {
+			"competence": "Competence",
+			"proficiencyLevel": "Proficiency Level",
+			"source": "Source",
+			"dateFrom": "Date From",
+			"dateTo": "Date To",
+			"noExpiration": "No Expiration"
 		}
 	}
 }

@@ -76,6 +76,10 @@ const PaymentTypesPage = lazy(() => import("./pages/PaymentTypesPage"));
 const BankStatementsPage = lazy(() => import("./pages/BankStatementsPage"));
 const BankStatementLinesPage = lazy(() => import("./pages/BankStatementLinesPage"));
 const MatchedStatementLinePage = lazy(() => import("./pages/MatchedStatementLinePage"));
+const EmployeeDocumentsPage = lazy(() => import("./pages/EmployeeDocumentsPage"));
+const AbsenceSummaryPage = lazy(() => import("./pages/AbsenceSummaryPage"));
+const CheckListPage = lazy(() => import("./pages/CheckListPage"));
+const CompetenciesPage = lazy(() => import("./pages/CompetenciesPage"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -169,6 +173,10 @@ const App = () => {
 						<Route path="bank-statements" element={<BankStatementsPage />} />
 						<Route path="bank-statements/:statementId/lines" element={<BankStatementLinesPage />} />
 						<Route path="matched-statement-lines" element={<MatchedStatementLinePage />} />
+						<Route path="employee-documents" element={<EmployeeDocumentsPage />} />
+						<Route path="absence-summary" element={<AbsenceSummaryPage />} />
+						<Route path="checklist" element={<CheckListPage />} />
+						<Route path="competencies" element={<CompetenciesPage />} />
 					</Route>
 				</Routes>
 			</Suspense>

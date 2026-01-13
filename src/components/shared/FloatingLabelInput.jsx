@@ -157,7 +157,7 @@ const FloatingLabelInput = memo(({
             transition-all duration-200
             ${
 				isFloating
-					? "-top-3 text-sm px-2 rounded-full  text-[#28819C]"
+					? "-top-4 text-sm px-2 rounded-full  text-[#28819C]"
 					: "top-1/2 -translate-y-1/2 text-sm text-[#7A9098]"
 			}
             ${hasError ? "text-red-400 bg-[#40171d]" : ""}

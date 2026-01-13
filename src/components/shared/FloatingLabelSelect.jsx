@@ -20,7 +20,13 @@ const FloatingLabelSelect = memo(
 		const [isOpen, setIsOpen] = useState(false);
 		const [searchTerm, setSearchTerm] = useState("");
 		const [isFocused, setIsFocused] = useState(false);
-		const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+		const [dropdownPosition, setDropdownPosition] = useState({
+			top: 0,
+			bottom: 0,
+			left: 0,
+			width: 0,
+			openUpward: false,
+		});
 		const selectRef = useRef(null);
 		const searchInputRef = useRef(null);
 		const selectId = useId();
@@ -43,10 +49,20 @@ const FloatingLabelSelect = memo(
 		useEffect(() => {
 			if (isOpen && selectRef.current) {
 				const rect = selectRef.current.getBoundingClientRect();
+				const viewportHeight = window.innerHeight;
+				const spaceBelow = viewportHeight - rect.bottom;
+				const spaceAbove = rect.top;
+				const dropdownHeight = 280; // max height of dropdown
+
+				// Determine if dropdown should open upward or downward
+				const shouldOpenUpward = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+
 				setDropdownPosition({
 					top: rect.bottom + 8,
+					bottom: window.innerHeight - rect.top + 8,
 					left: rect.left,
 					width: rect.width,
+					openUpward: shouldOpenUpward,
 				});
 			}
 		}, [isOpen]);
@@ -85,10 +101,19 @@ const FloatingLabelSelect = memo(
 				const handleScroll = () => {
 					if (selectRef.current) {
 						const rect = selectRef.current.getBoundingClientRect();
+						const viewportHeight = window.innerHeight;
+						const spaceBelow = viewportHeight - rect.bottom;
+						const spaceAbove = rect.top;
+						const dropdownHeight = 280;
+
+						const shouldOpenUpward = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+
 						setDropdownPosition({
 							top: rect.bottom + 8,
+							bottom: window.innerHeight - rect.top + 8,
 							left: rect.left,
 							width: rect.width,
+							openUpward: shouldOpenUpward,
 						});
 					}
 				};
@@ -146,7 +171,7 @@ const FloatingLabelSelect = memo(
 		const wrapperGlow = hasError
 			? "from-red-500 via-red-400 to-red-500 "
 			: isFocused
-			? "from-[#1da8d8] via-[#48C1F0] to-[#1da8d8] "
+			? ""
 			: "from-white/15 via-white/10 to-white/5 shadow-md";
 
 		const buttonTextClasses = hasValue
@@ -161,12 +186,16 @@ const FloatingLabelSelect = memo(
 		const dropdownContent = isOpen && (
 			<div
 				data-dropdown-portal="true"
-				className="bg-white rounded-[18px] shadow-2xl border border-[#48C1F0]/30 max-h-64 overflow-hidden"
+				className={`bg-white rounded-[18px] shadow-2xl border border-[#48C1F0]/30 overflow-hidden ${
+					dropdownPosition.openUpward ? "origin-bottom" : "origin-top"
+				}`}
 				style={{
 					position: "fixed",
-					top: `${dropdownPosition.top}px`,
+					top: dropdownPosition.openUpward ? "auto" : `${dropdownPosition.top}px`,
+					bottom: dropdownPosition.openUpward ? `${dropdownPosition.bottom}px` : "auto",
 					left: `${dropdownPosition.left}px`,
 					width: `${dropdownPosition.width}px`,
+					maxHeight: "280px",
 					zIndex: 99999,
 				}}
 				role="listbox"
@@ -292,7 +321,7 @@ const FloatingLabelSelect = memo(
 							className={`
 								absolute start-4 font-semibold pointer-events-none
 								transition-all duration-200
-								${isFloating ? "-top-3 text-xs px-3 text-gray-500" : "top-1/2 -translate-y-1/2 text-sm text-[#7A9098]"}
+								${isFloating ? "-top-4 text-xs px-3 text-gray-500" : "top-1/2 -translate-y-1/2 text-sm text-[#7A9098]"}
 								${hasError ? "text-red-400 bg-[#40171d]" : ""}
 							`}
 						>
