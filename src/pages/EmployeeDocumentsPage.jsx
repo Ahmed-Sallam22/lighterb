@@ -18,6 +18,11 @@ import Toggle from "../components/shared/Toggle";
 import Pagination from "../components/shared/Pagination";
 import Table from "../components/shared/Table";
 import { IoMdCloudUpload } from "react-icons/io";
+import NationalIDIcon from "../assets/NationalID.svg?react";
+import PassportIcon from "../assets/Passport.svg?react";
+import EmploymentContractIcon from "../assets/EmploymentContract.svg?react";
+import UniversityDegreeIcon from "../assets/UniversityDegree.svg?react";
+import InsurancePolicyIcon from "../assets/InsurancePolicy.svg?react";
 
 function FileUploadComponent() {
 	const { t } = useTranslation();
@@ -168,70 +173,6 @@ function FileUploadComponent() {
 	);
 }
 
-const DOCUMENTS = [
-	{
-		id: 1,
-		type: "National ID",
-		category: "Identification",
-		format: "PDF",
-		size: "2.4 MB",
-		uploadedDate: "Jan 15, 2023",
-		expiryDate: "Jan 15, 2028",
-		status: "active",
-		color: "bg-blue-100 text-blue-700",
-		iconColor: "bg-blue-50 text-blue-600",
-	},
-	{
-		id: 2,
-		type: "Passport",
-		category: "Identification",
-		format: "JPG",
-		size: "1.8 MB",
-		uploadedDate: "Mar 10, 2020",
-		expiryDate: "Nov 01, 2024",
-		status: "expiring",
-		color: "bg-orange-100 text-orange-700",
-		iconColor: "bg-orange-50 text-orange-600",
-	},
-	{
-		id: 3,
-		type: "Employment Contract",
-		category: "Legal",
-		format: "PDF",
-		size: "3.3 MB",
-		uploadedDate: "Jan 01, 2022",
-		expiryDate: "Dec 31, 2023",
-		status: "expired",
-		color: "bg-red-100 text-red-700",
-		iconColor: "bg-red-50 text-red-600",
-		actionRequired: true,
-	},
-	{
-		id: 4,
-		type: "University Degree",
-		category: "Education",
-		format: "PDF",
-		size: "5.1 MB",
-		uploadedDate: "Feb 20, 2023",
-		expiryDate: "No expiry",
-		status: "verified",
-		color: "bg-green-100 text-green-700",
-		iconColor: "bg-purple-50 text-purple-600",
-	},
-	{
-		id: 5,
-		type: "Insurance Policy",
-		category: "Insurance",
-		format: "PDF",
-		size: "1.2 MB",
-		uploadedDate: "Today",
-		expiryDate: "Dec 31, 2025",
-		status: "processing",
-		color: "bg-gray-100 text-gray-700",
-		iconColor: "bg-gray-50 text-gray-500",
-	},
-];
-
 const EmployeeDocumentsPage = () => {
 	const { t } = useTranslation();
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -239,6 +180,71 @@ const EmployeeDocumentsPage = () => {
 	const [selectedDoc, setSelectedDoc] = useState(null);
 	const [page, setPage] = useState(2);
 	const pageSize = 5;
+
+	// Documents state management
+	const [documents, setDocuments] = useState([
+		{
+			id: 1,
+			type: "National ID",
+			category: "Identification",
+			format: "PDF",
+			size: "2.4 MB",
+			uploadedDate: "Jan 15, 2023",
+			expiryDate: "Jan 15, 2028",
+			status: "active",
+			color: "bg-blue-100 text-blue-700",
+			iconColor: "bg-blue-50 text-blue-600",
+		},
+		{
+			id: 2,
+			type: "Passport",
+			category: "Identification",
+			format: "JPG",
+			size: "1.8 MB",
+			uploadedDate: "Mar 10, 2020",
+			expiryDate: "Nov 01, 2024",
+			status: "expiring",
+			color: "bg-orange-100 text-orange-700",
+			iconColor: "bg-orange-50 text-orange-600",
+		},
+		{
+			id: 3,
+			type: "Employment Contract",
+			category: "Legal",
+			format: "PDF",
+			size: "3.3 MB",
+			uploadedDate: "Jan 01, 2022",
+			expiryDate: "Dec 31, 2023",
+			status: "expired",
+			color: "bg-red-100 text-red-700",
+			iconColor: "bg-red-50 text-red-600",
+			actionRequired: true,
+		},
+		{
+			id: 4,
+			type: "University Degree",
+			category: "Education",
+			format: "PDF",
+			size: "5.1 MB",
+			uploadedDate: "Feb 20, 2023",
+			expiryDate: "No expiry",
+			status: "verified",
+			color: "bg-green-100 text-green-700",
+			iconColor: "bg-purple-50 text-purple-600",
+		},
+		{
+			id: 5,
+			type: "Insurance Policy",
+			category: "Insurance",
+			format: "PDF",
+			size: "1.2 MB",
+			uploadedDate: "Today",
+			expiryDate: "Dec 31, 2025",
+			status: "processing",
+			color: "bg-gray-100 text-gray-700",
+			iconColor: "bg-gray-50 text-gray-500",
+		},
+	]);
 
 	useEffect(() => {
 		document.title = `${t("employeeDocuments.title")} - LightERP`;
@@ -250,20 +256,20 @@ const EmployeeDocumentsPage = () => {
 	const docTypeOptions = useMemo(
 		() => [
 			{ value: "", label: t("employeeDocuments.modals.fields.documentType") },
-			...Array.from(new Set(DOCUMENTS.map(doc => doc.type))).map(type => ({ value: type, label: type })),
+			...Array.from(new Set(documents.map(doc => doc.type))).map(type => ({ value: type, label: type })),
 		],
-		[t]
+		[t, documents]
 	);
 
 	const categoryOptions = useMemo(
 		() => [
 			{ value: "", label: t("employeeDocuments.modals.fields.documentCategory") },
-			...Array.from(new Set(DOCUMENTS.map(doc => doc.category))).map(category => ({
+			...Array.from(new Set(documents.map(doc => doc.category))).map(category => ({
 				value: category,
 				label: category,
 			})),
 		],
-		[t]
+		[t, documents]
 	);
 
 	const handleOpenEdit = doc => {
@@ -298,6 +304,14 @@ const EmployeeDocumentsPage = () => {
 		);
 	};
 
+	const DOCUMENT_TYPE_ICONS = {
+		"National ID": NationalIDIcon,
+		Passport: PassportIcon,
+		"Employment Contract": EmploymentContractIcon,
+		"University Degree": UniversityDegreeIcon,
+		"Insurance Policy": InsurancePolicyIcon,
+	};
+
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<PageHeader
@@ -311,7 +325,7 @@ const EmployeeDocumentsPage = () => {
 					<h2 className="text-2xl font-bold text-[#1D7A8C]">{t("employeeDocuments.gridTitle")}</h2>
 					<div className="flex items-center gap-3">
 						<Button
-							onClick={() => handleOpenEdit(DOCUMENTS[0])}
+							onClick={() => handleOpenEdit(documents[0])}
 							title={t("employeeDocuments.buttons.editProfile")}
 							icon={<HiOutlinePencilAlt className="w-5 h-5" />}
 							className="bg-white text-gray-700 border border-gray-200 hover:bg-gray-100 shadow-none"
@@ -326,93 +340,111 @@ const EmployeeDocumentsPage = () => {
 				</div>
 
 				<div className="bg-white rounded-2xl shadow-lg p-4">
-					<Table
-						columns={[
-							{
-								header: t("employeeDocuments.table.documentType"),
-								accessor: "type",
-								render: (value, row) => (
-									<div className="flex items-center gap-3">
-										<span
-											className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-semibold ${row.iconColor}`}
+					<div className="overflow-x-auto">
+						<table className="w-full text-sm">
+							<thead className="bg-gray-50">
+								<tr>
+									<th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 tracking-wide">
+										{t("employeeDocuments.table.documentType")}
+									</th>
+									<th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 tracking-wide">
+										{t("employeeDocuments.table.uploadedDate")}
+									</th>
+									<th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 tracking-wide">
+										{t("employeeDocuments.table.expiryDate")}
+									</th>
+									<th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 tracking-wide">
+										{t("employeeDocuments.table.status")}
+									</th>
+									<th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 tracking-wide">
+										{t("employeeDocuments.table.actions")}
+									</th>
+								</tr>
+							</thead>
+							<tbody className="divide-y divide-gray-100">
+								{documents.map(doc => {
+									const IconComponent = DOCUMENT_TYPE_ICONS[doc.type] || HiOutlineDocumentText;
+									const isExpired = doc.status === "expired";
+									const isExpiring = doc.status === "expiring";
+
+									return (
+										<tr
+											key={doc.id}
+											className={`hover:bg-gray-50 ${isExpired ? "bg-red-50/60" : ""}`}
 										>
-											{row.format?.[0] || "D"}
-										</span>
-										<div className="text-left">
-											<p className="font-semibold text-gray-900">{row.type}</p>
-											<p className="text-xs text-gray-500">
-												{row.format} • {row.size}
-											</p>
-											{row.actionRequired && (
-												<p className="text-xs text-red-500 font-medium">
-													{t("employeeDocuments.badges.actionRequired")}
-												</p>
-											)}
-										</div>
-									</div>
-								),
-							},
-							{
-								header: t("employeeDocuments.table.uploadedDate"),
-								accessor: "uploadedDate",
-								render: value => <span className="text-gray-700">{value}</span>,
-							},
-							{
-								header: t("employeeDocuments.table.expiryDate"),
-								accessor: "expiryDate",
-								render: (value, row) => (
-									<span
-										className={`${
-											row.status === "expired" || row.status === "expiring"
-												? "text-red-600 font-semibold"
-												: ""
-										}`}
-									>
-										{value}
-									</span>
-								),
-							},
-							{
-								header: t("employeeDocuments.table.status"),
-								accessor: "status",
-								render: value => renderStatus(value),
-							},
-							{
-								header: t("employeeDocuments.table.actions"),
-								accessor: "actions",
-								render: (value, row) => (
-									<div className="flex items-center justify-center gap-2">
-										<button
-											title={t("employeeDocuments.actions.view")}
-											className="text-gray-500 hover:text-[#1D7A8C]"
-										>
-											<HiOutlineEye className="w-5 h-5" />
-										</button>
-										{row.status === "expired" && (
-											<button
-												onClick={() => handleOpenUpload()}
-												className="px-3 py-1 rounded-md bg-red-100 text-red-700 text-xs font-semibold hover:bg-red-200"
-											>
-												{t("employeeDocuments.actions.renewNow")}
-											</button>
-										)}
-										<button
-											title={t("employeeDocuments.actions.download")}
-											className="text-gray-500 hover:text-[#1D7A8C]"
-										>
-											<HiOutlineDownload className="w-5 h-5" />
-										</button>
-									</div>
-								),
-							},
-						]}
-						data={DOCUMENTS}
-						emptyMessage={t("employeeDocuments.table.empty")}
-						className="shadow-none"
-						showDeleteButton={() => false}
-						showEditButton={() => false}
-						showViewButton={() => false}
-					/>
+											<td className="px-6 py-4">
+												<div className="flex items-center gap-3">
+													<span
+														className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-semibold ${doc.iconColor}`}
+													>
+														<IconComponent className="w-5 h-5" />
+													</span>
+													<div className="text-left">
+														<p className="font-semibold text-gray-900">{doc.type}</p>
+														<p className="text-xs text-gray-500">
+															{doc.format} • {doc.size}
+														</p>
+														{doc.actionRequired && (
+															<p className="text-xs text-red-500 font-medium">
+																{t("employeeDocuments.badges.actionRequired")}
+															</p>
+														)}
+													</div>
+												</div>
+											</td>
+											<td className="px-6 py-4 text-gray-700 whitespace-nowrap">
+												{doc.uploadedDate}
+											</td>
+											<td className="px-6 py-4 whitespace-nowrap">
+												<span
+													className={
+														isExpired
+															? "text-red-600 font-semibold"
+															: isExpiring
+															? "text-orange-500 font-semibold"
+															: "text-gray-700"
+													}
+												>
+													{doc.expiryDate}
+												</span>
+											</td>
+											<td className="px-6 py-4">{renderStatus(doc.status)}</td>
+											<td className="px-6 py-4">
+												<div className="flex items-center justify-end gap-3">
+													<button
+														title={t("employeeDocuments.actions.view")}
+														className="text-gray-500 hover:text-[#1D7A8C]"
+													>
+														<HiOutlineEye className="w-5 h-5" />
+													</button>
+													{isExpired && (
+														<button
+															onClick={handleOpenUpload}
+															className="px-3 py-1 rounded-md bg-red-100 text-red-700 text-xs font-semibold hover:bg-red-200"
+														>
+															{t("employeeDocuments.actions.renewNow")}
+														</button>
+													)}
+													{!isExpired && (
+														<button
+															title={t("employeeDocuments.actions.download")}
+															className="text-gray-500 hover:text-[#1D7A8C]"
+															onClick={() => {
+																// Handle download logic here
+																console.log("Downloading document:", doc.id, doc.type);
+															}}
+														>
+															<HiOutlineDownload className="w-5 h-5" />
+														</button>
+													)}
+												</div>
+											</td>
+										</tr>
+									);
+								})}
+							</tbody>
+						</table>
+					</div>
 					<div className="mt-6">
 						<Pagination
 							currentPage={page}

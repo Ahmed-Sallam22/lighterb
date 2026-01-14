@@ -3,6 +3,7 @@ import { MdDashboard, MdPeople, MdShoppingCart, MdWork } from "react-icons/md";
 import { HiDocumentText, HiUsers } from "react-icons/hi";
 import { FaFileInvoiceDollar, FaCreditCard, FaFileAlt, FaUserTie } from "react-icons/fa";
 
+
 export const getSidebarLinks = (t, user) => {
 	const links = [
 		{ label: t("sidebar.dashboard"), path: "/dashboard", icon: <MdDashboard className={iconBase} /> },

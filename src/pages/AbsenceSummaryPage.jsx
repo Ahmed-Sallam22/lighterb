@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { HiOutlineUserGroup, HiOutlinePlus, HiOutlineExclamation, HiOutlineCheck } from "react-icons/hi";
+import { HiOutlinePlus, HiOutlineExclamation, HiOutlineCheck } from "react-icons/hi";
 
 import Button from "../components/shared/Button";
 import Table from "../components/shared/Table";
@@ -9,6 +9,9 @@ import SlideUpModal from "../components/shared/SlideUpModal";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import FloatingLabelTextarea from "../components/shared/FloatingLabelTextarea";
+import PageHeader from "../components/shared/PageHeader";
+import UserIcon from "../assets/userCorrectMark.svg?react";
+import GrayUserIcon from "../assets/grayUserCorrect.svg?react";
 
 const SUMMARY_CARDS = [
 	{ id: "annual", titleKey: "annual", remaining: "12", unitKey: "days" },
@@ -132,17 +135,17 @@ const AbsenceSummaryPage = () => {
 
 	return (
 		<div className="min-h-screen bg-[#f1f1f1]">
+			<PageHeader
+				icon={<UserIcon className="w-10 h-10 text-white" />}
+				title={t("absenceSummary.title")}
+				subtitle={t("absenceSummary.subtitle")}
+			/>
 			<div className="px-6 py-8 space-y-6">
 				<div className="grid grid-cols-1 xl:grid-cols-[280px_minmax(0,1fr)] gap-6">
 					<div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
 						<div className="bg-[#f3f3f3] px-6 py-10 flex items-center justify-center">
 							<div className="relative">
-								<div className="w-20 h-20 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center">
-									<HiOutlineUserGroup className="w-10 h-10 text-gray-500" />
-								</div>
-								<div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white border-2 border-[#1D7A8C] flex items-center justify-center">
-									<HiOutlineCheck className="w-4 h-4 text-[#1D7A8C]" />
-								</div>
+								<GrayUserIcon className="w-20 h-20 text-gray-400" />
 							</div>
 						</div>
 						<div className="px-6 py-8 text-center">
@@ -164,16 +167,23 @@ const AbsenceSummaryPage = () => {
 						<div className="mt-4">
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 								{SUMMARY_CARDS.map(card => (
-									<div key={card.id} className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
+									<div
+										key={card.id}
+										className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden"
+									>
 										<div className="bg-[#f3f3f3] py-4 text-center">
 											<h3 className="text-gray-700 font-semibold text-base md:text-lg">
 												{t(`absenceSummary.cards.${card.titleKey}`)}
 											</h3>
 										</div>
 										<div className="px-6 py-6 flex items-center justify-between min-h-[120px]">
-											<p className="text-sm text-gray-700">{t("absenceSummary.cards.remaining")}</p>
+											<p className="text-sm text-gray-700">
+												{t("absenceSummary.cards.remaining")}
+											</p>
 											<div className="text-center">
-												<p className="text-4xl font-semibold text-[#1D7A8C]">{card.remaining}</p>
+												<p className="text-4xl font-semibold text-[#1D7A8C]">
+													{card.remaining}
+												</p>
 												{!card.isUnlimited && (
 													<p className="text-sm text-gray-600 mt-2">
 														{t(`absenceSummary.cards.${card.unitKey}`)}
@@ -207,7 +217,7 @@ const AbsenceSummaryPage = () => {
 							totalCount={ABSENCES.length}
 							pageSize={5}
 							onPageChange={setPage}
-							onPageSizeChange={() => {}}
+							onPageSizeChange={() => { }}
 							hasNext={false}
 							hasPrevious={false}
 							showPageSizeSelector={false}
@@ -225,13 +235,15 @@ const AbsenceSummaryPage = () => {
 				title={t("absenceSummary.modal.title")}
 				maxWidth="900px"
 			>
-				<div className="grid grid-cols-1 gap-8">
+				<div className="grid grid-cols-1 gap-10">
 					<FloatingLabelSelect
 						label={t("absenceSummary.form.type")}
 						name="type"
 						options={typeOptions}
 						value={formData.type}
 						onChange={handleInputChange}
+						required
+						error={!formData.type && t("absenceSummary.form.required")}
 					/>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<FloatingLabelInput

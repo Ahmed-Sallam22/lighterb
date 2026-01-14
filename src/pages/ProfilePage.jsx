@@ -9,6 +9,7 @@ import {
 	HiOutlineCheck,
 	HiOutlineBookmark,
 } from "react-icons/hi";
+import ProfileIcon from "../assets/profile.svg?react";
 
 import PageHeader from "../components/shared/PageHeader";
 import Button from "../components/shared/Button";
@@ -16,6 +17,7 @@ import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import SlideUpModal from "../components/shared/SlideUpModal";
 import Toggle from "../components/shared/Toggle";
+import Table from "../components/shared/Table";
 import { fetchBusinessGroups } from "../store/businessGroupsSlice";
 import { fetchDepartments } from "../store/departmentsSlice";
 import userImage from "../assets/userimage.png";
@@ -40,6 +42,25 @@ const COMPETENCIES_LIST = [
 	{ id: 5, name: "Data Analysis", selected: false, level: "" },
 	{ id: 6, name: "Teamwork", selected: true, level: "intermediate" },
 	{ id: 7, name: "Communication", selected: true, level: "advanced" },
+];
+
+const CONTACTS_DATA = [
+	{
+		id: 1,
+		email: "ahmed@company.com",
+		phone: "01012345678",
+		address: "25 Abbas El Akkad St., Nasr city, Cairo, Egypt",
+		addressType: "Home",
+		lastUpdate: "2025-03-01",
+	},
+	{
+		id: 2,
+		email: "ahmed.old@mail.com",
+		phone: "01198765432",
+		address: "12 El Tayaran St., Heliopolis Cairo, Egypt",
+		addressType: "Home",
+		lastUpdate: "2022-01-15",
+	},
 ];
 
 const QUALIFICATION_INITIAL_STATE = {
@@ -74,8 +95,11 @@ const ProfilePage = () => {
 		status: true,
 	});
 
-	// Qualification modal
+	// Qualification modals
 	const [isQualificationModalOpen, setIsQualificationModalOpen] = useState(false);
+	const [isViewQualificationModalOpen, setIsViewQualificationModalOpen] = useState(false);
+	const [isEditQualificationModalOpen, setIsEditQualificationModalOpen] = useState(false);
+	const [selectedQualification, setSelectedQualification] = useState(null);
 	const [qualificationForm, setQualificationForm] = useState(QUALIFICATION_INITIAL_STATE);
 	const [competencies, setCompetencies] = useState(COMPETENCIES_LIST);
 	const [isCompetenciesOpen, setIsCompetenciesOpen] = useState(false);
@@ -182,13 +206,30 @@ const ProfilePage = () => {
 		setCompetencies(COMPETENCIES_LIST);
 	};
 
+	const handleViewQualification = qualification => {
+		setSelectedQualification(qualification);
+		setIsViewQualificationModalOpen(true);
+	};
+
+	const handleEditQualification = qualification => {
+		setSelectedQualification(qualification);
+		setQualificationForm(prev => ({
+			...prev,
+			qualificationTitle: qualification.qualification,
+			qualificationType: qualification.type.toLowerCase(),
+			status: qualification.status === "valid" || qualification.status === "active",
+			gradeScore: "",
+			awardingEntity: qualification.issuer,
+		}));
+		setIsEditQualificationModalOpen(true);
+	};
+
 	const renderStatusBadge = status => {
 		const isActive = status === "active";
 		return (
 			<span
-				className={`px-3 py-1 rounded-full text-xs font-semibold ${
-					isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
-				}`}
+				className={`px-3 py-1 rounded-full text-xs font-semibold ${isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
+					}`}
 			>
 				{isActive ? t("common.active") : t("common.inactive")}
 			</span>
@@ -224,10 +265,39 @@ const ProfilePage = () => {
 		}
 	};
 
+	const latestContactId = useMemo(() => {
+		if (!CONTACTS_DATA.length) return null;
+
+		return CONTACTS_DATA.reduce((latest, contact) => {
+			const currentTime = new Date(contact.lastUpdate).getTime();
+
+			if (!latest) {
+				return contact;
+			}
+
+			const latestTime = new Date(latest.lastUpdate).getTime();
+			return currentTime > latestTime ? contact : latest;
+		}, null)?.id;
+	}, []);
+
+	const formatContactDate = dateString => {
+		if (!dateString) return "";
+		const date = new Date(dateString);
+		if (Number.isNaN(date.getTime())) return dateString;
+
+		return date
+			.toLocaleDateString("en-GB", {
+				day: "2-digit",
+				month: "short",
+				year: "numeric",
+			})
+			.replace(/ /g, "-");
+	};
+
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<PageHeader
-				icon={<HiOutlineUser className="w-8 h-8 text-white mr-3" />}
+				icon={<ProfileIcon className="w-8 h-8 text-[#D3D3D3]" />}
 				title={t("profile.title")}
 				subtitle={t("profile.subtitle")}
 			/>
@@ -238,7 +308,7 @@ const ProfilePage = () => {
 					<aside className="bg-white rounded-2xl shadow-lg p-4">
 						<h3 className="text-lg font-semibold text-[#1D7A8C]">{t("profile.personalInformation")}</h3>
 						<div className="mt-4 flex items-center justify-center">
-							<img src={userImage} alt="Ahmed Ali" className="w-32 h-32 rounded-full object-cover" />
+							<img src={userImage} alt="Ahmed Ali" className="w-60 h-50  rounded-lg object-cover" />
 						</div>
 						<div className="mt-4 border-t border-gray-200 pt-4">
 							<h2 className="text-xl font-bold text-gray-900">Ahmed Ali</h2>
@@ -288,16 +358,14 @@ const ProfilePage = () => {
 											<button
 												type="button"
 												onClick={() => setActiveTab(tab.id)}
-												className={`flex items-center gap-3 pb-2 border-b-2 transition-colors whitespace-nowrap ${
-													isActive
-														? "border-[#1D7A8C] text-[#1D7A8C]"
-														: "border-transparent text-gray-500 hover:text-gray-700"
-												}`}
+												className={`flex items-center gap-3 pb-2 border-b-2 transition-colors whitespace-nowrap ${isActive
+													? "border-[#1D7A8C] text-[#1D7A8C]"
+													: "border-transparent text-gray-500 hover:text-gray-700"
+													}`}
 											>
 												<span
-													className={`w-2 h-2 rounded-full ${
-														isActive ? "bg-[#1D7A8C]" : "bg-gray-300"
-													}`}
+													className={`w-2 h-2 rounded-full ${isActive ? "bg-[#1D7A8C]" : "bg-gray-300"
+														}`}
 												/>
 												<span className="text-sm font-medium">{tab.label}</span>
 											</button>
@@ -400,32 +468,30 @@ const ProfilePage = () => {
 												</tr>
 											</thead>
 											<tbody className="divide-y divide-gray-100">
-												<tr>
-													<td className="px-4 py-4 text-[#1D7A8C] cursor-pointer hover:underline">
-														ahmed@company.com
-													</td>
-													<td className="px-4 py-4 text-[#1D7A8C] cursor-pointer hover:underline">
-														01012345678
-													</td>
-													<td className="px-4 py-4 text-[#1D7A8C] cursor-pointer hover:underline">
-														25 Abbas El Akkad St., Nasr city, Cairo, Egypt
-													</td>
-													<td className="px-4 py-4 text-[#1D7A8C] cursor-pointer hover:underline">
-														Home
-													</td>
-													<td className="px-4 py-4 text-[#1D7A8C] cursor-pointer hover:underline">
-														01-Mar-2025
-													</td>
-												</tr>
-												<tr>
-													<td className="px-4 py-4 text-gray-700">ahmed.old@mail.com</td>
-													<td className="px-4 py-4 text-gray-700">01198765432</td>
-													<td className="px-4 py-4 text-gray-700">
-														12 El Tayaran St., Heliopolis Cairo, Egypt
-													</td>
-													<td className="px-4 py-4 text-gray-700">Home</td>
-													<td className="px-4 py-4 text-gray-700">15-Jan-2022</td>
-												</tr>
+												{CONTACTS_DATA.map(contact => {
+													const isLatest = contact.id === latestContactId;
+													const rowBorderClass = isLatest
+														? "border-l-4 border-r-4 border-[#187FC3] border-b-0"
+														: "";
+													const cellClass = isLatest
+														? "px-4 py-4 text-[#187FC3] cursor-pointer hover:underline"
+														: "px-4 py-4 text-gray-700";
+
+													return (
+														<tr
+															key={contact.id}
+															className={`hover:bg-gray-50 ${rowBorderClass}`}
+														>
+															<td className={cellClass}>{contact.email}</td>
+															<td className={cellClass}>{contact.phone}</td>
+															<td className={cellClass}>{contact.address}</td>
+															<td className={cellClass}>{contact.addressType}</td>
+															<td className={cellClass}>
+																{formatContactDate(contact.lastUpdate)}
+															</td>
+														</tr>
+													);
+												})}
 											</tbody>
 										</table>
 									</div>
@@ -477,75 +543,46 @@ const ProfilePage = () => {
 						{activeTab === "qualifications" && (
 							<div className="space-y-4">
 								<div className="bg-white rounded-2xl shadow-lg p-6">
-									<div className="overflow-x-auto">
-										<table className="w-full text-sm">
-											<thead className="bg-gray-50">
-												<tr>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.qualifications.table.type")}
-													</th>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.qualifications.table.qualification")}
-													</th>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.qualifications.table.issuer")}
-													</th>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.qualifications.table.year")}
-													</th>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.qualifications.table.status")}
-													</th>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.qualifications.table.action")}
-													</th>
-												</tr>
-											</thead>
-											<tbody className="divide-y divide-gray-100">
-												{QUALIFICATION_DATA.map((qual, index) => (
-													<tr key={index}>
-														<td className="px-4 py-4 text-gray-700">{qual.type}</td>
-														<td className="px-4 py-4 text-gray-700">
-															{qual.qualification}
-														</td>
-														<td className="px-4 py-4 text-gray-700">{qual.issuer}</td>
-														<td className="px-4 py-4 text-gray-700">{qual.year}</td>
-														<td className="px-4 py-4">
-															{renderQualificationStatus(qual.status)}
-														</td>
-														<td className="px-4 py-4">
-															<div className="flex items-center gap-2">
-																<button
-																	type="button"
-																	className="p-1.5 text-gray-500 hover:text-[#1D7A8C] transition-colors"
-																	title="View"
-																>
-																	<HiOutlineEye className="w-5 h-5" />
-																</button>
-																<button
-																	type="button"
-																	className="p-1.5 text-gray-500 hover:text-[#1D7A8C] transition-colors"
-																	title="Edit"
-																>
-																	<HiOutlinePencilAlt className="w-5 h-5" />
-																</button>
-															</div>
-														</td>
-													</tr>
-												))}
-											</tbody>
-										</table>
-									</div>
+									<Table
+										className="shadow-none"
+										columns={[
+											{
+												header: t("profile.qualifications.table.type"),
+												accessor: "type",
+												render: value => <span className="text-sm text-gray-700">{value}</span>,
+											},
+											{
+												header: t("profile.qualifications.table.qualification"),
+												accessor: "qualification",
+												render: value => <span className="text-sm text-gray-700">{value}</span>,
+											},
+											{
+												header: t("profile.qualifications.table.issuer"),
+												accessor: "issuer",
+												render: value => <span className="text-sm text-gray-700">{value}</span>,
+											},
+											{
+												header: t("profile.qualifications.table.year"),
+												accessor: "year",
+												render: value => <span className="text-sm text-gray-700">{value}</span>,
+											},
+											{
+												header: t("profile.qualifications.table.status"),
+												accessor: "status",
+												render: value => renderQualificationStatus(value),
+											},
+										]}
+										data={QUALIFICATION_DATA}
+										onView={handleViewQualification}
+										onEdit={handleEditQualification}
+									/>
 								</div>
 
 								<div className="bg-white rounded-2xl shadow-lg p-4 flex items-center justify-end">
-									<button
-										type="button"
+									<Button
 										onClick={() => setIsQualificationModalOpen(true)}
-										className="px-4 py-2 text-sm font-medium text-[#1D7A8C] border border-[#1D7A8C] rounded-lg hover:bg-[#1D7A8C]/5 transition-colors"
-									>
-										{t("profile.qualifications.actions.add")}
-									</button>
+										title={t("profile.qualifications.actions.add")}
+									/>
 								</div>
 							</div>
 						)}
@@ -604,39 +641,40 @@ const ProfilePage = () => {
 				maxWidth="560px"
 			>
 				{selectedAssignment && (
-					<div className="py-4">
-						<h4 className="text-lg font-semibold text-[#1D7A8C] mb-6 underline">
+					<div className="py-6">
+						<h4 className="text-base font-semibold text-[#1D7A8C] mb-4">
 							{t("profile.modals.assignmentDetails")}
 						</h4>
-						<div className="space-y-4">
-							<div className="mb-3">
-								<p className="text-gray-800 font-medium text-base">{selectedAssignment.title}</p>
+						<div className="border-t border-gray-200 pt-4 space-y-4">
+							<div className="flex items-center justify-between">
+								<span className="text-sm text-gray-500">
+									{t("profile.assignment.fields.title")}
+								</span>
+								<span className="text-sm font-medium text-gray-900">
+									{selectedAssignment.title}
+								</span>
 							</div>
-							<div className="space-y-3">
-								<div className="flex items-start gap-4">
-									<label className="block text-sm text-gray-500 min-w-[140px]">
-										{t("profile.assignment.fields.title")}
-									</label>
-									<p className="text-gray-800 font-medium">{selectedAssignment.title}</p>
-								</div>
-								<div className="flex items-start gap-4">
-									<label className="block text-sm text-gray-500 min-w-[140px]">
-										{t("profile.assignment.fields.assignmentType")}
-									</label>
-									<p className="text-gray-800 font-medium">{selectedAssignment.type}</p>
-								</div>
-								<div className="flex items-start gap-4">
-									<label className="block text-sm text-gray-500 min-w-[140px]">
-										{t("profile.assignment.fields.effectiveFrom")}
-									</label>
-									<p className="text-gray-800 font-medium">{selectedAssignment.effectiveFrom}</p>
-								</div>
-								<div className="flex items-start gap-4">
-									<label className="block text-sm text-gray-500 min-w-[140px]">
-										{t("profile.assignment.fields.assignmentStatus")}
-									</label>
-									{renderStatusBadge(selectedAssignment.status)}
-								</div>
+							<div className="flex items-center justify-between">
+								<span className="text-sm text-gray-500">
+									{t("profile.assignment.fields.assignmentType")}
+								</span>
+								<span className="text-sm font-medium text-gray-900">
+									{selectedAssignment.type}
+								</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-sm text-gray-500">
+									{t("profile.assignment.fields.effectiveFrom")}
+								</span>
+								<span className="text-sm font-medium text-gray-900">
+									{selectedAssignment.effectiveFrom}
+								</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-sm text-gray-500">
+									{t("profile.assignment.fields.assignmentStatus")}
+								</span>
+								{renderStatusBadge(selectedAssignment.status)}
 							</div>
 						</div>
 					</div>
@@ -657,7 +695,7 @@ const ProfilePage = () => {
 				title={t("profile.modals.editAssignment")}
 				maxWidth="560px"
 			>
-				<div className="py-4">
+				<div className="py-6 space-y-4">
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<FloatingLabelInput
 							label={t("profile.assignment.fields.title")}
@@ -679,25 +717,151 @@ const ProfilePage = () => {
 							value={editAssignmentForm.effectiveFrom}
 							onChange={e => setEditAssignmentForm(prev => ({ ...prev, effectiveFrom: e.target.value }))}
 						/>
-						<div className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-3">
-							<label className="text-sm text-gray-600">{t("profile.assignment.fields.status")}</label>
-							<Toggle
-								enabled={editAssignmentForm.status === true || editAssignmentForm.status === "active"}
-								onChange={enabled => setEditAssignmentForm(prev => ({ ...prev, status: enabled }))}
-							/>
-						</div>
+					</div>
+					<div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 border border-gray-200">
+						<label className="text-sm text-gray-600">
+							{t("profile.assignment.fields.status")}
+						</label>
+						<Toggle
+							enabled={editAssignmentForm.status === true || editAssignmentForm.status === "active"}
+							onChange={enabled => setEditAssignmentForm(prev => ({ ...prev, status: enabled }))}
+						/>
 					</div>
 				</div>
-				<div className="flex items-center justify-end gap-3 py-4 border-t border-gray-200 mt-4">
+				<div className="flex items-center justify-end gap-3 py-4 border-t border-gray-200 mt-2">
 					<Button
 						onClick={() => setIsEditAssignmentModalOpen(false)}
 						title={t("common.cancel")}
-						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none"
+						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none px-6"
 					/>
 					<Button
 						onClick={() => setIsEditAssignmentModalOpen(false)}
 						title={t("common.edit")}
-						className="shadow-none"
+						className="shadow-none px-8"
+					/>
+				</div>
+			</SlideUpModal>
+
+			{/* View Qualification Modal */}
+			<SlideUpModal
+				isOpen={isViewQualificationModalOpen}
+				onClose={() => setIsViewQualificationModalOpen(false)}
+				title="View Qualification"
+				maxWidth="760px"
+			>
+				{selectedQualification && (
+					<div className="py-6">
+						<h4 className="text-base font-semibold text-[#1D7A8C] mb-4">
+							Qualification Details
+						</h4>
+						<div className="border-t border-gray-200 pt-4 space-y-4">
+							<div className="flex items-center justify-between">
+								<span className="text-sm text-gray-500">
+									{t("profile.qualifications.table.type")}
+								</span>
+								<span className="text-sm font-medium text-gray-900">
+									{selectedQualification.type}
+								</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-sm text-gray-500">
+									{t("profile.qualifications.table.qualification")}
+								</span>
+								<span className="text-sm font-medium text-gray-900">
+									{selectedQualification.qualification}
+								</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-sm text-gray-500">
+									{t("profile.qualifications.table.issuer")}
+								</span>
+								<span className="text-sm font-medium text-gray-900">
+									{selectedQualification.issuer}
+								</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-sm text-gray-500">
+									{t("profile.qualifications.table.year")}
+								</span>
+								<span className="text-sm font-medium text-[#1D7A8C]">
+									{selectedQualification.year}
+								</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-sm text-gray-500">
+									{t("profile.qualifications.fields.status")}
+								</span>
+								{renderQualificationStatus(selectedQualification.status)}
+							</div>
+						</div>
+					</div>
+				)}
+				<div className="flex items-center justify-end gap-3 py-4 border-t border-gray-200 mt-4">
+					<Button
+						onClick={() => setIsViewQualificationModalOpen(false)}
+						title={t("common.cancel")}
+						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none px-6"
+					/>
+				</div>
+			</SlideUpModal>
+
+			{/* Edit Qualification Modal (compact, like design) */}
+			<SlideUpModal
+				isOpen={isEditQualificationModalOpen}
+				onClose={() => setIsEditQualificationModalOpen(false)}
+				title="Edit Qualification"
+				maxWidth="760px"
+			>
+				<div className="py-6 space-y-6">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<FloatingLabelSelect
+							label={t("profile.qualifications.table.type")}
+							name="qualificationType"
+							value={qualificationForm.qualificationType}
+							onChange={handleQualificationChange}
+							options={qualificationTypeOptions}
+						/>
+						<FloatingLabelInput
+							label={t("profile.qualifications.table.qualification")}
+							name="qualificationTitle"
+							value={qualificationForm.qualificationTitle}
+							onChange={handleQualificationChange}
+						/>
+						<FloatingLabelInput
+							label={t("profile.qualifications.table.year")}
+							name="year"
+							value={selectedQualification?.year || ""}
+							onChange={() => { }}
+							disabled
+						/>
+						<FloatingLabelInput
+							label={t("profile.qualifications.table.issuer")}
+							name="awardingEntity"
+							value={qualificationForm.awardingEntity}
+							onChange={handleQualificationChange}
+						/>
+					</div>
+					<div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 border border-gray-200">
+						<label className="text-sm text-gray-600">
+							{t("profile.qualifications.fields.status")}
+						</label>
+						<Toggle
+							enabled={qualificationForm.status === true}
+							onChange={enabled => setQualificationForm(prev => ({ ...prev, status: enabled }))}
+							className="py-1"
+						/>
+					</div>
+				</div>
+				<div className="flex items-center justify-end gap-3 py-4 border-t border-gray-200 mt-2">
+					<Button
+						onClick={() => setIsEditQualificationModalOpen(false)}
+						title={t("common.cancel")}
+						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none px-6"
+					/>
+					<Button
+						onClick={() => setIsEditQualificationModalOpen(false)}
+						title={t("common.edit")}
+						className="shadow-none px-8"
 					/>
 				</div>
 			</SlideUpModal>
@@ -846,15 +1010,33 @@ const ProfilePage = () => {
 													type="button"
 													onClick={e => {
 														e.stopPropagation();
+														if (comp.selected) {
+															setActiveLevelDropdown(
+																activeLevelDropdown === comp.id ? null : comp.id
+															);
+														}
+													}}
+													className={`w-6 h-6 flex items-center justify-center rounded-md border transition-colors ${comp.selected
+														? "border-[#1D7A8C] bg-white text-[#1D7A8C]"
+														: "border-gray-300 bg-white text-gray-300 cursor-not-allowed"
+														}`}
+													disabled={!comp.selected}
+												>
+													<HiOutlineChevronDown className="w-3.5 h-3.5" />
+												</button>
+												<button
+													type="button"
+													onClick={e => {
+														e.stopPropagation();
 														const newSelected = !comp.selected;
 														setCompetencies(prev =>
 															prev.map(c =>
 																c.id === comp.id
 																	? {
-																			...c,
-																			selected: newSelected,
-																			level: newSelected ? c.level || "" : "",
-																	  }
+																		...c,
+																		selected: newSelected,
+																		level: newSelected ? c.level || "" : "",
+																	}
 																	: c
 															)
 														);
@@ -862,33 +1044,14 @@ const ProfilePage = () => {
 															setActiveLevelDropdown(null);
 														}
 													}}
-													className={`p-1 rounded transition-colors ${
-														comp.selected ? "text-[#1D7A8C]" : "text-gray-400"
-													}`}
+													className={`w-6 h-6 flex items-center justify-center rounded-md border transition-colors ${comp.selected
+														? "border-[#1D7A8C] bg-[#1D7A8C] text-white"
+														: "border-[#1D7A8C] bg-white text-[#1D7A8C]"
+														}`}
 												>
-													<HiOutlineCheck className="w-5 h-5" />
+													<HiOutlineCheck className="w-4 h-4" />
 												</button>
-												<button
-													type="button"
-													onClick={e => {
-														e.stopPropagation();
-														if (comp.selected) {
-															setActiveLevelDropdown(
-																activeLevelDropdown === comp.id ? null : comp.id
-															);
-														}
-													}}
-													className={`p-1 rounded transition-colors ${
-														comp.selected
-															? "text-[#1D7A8C]"
-															: "text-gray-300 cursor-not-allowed"
-													}`}
-													disabled={!comp.selected}
-												>
-													<HiOutlineChevronDown
-														className={`w-4 h-4 ${comp.selected ? "" : "opacity-50"}`}
-													/>
-												</button>
+
 
 												{/* Level Selection Popover */}
 												{activeLevelDropdown === comp.id && comp.selected && (
@@ -909,19 +1072,18 @@ const ProfilePage = () => {
 																			);
 																			setActiveLevelDropdown(null);
 																		}}
-																		className={`w-full text-center px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-																			isSelected
-																				? levelLower === "beginner"
-																					? "bg-orange-100 text-orange-600"
-																					: levelLower === "intermediate"
+																		className={`w-full text-center px-4 py-2 rounded-full text-sm font-medium transition-colors ${isSelected
+																			? levelLower === "beginner"
+																				? "bg-orange-100 text-orange-600"
+																				: levelLower === "intermediate"
 																					? "bg-blue-100 text-blue-600"
 																					: "bg-green-100 text-green-700"
-																				: levelLower === "beginner"
+																			: levelLower === "beginner"
 																				? "bg-orange-100 text-orange-600 hover:bg-orange-200"
 																				: levelLower === "intermediate"
-																				? "bg-blue-100 text-blue-600 hover:bg-blue-200"
-																				: "bg-green-100 text-green-700 hover:bg-green-200"
-																		}`}
+																					? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+																					: "bg-green-100 text-green-700 hover:bg-green-200"
+																			}`}
 																	>
 																		{level}
 																	</button>
@@ -964,11 +1126,7 @@ const ProfilePage = () => {
 					</div>
 				</div>
 				<div className="flex items-center justify-end gap-3 py-4">
-					<Button
-						onClick={() => setIsQualificationModalOpen(false)}
-						title={t("common.cancel")}
-						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none"
-					/>
+					<Button onClick={() => setIsQualificationModalOpen(false)} title={t("common.cancel")} />
 					<Button onClick={handleQualificationSubmit} title={t("common.add")} className="shadow-none" />
 				</div>
 			</SlideUpModal>

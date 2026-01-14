@@ -168,11 +168,11 @@ const FloatingLabelSelect = memo(
 			</svg>
 		);
 
-		const wrapperGlow = hasError
-			? "from-red-500 via-red-400 to-red-500 "
-			: isFocused
-			? ""
-			: "from-white/15 via-white/10 to-white/5 shadow-md";
+		const wrapperGlow = isFocused ? "" : "from-white/15 via-white/10 to-white/5 shadow-md";
+
+		const innerWrapperClasses = `relative rounded-[18px] ${
+			hasError ? "bg-[#FFF5F2] border-l-4 border-orange-400" : "bg-white"
+		}`;
 
 		const buttonTextClasses = hasValue
 			? "text-[#0f3143] font-medium"
@@ -290,7 +290,7 @@ const FloatingLabelSelect = memo(
 						${disabled ? "opacity-70" : ""}
 					`}
 				>
-					<div className="relative rounded-[18px] bg-white">
+					<div className={innerWrapperClasses}>
 						{/* Select Button */}
 						<button
 							type="button"
@@ -321,8 +321,12 @@ const FloatingLabelSelect = memo(
 							className={`
 								absolute start-4 font-semibold pointer-events-none
 								transition-all duration-200
-								${isFloating ? "-top-4 text-xs px-3 text-gray-500" : "top-1/2 -translate-y-1/2 text-sm text-[#7A9098]"}
-								${hasError ? "text-red-400 bg-[#40171d]" : ""}
+								${
+									isFloating
+										? "-top-4 text-xs px-0 text-gray-700"
+										: "top-1/2 -translate-y-1/2 text-sm text-[#7A9098]"
+								}
+								${hasError ? "text-gray-900" : ""}
 							`}
 						>
 							{label} {required && <span className="text-red-400">*</span>}
@@ -332,20 +336,8 @@ const FloatingLabelSelect = memo(
 						{hasError && (
 							<p
 								id={errorId}
-								className="absolute -bottom-6 start-1 text-sm text-red-400 flex items-center gap-1"
+								className="absolute -bottom-6 start-1 text-xs text-gray-500"
 							>
-								<svg
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									xmlns="http://www.w3.org/2000/svg"
-								>
-									<path
-										d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z"
-										fill="currentColor"
-									/>
-								</svg>
 								{error}
 							</p>
 						)}

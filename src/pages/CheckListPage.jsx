@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { HiOutlineClipboardCheck, HiOutlinePlus, HiOutlineSearch, HiOutlineTrash } from "react-icons/hi";
 import { FiEdit2 } from "react-icons/fi";
+import { LuClock } from "react-icons/lu";
+import { IoIosCalendar } from "react-icons/io";
+import { PiWarningCircleFill } from "react-icons/pi";
 
 import PageHeader from "../components/shared/PageHeader";
 import Button from "../components/shared/Button";
@@ -10,6 +13,7 @@ import SlideUpModal from "../components/shared/SlideUpModal";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import FloatingLabelTextarea from "../components/shared/FloatingLabelTextarea";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
+import { IoLayers } from "react-icons/io5";
 
 const TASKS = [
 	{
@@ -195,7 +199,7 @@ const CheckListPage = () => {
 		setIsEditModalOpen(false);
 	};
 
-	const renderStatusBadge = status => {
+	const renderStatusBadge = (status, isCompleted = false) => {
 		const statusMap = {
 			"in-progress": { className: "bg-cyan-100 text-cyan-700", label: t("checklist.status.inProgress") },
 			pending: { className: "bg-gray-100 text-gray-600", label: t("checklist.status.pending") },
@@ -203,6 +207,15 @@ const CheckListPage = () => {
 			completed: { className: "bg-green-100 text-green-700", label: t("checklist.status.completed") },
 		};
 		const statusInfo = statusMap[status] || statusMap.pending;
+
+		// Override with gray styling if task is completed
+		if (isCompleted) {
+			return (
+				<span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-500">
+					{statusInfo.label}
+				</span>
+			);
+		}
 		return (
 			<span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusInfo.className}`}>
 				{statusInfo.label}
@@ -210,11 +223,23 @@ const CheckListPage = () => {
 		);
 	};
 
-	const renderDueDate = (date, type) => {
+	const renderDueDate = (date, type, isCompleted = false) => {
+		// If completed, render in gray
+		if (isCompleted) {
+			return (
+				<span className="flex items-center gap-1 text-gray-400">
+					<IoIosCalendar className="text-gray-400 w-4 h-4" />
+					{date}
+				</span>
+			);
+		}
+
 		const typeMap = {
-			warning: { icon: "📅", className: "text-amber-600" },
-			overdue: { icon: "🔴", className: "text-red-600" },
-			normal: { icon: "📅", className: "text-gray-600" },
+			warning: { icon: <IoIosCalendar className="text-amber-600 w-4 h-4" /> },
+			overdue: {
+				icon: <PiWarningCircleFill className="text-red-600 w-4 h-4" />,
+			},
+			normal: { icon: <IoIosCalendar className="text-gray-600 w-4 h-4" /> },
 		};
 		const info = typeMap[type] || typeMap.normal;
 		return (
@@ -300,7 +325,7 @@ const CheckListPage = () => {
 						{/* Stats Cards */}
 						<div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-4">
 							<div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-								<span className="text-blue-600 text-lg">≡</span>
+								<IoLayers className="w-5 h-5 text-blue-600" />
 							</div>
 							<div>
 								<p className="text-sm text-gray-500">{t("checklist.stats.totalTasks")}</p>
@@ -319,8 +344,8 @@ const CheckListPage = () => {
 						</div>
 
 						<div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-4">
-							<div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-								<span className="text-red-600 text-lg">⊘</span>
+							<div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+								<LuClock className="w-5 h-5 text-orange-600" />
 							</div>
 							<div>
 								<p className="text-sm text-gray-500">{t("checklist.stats.pending")}</p>
@@ -375,7 +400,7 @@ const CheckListPage = () => {
 									<tr
 										key={task.id}
 										className={`hover:bg-gray-50 transition-colors ${
-											task.completed ? "bg-gray-50/50" : ""
+											task.completed ? "bg-gray-100" : ""
 										}`}
 									>
 										<td className="px-6 py-4">
@@ -383,26 +408,39 @@ const CheckListPage = () => {
 												type="checkbox"
 												checked={task.completed}
 												onChange={() => handleToggleComplete(task.id)}
-												className="rounded border-gray-300 text-[#1D7A8C] focus:ring-[#1D7A8C]"
+												className={`w-4 h-4 text-[#64748B] bg-white border-gray-300 rounded focus:ring-[#1D7A8C] focus:ring-2 accent-[#1D7A8C]
+													${task.completed ? "accent-[#CBD5E1]" : ""}`}
 											/>
 										</td>
 										<td className="px-6 py-4">
 											<div>
 												<p
 													className={`font-semibold ${
-														task.completed ? "text-[#1D7A8C] line-through" : "text-gray-900"
+														task.completed ? "text-gray-400 line-through" : "text-gray-900"
 													}`}
 												>
 													{task.name}
 												</p>
-												<p className="text-xs text-gray-500">{task.description}</p>
+												<p
+													className={`text-xs ${
+														task.completed ? "text-gray-400" : "text-gray-500"
+													}`}
+												>
+													{task.description}
+												</p>
 											</div>
 										</td>
-										<td className="px-6 py-4 text-sm text-gray-700">{task.owner}</td>
-										<td className="px-6 py-4 text-sm">
-											{renderDueDate(task.dueDate, task.dueDateType)}
+										<td
+											className={`px-6 py-4 text-sm ${
+												task.completed ? "text-gray-400" : "text-gray-700"
+											}`}
+										>
+											{task.owner}
 										</td>
-										<td className="px-6 py-4">{renderStatusBadge(task.status)}</td>
+										<td className="px-6 py-4 text-sm">
+											{renderDueDate(task.dueDate, task.dueDateType, task.completed)}
+										</td>
+										<td className="px-6 py-4">{renderStatusBadge(task.status, task.completed)}</td>
 										<td className="px-6 py-4">
 											<div className="flex items-center justify-center gap-2">
 												{!task.completed ? (

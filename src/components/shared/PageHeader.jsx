@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-
 const HeroPattern = () => (
 	<svg
 		width="1439"
