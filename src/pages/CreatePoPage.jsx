@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 import PageHeader from "../components/shared/PageHeader";
 import Card from "../components/shared/Card";
@@ -15,6 +16,7 @@ import Button from "../components/shared/Button";
 
 import { fetchSuppliers } from "../store/suppliersSlice";
 import { fetchCurrencies } from "../store/currenciesSlice";
+import { fetchTaxRates } from "../store/taxRatesSlice";
 import api from "../api/axios";
 
 import { FiCheck, FiX } from "react-icons/fi";
@@ -33,9 +35,15 @@ const INITIAL_FORM_STATE = {
 	po_type: "",
 	supplier_id: "",
 	currency_id: "",
+	tax_rate_id: "",
+	delivery_amount: "",
 	po_date: new Date().toISOString().split("T")[0],
-	required_date: "",
-	notes: "",
+	receiving_date: "",
+	receiving_address: "",
+	receiver_email: "",
+	receiver_contact: "",
+	receiver_phone: "",
+	description: "",
 };
 
 // PO Icon
@@ -54,6 +62,7 @@ const POIcon = () => (
 
 const CreatePoPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("createPO"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -61,6 +70,7 @@ const CreatePoPage = () => {
 	// Redux state
 	const { suppliers = [] } = useSelector(state => state.suppliers || {});
 	const { currencies = [] } = useSelector(state => state.currencies || {});
+	const { taxRates = [] } = useSelector(state => state.taxRates || {});
 
 	// Local state
 	const [activeTab, setActiveTab] = useState("general");
@@ -72,12 +82,13 @@ const CreatePoPage = () => {
 	const [prItems, setPrItems] = useState([]);
 	const [loadingItems, setLoadingItems] = useState(false);
 	const [selectedItems, setSelectedItems] = useState([]); // Array of selected item IDs
-	const [itemDetails, setItemDetails] = useState({}); // { [id]: { quantity, unit_price, line_notes } }
+	const [itemDetails, setItemDetails] = useState({}); // { [id]: { quantity_to_convert, unit_price, tolerance_percentage, line_notes } }
 
-	// Fetch suppliers and currencies on mount
+	// Fetch suppliers, currencies and tax rates on mount
 	useEffect(() => {
 		dispatch(fetchSuppliers());
 		dispatch(fetchCurrencies());
+		dispatch(fetchTaxRates());
 	}, [dispatch]);
 
 	// Update page title
@@ -152,6 +163,17 @@ const CreatePoPage = () => {
 		];
 	}, [currencies, t]);
 
+	// Tax Rate options
+	const taxRateOptions = useMemo(() => {
+		return [
+			{ value: "", label: t("createPO.form.selectTaxRate") },
+			...taxRates.map(taxRate => ({
+				value: taxRate.id,
+				label: `${taxRate.name} (${taxRate.rate}%)`,
+			})),
+		];
+	}, [taxRates, t]);
+
 	// PO Type options with translations
 	const poTypeOptions = useMemo(
 		() =>
@@ -167,7 +189,7 @@ const CreatePoPage = () => {
 		return selectedItems
 			.reduce((total, itemId) => {
 				const details = itemDetails[itemId] || {};
-				const qty = parseFloat(details.quantity) || 0;
+				const qty = parseFloat(details.quantity_to_convert) || 0;
 				const price = parseFloat(details.unit_price) || 0;
 				return total + qty * price;
 			}, 0)
@@ -205,8 +227,9 @@ const CreatePoPage = () => {
 						setItemDetails(prevDetails => ({
 							...prevDetails,
 							[itemId]: {
-								quantity: item.remaining_quantity || item.quantity || "",
+								quantity_to_convert: item.remaining_quantity || item.quantity || "",
 								unit_price: item.estimated_unit_price || "",
+								tolerance_percentage: "10.00",
 								line_notes: "",
 							},
 						}));
@@ -245,11 +268,14 @@ const CreatePoPage = () => {
 		if (!formData.currency_id) {
 			errors.currency_id = t("createPO.validation.currencyRequired");
 		}
+		if (!formData.tax_rate_id) {
+			errors.tax_rate_id = t("createPO.validation.taxRateRequired");
+		}
 		if (!formData.po_date) {
 			errors.po_date = t("createPO.validation.poDateRequired");
 		}
-		if (!formData.required_date) {
-			errors.required_date = t("createPO.validation.requiredDateRequired");
+		if (!formData.receiving_date) {
+			errors.receiving_date = t("createPO.validation.receivingDateRequired");
 		}
 
 		if (selectedItems.length === 0) {
@@ -259,7 +285,7 @@ const CreatePoPage = () => {
 		// Validate each selected item
 		selectedItems.forEach(itemId => {
 			const details = itemDetails[itemId] || {};
-			if (!details.quantity || parseFloat(details.quantity) <= 0) {
+			if (!details.quantity_to_convert || parseFloat(details.quantity_to_convert) <= 0) {
 				errors[`item_${itemId}_quantity`] = t("createPO.validation.quantityRequired");
 			}
 			if (!details.unit_price || parseFloat(details.unit_price) <= 0) {
@@ -277,7 +303,13 @@ const CreatePoPage = () => {
 			if (formErrors.items || selectedItems.length === 0) {
 				toast.error(t("createPO.validation.checkLines"));
 				setActiveTab("lines");
-			} else if (formErrors.po_type || formErrors.supplier_id || formErrors.currency_id) {
+			} else if (
+				formErrors.po_type ||
+				formErrors.supplier_id ||
+				formErrors.currency_id ||
+				formErrors.tax_rate_id ||
+				formErrors.receiving_date
+			) {
 				toast.error(t("createPO.validation.checkGeneral"));
 				setActiveTab("general");
 			}
@@ -290,13 +322,20 @@ const CreatePoPage = () => {
 			po_type: formData.po_type,
 			supplier_id: parseInt(formData.supplier_id),
 			currency_id: parseInt(formData.currency_id),
+			tax_rate_id: parseInt(formData.tax_rate_id),
+			delivery_amount: formData.delivery_amount || "0.00",
 			po_date: formData.po_date,
-			required_date: formData.required_date,
-			notes: formData.notes,
+			receiving_date: formData.receiving_date,
+			receiving_address: formData.receiving_address,
+			receiver_email: formData.receiver_email,
+			receiver_contact: formData.receiver_contact,
+			receiver_phone: formData.receiver_phone,
+			description: formData.description,
 			items_from_pr: selectedItems.map(itemId => ({
 				pr_item_id: itemId,
-				quantity: parseFloat(itemDetails[itemId]?.quantity) || 0,
+				quantity_to_convert: itemDetails[itemId]?.quantity_to_convert || "0.000",
 				unit_price: itemDetails[itemId]?.unit_price || "0.00",
+				tolerance_percentage: itemDetails[itemId]?.tolerance_percentage || "10.00",
 				line_notes: itemDetails[itemId]?.line_notes || "",
 			})),
 		};
@@ -384,6 +423,17 @@ const CreatePoPage = () => {
 								required
 							/>
 
+							{/* Tax Rate */}
+							<FloatingLabelSelect
+								label={t("createPO.form.taxRate")}
+								name="tax_rate_id"
+								value={formData.tax_rate_id}
+								onChange={e => handleInputChange("tax_rate_id", e.target.value)}
+								options={taxRateOptions}
+								error={formErrors.tax_rate_id}
+								required
+							/>
+
 							{/* PO Date */}
 							<FloatingLabelInput
 								label={t("createPO.form.poDate")}
@@ -395,24 +445,73 @@ const CreatePoPage = () => {
 								required
 							/>
 
-							{/* Required Date */}
+							{/* Receiving Date */}
 							<FloatingLabelInput
-								label={t("createPO.form.requiredDate")}
-								name="required_date"
+								label={t("createPO.form.receivingDate")}
+								name="receiving_date"
 								type="date"
-								value={formData.required_date}
-								onChange={e => handleInputChange("required_date", e.target.value)}
-								error={formErrors.required_date}
+								value={formData.receiving_date}
+								onChange={e => handleInputChange("receiving_date", e.target.value)}
+								error={formErrors.receiving_date}
 								required
 							/>
 
-							{/* Notes - Full width */}
+							{/* Delivery Amount */}
+							<FloatingLabelInput
+								label={t("createPO.form.deliveryAmount")}
+								name="delivery_amount"
+								type="number"
+								step="0.01"
+								value={formData.delivery_amount}
+								onChange={e => handleInputChange("delivery_amount", e.target.value)}
+								error={formErrors.delivery_amount}
+							/>
+
+							{/* Receiving Address */}
+							<FloatingLabelInput
+								label={t("createPO.form.receivingAddress")}
+								name="receiving_address"
+								value={formData.receiving_address}
+								onChange={e => handleInputChange("receiving_address", e.target.value)}
+								error={formErrors.receiving_address}
+							/>
+
+							{/* Receiver Contact */}
+							<FloatingLabelInput
+								label={t("createPO.form.receiverContact")}
+								name="receiver_contact"
+								value={formData.receiver_contact}
+								onChange={e => handleInputChange("receiver_contact", e.target.value)}
+								error={formErrors.receiver_contact}
+							/>
+
+							{/* Receiver Email */}
+							<FloatingLabelInput
+								label={t("createPO.form.receiverEmail")}
+								name="receiver_email"
+								type="email"
+								value={formData.receiver_email}
+								onChange={e => handleInputChange("receiver_email", e.target.value)}
+								error={formErrors.receiver_email}
+							/>
+
+							{/* Receiver Phone */}
+							<FloatingLabelInput
+								label={t("createPO.form.receiverPhone")}
+								name="receiver_phone"
+								type="tel"
+								value={formData.receiver_phone}
+								onChange={e => handleInputChange("receiver_phone", e.target.value)}
+								error={formErrors.receiver_phone}
+							/>
+
+							{/* Description - Full width */}
 							<div className="md:col-span-2">
 								<FloatingLabelTextarea
-									label={t("createPO.form.notes")}
-									name="notes"
-									value={formData.notes}
-									onChange={e => handleInputChange("notes", e.target.value)}
+									label={t("createPO.form.description")}
+									name="description"
+									value={formData.description}
+									onChange={e => handleInputChange("description", e.target.value)}
 									rows={4}
 								/>
 							</div>
@@ -495,26 +594,26 @@ const CreatePoPage = () => {
 													{/* Item Details Form - Shown when selected */}
 													{isSelected && (
 														<div className="border-t border-gray-200 bg-gray-50 p-4">
-															<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-																{/* Quantity */}
+															<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+																{/* Quantity to Convert */}
 																<div>
 																	<label className="block text-sm font-medium text-gray-700 mb-1">
 																		{t("createPO.lines.quantity")} *
 																	</label>
 																	<input
 																		type="number"
-																		value={details.quantity || ""}
+																		value={details.quantity_to_convert || ""}
 																		onChange={e =>
 																			handleItemDetailChange(
 																				item.id,
-																				"quantity",
+																				"quantity_to_convert",
 																				e.target.value
 																			)
 																		}
 																		onClick={e => e.stopPropagation()}
 																		max={item.remaining_quantity}
 																		min="0"
-																		step="0.01"
+																		step="0.001"
 																		className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#28819C] ${
 																			formErrors[`item_${item.id}_quantity`]
 																				? "border-red-500"
@@ -565,6 +664,32 @@ const CreatePoPage = () => {
 																	)}
 																</div>
 
+																{/* Tolerance Percentage */}
+																<div>
+																	<label className="block text-sm font-medium text-gray-700 mb-1">
+																		{t("createPO.lines.tolerancePercentage")}
+																	</label>
+																	<input
+																		type="number"
+																		value={details.tolerance_percentage || ""}
+																		onChange={e =>
+																			handleItemDetailChange(
+																				item.id,
+																				"tolerance_percentage",
+																				e.target.value
+																			)
+																		}
+																		onClick={e => e.stopPropagation()}
+																		min="0"
+																		max="100"
+																		step="0.01"
+																		className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#28819C]"
+																		placeholder={t(
+																			"createPO.lines.tolerancePlaceholder"
+																		)}
+																	/>
+																</div>
+
 																{/* Line Notes */}
 																<div>
 																	<label className="block text-sm font-medium text-gray-700 mb-1">
@@ -595,7 +720,8 @@ const CreatePoPage = () => {
 																	{t("createPO.lines.lineTotal")}:{" "}
 																	<span className="font-semibold text-gray-900">
 																		{(
-																			(parseFloat(details.quantity) || 0) *
+																			(parseFloat(details.quantity_to_convert) ||
+																				0) *
 																			(parseFloat(details.unit_price) || 0)
 																		).toFixed(2)}
 																	</span>

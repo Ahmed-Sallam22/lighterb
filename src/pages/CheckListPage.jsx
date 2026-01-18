@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { HiOutlineClipboardCheck, HiOutlinePlus, HiOutlineSearch, HiOutlineTrash } from "react-icons/hi";
 import { FiEdit2 } from "react-icons/fi";
 import { LuClock } from "react-icons/lu";
@@ -101,13 +102,6 @@ const CheckListPage = () => {
 		dueDate: "",
 		status: "pending",
 	});
-
-	useEffect(() => {
-		document.title = `${t("checklist.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	const stats = useMemo(() => {
 		const total = tasks.length;

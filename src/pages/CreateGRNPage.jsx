@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -57,6 +58,7 @@ const GRNIcon = () => (
 
 const CreateGRNPage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("createGRN"));
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
@@ -80,7 +82,7 @@ const CreateGRNPage = () => {
 	// PO Items state
 	const [poItems, setPoItems] = useState([]);
 	const [selectedItems, setSelectedItems] = useState([]); // Array of selected item IDs
-	const [itemDetails, setItemDetails] = useState({}); // { [id]: { quantity_to_receive, line_notes } }
+	const [itemDetails, setItemDetails] = useState({}); // { [id]: { quantity_to_receive, receiving_type, line_notes } }
 
 	// Fetch available POs and user profile on mount
 	useEffect(() => {
@@ -207,6 +209,7 @@ const CreateGRNPage = () => {
 							...prevDetails,
 							[itemId]: {
 								quantity_to_receive: item.remaining_quantity || "",
+								receiving_type: "PARTIAL",
 								line_notes: "",
 							},
 						}));
@@ -283,11 +286,11 @@ const CreateGRNPage = () => {
 			po_header_id: parseInt(formData.po_header_id),
 			receipt_date: formData.receipt_date,
 			grn_type: selectedPO?.po_type || "Catalog",
-			received_by_id: userProfile?.id || 1,
 			notes: formData.notes,
 			lines_from_po: selectedItems.map(itemId => ({
 				po_line_item_id: itemId,
 				quantity_to_receive: itemDetails[itemId]?.quantity_to_receive || "0.000",
+				receiving_type: itemDetails[itemId]?.receiving_type || "PARTIAL",
 				line_notes: itemDetails[itemId]?.line_notes || "",
 			})),
 		};
@@ -496,7 +499,7 @@ const CreateGRNPage = () => {
 													{/* Item Details Form - Shown when selected */}
 													{isSelected && (
 														<div className="border-t border-gray-200 bg-gray-50 p-4">
-															<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+															<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 																{/* Quantity to Receive */}
 																<div>
 																	<label className="block text-sm font-medium text-gray-700 mb-1">
@@ -530,6 +533,32 @@ const CreateGRNPage = () => {
 																			{formErrors[`item_${item.id}_quantity`]}
 																		</p>
 																	)}
+																</div>
+
+																{/* Receiving Type */}
+																<div>
+																	<label className="block text-sm font-medium text-gray-700 mb-1">
+																		{t("createGRN.lines.receivingType")} *
+																	</label>
+																	<select
+																		value={details.receiving_type || "PARTIAL"}
+																		onChange={e =>
+																			handleItemDetailChange(
+																				item.id,
+																				"receiving_type",
+																				e.target.value
+																			)
+																		}
+																		onClick={e => e.stopPropagation()}
+																		className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#28819C]"
+																	>
+																		<option value="PARTIAL">
+																			{t("createGRN.lines.partial")}
+																		</option>
+																		<option value="FULLY">
+																			{t("createGRN.lines.fully")}
+																		</option>
+																	</select>
 																</div>
 
 																{/* Line Notes */}

@@ -19,9 +19,11 @@ import Button from "../components/shared/Button";
 import StatisticsCard from "../components/shared/StatisticsCard";
 import SearchInput from "../components/shared/SearchInput";
 import { sampleData } from "../dummyData/assetsData";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 const AssetsPage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("assets"));
 
 	const { loading, error, statistics } = useState(
 		{ lines: [], loading: false, error: null, statistics: {} } // Placeholder state

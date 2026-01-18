@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { HiSearch } from "react-icons/hi";
 
 import PageHeader from "../components/shared/PageHeader";
@@ -52,6 +53,7 @@ const INITIAL_FILTERS = {
 
 const EmployeeSearchPage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("employeeSearch"));
 	const dispatch = useDispatch();
 	const { businessGroups = [] } = useSelector(state => state.businessGroups || {});
 	const { departments = [] } = useSelector(state => state.departments || {});
@@ -61,25 +63,16 @@ const EmployeeSearchPage = () => {
 	const [pageSize, setPageSize] = useState(25);
 
 	useEffect(() => {
-		document.title = `${t("employeeSearch.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
-
-	useEffect(() => {
 		dispatch(fetchBusinessGroups({ page_size: 100 }));
 		dispatch(fetchDepartments({ page: 1, page_size: 100 }));
 	}, [dispatch]);
 
-	const getOptionValue = value =>
-		value === null || value === undefined ? "" : String(value);
+	const getOptionValue = value => (value === null || value === undefined ? "" : String(value));
 
 	const getBusinessGroupKey = businessGroup =>
 		getOptionValue(businessGroup?.id ?? businessGroup?.code ?? businessGroup?.name);
 
-	const getDepartmentKey = department =>
-		getOptionValue(department?.id ?? department?.code ?? department?.name);
+	const getDepartmentKey = department => getOptionValue(department?.id ?? department?.code ?? department?.name);
 
 	const businessGroupOptions = useMemo(() => {
 		return [
@@ -116,9 +109,7 @@ const EmployeeSearchPage = () => {
 
 	const selectedBusinessGroupName = useMemo(() => {
 		if (appliedFilters.businessGroup === "all") return "";
-		const matchedGroup = businessGroups.find(
-			group => getBusinessGroupKey(group) === appliedFilters.businessGroup
-		);
+		const matchedGroup = businessGroups.find(group => getBusinessGroupKey(group) === appliedFilters.businessGroup);
 		return matchedGroup?.name || matchedGroup?.code || appliedFilters.businessGroup;
 	}, [appliedFilters.businessGroup, businessGroups]);
 
@@ -344,11 +335,7 @@ const EmployeeSearchPage = () => {
 				</div>
 
 				<div className="bg-white rounded-2xl shadow-lg p-4 mt-6">
-					<Table
-						columns={columns}
-						data={paginatedEmployees}
-						emptyMessage={t("employeeSearch.table.empty")}
-					/>
+					<Table columns={columns} data={paginatedEmployees} emptyMessage={t("employeeSearch.table.empty")} />
 
 					<div className="mt-6">
 						<Pagination

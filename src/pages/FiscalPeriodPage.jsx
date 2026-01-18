@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { FaChevronDown, FaCalendarAlt } from "react-icons/fa";
 import PageHeader from "../components/shared/PageHeader";
 import Table from "../components/shared/Table";
@@ -23,6 +24,7 @@ import {
 
 const FiscalPeriodPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("fiscalPeriods"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const navigate = useNavigate();

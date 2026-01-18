@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { useLocale } from "../hooks/useLocale";
 import { HiOfficeBuilding, HiLocationMarker, HiViewGrid, HiBriefcase, HiTrendingUp } from "react-icons/hi";
 import PageHeader from "../components/shared/PageHeader";
@@ -8,6 +9,7 @@ import RequisitionsHeadIcon from "../ui/icons/RequisitionsHeadIcon";
 
 const WorkStructurePage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("workStructure"));
 	const { locale } = useLocale();
 	const navigate = useNavigate();
 	const isRTL = locale === "AR";

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -64,6 +65,7 @@ const createEmptyLineItem = () => ({
 
 const CreateRequisitionPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("createRequisition"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const dispatch = useDispatch();

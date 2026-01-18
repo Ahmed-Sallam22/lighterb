@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 import PageHeader from "../components/shared/PageHeader";
 import Table from "../components/shared/Table";
@@ -56,6 +57,7 @@ const STATUS_OPTIONS = [
 
 const POPage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("purchaseOrders"));
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 

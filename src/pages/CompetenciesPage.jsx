@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { HiOutlineAcademicCap } from "react-icons/hi";
 
 import PageHeader from "../components/shared/PageHeader";
@@ -35,6 +36,7 @@ const COMPETENCIES_DATA = [
 
 const CompetenciesPage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("competencies"));
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [noExpiration, setNoExpiration] = useState(false);
 	const [formData, setFormData] = useState({
@@ -44,13 +46,6 @@ const CompetenciesPage = () => {
 		dateFrom: "",
 		dateTo: "",
 	});
-
-	useEffect(() => {
-		document.title = `${t("competencies.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	const competenceOptions = [
 		{ value: "", label: t("competencies.fields.competence") },
@@ -185,27 +180,30 @@ const CompetenciesPage = () => {
 						</h3>
 						<div className="space-y-4">
 							<FloatingLabelSelect
-								label={t("competencies.fields.competence") + " *"}
+								label={t("competencies.fields.competence") }
 								name="competence"
 								options={competenceOptions}
 								value={formData.competence}
 								onChange={value => handleInputChange("competence", value)}
+								required
 							/>
 
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<FloatingLabelSelect
-									label={t("competencies.fields.proficiencyLevel") + " *"}
+									label={t("competencies.fields.proficiencyLevel")}
 									name="proficiencyLevel"
 									options={proficiencyOptions}
 									value={formData.proficiencyLevel}
 									onChange={value => handleInputChange("proficiencyLevel", value)}
+									required
 								/>
 								<FloatingLabelSelect
-									label={t("competencies.fields.source") + " *"}
+									label={t("competencies.fields.source")}
 									name="source"
 									options={sourceOptions}
 									value={formData.source}
 									onChange={value => handleInputChange("source", value)}
+									required	
 								/>
 							</div>
 						</div>
@@ -241,8 +239,7 @@ const CompetenciesPage = () => {
 											id="noExpiration"
 											checked={noExpiration}
 											onChange={e => handleNoExpirationChange(e.target.checked)}
-											className="w-4 h-4 text-[#1D7A8C] bg-white border-gray-300 rounded focus:ring-[#1D7A8C] focus:ring-2 accent-[#1D7A8C]" 
-											
+											className="w-4 h-4 text-[#1D7A8C] bg-white border-gray-300 rounded focus:ring-[#1D7A8C] focus:ring-2 accent-[#1D7A8C]"
 										/>
 										<label htmlFor="noExpiration" className="text-sm text-gray-700 cursor-pointer">
 											{t("competencies.fields.noExpiration")}

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import {
 	HiOutlineUser,
 	HiOutlineEye,
@@ -79,6 +80,7 @@ const QUALIFICATION_INITIAL_STATE = {
 
 const ProfilePage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("profile"));
 	const dispatch = useDispatch();
 	useSelector(state => state.businessGroups || {});
 	useSelector(state => state.departments || {});
@@ -228,8 +230,9 @@ const ProfilePage = () => {
 		const isActive = status === "active";
 		return (
 			<span
-				className={`px-3 py-1 rounded-full text-xs font-semibold ${isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
-					}`}
+				className={`px-3 py-1 rounded-full text-xs font-semibold ${
+					isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
+				}`}
 			>
 				{isActive ? t("common.active") : t("common.inactive")}
 			</span>
@@ -358,14 +361,16 @@ const ProfilePage = () => {
 											<button
 												type="button"
 												onClick={() => setActiveTab(tab.id)}
-												className={`flex items-center gap-3 pb-2 border-b-2 transition-colors whitespace-nowrap ${isActive
-													? "border-[#1D7A8C] text-[#1D7A8C]"
-													: "border-transparent text-gray-500 hover:text-gray-700"
-													}`}
+												className={`flex items-center gap-3 pb-2 border-b-2 transition-colors whitespace-nowrap ${
+													isActive
+														? "border-[#1D7A8C] text-[#1D7A8C]"
+														: "border-transparent text-gray-500 hover:text-gray-700"
+												}`}
 											>
 												<span
-													className={`w-2 h-2 rounded-full ${isActive ? "bg-[#1D7A8C]" : "bg-gray-300"
-														}`}
+													className={`w-2 h-2 rounded-full ${
+														isActive ? "bg-[#1D7A8C]" : "bg-gray-300"
+													}`}
 												/>
 												<span className="text-sm font-medium">{tab.label}</span>
 											</button>
@@ -647,20 +652,14 @@ const ProfilePage = () => {
 						</h4>
 						<div className="border-t border-gray-200 pt-4 space-y-4">
 							<div className="flex items-center justify-between">
-								<span className="text-sm text-gray-500">
-									{t("profile.assignment.fields.title")}
-								</span>
-								<span className="text-sm font-medium text-gray-900">
-									{selectedAssignment.title}
-								</span>
+								<span className="text-sm text-gray-500">{t("profile.assignment.fields.title")}</span>
+								<span className="text-sm font-medium text-gray-900">{selectedAssignment.title}</span>
 							</div>
 							<div className="flex items-center justify-between">
 								<span className="text-sm text-gray-500">
 									{t("profile.assignment.fields.assignmentType")}
 								</span>
-								<span className="text-sm font-medium text-gray-900">
-									{selectedAssignment.type}
-								</span>
+								<span className="text-sm font-medium text-gray-900">{selectedAssignment.type}</span>
 							</div>
 							<div className="flex items-center justify-between">
 								<span className="text-sm text-gray-500">
@@ -719,9 +718,7 @@ const ProfilePage = () => {
 						/>
 					</div>
 					<div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 border border-gray-200">
-						<label className="text-sm text-gray-600">
-							{t("profile.assignment.fields.status")}
-						</label>
+						<label className="text-sm text-gray-600">{t("profile.assignment.fields.status")}</label>
 						<Toggle
 							enabled={editAssignmentForm.status === true || editAssignmentForm.status === "active"}
 							onChange={enabled => setEditAssignmentForm(prev => ({ ...prev, status: enabled }))}
@@ -751,17 +748,11 @@ const ProfilePage = () => {
 			>
 				{selectedQualification && (
 					<div className="py-6">
-						<h4 className="text-base font-semibold text-[#1D7A8C] mb-4">
-							Qualification Details
-						</h4>
+						<h4 className="text-base font-semibold text-[#1D7A8C] mb-4">Qualification Details</h4>
 						<div className="border-t border-gray-200 pt-4 space-y-4">
 							<div className="flex items-center justify-between">
-								<span className="text-sm text-gray-500">
-									{t("profile.qualifications.table.type")}
-								</span>
-								<span className="text-sm font-medium text-gray-900">
-									{selectedQualification.type}
-								</span>
+								<span className="text-sm text-gray-500">{t("profile.qualifications.table.type")}</span>
+								<span className="text-sm font-medium text-gray-900">{selectedQualification.type}</span>
 							</div>
 							<div className="flex items-center justify-between">
 								<span className="text-sm text-gray-500">
@@ -780,12 +771,8 @@ const ProfilePage = () => {
 								</span>
 							</div>
 							<div className="flex items-center justify-between">
-								<span className="text-sm text-gray-500">
-									{t("profile.qualifications.table.year")}
-								</span>
-								<span className="text-sm font-medium text-[#1D7A8C]">
-									{selectedQualification.year}
-								</span>
+								<span className="text-sm text-gray-500">{t("profile.qualifications.table.year")}</span>
+								<span className="text-sm font-medium text-[#1D7A8C]">{selectedQualification.year}</span>
 							</div>
 							<div className="flex items-center justify-between">
 								<span className="text-sm text-gray-500">
@@ -831,7 +818,7 @@ const ProfilePage = () => {
 							label={t("profile.qualifications.table.year")}
 							name="year"
 							value={selectedQualification?.year || ""}
-							onChange={() => { }}
+							onChange={() => {}}
 							disabled
 						/>
 						<FloatingLabelInput
@@ -842,9 +829,7 @@ const ProfilePage = () => {
 						/>
 					</div>
 					<div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 border border-gray-200">
-						<label className="text-sm text-gray-600">
-							{t("profile.qualifications.fields.status")}
-						</label>
+						<label className="text-sm text-gray-600">{t("profile.qualifications.fields.status")}</label>
 						<Toggle
 							enabled={qualificationForm.status === true}
 							onChange={enabled => setQualificationForm(prev => ({ ...prev, status: enabled }))}
@@ -1016,10 +1001,11 @@ const ProfilePage = () => {
 															);
 														}
 													}}
-													className={`w-6 h-6 flex items-center justify-center rounded-md border transition-colors ${comp.selected
-														? "border-[#1D7A8C] bg-white text-[#1D7A8C]"
-														: "border-gray-300 bg-white text-gray-300 cursor-not-allowed"
-														}`}
+													className={`w-6 h-6 flex items-center justify-center rounded-md border transition-colors ${
+														comp.selected
+															? "border-[#1D7A8C] bg-white text-[#1D7A8C]"
+															: "border-gray-300 bg-white text-gray-300 cursor-not-allowed"
+													}`}
 													disabled={!comp.selected}
 												>
 													<HiOutlineChevronDown className="w-3.5 h-3.5" />
@@ -1033,10 +1019,10 @@ const ProfilePage = () => {
 															prev.map(c =>
 																c.id === comp.id
 																	? {
-																		...c,
-																		selected: newSelected,
-																		level: newSelected ? c.level || "" : "",
-																	}
+																			...c,
+																			selected: newSelected,
+																			level: newSelected ? c.level || "" : "",
+																	  }
 																	: c
 															)
 														);
@@ -1044,14 +1030,14 @@ const ProfilePage = () => {
 															setActiveLevelDropdown(null);
 														}
 													}}
-													className={`w-6 h-6 flex items-center justify-center rounded-md border transition-colors ${comp.selected
-														? "border-[#1D7A8C] bg-[#1D7A8C] text-white"
-														: "border-[#1D7A8C] bg-white text-[#1D7A8C]"
-														}`}
+													className={`w-6 h-6 flex items-center justify-center rounded-md border transition-colors ${
+														comp.selected
+															? "border-[#1D7A8C] bg-[#1D7A8C] text-white"
+															: "border-[#1D7A8C] bg-white text-[#1D7A8C]"
+													}`}
 												>
 													<HiOutlineCheck className="w-4 h-4" />
 												</button>
-
 
 												{/* Level Selection Popover */}
 												{activeLevelDropdown === comp.id && comp.selected && (
@@ -1072,18 +1058,19 @@ const ProfilePage = () => {
 																			);
 																			setActiveLevelDropdown(null);
 																		}}
-																		className={`w-full text-center px-4 py-2 rounded-full text-sm font-medium transition-colors ${isSelected
-																			? levelLower === "beginner"
-																				? "bg-orange-100 text-orange-600"
-																				: levelLower === "intermediate"
+																		className={`w-full text-center px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+																			isSelected
+																				? levelLower === "beginner"
+																					? "bg-orange-100 text-orange-600"
+																					: levelLower === "intermediate"
 																					? "bg-blue-100 text-blue-600"
 																					: "bg-green-100 text-green-700"
-																			: levelLower === "beginner"
+																				: levelLower === "beginner"
 																				? "bg-orange-100 text-orange-600 hover:bg-orange-200"
 																				: levelLower === "intermediate"
-																					? "bg-blue-100 text-blue-600 hover:bg-blue-200"
-																					: "bg-green-100 text-green-700 hover:bg-green-200"
-																			}`}
+																				? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+																				: "bg-green-100 text-green-700 hover:bg-green-200"
+																		}`}
 																	>
 																		{level}
 																	</button>

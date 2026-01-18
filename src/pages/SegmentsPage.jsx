@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import PageHeader from "../components/shared/PageHeader";
 import SegmentTypes from "../components/segments/SegmentTypes";
 import SegmentValues from "../components/segments/SegmentValues";
@@ -11,6 +12,7 @@ import SegmentPageHeaderIcon from "../assets/icons/SegmentPageHeaderIcon";
 
 const SegmentsPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("segments"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const { types, values, typesLoading, valuesLoading, valuesCount, valuesPage, valuesHasNext, valuesHasPrevious } =

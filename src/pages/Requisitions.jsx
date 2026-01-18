@@ -8,6 +8,7 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import { MdAccessTime } from "react-icons/md";
 import { PiCirclesFourFill } from "react-icons/pi";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import PageHeader from "../components/shared/PageHeader";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import RequisitionsHeadIcon from "../ui/icons/RequisitionsHeadIcon";
@@ -49,6 +50,7 @@ const TAB_CONFIG = [
 
 const RequisitionsPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("requisitions"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const dispatch = useDispatch();

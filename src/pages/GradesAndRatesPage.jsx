@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { HiTrendingUp, HiArrowLeft, HiPlus, HiClock } from "react-icons/hi";
 
 import { parseApiError } from "../utils/errorHandler";
@@ -55,6 +56,7 @@ const RATE_FORM_INITIAL = {
 
 const GradesAndRatesPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("gradesAndRates"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 

@@ -1,28 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import AuthLayout from '../components/auth/AuthLayout';
-import AuthInput from '../components/auth/AuthInput';
-import AuthButton from '../components/auth/AuthButton';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
+import { useDispatch, useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import AuthLayout from "../components/auth/AuthLayout";
+import AuthInput from "../components/auth/AuthInput";
+import AuthButton from "../components/auth/AuthButton";
 // import SocialLogin from '../components/auth/SocialLogin';
-import AuthLogo from '../components/auth/AuthLogo';
-import { registerUser, clearError } from '../store/authSlice';
+import AuthLogo from "../components/auth/AuthLogo";
+import { registerUser, clearError } from "../store/authSlice";
 
 const RegisterPage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("register"));
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const { loading, error } = useSelector((state) => state.auth);
+	const { loading, error } = useSelector(state => state.auth);
 
 	const [formData, setFormData] = useState({
-		name: '',
-		email: '',
-		phone_number: '',
-		password: '',
-		confirm_password: '',
+		name: "",
+		email: "",
+		phone_number: "",
+		password: "",
+		confirm_password: "",
 	});
 	const [errors, setErrors] = useState({});
 
@@ -47,7 +49,7 @@ const RegisterPage = () => {
 		if (errors[id]) {
 			setErrors(prev => ({
 				...prev,
-				[id]: '',
+				[id]: "",
 			}));
 		}
 	};
@@ -56,36 +58,36 @@ const RegisterPage = () => {
 		const newErrors = {};
 
 		if (!formData.name.trim()) {
-			newErrors.name = t('auth.register.nameRequired');
+			newErrors.name = t("auth.register.nameRequired");
 		}
 
 		if (!formData.email.trim()) {
-			newErrors.email = t('auth.register.emailRequired');
+			newErrors.email = t("auth.register.emailRequired");
 		} else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-			newErrors.email = t('auth.register.emailInvalid');
+			newErrors.email = t("auth.register.emailInvalid");
 		}
 
 		if (!formData.phone_number.trim()) {
-			newErrors.phone_number = t('auth.register.phoneRequired');
+			newErrors.phone_number = t("auth.register.phoneRequired");
 		}
 
 		if (!formData.password) {
-			newErrors.password = t('auth.register.passwordRequired');
+			newErrors.password = t("auth.register.passwordRequired");
 		} else if (formData.password.length < 8) {
-			newErrors.password = t('auth.register.passwordMinLength');
+			newErrors.password = t("auth.register.passwordMinLength");
 		}
 
 		if (!formData.confirm_password) {
-			newErrors.confirm_password = t('auth.register.confirmPasswordRequired');
+			newErrors.confirm_password = t("auth.register.confirmPasswordRequired");
 		} else if (formData.password !== formData.confirm_password) {
-			newErrors.confirm_password = t('auth.register.passwordsDoNotMatch');
+			newErrors.confirm_password = t("auth.register.passwordsDoNotMatch");
 		}
 
 		setErrors(newErrors);
 		return Object.keys(newErrors).length === 0;
 	};
 
-	const handleSubmit = async (e) => {
+	const handleSubmit = async e => {
 		e.preventDefault();
 
 		if (!validateForm()) {
@@ -94,9 +96,8 @@ const RegisterPage = () => {
 
 		try {
 			await dispatch(registerUser(formData)).unwrap();
-			toast.success(t('auth.register.success'));
-			navigate('/');
-		
+			toast.success(t("auth.register.success"));
+			navigate("/");
 		} catch {
 			// Error is handled by the useEffect
 		}
@@ -104,22 +105,22 @@ const RegisterPage = () => {
 
 	return (
 		<AuthLayout
-			footerText={t('auth.register.haveAccount')}
-			footerLinkText={t('auth.register.signIn')}
+			footerText={t("auth.register.haveAccount")}
+			footerLinkText={t("auth.register.signIn")}
 			footerLinkTo="/auth/login"
 		>
 			<ToastContainer position="top-right" autoClose={3000} />
-			<AuthLogo title={t('auth.register.title')} subtitle={t('auth.register.subtitle')} />
+			<AuthLogo title={t("auth.register.title")} subtitle={t("auth.register.subtitle")} />
 
 			{/* Register Form */}
 			<form onSubmit={handleSubmit} className="space-y-5">
 				<AuthInput
 					id="name"
-					label={t('auth.register.name')}
+					label={t("auth.register.name")}
 					type="text"
 					value={formData.name}
 					onChange={handleChange}
-					placeholder={t('auth.register.namePlaceholder')}
+					placeholder={t("auth.register.namePlaceholder")}
 					autoComplete="name"
 					error={errors.name}
 					required
@@ -127,11 +128,11 @@ const RegisterPage = () => {
 
 				<AuthInput
 					id="email"
-					label={t('auth.register.email')}
+					label={t("auth.register.email")}
 					type="email"
 					value={formData.email}
 					onChange={handleChange}
-					placeholder={t('auth.register.emailPlaceholder')}
+					placeholder={t("auth.register.emailPlaceholder")}
 					autoComplete="email"
 					error={errors.email}
 					required
@@ -139,11 +140,11 @@ const RegisterPage = () => {
 
 				<AuthInput
 					id="phone_number"
-					label={t('auth.register.phone')}
+					label={t("auth.register.phone")}
 					type="tel"
 					value={formData.phone_number}
 					onChange={handleChange}
-					placeholder={t('auth.register.phonePlaceholder')}
+					placeholder={t("auth.register.phonePlaceholder")}
 					autoComplete="tel"
 					error={errors.phone_number}
 					required
@@ -151,11 +152,11 @@ const RegisterPage = () => {
 
 				<AuthInput
 					id="password"
-					label={t('auth.register.password')}
+					label={t("auth.register.password")}
 					type="password"
 					value={formData.password}
 					onChange={handleChange}
-					placeholder={t('auth.register.passwordPlaceholder')}
+					placeholder={t("auth.register.passwordPlaceholder")}
 					autoComplete="new-password"
 					error={errors.password}
 					required
@@ -164,11 +165,11 @@ const RegisterPage = () => {
 
 				<AuthInput
 					id="confirm_password"
-					label={t('auth.register.confirmPassword')}
+					label={t("auth.register.confirmPassword")}
 					type="password"
 					value={formData.confirm_password}
 					onChange={handleChange}
-					placeholder={t('auth.register.confirmPasswordPlaceholder')}
+					placeholder={t("auth.register.confirmPasswordPlaceholder")}
 					autoComplete="new-password"
 					error={errors.confirm_password}
 					required
@@ -177,7 +178,7 @@ const RegisterPage = () => {
 
 				<div className="pt-1">
 					<AuthButton type="submit" disabled={loading}>
-						{loading ? t('auth.register.registering') : t('auth.register.createAccount')}
+						{loading ? t("auth.register.registering") : t("auth.register.createAccount")}
 					</AuthButton>
 				</div>
 			</form>

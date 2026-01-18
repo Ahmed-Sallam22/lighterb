@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { Navigate } from "react-router";
 
 import PageHeader from "../components/shared/PageHeader";
@@ -37,6 +38,7 @@ const INITIAL_FILTERS_STATE = {
 
 const UsersPage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("users"));
 	const dispatch = useDispatch();
 
 	const { users = [], loading, error } = useSelector(state => state.users || {});

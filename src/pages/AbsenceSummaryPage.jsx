@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { HiOutlinePlus, HiOutlineExclamation, HiOutlineCheck } from "react-icons/hi";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 import Button from "../components/shared/Button";
 import Table from "../components/shared/Table";
@@ -45,6 +46,7 @@ const ABSENCES = [
 
 const AbsenceSummaryPage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("absenceSummary.title"));
 	const [page, setPage] = useState(1);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [showConflict, setShowConflict] = useState(false);
@@ -54,13 +56,6 @@ const AbsenceSummaryPage = () => {
 		endDate: "",
 		reason: "",
 	});
-
-	useEffect(() => {
-		document.title = `${t("absenceSummary.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	const typeOptions = useMemo(
 		() => [
@@ -217,7 +212,7 @@ const AbsenceSummaryPage = () => {
 							totalCount={ABSENCES.length}
 							pageSize={5}
 							onPageChange={setPage}
-							onPageSizeChange={() => { }}
+							onPageSizeChange={() => {}}
 							hasNext={false}
 							hasPrevious={false}
 							showPageSizeSelector={false}

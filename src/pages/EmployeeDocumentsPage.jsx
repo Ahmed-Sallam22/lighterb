@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import {
 	HiOutlineDocumentText,
 	HiOutlineEye,
@@ -175,6 +176,7 @@ function FileUploadComponent() {
 
 const EmployeeDocumentsPage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("employeeDocuments"));
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 	const [selectedDoc, setSelectedDoc] = useState(null);

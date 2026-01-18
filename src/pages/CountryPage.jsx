@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -12,13 +13,7 @@ import ConfirmModal from "../components/shared/ConfirmModal";
 import Button from "../components/shared/Button";
 import LoadingSpan from "../components/shared/LoadingSpan";
 
-import {
-	fetchCountries,
-	createCountry,
-	updateCountry,
-	deleteCountry,
-	clearError,
-} from "../store/countriesSlice";
+import { fetchCountries, createCountry, updateCountry, deleteCountry, clearError } from "../store/countriesSlice";
 
 import { BiPlusCircle } from "react-icons/bi";
 import { FaGlobeAmericas } from "react-icons/fa";
@@ -30,12 +25,19 @@ const INITIAL_FORM_STATE = {
 
 const CountryPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("countries"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
-	const { countries = [], loading, error, creating, updating, deleting, actionError } = useSelector(
-		state => state.countries || {}
-	);
+	const {
+		countries = [],
+		loading,
+		error,
+		creating,
+		updating,
+		deleting,
+		actionError,
+	} = useSelector(state => state.countries || {});
 
 	// Modal states
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,9 +60,8 @@ const CountryPage = () => {
 	// Show error toast
 	useEffect(() => {
 		if (error || actionError) {
-			const errorMsg = typeof actionError === "object" 
-				? Object.values(actionError).flat().join(", ") 
-				: error || actionError;
+			const errorMsg =
+				typeof actionError === "object" ? Object.values(actionError).flat().join(", ") : error || actionError;
 			toast.error(errorMsg, { autoClose: 5000 });
 			dispatch(clearError());
 		}
@@ -262,7 +263,13 @@ const CountryPage = () => {
 						<div className="flex items-center gap-4">
 							<div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
 								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-green-600">
-									<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+									<path
+										d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
 								</svg>
 							</div>
 							<div>
@@ -276,7 +283,13 @@ const CountryPage = () => {
 						<div className="flex items-center gap-4">
 							<div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
 								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-blue-600">
-									<path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+									<path
+										d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
 								</svg>
 							</div>
 							<div>
@@ -333,7 +346,6 @@ const CountryPage = () => {
 
 					{/* Action Buttons */}
 					<div className="flex gap-3 pt-4 justify-center">
-
 						<Button
 							onClick={handleCloseModal}
 							title={t("countries.actions.cancel")}
@@ -341,13 +353,15 @@ const CountryPage = () => {
 						/>
 
 						<Button
-														disabled={creating || updating}
+							disabled={creating || updating}
 							onClick={handleSubmit}
-							title={creating || updating
-								? t("countries.actions.saving")
-								: isEditMode
-								? t("countries.actions.update")
-								: t("countries.actions.create")}
+							title={
+								creating || updating
+									? t("countries.actions.saving")
+									: isEditMode
+									? t("countries.actions.update")
+									: t("countries.actions.create")
+							}
 						/>
 					</div>
 				</div>

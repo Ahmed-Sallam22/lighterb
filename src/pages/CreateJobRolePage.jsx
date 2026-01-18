@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 import PageHeader from "../components/shared/PageHeader";
 import Card from "../components/shared/Card";
@@ -110,6 +111,7 @@ const CreateJobRolePage = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const { t } = useTranslation();
+	usePageTitle(t("createJobRole"));
 
 	const { pages = [], pagesLoading, creating, actionError } = useSelector(state => state.jobRoles || {});
 

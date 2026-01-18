@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import PageHeader from "../components/shared/PageHeader";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
@@ -18,6 +19,7 @@ import Button from "../components/shared/Button";
 
 const CreateJournalPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("createJournal"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const location = useLocation();

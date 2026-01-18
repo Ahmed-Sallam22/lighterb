@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import PageHeader from "../components/shared/PageHeader";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import Button from "../components/shared/Button";
@@ -49,6 +50,7 @@ const statusStyles = {
 
 const ProcurementApprovals = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("procurementApprovals"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const dispatch = useDispatch();

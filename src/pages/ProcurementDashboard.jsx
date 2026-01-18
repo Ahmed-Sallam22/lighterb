@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import PageHeader from "../components/shared/PageHeader";
 import { TbRulerMeasure } from "react-icons/tb";
 
@@ -189,6 +190,7 @@ const cardConfigs = [
 
 const ProcurementDashboard = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("procurementDashboard"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 

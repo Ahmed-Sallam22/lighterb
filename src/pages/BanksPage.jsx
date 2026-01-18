@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 import PageHeader from "../components/shared/PageHeader";
 import Table from "../components/shared/Table";
@@ -50,6 +51,7 @@ const INITIAL_FORM_STATE = {
 
 const BanksPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("banks"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const navigate = useNavigate();

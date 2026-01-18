@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { FaChevronDown, FaPlus, FaTrash } from "react-icons/fa";
 import PageHeader from "../components/shared/PageHeader";
 import Table from "../components/shared/Table";
@@ -23,6 +24,7 @@ import { fetchSegmentTypes, fetchSegmentValues } from "../store/segmentsSlice";
 
 const DefaultValuesPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("defaultValues"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const { combinations, selectedCombination, loading } = useSelector(state => state.defaultCombinations);

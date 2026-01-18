@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -39,6 +40,7 @@ const INITIAL_FORM_STATE = {
 
 const UOMPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("uom"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 

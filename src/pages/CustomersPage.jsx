@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 import PageHeader from "../components/shared/PageHeader";
 import Toolbar from "../components/shared/Toolbar";
@@ -47,6 +48,7 @@ const INITIAL_FILTERS_STATE = {
 
 const CustomersPage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("customers"));
 	const dispatch = useDispatch();
 
 	const { customers = [], loading, error } = useSelector(state => state.customers || {});

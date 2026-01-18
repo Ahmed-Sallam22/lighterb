@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 import PageHeader from "../components/shared/PageHeader";
 import Table from "../components/shared/Table";
@@ -37,6 +38,7 @@ const JobRolesPage = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const { t } = useTranslation();
+	usePageTitle(t("jobRoles"));
 
 	const {
 		roles = [],

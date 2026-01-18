@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import PageHeader from "../components/shared/PageHeader";
 import Card from "../components/shared/Card";
 import Table from "../components/shared/Table";
@@ -42,6 +43,7 @@ const SupplierIcon = () => (
 
 const SuppliersPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("suppliers"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const { suppliers, loading, error } = useSelector(state => state.suppliers);

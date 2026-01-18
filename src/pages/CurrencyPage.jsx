@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import PageHeader from "../components/shared/PageHeader";
 import Table from "../components/shared/Table";
 import Pagination from "../components/shared/Pagination";
@@ -26,6 +27,7 @@ import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 
 const CurrencyPage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("currencies"));
 	const dispatch = useDispatch();
 	const { currencies, count, page, hasNext, hasPrevious } = useSelector(state => state.currencies);
 	const [isModalOpen, setIsModalOpen] = useState(false);

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { HiOfficeBuilding, HiClock } from "react-icons/hi";
 
 import { parseApiError } from "../utils/errorHandler";
@@ -52,6 +53,7 @@ const ENTERPRISE_FORM_INITIAL = {
 
 const EnterpriseAndBusinessGroupsPage = () => {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t("enterpriseAndBusinessGroups"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 

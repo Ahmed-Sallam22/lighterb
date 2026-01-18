@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useTranslation } from 'react-i18next';
-import PageHeader from '../components/shared/PageHeader';
-import Card from '../components/shared/Card';
-import FloatingLabelInput from '../components/shared/FloatingLabelInput';
-import Table from '../components/shared/Table';
-import Button from '../components/shared/Button';
-import { fetchTrialBalance, fetchARAgingReport, fetchAPAgingReport } from '../store/reportsSlice';
+import React, { useState, useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
+import PageHeader from "../components/shared/PageHeader";
+import Card from "../components/shared/Card";
+import FloatingLabelInput from "../components/shared/FloatingLabelInput";
+import Table from "../components/shared/Table";
+import Button from "../components/shared/Button";
+import { fetchTrialBalance, fetchARAgingReport, fetchAPAgingReport } from "../store/reportsSlice";
 
 const ReportsIcon = () => (
 	<svg width="28" height="27" viewBox="0 0 28 27" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -27,31 +28,32 @@ const ReportsIcon = () => (
 
 const ReportsPage = () => {
 	const { t, i18n } = useTranslation();
-	const isRtl = i18n.dir() === 'rtl';
+	usePageTitle(t("reports"));
+	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const { trialBalance, arAging, apAging } = useSelector(state => state.reports);
 
-	const [selectedReport, setSelectedReport] = useState('trial-balance');
+	const [selectedReport, setSelectedReport] = useState("trial-balance");
 	const [filters, setFilters] = useState({
-		dateFrom: '',
-		dateTo: '',
-		asOf: new Date().toISOString().split('T')[0], // Default to today
+		dateFrom: "",
+		dateTo: "",
+		asOf: new Date().toISOString().split("T")[0], // Default to today
 	});
 
 	const reportTabs = useMemo(
 		() => [
-			{ value: 'trial-balance', label: t('reports.tabs.trialBalance') },
-			{ value: 'ar-aging', label: t('reports.tabs.arAging') },
-			{ value: 'ap-aging', label: t('reports.tabs.apAging') },
+			{ value: "trial-balance", label: t("reports.tabs.trialBalance") },
+			{ value: "ar-aging", label: t("reports.tabs.arAging") },
+			{ value: "ap-aging", label: t("reports.tabs.apAging") },
 		],
 		[t]
 	);
 
 	// Update browser title
 	useEffect(() => {
-		document.title = `${t('reports.title')} - LightERP`;
+		document.title = `${t("reports.title")} - LightERP`;
 		return () => {
-			document.title = 'LightERP';
+			document.title = "LightERP";
 		};
 	}, [t]);
 
@@ -59,8 +61,8 @@ const ReportsPage = () => {
 	useEffect(() => {
 		dispatch(
 			fetchTrialBalance({
-				dateFrom: '',
-				dateTo: '',
+				dateFrom: "",
+				dateTo: "",
 			})
 		);
 	}, [dispatch]);
@@ -68,11 +70,11 @@ const ReportsPage = () => {
 	// Get current report state
 	const getCurrentReport = () => {
 		switch (selectedReport) {
-			case 'trial-balance':
+			case "trial-balance":
 				return trialBalance;
-			case 'ar-aging':
+			case "ar-aging":
 				return arAging;
-			case 'ap-aging':
+			case "ap-aging":
 				return apAging;
 			default:
 				return { data: [], loading: false, error: null, downloadLinks: null };
@@ -90,64 +92,64 @@ const ReportsPage = () => {
 		setSelectedReport(reportType);
 		// Reset filters when changing report type
 		setFilters({
-			dateFrom: '',
-			dateTo: '',
-			asOf: new Date().toISOString().split('T')[0],
+			dateFrom: "",
+			dateTo: "",
+			asOf: new Date().toISOString().split("T")[0],
 		});
 
 		// Auto-load report data when switching tabs
-		if (reportType === 'trial-balance') {
-			dispatch(fetchTrialBalance({ dateFrom: '', dateTo: '' }));
-		} else if (reportType === 'ar-aging') {
-			dispatch(fetchARAgingReport({ asOf: new Date().toISOString().split('T')[0] }));
-		} else if (reportType === 'ap-aging') {
-			dispatch(fetchAPAgingReport({ asOf: new Date().toISOString().split('T')[0] }));
+		if (reportType === "trial-balance") {
+			dispatch(fetchTrialBalance({ dateFrom: "", dateTo: "" }));
+		} else if (reportType === "ar-aging") {
+			dispatch(fetchARAgingReport({ asOf: new Date().toISOString().split("T")[0] }));
+		} else if (reportType === "ap-aging") {
+			dispatch(fetchAPAgingReport({ asOf: new Date().toISOString().split("T")[0] }));
 		}
 	};
 
 	const handleDownload = format => {
 		const links = currentReport.downloadLinks;
 		if (!links) {
-			toast.error(t('reports.messages.noLinks'));
+			toast.error(t("reports.messages.noLinks"));
 			return;
 		}
 
-		const url = format === 'xlsx' ? links?.xlsx : links?.csv;
+		const url = format === "xlsx" ? links?.xlsx : links?.csv;
 		if (!url) {
-			toast.error(t('reports.messages.linkUnavailable', { format: format.toUpperCase() }));
+			toast.error(t("reports.messages.linkUnavailable", { format: format.toUpperCase() }));
 			return;
 		}
 
-		window.open(url, '_blank');
-		toast.success(t('reports.messages.downloading', { format: format.toUpperCase() }));
+		window.open(url, "_blank");
+		toast.success(t("reports.messages.downloading", { format: format.toUpperCase() }));
 	};
 
 	// Trial Balance Table Columns
 	const trialBalanceColumns = useMemo(
 		() => [
 			{
-				header: t('reports.columns.accountCode'),
-				accessor: 'code',
+				header: t("reports.columns.accountCode"),
+				accessor: "code",
 				sortable: true,
 			},
 			{
-				header: t('reports.columns.accountName'),
-				accessor: 'name',
+				header: t("reports.columns.accountName"),
+				accessor: "name",
 				sortable: true,
 			},
 			{
-				header: t('reports.columns.debit'),
-				accessor: 'debit',
+				header: t("reports.columns.debit"),
+				accessor: "debit",
 				sortable: true,
 				render: value =>
-					value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00',
+					value?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00",
 			},
 			{
-				header: t('reports.columns.credit'),
-				accessor: 'credit',
+				header: t("reports.columns.credit"),
+				accessor: "credit",
 				sortable: true,
 				render: value =>
-					value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00',
+					value?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00",
 			},
 		],
 		[t]
@@ -156,35 +158,35 @@ const ReportsPage = () => {
 	// AR/AP Aging Invoice Columns
 	const agingInvoiceColumns = useMemo(
 		() => [
-			{ header: t('reports.columns.invoiceNumber'), accessor: 'number', sortable: true },
+			{ header: t("reports.columns.invoiceNumber"), accessor: "number", sortable: true },
 			{
-				header: selectedReport === 'ar-aging' ? t('reports.columns.customer') : t('reports.columns.supplier'),
-				accessor: selectedReport === 'ar-aging' ? 'customer' : 'supplier',
+				header: selectedReport === "ar-aging" ? t("reports.columns.customer") : t("reports.columns.supplier"),
+				accessor: selectedReport === "ar-aging" ? "customer" : "supplier",
 				sortable: true,
 			},
-			{ header: t('reports.columns.date'), accessor: 'date', sortable: true },
-			{ header: t('reports.columns.dueDate'), accessor: 'due_date', sortable: true },
+			{ header: t("reports.columns.date"), accessor: "date", sortable: true },
+			{ header: t("reports.columns.dueDate"), accessor: "due_date", sortable: true },
 			{
-				header: t('reports.columns.daysOverdue'),
-				accessor: 'days_overdue',
+				header: t("reports.columns.daysOverdue"),
+				accessor: "days_overdue",
 				sortable: true,
 				render: value => (value > 0 ? <span className="text-red-600 font-semibold">{value}</span> : value || 0),
 			},
 			{
-				header: t('reports.columns.balance'),
-				accessor: 'balance',
+				header: t("reports.columns.balance"),
+				accessor: "balance",
 				sortable: true,
 				render: value =>
-					value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00',
+					value?.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00",
 			},
-			{ header: t('reports.columns.agingBucket'), accessor: 'bucket', sortable: true },
+			{ header: t("reports.columns.agingBucket"), accessor: "bucket", sortable: true },
 		],
 		[t, selectedReport]
 	);
 
 	const renderTrialBalance = () => {
 		if (!trialBalance.data || trialBalance.data.length === 0) {
-			return <div className="text-center py-8 text-gray-500">{t('reports.messages.noData')}</div>;
+			return <div className="text-center py-8 text-gray-500">{t("reports.messages.noData")}</div>;
 		}
 
 		return (
@@ -192,14 +194,14 @@ const ReportsPage = () => {
 				columns={trialBalanceColumns}
 				data={trialBalance.data}
 				rowsPerPage={15}
-				emptyMessage={t('reports.messages.noTrialData')}
+				emptyMessage={t("reports.messages.noTrialData")}
 			/>
 		);
 	};
 
 	const renderAgingReport = reportData => {
 		if (!reportData.data) {
-			return <div className="text-center py-8 text-gray-500">{t('reports.messages.noData')}</div>;
+			return <div className="text-center py-8 text-gray-500">{t("reports.messages.noData")}</div>;
 		}
 
 		const { invoices, summary, buckets } = reportData.data;
@@ -213,7 +215,7 @@ const ReportsPage = () => {
 							<div className="text-center">
 								<div className="text-xs text-gray-600 mb-1">{bucket}</div>
 								<div className="text-lg font-bold text-[#0d5f7a]">
-									{summary[bucket]?.toLocaleString('en-US', { minimumFractionDigits: 2 }) || '0.00'}
+									{summary[bucket]?.toLocaleString("en-US", { minimumFractionDigits: 2 }) || "0.00"}
 								</div>
 							</div>
 						</Card>
@@ -224,22 +226,22 @@ const ReportsPage = () => {
 				<Card className="bg-green-50 border-2 border-green-200">
 					<div className="flex justify-between items-center">
 						<span className="text-lg font-semibold text-gray-700">
-							{t('reports.sections.totalOutstanding')}:
+							{t("reports.sections.totalOutstanding")}:
 						</span>
 						<span className="text-2xl font-bold text-green-700">
-							{summary.TOTAL?.toLocaleString('en-US', { minimumFractionDigits: 2 }) || '0.00'}
+							{summary.TOTAL?.toLocaleString("en-US", { minimumFractionDigits: 2 }) || "0.00"}
 						</span>
 					</div>
 				</Card>
 
 				{/* Invoices Table */}
 				<Card>
-					<h3 className="text-lg font-semibold mb-4 text-gray-700">{t('reports.sections.invoiceDetails')}</h3>
+					<h3 className="text-lg font-semibold mb-4 text-gray-700">{t("reports.sections.invoiceDetails")}</h3>
 					<Table
 						columns={agingInvoiceColumns}
 						data={invoices || []}
 						rowsPerPage={10}
-						emptyMessage={t('reports.messages.noInvoices')}
+						emptyMessage={t("reports.messages.noInvoices")}
 					/>
 				</Card>
 			</div>
@@ -258,17 +260,17 @@ const ReportsPage = () => {
 		if (currentReport.error) {
 			return (
 				<div className="text-center py-8 text-red-500">
-					{t('reports.messages.error', { message: currentReport.error })}
+					{t("reports.messages.error", { message: currentReport.error })}
 				</div>
 			);
 		}
 
 		switch (selectedReport) {
-			case 'trial-balance':
+			case "trial-balance":
 				return renderTrialBalance();
-			case 'ar-aging':
+			case "ar-aging":
 				return renderAgingReport(arAging);
-			case 'ap-aging':
+			case "ap-aging":
 				return renderAgingReport(apAging);
 			default:
 				return null;
@@ -277,8 +279,8 @@ const ReportsPage = () => {
 
 	return (
 		<div className="">
-			<ToastContainer position={isRtl ? 'top-left' : 'top-right'} autoClose={3000} rtl={isRtl} />
-			<PageHeader title={t('reports.title')} subtitle={t('reports.subtitle')} icon={<ReportsIcon />} />
+			<ToastContainer position={isRtl ? "top-left" : "top-right"} autoClose={3000} rtl={isRtl} />
+			<PageHeader title={t("reports.title")} subtitle={t("reports.subtitle")} icon={<ReportsIcon />} />
 
 			<div className="space-y-6">
 				{/* Tabs Navigation */}
@@ -291,8 +293,8 @@ const ReportsPage = () => {
 								title={tab.label}
 								className={`px-6 py-3 font-medium text-sm transition-colors relative bg-transparent shadow-none hover:shadow-none ${
 									selectedReport === tab.value
-										? 'text-[#0d5f7a] border-b-2 border-[#0d5f7a]'
-										: 'text-gray-500 hover:text-gray-700'
+										? "text-[#0d5f7a] border-b-2 border-[#0d5f7a]"
+										: "text-gray-500 hover:text-gray-700"
 								}`}
 							/>
 						))}
@@ -304,17 +306,17 @@ const ReportsPage = () => {
 					<div className="space-y-4">
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 							{/* Conditional Filters */}
-							{selectedReport === 'trial-balance' && (
+							{selectedReport === "trial-balance" && (
 								<>
 									<FloatingLabelInput
-										label={t('reports.filters.dateFrom')}
+										label={t("reports.filters.dateFrom")}
 										name="dateFrom"
 										type="date"
 										value={filters.dateFrom}
 										onChange={handleFilterChange}
 									/>
 									<FloatingLabelInput
-										label={t('reports.filters.dateTo')}
+										label={t("reports.filters.dateTo")}
 										name="dateTo"
 										type="date"
 										value={filters.dateTo}
@@ -323,9 +325,9 @@ const ReportsPage = () => {
 								</>
 							)}
 
-							{(selectedReport === 'ar-aging' || selectedReport === 'ap-aging') && (
+							{(selectedReport === "ar-aging" || selectedReport === "ap-aging") && (
 								<FloatingLabelInput
-									label={t('reports.filters.asOf')}
+									label={t("reports.filters.asOf")}
 									name="asOf"
 									type="date"
 									value={filters.asOf}
@@ -340,13 +342,13 @@ const ReportsPage = () => {
 							{currentReport.downloadLinks && (
 								<>
 									<Button
-										onClick={() => handleDownload('xlsx')}
-										title={t('reports.actions.downloadExcel')}
+										onClick={() => handleDownload("xlsx")}
+										title={t("reports.actions.downloadExcel")}
 										className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-none hover:shadow-none"
 									/>
 									<Button
-										onClick={() => handleDownload('csv')}
-										title={t('reports.actions.downloadCsv')}
+										onClick={() => handleDownload("csv")}
+										title={t("reports.actions.downloadCsv")}
 										className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-none hover:shadow-none"
 									/>
 								</>

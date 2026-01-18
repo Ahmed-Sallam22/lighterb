@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 import { fetchApprovalSteps, approveStep, rejectStep } from "../store/approvalStepsSlice";
 
 // Components
@@ -14,6 +15,7 @@ import ApprovalActionModals from "../components/ApprovalActionModals";
 
 const ProcurementApprovalDetail = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("procurementApprovalDetail"));
 	const navigate = useNavigate();
 	const { instanceId } = useParams();
 	const dispatch = useDispatch();
@@ -33,14 +35,6 @@ const ProcurementApprovalDetail = () => {
 			dispatch(fetchApprovalSteps({ approval_instance: instanceId }));
 		}
 	}, [dispatch, instanceId]);
-
-	// Title Management
-	useEffect(() => {
-		document.title = `${t("procurementApprovalDetail.title", { id: instanceId })} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [instanceId, t]);
 
 	// Derived State
 	const instanceSteps = useMemo(
