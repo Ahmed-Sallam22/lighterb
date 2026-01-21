@@ -38,7 +38,7 @@ const JobRolesPage = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const { t } = useTranslation();
-	usePageTitle(t("jobRoles"));
+	usePageTitle(t("jobRoles.title"));
 
 	const {
 		roles = [],
@@ -84,13 +84,6 @@ const JobRolesPage = () => {
 		}
 	}, [error, actionError, dispatch]);
 
-	// Update page title
-	useEffect(() => {
-		document.title = `${t("jobRoles.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Pagination handlers
 	const handlePageChange = useCallback(

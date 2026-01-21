@@ -13,7 +13,7 @@ import { changePassword, clearError } from "../store/authSlice";
 
 const ChangePasswordPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("changePassword"));
+	usePageTitle(t("changePassword.title"));
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const { loading, error, isAuthenticated } = useSelector(state => state.auth);

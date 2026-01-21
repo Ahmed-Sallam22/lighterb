@@ -54,7 +54,7 @@ const INITIAL_FORM_STATE = {
 
 const BankStatementsPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("bankStatements"));
+	usePageTitle(t("bankStatements.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const navigate = useNavigate();

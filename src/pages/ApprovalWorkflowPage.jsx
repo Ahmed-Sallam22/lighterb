@@ -41,7 +41,7 @@ const WorkflowIcon = () => (
 
 const ApprovalWorkflowPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("approvalWorkflow"));
+	usePageTitle(t("approvalWorkflow.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -78,13 +78,6 @@ const ApprovalWorkflowPage = () => {
 		dispatch(fetchWorkflowTemplates(params));
 	}, [dispatch, page, localPageSize, filters]);
 
-	// Update browser title
-	useEffect(() => {
-		document.title = `${t("approvalWorkflow.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Pagination handlers
 	const handlePageChange = useCallback(

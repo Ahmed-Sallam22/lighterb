@@ -12,7 +12,7 @@ import SegmentPageHeaderIcon from "../assets/icons/SegmentPageHeaderIcon";
 
 const SegmentsPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("segments"));
+	usePageTitle(t("segments.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const { types, values, typesLoading, valuesLoading, valuesCount, valuesPage, valuesHasNext, valuesHasPrevious } =

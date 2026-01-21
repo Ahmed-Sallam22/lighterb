@@ -14,7 +14,7 @@ import { loginUser, clearError } from "../store/authSlice";
 
 const LoginPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("login"));
+	usePageTitle(t("login.title"));
 	const navigate = useNavigate();
 	const location = useLocation();
 	const dispatch = useDispatch();

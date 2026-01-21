@@ -25,7 +25,7 @@ const INITIAL_FORM_STATE = {
 
 const CountryPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("countries"));
+	usePageTitle(t("countries.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
@@ -67,13 +67,6 @@ const CountryPage = () => {
 		}
 	}, [error, actionError, dispatch]);
 
-	// Update page title
-	useEffect(() => {
-		document.title = `${t("countries.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Filter countries based on search
 	const filteredCountries = useMemo(() => {

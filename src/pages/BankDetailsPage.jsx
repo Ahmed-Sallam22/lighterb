@@ -96,7 +96,7 @@ const BALANCE_UPDATE_INITIAL = {
 
 const BankDetailsPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("bankDetails"));
+	usePageTitle(t("bankDetails.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const navigate = useNavigate();

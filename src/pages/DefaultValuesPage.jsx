@@ -24,7 +24,7 @@ import { fetchSegmentTypes, fetchSegmentValues } from "../store/segmentsSlice";
 
 const DefaultValuesPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("defaultValues"));
+	usePageTitle(t("defaultValues.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const { combinations, selectedCombination, loading } = useSelector(state => state.defaultCombinations);

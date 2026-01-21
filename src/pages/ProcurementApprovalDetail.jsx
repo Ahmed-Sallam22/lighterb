@@ -15,7 +15,7 @@ import ApprovalActionModals from "../components/ApprovalActionModals";
 
 const ProcurementApprovalDetail = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("procurementApprovalDetail"));
+	usePageTitle(t("procurementApprovalDetail.title"));
 	const navigate = useNavigate();
 	const { instanceId } = useParams();
 	const dispatch = useDispatch();

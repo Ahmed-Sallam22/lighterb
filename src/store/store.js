@@ -29,6 +29,7 @@ import locationsReducer from "./locationsSlice";
 import enterprisesReducer from "./enterprisesSlice";
 import businessGroupsReducer from "./businessGroupsSlice";
 import departmentsReducer from "./departmentsSlice";
+import organizationsReducer from "./organizationsSlice";
 import gradesReducer from "./gradesSlice";
 import positionsReducer from "./positionsSlice";
 import defaultCombinationsReducer from "./defaultCombinationsSlice";
@@ -43,6 +44,11 @@ import paymentTypesReducer from "./paymentTypesSlice";
 import bankStatementsReducer from "./bankStatementsSlice";
 import statementLinesReducer from "./statementLinesSlice";
 import matchesReducer from "./matchesSlice";
+import jobsReducer from "./jobsSlice";
+import employeesReducer from "./employeesSlice";
+import lookupsReducer from "./lookupsSlice";
+import addressesReducer from "./addressesSlice";
+import personTypesReducer from "./personTypesSlice";
 
 export const store = configureStore({
 	reducer: {
@@ -76,6 +82,7 @@ export const store = configureStore({
 		enterprises: enterprisesReducer,
 		businessGroups: businessGroupsReducer,
 		departments: departmentsReducer,
+		organizations: organizationsReducer,
 		grades: gradesReducer,
 		positions: positionsReducer,
 		defaultCombinations: defaultCombinationsReducer,
@@ -90,6 +97,11 @@ export const store = configureStore({
 		bankStatements: bankStatementsReducer,
 		statementLines: statementLinesReducer,
 		matches: matchesReducer,
+		jobs: jobsReducer,
+		employees: employeesReducer,
+		lookups: lookupsReducer,
+		addresses: addressesReducer,
+		personTypes: personTypesReducer,
 	},
 });
 

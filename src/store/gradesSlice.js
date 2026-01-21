@@ -40,7 +40,7 @@ export const createGrade = createAsyncThunk("grades/createGrade", async (gradeDa
 	}
 });
 
-// Update a grade (PATCH - code and business_group are read-only)
+// Update a grade (PATCH - code and organization are read-only)
 export const updateGrade = createAsyncThunk("grades/updateGrade", async ({ id, data }, { rejectWithValue }) => {
 	try {
 		const response = await api.patch(`/hr/work_structures/grades/${id}/`, data);
@@ -63,14 +63,37 @@ export const deleteGrade = createAsyncThunk("grades/deleteGrade", async (id, { r
 	}
 });
 
-// Fetch grade rates for a specific grade
-export const fetchGradeRates = createAsyncThunk("grades/fetchGradeRates", async (gradeId, { rejectWithValue }) => {
+// Fetch grade names lookup from lookups API
+export const fetchGradeNames = createAsyncThunk("grades/fetchGradeNames", async (_, { rejectWithValue }) => {
 	try {
-		const response = await api.get(`/hr/work_structures/grades/${gradeId}/rates/`);
+		const response = await api.get("/core/lookups/values/?lookup_type=GRADE_NAME");
+		return response.data?.data || response.data || [];
+	} catch (error) {
+		return rejectWithValue(error.message || "Failed to fetch grade names");
+	}
+});
+
+// Fetch grade rate types (lookup)
+export const fetchGradeRateTypes = createAsyncThunk("grades/fetchGradeRateTypes", async (_, { rejectWithValue }) => {
+	try {
+		const response = await api.get("/hr/work_structures/grade-rate-types/");
+		const data = response.data?.data || response.data;
+		return data.results || data || [];
+	} catch (error) {
+		return rejectWithValue(error.message || "Failed to fetch grade rate types");
+	}
+});
+
+// Fetch grade rates with pagination and filters
+export const fetchGradeRates = createAsyncThunk("grades/fetchGradeRates", async (params = {}, { rejectWithValue }) => {
+	try {
+		const response = await api.get("/hr/work_structures/grade-rates/", { params });
 		const data = response.data?.data || response.data;
 		return {
-			gradeId,
-			rates: Array.isArray(data) ? data : data.results || [],
+			results: data.results || data || [],
+			count: data.count || 0,
+			next: data.next,
+			previous: data.previous,
 		};
 	} catch (error) {
 		return rejectWithValue(error.message || "Failed to fetch grade rates");
@@ -78,55 +101,40 @@ export const fetchGradeRates = createAsyncThunk("grades/fetchGradeRates", async 
 });
 
 // Create a grade rate
-export const createGradeRate = createAsyncThunk(
-	"grades/createGradeRate",
-	async ({ gradeId, data }, { rejectWithValue }) => {
-		try {
-			const response = await api.post(`/hr/work_structures/grades/${gradeId}/rates/`, data);
-			return {
-				gradeId,
-				rate: response.data?.data || response.data,
-			};
-		} catch (error) {
-			if (error.data) {
-				return rejectWithValue(error.data);
-			}
-			return rejectWithValue(error.message || "Failed to create grade rate");
+export const createGradeRate = createAsyncThunk("grades/createGradeRate", async (rateData, { rejectWithValue }) => {
+	try {
+		const response = await api.post("/hr/work_structures/grade-rates/", rateData);
+		return response.data?.data || response.data;
+	} catch (error) {
+		if (error.data) {
+			return rejectWithValue(error.data);
 		}
+		return rejectWithValue(error.message || "Failed to create grade rate");
 	}
-);
+});
 
 // Update a grade rate
-export const updateGradeRate = createAsyncThunk(
-	"grades/updateGradeRate",
-	async ({ gradeId, rateId, data }, { rejectWithValue }) => {
-		try {
-			const response = await api.patch(`/hr/work_structures/grades/${gradeId}/rates/${rateId}/`, data);
-			return {
-				gradeId,
-				rate: response.data?.data || response.data,
-			};
-		} catch (error) {
-			if (error.data) {
-				return rejectWithValue(error.data);
-			}
-			return rejectWithValue(error.message || "Failed to update grade rate");
+export const updateGradeRate = createAsyncThunk("grades/updateGradeRate", async ({ id, data }, { rejectWithValue }) => {
+	try {
+		const response = await api.patch(`/hr/work_structures/grade-rates/${id}/`, data);
+		return response.data?.data || response.data;
+	} catch (error) {
+		if (error.data) {
+			return rejectWithValue(error.data);
 		}
+		return rejectWithValue(error.message || "Failed to update grade rate");
 	}
-);
+});
 
 // Delete a grade rate
-export const deleteGradeRate = createAsyncThunk(
-	"grades/deleteGradeRate",
-	async ({ gradeId, rateId }, { rejectWithValue }) => {
-		try {
-			await api.delete(`/hr/work_structures/grades/${gradeId}/rates/${rateId}/`);
-			return { gradeId, rateId };
-		} catch (error) {
-			return rejectWithValue(error.message || "Failed to delete grade rate");
-		}
+export const deleteGradeRate = createAsyncThunk("grades/deleteGradeRate", async (id, { rejectWithValue }) => {
+	try {
+		await api.delete(`/hr/work_structures/grade-rates/${id}/`);
+		return id;
+	} catch (error) {
+		return rejectWithValue(error.message || "Failed to delete grade rate");
 	}
-);
+});
 
 // Fetch grade history (includes rates history)
 export const fetchGradeHistory = createAsyncThunk("grades/fetchGradeHistory", async (gradeId, { rejectWithValue }) => {
@@ -148,13 +156,19 @@ const gradesSlice = createSlice({
 		grades: [],
 		selectedGrade: null,
 		gradeRates: [],
+		gradeNames: [],
+		gradeRateTypes: [],
 		loading: false,
 		ratesLoading: false,
 		error: null,
 		count: 0,
+		ratesCount: 0,
 		page: 1,
+		ratesPage: 1,
 		hasNext: false,
 		hasPrevious: false,
+		ratesHasNext: false,
+		ratesHasPrevious: false,
 		creating: false,
 		updating: false,
 		deleting: false,
@@ -167,13 +181,14 @@ const gradesSlice = createSlice({
 		setPage: (state, action) => {
 			state.page = action.payload;
 		},
+		setRatesPage: (state, action) => {
+			state.ratesPage = action.payload;
+		},
 		setSelectedGrade: (state, action) => {
 			state.selectedGrade = action.payload;
-			state.gradeRates = action.payload?.rates || [];
 		},
 		clearSelectedGrade: state => {
 			state.selectedGrade = null;
-			state.gradeRates = [];
 		},
 		clearError: state => {
 			state.error = null;
@@ -274,11 +289,24 @@ const gradesSlice = createSlice({
 			})
 			.addCase(fetchGradeRates.fulfilled, (state, action) => {
 				state.ratesLoading = false;
-				state.gradeRates = action.payload.rates;
+				state.gradeRates = action.payload.results;
+				state.ratesCount = action.payload.count;
+				state.ratesHasNext = !!action.payload.next;
+				state.ratesHasPrevious = !!action.payload.previous;
 			})
 			.addCase(fetchGradeRates.rejected, (state, action) => {
 				state.ratesLoading = false;
 				state.actionError = action.payload;
+			})
+
+			// Fetch grade names
+			.addCase(fetchGradeNames.fulfilled, (state, action) => {
+				state.gradeNames = action.payload;
+			})
+
+			// Fetch grade rate types
+			.addCase(fetchGradeRateTypes.fulfilled, (state, action) => {
+				state.gradeRateTypes = action.payload;
 			})
 
 			// Create grade rate
@@ -288,12 +316,8 @@ const gradesSlice = createSlice({
 			})
 			.addCase(createGradeRate.fulfilled, (state, action) => {
 				state.rateCreating = false;
-				state.gradeRates.push(action.payload.rate);
-				// Also update the rates in grades list if this grade exists
-				const gradeIndex = state.grades.findIndex(g => g.id === action.payload.gradeId);
-				if (gradeIndex !== -1 && state.grades[gradeIndex].rates) {
-					state.grades[gradeIndex].rates.push(action.payload.rate);
-				}
+				state.gradeRates.unshift(action.payload);
+				state.ratesCount += 1;
 			})
 			.addCase(createGradeRate.rejected, (state, action) => {
 				state.rateCreating = false;
@@ -307,9 +331,9 @@ const gradesSlice = createSlice({
 			})
 			.addCase(updateGradeRate.fulfilled, (state, action) => {
 				state.rateUpdating = false;
-				const rateIndex = state.gradeRates.findIndex(r => r.id === action.payload.rate.id);
+				const rateIndex = state.gradeRates.findIndex(r => r.id === action.payload.id);
 				if (rateIndex !== -1) {
-					state.gradeRates[rateIndex] = action.payload.rate;
+					state.gradeRates[rateIndex] = action.payload;
 				}
 			})
 			.addCase(updateGradeRate.rejected, (state, action) => {
@@ -324,7 +348,8 @@ const gradesSlice = createSlice({
 			})
 			.addCase(deleteGradeRate.fulfilled, (state, action) => {
 				state.rateDeleting = false;
-				state.gradeRates = state.gradeRates.filter(r => r.id !== action.payload.rateId);
+				state.gradeRates = state.gradeRates.filter(r => r.id !== action.payload);
+				state.ratesCount -= 1;
 			})
 			.addCase(deleteGradeRate.rejected, (state, action) => {
 				state.rateDeleting = false;
@@ -333,5 +358,5 @@ const gradesSlice = createSlice({
 	},
 });
 
-export const { setPage, setSelectedGrade, clearSelectedGrade, clearError } = gradesSlice.actions;
+export const { setPage, setRatesPage, setSelectedGrade, clearSelectedGrade, clearError } = gradesSlice.actions;
 export default gradesSlice.reducer;

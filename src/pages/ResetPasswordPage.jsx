@@ -9,7 +9,7 @@ import AuthLogo from "../components/auth/AuthLogo";
 
 const ResetPasswordPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("resetPassword"));
+	usePageTitle(t("resetPassword.title"));
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const token = searchParams.get("token"); // Get reset token from URL

@@ -1,3 +1,4 @@
+import { t } from "i18next";
 import React, { useState, useRef, useEffect, useId, memo } from "react";
 import { createPortal } from "react-dom";
 
@@ -8,7 +9,7 @@ const FloatingLabelSelect = memo(
 		onChange,
 		options = [],
 		name,
-		placeholder = "Select an option",
+		placeholder = t("selectPlaceholder"),
 		required = false,
 		disabled = false,
 		error = "",
@@ -177,8 +178,8 @@ const FloatingLabelSelect = memo(
 		const buttonTextClasses = hasValue
 			? "text-[#0f3143] font-medium"
 			: isFloating
-			? "text-[#7A9098]"
-			: "text-transparent";
+				? "text-[#7A9098]"
+				: "text-transparent";
 
 		const displayText = hasValue ? selectedLabel : isFloating ? placeholder : "";
 
@@ -282,7 +283,7 @@ const FloatingLabelSelect = memo(
 		);
 
 		return (
-			<div className={`relative ${className}`} ref={selectRef}>
+			<div className={`relative py-3 ${className}`} ref={selectRef}>
 				<div
 					className={`
 						relative rounded-[20px] p-0.5 transition-all duration-300
@@ -321,11 +322,7 @@ const FloatingLabelSelect = memo(
 							className={`
 								absolute start-4 font-semibold pointer-events-none
 								transition-all duration-200
-								${
-									isFloating
-										? "-top-4 text-xs px-0 text-gray-700"
-										: "top-1/2 -translate-y-1/2 text-sm text-[#7A9098]"
-								}
+								${isFloating ? "-top-4 text-xs px-0 text-gray-700" : "top-1/2 -translate-y-1/2 text-sm text-[#7A9098]"}
 								${hasError ? "text-gray-900" : ""}
 							`}
 						>
@@ -333,16 +330,13 @@ const FloatingLabelSelect = memo(
 						</label>
 
 						{/* Error Message */}
-						{hasError && (
-							<p
-								id={errorId}
-								className="absolute -bottom-6 start-1 text-xs text-gray-500"
-							>
-								{error}
-							</p>
-						)}
 					</div>
 				</div>
+				{hasError && (
+					<p id={errorId} className="mx-2 text-xs text-gray-500 ">
+						{error}
+					</p>
+				)}
 
 				{/* Portal Dropdown */}
 				{typeof document !== "undefined" && dropdownContent && createPortal(dropdownContent, document.body)}

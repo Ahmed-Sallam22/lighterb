@@ -5,6 +5,7 @@ import { HiBookOpen } from 'react-icons/hi';
 import QuickActionsPanel from '../../components/shared/QuickActionsPanel';
 import { QUICK_ACTIONS } from '../../constants/quickActions';
 import { useLocale } from '../../hooks/useLocale';
+import { usePageTitle } from '../../hooks/usePageTitle';
 import { getCardsData } from './constants/cardsData';
 import { getHomeRoutes } from './constants/routes';
 import { useScrollNavigation } from './hooks/useScrollNavigation';
@@ -18,6 +19,7 @@ const Home = () => {
 	const scrollContainerRef = useRef(null);
 	const navigate = useNavigate();
 	const { t } = useTranslation();
+	usePageTitle(t('home.title'));
 	const { locale } = useLocale();
 	const isRTL = locale === 'AR';
 

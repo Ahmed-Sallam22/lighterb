@@ -62,7 +62,7 @@ const POIcon = () => (
 
 const CreatePoPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("createPO"));
+	usePageTitle(t("createPO.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -91,13 +91,6 @@ const CreatePoPage = () => {
 		dispatch(fetchTaxRates());
 	}, [dispatch]);
 
-	// Update page title
-	useEffect(() => {
-		document.title = `${t("createPO.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Fetch PR items when PO type changes
 	useEffect(() => {

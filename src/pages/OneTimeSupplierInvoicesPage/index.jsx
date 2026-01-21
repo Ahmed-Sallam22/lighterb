@@ -12,6 +12,7 @@ import InvoiceModal from "../InvoicesShared/components/InvoiceModal";
 import OneTimeSupplierInvoiceDetailsModal from "./components/OneTimeSupplierInvoiceDetailsModal";
 import InvoiceToolbarFilters from "../InvoicesShared/components/InvoiceToolbarFilters";
 import { PAGE_CONFIG } from "./constants/pageConfig";
+import { usePageTitle } from "../../hooks/usePageTitle";
 
 const OneTimeSupplierInvoicesPage = () => {
 	const navigate = useNavigate();
@@ -44,6 +45,7 @@ const OneTimeSupplierInvoicesPage = () => {
 	const [actionType, setActionType] = useState(null); // 'delete'
 	const [isDetailOpen, setIsDetailOpen] = useState(false);
 	const [detailInvoiceId, setDetailInvoiceId] = useState(null);
+	usePageTitle(t("oneTimeSupplierInvoices.title"));
 
 	// Show error toast when error occurs
 	useEffect(() => {
@@ -51,14 +53,6 @@ const OneTimeSupplierInvoicesPage = () => {
 			toast.error(error, { autoClose: 5000 });
 		}
 	}, [error]);
-
-	// Update browser title
-	useEffect(() => {
-		document.title = `${t("oneTimeSupplierInvoices.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Prepare table data and columns
 	const tableData = buildInvoiceTableData(invoices, "ONE_TIME_SUPPLIER");

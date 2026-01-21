@@ -44,7 +44,7 @@ const FORM_INITIAL_STATE = {
 
 const DepartmentsPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("departments"));
+	usePageTitle(t("departments.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
@@ -88,12 +88,6 @@ const DepartmentsPage = () => {
 		dispatch(fetchDepartments(params));
 	}, [dispatch, page, localPageSize, searchTerm, filters]);
 
-	useEffect(() => {
-		document.title = `${t("departments.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Fetch tree data when switching to tree view or when business group changes
 	useEffect(() => {

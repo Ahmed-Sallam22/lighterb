@@ -50,7 +50,7 @@ const statusStyles = {
 
 const ProcurementApprovals = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("procurementApprovals"));
+	usePageTitle(t("procurementApprovals.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -76,12 +76,6 @@ const ProcurementApprovals = () => {
 		dispatch(fetchApprovalSteps());
 	}, [dispatch]);
 
-	useEffect(() => {
-		document.title = t("procurementApprovals.metaTitle");
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Group steps by approval instance
 	const groupedSteps = useMemo(() => {

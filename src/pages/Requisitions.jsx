@@ -50,7 +50,7 @@ const TAB_CONFIG = [
 
 const RequisitionsPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("requisitions"));
+	usePageTitle(t("requisitions.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const dispatch = useDispatch();

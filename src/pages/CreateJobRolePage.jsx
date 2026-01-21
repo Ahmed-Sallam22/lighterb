@@ -111,7 +111,7 @@ const CreateJobRolePage = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const { t } = useTranslation();
-	usePageTitle(t("createJobRole"));
+	usePageTitle(t("createJobRole.title"));
 
 	const { pages = [], pagesLoading, creating, actionError } = useSelector(state => state.jobRoles || {});
 
@@ -132,13 +132,6 @@ const CreateJobRolePage = () => {
 		dispatch(fetchPages());
 	}, [dispatch]);
 
-	// Update page title
-	useEffect(() => {
-		document.title = `${t("jobRoles.modals.createTitle")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Show error toast
 	useEffect(() => {

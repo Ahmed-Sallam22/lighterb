@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 
 import ViewIcon from "../../assets/eye.svg?react";
 import EditIcon from "../../assets/edit.svg?react";
+import { useTranslation } from "react-i18next";
 // Memoized icon components
 const DeleteIcon = memo(() => (
 	<svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -16,10 +17,7 @@ const DeleteIcon = memo(() => (
 ));
 DeleteIcon.displayName = "DeleteIcon";
 
-
 EditIcon.displayName = "EditIcon";
-
-
 
 ViewIcon.displayName = "ViewIcon";
 
@@ -61,7 +59,7 @@ const TableRow = memo(
 				</td>
 			))}
 
-			{(onView || onEdit || onDelete ) && (
+			{(onView || onEdit || onDelete) && (
 				<td className="px-6 py-4" style={{ textAlign: "center" }}>
 					{!showActions ||
 					showActions(row) ||
@@ -74,7 +72,6 @@ const TableRow = memo(
 									onClick={() => onView(row, rowIndex)}
 									className="hover:scale-110 transition-transform duration-200 rounded-full border border-gray-300 p-2"
 									title="View"
-
 								>
 									<ViewIcon />
 								</button>
@@ -141,6 +138,7 @@ const Table = memo(
 		showViewButton,
 		showEditButton,
 	}) => {
+		const { t } = useTranslation();
 		return (
 			<div className={`bg-white rounded-2xl shadow-lg overflow-hidden ${className}`}>
 				<div className="overflow-x-auto">
@@ -164,7 +162,7 @@ const Table = memo(
 										className="px-6 py-4 text-sm font-semibold text-[#000000]"
 										style={{ textAlign: "center" }}
 									>
-										Actions
+										{t("table.actions")}
 									</th>
 								)}
 							</tr>

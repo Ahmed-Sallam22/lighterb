@@ -34,7 +34,7 @@ const LinesHeaderIcon = () => <BsListUl className="w-8 h-8 text-white" />;
 
 const BankStatementLinesPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("bankStatementLines"));
+	usePageTitle(t("bankStatementLines.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const navigate = useNavigate();

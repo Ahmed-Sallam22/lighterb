@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePageTitle } from "../hooks/usePageTitle";
 import { HiOutlineAcademicCap } from "react-icons/hi";
@@ -36,7 +36,7 @@ const COMPETENCIES_DATA = [
 
 const CompetenciesPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("competencies"));
+	usePageTitle(t("competencies.title"));
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [noExpiration, setNoExpiration] = useState(false);
 	const [formData, setFormData] = useState({

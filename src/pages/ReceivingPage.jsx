@@ -42,7 +42,7 @@ const GRNIcon = () => (
 
 const ReceivingPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("receiving"));
+	usePageTitle(t("receiving.title"));
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
@@ -60,13 +60,6 @@ const ReceivingPage = () => {
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [grnToDelete, setGrnToDelete] = useState(null);
 
-	// Update page title
-	useEffect(() => {
-		document.title = `${t("receivingPage.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Fetch GRN list
 	useEffect(() => {

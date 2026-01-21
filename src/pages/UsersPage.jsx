@@ -38,7 +38,7 @@ const INITIAL_FILTERS_STATE = {
 
 const UsersPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("users"));
+	usePageTitle(t("users.title"));
 	const dispatch = useDispatch();
 
 	const { users = [], loading, error } = useSelector(state => state.users || {});
@@ -116,13 +116,6 @@ const UsersPage = () => {
 		}
 	}, [error]);
 
-	// Update browser title when translations load/change
-	useEffect(() => {
-		document.title = `${title} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [title]);
 
 	// Redirect if not admin
 	if (!isAdminUser) {

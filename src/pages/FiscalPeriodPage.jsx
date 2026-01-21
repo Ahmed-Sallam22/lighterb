@@ -24,7 +24,7 @@ import {
 
 const FiscalPeriodPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("fiscalPeriods"));
+	usePageTitle(t("fiscalPeriods.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const navigate = useNavigate();

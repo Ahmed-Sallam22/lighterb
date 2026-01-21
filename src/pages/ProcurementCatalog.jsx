@@ -50,7 +50,7 @@ const INITIAL_FORM_STATE = {
 
 const ProcurementCatalog = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("procurementCatalog"));
+	usePageTitle(t("procurementCatalog.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
@@ -114,13 +114,6 @@ const ProcurementCatalog = () => {
 		}
 	}, [error, actionError, dispatch]);
 
-	// Update page title
-	useEffect(() => {
-		document.title = `${t("catalog.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Calculate statistics
 	const stats = useMemo(() => {

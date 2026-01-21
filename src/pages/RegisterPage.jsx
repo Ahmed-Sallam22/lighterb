@@ -14,7 +14,7 @@ import { registerUser, clearError } from "../store/authSlice";
 
 const RegisterPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("register"));
+	usePageTitle(t("register.title"));
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const { loading, error } = useSelector(state => state.auth);

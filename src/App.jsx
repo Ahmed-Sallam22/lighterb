@@ -57,7 +57,7 @@ const PoPage = lazy(() => import("./pages/POPage"));
 const Receiving = lazy(() => import("./pages/ReceivingPage"));
 const CreateGRNPage = lazy(() => import("./pages/CreateGRNPage"));
 const WorkStructurePage = lazy(() => import("./pages/WorkStructurePage"));
-const EnterpriseAndBusinessGroupsPage = lazy(() => import("./pages/EnterpriseAndBusinessGroupsPage"));
+const OrganizationsPage = lazy(() => import("./pages/OrganizationsPage"));
 const DepartmentsPage = lazy(() => import("./pages/DepartmentsPage"));
 const GradesAndRatesPage = lazy(() => import("./pages/GradesAndRatesPage"));
 const LocationsPage = lazy(() => import("./pages/LocationsPage"));
@@ -80,6 +80,7 @@ const EmployeeDocumentsPage = lazy(() => import("./pages/EmployeeDocumentsPage")
 const AbsenceSummaryPage = lazy(() => import("./pages/AbsenceSummaryPage"));
 const CheckListPage = lazy(() => import("./pages/CheckListPage"));
 const CompetenciesPage = lazy(() => import("./pages/CompetenciesPage"));
+const JobsPage = lazy(() => import("./pages/JobsPage"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -154,7 +155,7 @@ const App = () => {
 						<Route path="procurement/receiving-grn" element={<Receiving />} />
 						<Route path="procurement/receiving-grn/create" element={<CreateGRNPage />} />
 						<Route path="work-structure" element={<WorkStructurePage />} />
-						<Route path="enterprise-business-groups" element={<EnterpriseAndBusinessGroupsPage />} />
+						<Route path="organizations" element={<OrganizationsPage />} />
 						<Route path="departments" element={<DepartmentsPage />} />
 						<Route path="grades-and-rates" element={<GradesAndRatesPage />} />
 						<Route path="locations" element={<LocationsPage />} />
@@ -177,6 +178,7 @@ const App = () => {
 						<Route path="absence-summary" element={<AbsenceSummaryPage />} />
 						<Route path="checklist" element={<CheckListPage />} />
 						<Route path="competencies" element={<CompetenciesPage />} />
+						<Route path="jobs" element={<JobsPage />} />
 					</Route>
 				</Routes>
 			</Suspense>

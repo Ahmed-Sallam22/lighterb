@@ -22,7 +22,7 @@ import {
 
 const GLPeriodsPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("glPeriods"));
+	usePageTitle(t("glPeriods.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
@@ -59,13 +59,6 @@ const GLPeriodsPage = () => {
 		);
 	}, [dispatch, page, localPageSize, filterState, filterFiscalYear]);
 
-	// Update browser title
-	useEffect(() => {
-		document.title = `${t("glPeriods.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Pagination handlers
 	const handlePageChange = useCallback(

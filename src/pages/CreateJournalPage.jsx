@@ -19,7 +19,7 @@ import Button from "../components/shared/Button";
 
 const CreateJournalPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("createJournal"));
+	usePageTitle(t("createJournal.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const location = useLocation();

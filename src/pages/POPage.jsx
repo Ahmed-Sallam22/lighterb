@@ -57,7 +57,7 @@ const STATUS_OPTIONS = [
 
 const POPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("purchaseOrders"));
+	usePageTitle(t("purchaseOrders.title"));
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
@@ -79,13 +79,6 @@ const POPage = () => {
 	const [poToCancel, setPoToCancel] = useState(null);
 	const [cancellationReason, setCancellationReason] = useState("");
 
-	// Update page title
-	useEffect(() => {
-		document.title = `${t("poPage.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Fetch PO list
 	useEffect(() => {

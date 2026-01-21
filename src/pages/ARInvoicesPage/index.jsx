@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../../hooks/usePageTitle";
 import PageHeader from "../../components/shared/PageHeader";
 import { useARInvoices } from "./hooks/useARInvoices";
 import { buildInvoiceTableColumns } from "../InvoicesShared/utils/buildTableColumns";
@@ -17,6 +18,7 @@ import { useInvoiceHandlers } from "../InvoicesShared/handlers/useInvoiceHandler
 const ARInvoicesPage = () => {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
+	usePageTitle(t("arInvoices.title"));
 
 	// Custom hook for invoice data and operations
 	const {
@@ -56,13 +58,6 @@ const ARInvoicesPage = () => {
 		}
 	}, [error]);
 
-	// Update browser title
-	useEffect(() => {
-		document.title = `${t("arInvoices.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Prepare table data and columns
 	const tableData = buildInvoiceTableData(invoices, "AR");

@@ -40,7 +40,7 @@ const MatchHeaderIcon = () => <BsLink45Deg className="w-8 h-8 text-white" />;
 
 const MatchedStatementLinePage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("matchedStatementLine"));
+	usePageTitle(t("matchedStatementLine.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 

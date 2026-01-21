@@ -43,7 +43,7 @@ const SupplierIcon = () => (
 
 const SuppliersPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("suppliers"));
+	usePageTitle(t("suppliers.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const { suppliers, loading, error } = useSelector(state => state.suppliers);
@@ -78,13 +78,6 @@ const SuppliersPage = () => {
 		}));
 	}, [countriesData]);
 
-	// Update browser title
-	useEffect(() => {
-		document.title = `${t("suppliers.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	const refreshSuppliers = useCallback(() => dispatch(fetchSuppliers()), [dispatch]);
 

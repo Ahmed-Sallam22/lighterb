@@ -58,7 +58,7 @@ const GRNIcon = () => (
 
 const CreateGRNPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("createGRN"));
+	usePageTitle(t("createGRN.title"));
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
@@ -95,13 +95,6 @@ const CreateGRNPage = () => {
 		};
 	}, [dispatch]);
 
-	// Update page title
-	useEffect(() => {
-		document.title = `${t("createGRN.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Fetch PO details when PO is selected
 	useEffect(() => {

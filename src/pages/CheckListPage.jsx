@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePageTitle } from "../hooks/usePageTitle";
 import { HiOutlineClipboardCheck, HiOutlinePlus, HiOutlineSearch, HiOutlineTrash } from "react-icons/hi";
@@ -89,6 +89,7 @@ const EMPLOYEES = [
 
 const CheckListPage = () => {
 	const { t } = useTranslation();
+	usePageTitle(t("checklist.title"));
 	const [page, setPage] = useState(2);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);

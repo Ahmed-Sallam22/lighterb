@@ -4,7 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 import { usePageTitle } from "../hooks/usePageTitle";
-import { HiLocationMarker } from "react-icons/hi";
+import Location from "../assets/location.svg?react";
 
 import { parseApiError } from "../utils/errorHandler";
 
@@ -16,31 +16,56 @@ import SlideUpModal from "../components/shared/SlideUpModal";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import Button from "../components/shared/Button";
+import SearchInput from "../components/shared/SearchInput";
 
-import { fetchLocations, createLocation, updateLocation, deleteLocation, setPage } from "../store/locationsSlice";
-import { fetchBusinessGroups } from "../store/businessGroupsSlice";
-import { fetchEnterprises } from "../store/enterprisesSlice";
+import {
+	fetchLocations,
+	fetchLocation,
+	createLocation,
+	updateLocation,
+	deleteLocation,
+	setPage,
+	fetchCountriesLookup,
+	fetchCitiesLookup,
+	clearCities,
+} from "../store/locationsSlice";
+import { fetchOrganizations } from "../store/organizationsSlice";
 
 const FORM_INITIAL_STATE = {
 	name: "",
 	code: "",
-	address_details: "",
-	country: "",
-	enterprise: "",
-	business_group: "",
+	description: "",
+	organization_id: "",
+	country_id: "",
+	city_id: "",
+	zone: "",
+	street: "",
+	building: "",
+	floor: "",
+	office: "",
+	po_box: "",
 };
 
 const LocationsPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("locations"));
+	usePageTitle(t("locations.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
-	const { locations, loading, count, page, hasNext, hasPrevious, creating, updating } = useSelector(
-		state => state.locations
-	);
-	const { businessGroups } = useSelector(state => state.businessGroups);
-	const { enterprises } = useSelector(state => state.enterprises);
+	const {
+		locations,
+		loading,
+		count,
+		page,
+		hasNext,
+		hasPrevious,
+		creating,
+		updating,
+		countries,
+		cities,
+		citiesLoading,
+	} = useSelector(state => state.locations);
+	const { organizations } = useSelector(state => state.organizations);
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingItem, setEditingItem] = useState(null);
@@ -49,22 +74,34 @@ const LocationsPage = () => {
 	const [formData, setFormData] = useState(FORM_INITIAL_STATE);
 	const [formErrors, setFormErrors] = useState({});
 	const [localPageSize, setLocalPageSize] = useState(25);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [filterOrganization, setFilterOrganization] = useState("");
 
+	// Fetch organizations and countries on mount
 	useEffect(() => {
-		dispatch(fetchBusinessGroups({ page: 1, page_size: 100 }));
-		dispatch(fetchEnterprises({ page: 1, page_size: 100 }));
+		dispatch(fetchOrganizations({ page_size: 100 }));
+		dispatch(fetchCountriesLookup());
 	}, [dispatch]);
 
+	// Fetch locations with filters
 	useEffect(() => {
-		dispatch(fetchLocations({ page, page_size: localPageSize }));
-	}, [dispatch, page, localPageSize]);
-
-	useEffect(() => {
-		document.title = `${t("locations.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
+		const params = {
+			page,
+			page_size: localPageSize,
+			...(searchTerm && { search: searchTerm }),
+			...(filterOrganization && { organization: filterOrganization }),
 		};
-	}, [t]);
+		dispatch(fetchLocations(params));
+	}, [dispatch, page, localPageSize, searchTerm, filterOrganization]);
+
+	// Fetch cities when country changes in form
+	useEffect(() => {
+		if (formData.country_id) {
+			dispatch(fetchCitiesLookup(formData.country_id));
+		} else {
+			dispatch(clearCities());
+		}
+	}, [formData.country_id, dispatch]);
 
 	const handlePageChange = useCallback(
 		newPage => {
@@ -111,18 +148,18 @@ const LocationsPage = () => {
 			render: value => value || "-",
 		},
 		{
-			header: t("locations.table.enterprise"),
-			accessor: "enterprise_name",
-			render: value => value || "-",
-		},
-		{
-			header: t("locations.table.businessGroup"),
-			accessor: "business_group_name",
+			header: t("locations.table.organization"),
+			accessor: "organization_name",
 			render: value => value || "-",
 		},
 		{
 			header: t("locations.table.country"),
-			accessor: "country",
+			accessor: "country_name",
+			render: value => value || "-",
+		},
+		{
+			header: t("locations.table.city"),
+			accessor: "city_name",
 			render: value => value || "-",
 		},
 		{
@@ -132,19 +169,27 @@ const LocationsPage = () => {
 		},
 	];
 
-	const enterpriseOptions = [
-		{ value: "", label: t("locations.form.selectEnterprise") },
-		...enterprises.map(ent => ({
-			value: ent.id,
-			label: ent.name,
+	const organizationOptions = [
+		{ value: "", label: t("locations.form.selectOrganization") },
+		...organizations.map(org => ({
+			value: org.id,
+			label: org.name_display || org.name,
 		})),
 	];
 
-	const businessGroupOptions = [
-		{ value: "", label: t("locations.form.selectBusinessGroup") },
-		...businessGroups.map(bg => ({
-			value: bg.id,
-			label: bg.name,
+	const countryOptions = [
+		{ value: "", label: t("locations.form.selectCountry") },
+		...countries.map(country => ({
+			value: country.id,
+			label: country.name,
+		})),
+	];
+
+	const cityOptions = [
+		{ value: "", label: citiesLoading ? t("common.loading") : t("locations.form.selectCity") },
+		...cities.map(city => ({
+			value: city.id,
+			label: city.name,
 		})),
 	];
 
@@ -155,18 +200,35 @@ const LocationsPage = () => {
 		setIsModalOpen(true);
 	};
 
-	const handleEdit = item => {
-		setEditingItem(item);
-		setFormData({
-			name: item.name || "",
-			code: item.code || "",
-			address_details: item.address_details || "",
-			country: item.country || "",
-			enterprise: item.enterprise || "",
-			business_group: item.business_group || "",
-		});
-		setFormErrors({});
-		setIsModalOpen(true);
+	const handleEdit = async item => {
+		try {
+			setEditingItem(item);
+			// Fetch the full location data from API
+			const locationData = await dispatch(fetchLocation(item.id)).unwrap();
+			
+			setFormData({
+				name: locationData.name || "",
+				code: locationData.code || "",
+				description: locationData.description || "",
+				organization_id: locationData.organization || "",
+				country_id: locationData.country || "",
+				city_id: locationData.city || "",
+				zone: locationData.zone || "",
+				street: locationData.street || "",
+				building: locationData.building || "",
+				floor: locationData.floor || "",
+				office: locationData.office || "",
+				po_box: locationData.po_box || "",
+			});
+			setFormErrors({});
+			// Fetch cities for the country
+			if (locationData.country) {
+				dispatch(fetchCitiesLookup(locationData.country));
+			}
+			setIsModalOpen(true);
+		} catch (error) {
+			toast.error(parseApiError(error, t, "errors.generic"));
+		}
 	};
 
 	const handleCloseModal = () => {
@@ -178,7 +240,14 @@ const LocationsPage = () => {
 
 	const handleInputChange = e => {
 		const { name, value } = e.target;
-		setFormData(prev => ({ ...prev, [name]: value }));
+		setFormData(prev => {
+			const newData = { ...prev, [name]: value };
+			// Reset city when country changes
+			if (name === "country_id") {
+				newData.city_id = "";
+			}
+			return newData;
+		});
 		if (formErrors[name]) {
 			setFormErrors(prev => ({ ...prev, [name]: "" }));
 		}
@@ -189,11 +258,11 @@ const LocationsPage = () => {
 		if (!formData.name.trim()) {
 			errors.name = t("common.required");
 		}
-		if (!formData.country.trim()) {
-			errors.country = t("common.required");
+		if (!editingItem && !formData.organization_id) {
+			errors.organization_id = t("common.required");
 		}
-		if (!editingItem && !formData.enterprise && !formData.business_group) {
-			errors.enterprise = t("locations.form.enterpriseOrBgRequired");
+		if (!editingItem && !formData.code.trim()) {
+			errors.code = t("common.required");
 		}
 		setFormErrors(errors);
 		return Object.keys(errors).length === 0;
@@ -205,29 +274,48 @@ const LocationsPage = () => {
 
 		try {
 			if (editingItem) {
-				// For update, only send editable fields
+				// For update, send editable fields (organization_id and code cannot be changed)
 				const payload = {
 					name: formData.name,
-					...(formData.address_details && { address_details: formData.address_details }),
-					country: formData.country,
+					...(formData.description && { description: formData.description }),
+					...(formData.country_id && { country_id: parseInt(formData.country_id) }),
+					...(formData.city_id && { city_id: parseInt(formData.city_id) }),
+					zone: formData.zone || "",
+					street: formData.street || "",
+					building: formData.building || "",
+					floor: formData.floor || "",
+					office: formData.office || "",
+					po_box: formData.po_box || "",
 				};
 				await dispatch(updateLocation({ id: editingItem.id, data: payload })).unwrap();
 				toast.success(t("locations.messages.updateSuccess"));
 			} else {
 				// For create, include all required fields
 				const payload = {
+					organization_id: parseInt(formData.organization_id),
+					code: formData.code,
 					name: formData.name,
-					country: formData.country,
-					...(formData.code && { code: formData.code }),
-					...(formData.address_details && { address_details: formData.address_details }),
-					...(formData.enterprise && { enterprise: formData.enterprise }),
-					...(formData.business_group && { business_group: formData.business_group }),
+					...(formData.description && { description: formData.description }),
+					...(formData.country_id && { country_id: parseInt(formData.country_id) }),
+					...(formData.city_id && { city_id: parseInt(formData.city_id) }),
+					zone: formData.zone || "",
+					street: formData.street || "",
+					building: formData.building || "",
+					floor: formData.floor || "",
+					office: formData.office || "",
+					po_box: formData.po_box || "",
 				};
 				await dispatch(createLocation(payload)).unwrap();
 				toast.success(t("locations.messages.createSuccess"));
 			}
 			handleCloseModal();
-			dispatch(fetchLocations({ page, page_size: localPageSize }));
+			dispatch(
+				fetchLocations({
+					page,
+					page_size: localPageSize,
+					...(filterOrganization && { organization: filterOrganization }),
+				})
+			);
 		} catch (error) {
 			toast.error(parseApiError(error, t, "locations.messages.saveError"));
 		}
@@ -260,30 +348,46 @@ const LocationsPage = () => {
 			<ToastContainer position="top-right" autoClose={3000} />
 
 			<PageHeader
-				icon={<HiLocationMarker className="w-8 h-8 text-white mr-3" />}
+				icon={<Location className="w-8 h-8 text-white" />}
 				title={t("locations.title")}
 				subtitle={t("locations.subtitle")}
 			/>
 
 			<div className="p-6">
 				<div className="bg-white rounded-2xl shadow-lg p-6">
-					<div className="flex justify-between items-center mb-6">
+					<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
 						<h2 className="text-2xl font-bold text-[#1D7A8C]">{t("locations.title")}</h2>
-						<Button
-							onClick={handleCreate}
-							icon={
-								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M12 4v16m8-8H4"
-									/>
-								</svg>
-							}
-							title={t("locations.createLocation")}
-							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
-						/>
+						<div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
+							<SearchInput
+								placeholder={t("locations.searchPlaceholder")}
+								value={searchTerm}
+								onChange={e => setSearchTerm(e.target.value)}
+								className="w-full md:w-64"
+							/>
+							<FloatingLabelSelect
+								label={t("locations.form.filterByOrganization")}
+								name="filterOrganization"
+								value={filterOrganization}
+								onChange={e => setFilterOrganization(e.target.value)}
+								options={organizationOptions}
+								className="w-full md:w-48"
+							/>
+							<Button
+								onClick={handleCreate}
+								icon={
+									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M12 4v16m8-8H4"
+										/>
+									</svg>
+								}
+								title={t("locations.createLocation")}
+								className="bg-[#1D7A8C] hover:bg-[#156576] text-white whitespace-nowrap"
+							/>
+						</div>
 					</div>
 
 					<Table
@@ -292,6 +396,7 @@ const LocationsPage = () => {
 						onEdit={handleEdit}
 						onDelete={handleDeleteClick}
 						emptyMessage={t("locations.table.emptyMessage")}
+						loading={loading}
 					/>
 
 					<div className="mt-6">
@@ -314,63 +419,126 @@ const LocationsPage = () => {
 				onClose={handleCloseModal}
 				title={editingItem ? t("locations.modal.editTitle") : t("locations.modal.createTitle")}
 			>
-				<form onSubmit={handleSubmit} className="space-y-4 p-4">
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<FloatingLabelInput
-							label={t("locations.form.name")}
-							name="name"
-							value={formData.name}
-							onChange={handleInputChange}
-							error={formErrors.name}
-							required
-						/>
-						<FloatingLabelInput
-							label={t("locations.form.code")}
-							name="code"
-							value={formData.code}
-							onChange={handleInputChange}
-							disabled={!!editingItem}
-						/>
-					</div>
-
-					{!editingItem && (
+				<form onSubmit={handleSubmit} className="p-4">
+					{/* Basic Information */}
+					<div className="mb-6">
+						<h3 className="text-lg font-semibold text-gray-700 mb-4">{t("locations.form.basicInfo")}</h3>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<FloatingLabelSelect
-								label={t("locations.form.enterprise")}
-								name="enterprise"
-								value={formData.enterprise}
+							<FloatingLabelInput
+								label={t("locations.form.name")}
+								name="name"
+								value={formData.name}
 								onChange={handleInputChange}
-								options={enterpriseOptions}
-								error={formErrors.enterprise}
+								error={formErrors.name}
+								required
 							/>
-							<FloatingLabelSelect
-								label={t("locations.form.businessGroup")}
-								name="business_group"
-								value={formData.business_group}
+							<FloatingLabelInput
+								label={t("locations.form.code")}
+								name="code"
+								value={formData.code}
 								onChange={handleInputChange}
-								options={businessGroupOptions}
+								error={formErrors.code}
+								disabled={!!editingItem}
+								required={!editingItem}
 							/>
 						</div>
-					)}
-
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<FloatingLabelInput
-							label={t("locations.form.country")}
-							name="country"
-							value={formData.country}
-							onChange={handleInputChange}
-							error={formErrors.country}
-							required
-						/>
-						<FloatingLabelInput
-							label={t("locations.form.addressDetails")}
-							name="address_details"
-							value={formData.address_details}
-							onChange={handleInputChange}
-						/>
+						<div className="grid grid-cols-1 gap-4 mt-4">
+							<FloatingLabelInput
+								label={t("locations.form.description")}
+								name="description"
+								value={formData.description}
+								onChange={handleInputChange}
+							/>
+						</div>
+						{!editingItem && (
+							<div className="grid grid-cols-1 gap-4 mt-4">
+								<FloatingLabelSelect
+									label={t("locations.form.organization")}
+									name="organization_id"
+									value={formData.organization_id}
+									onChange={handleInputChange}
+									options={organizationOptions}
+									error={formErrors.organization_id}
+									required
+								/>
+							</div>
+						)}
 					</div>
 
-					<div className="flex justify-end gap-3 pt-4">
+					{/* Location Details */}
+					<div className="mb-6">
+						<h3 className="text-lg font-semibold text-gray-700 mb-4">
+							{t("locations.form.locationDetails")}
+						</h3>
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<FloatingLabelSelect
+								label={t("locations.form.country")}
+								name="country_id"
+								value={formData.country_id}
+								onChange={handleInputChange}
+								options={countryOptions}
+							/>
+							<FloatingLabelSelect
+								label={t("locations.form.city")}
+								name="city_id"
+								value={formData.city_id}
+								onChange={handleInputChange}
+								options={cityOptions}
+								disabled={!formData.country_id || citiesLoading}
+							/>
+						</div>
+					</div>
+
+					{/* Address Details */}
+					<div className="mb-6">
+						<h3 className="text-lg font-semibold text-gray-700 mb-4">
+							{t("locations.form.addressSection")}
+						</h3>
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<FloatingLabelInput
+								label={t("locations.form.zone")}
+								name="zone"
+								value={formData.zone}
+								onChange={handleInputChange}
+							/>
+							<FloatingLabelInput
+								label={t("locations.form.street")}
+								name="street"
+								value={formData.street}
+								onChange={handleInputChange}
+							/>
+						</div>
+						<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+							<FloatingLabelInput
+								label={t("locations.form.building")}
+								name="building"
+								value={formData.building}
+								onChange={handleInputChange}
+							/>
+							<FloatingLabelInput
+								label={t("locations.form.floor")}
+								name="floor"
+								value={formData.floor}
+								onChange={handleInputChange}
+							/>
+							<FloatingLabelInput
+								label={t("locations.form.office")}
+								name="office"
+								value={formData.office}
+								onChange={handleInputChange}
+							/>
+						</div>
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+							<FloatingLabelInput
+								label={t("locations.form.poBox")}
+								name="po_box"
+								value={formData.po_box}
+								onChange={handleInputChange}
+							/>
+						</div>
+					</div>
+
+					<div className="flex justify-end gap-3 pt-4 border-t">
 						<Button
 							type="button"
 							onClick={handleCloseModal}
@@ -384,8 +552,8 @@ const LocationsPage = () => {
 								creating || updating
 									? t("common.saving")
 									: editingItem
-									? t("common.update")
-									: t("common.create")
+										? t("common.update")
+										: t("common.create")
 							}
 							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
 						/>

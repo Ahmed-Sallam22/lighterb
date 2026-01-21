@@ -48,7 +48,7 @@ import { useNavigate } from "react-router";
 
 const InvoiceApprovalsPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("invoiceApprovals"));
+	usePageTitle(t("invoiceApprovals.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 

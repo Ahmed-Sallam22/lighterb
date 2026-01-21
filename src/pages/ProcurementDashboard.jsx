@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { usePageTitle } from "../hooks/usePageTitle";
@@ -190,16 +190,10 @@ const cardConfigs = [
 
 const ProcurementDashboard = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("procurementDashboard"));
+	usePageTitle(t("procurementDashboard.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		document.title = t("procurementDashboard.metaTitle");
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	const handleCardClick = path => {
 		if (path) {

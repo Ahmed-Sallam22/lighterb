@@ -30,7 +30,7 @@ import ReceivePaymentForm from "../components/forms/ReceivePaymentForm";
 
 const ARReceiptsPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("arReceipts"));
+	usePageTitle(t("arReceipts.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
@@ -79,13 +79,6 @@ const ARReceiptsPage = () => {
 		dispatch(fetchARPayments(params));
 	}, [dispatch, page, localPageSize, filters]);
 
-	// Update browser title
-	useEffect(() => {
-		document.title = `${t("payments.ar.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Pagination handlers
 	const handlePageChange = useCallback(

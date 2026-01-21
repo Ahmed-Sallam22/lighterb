@@ -28,7 +28,7 @@ const ReportsIcon = () => (
 
 const ReportsPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("reports"));
+	usePageTitle(t("reports.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const { trialBalance, arAging, apAging } = useSelector(state => state.reports);
@@ -49,13 +49,6 @@ const ReportsPage = () => {
 		[t]
 	);
 
-	// Update browser title
-	useEffect(() => {
-		document.title = `${t("reports.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Auto-load Trial Balance on mount
 	useEffect(() => {

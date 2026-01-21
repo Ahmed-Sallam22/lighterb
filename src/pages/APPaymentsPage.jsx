@@ -30,7 +30,7 @@ import APPaymentIcon from "../assets/icons/APPaymentIcon";
 
 const APPaymentsPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("apPayments"));
+	usePageTitle(t("apPayments.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
@@ -79,13 +79,6 @@ const APPaymentsPage = () => {
 		dispatch(fetchAPPayments(params));
 	}, [dispatch, page, localPageSize, filters]);
 
-	// Update browser title
-	useEffect(() => {
-		document.title = `${t("payments.ap.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Pagination handlers
 	const handlePageChange = useCallback(

@@ -22,7 +22,7 @@ import {
 
 const GeneratePeriodsPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("generatePeriods"));
+	usePageTitle(t("generatePeriods.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const navigate = useNavigate();

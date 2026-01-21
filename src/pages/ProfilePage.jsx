@@ -11,7 +11,7 @@ import {
 	HiOutlineBookmark,
 } from "react-icons/hi";
 import ProfileIcon from "../assets/profile.svg?react";
-
+import CustomTable from "../components/shared/CustomTable";
 import PageHeader from "../components/shared/PageHeader";
 import Button from "../components/shared/Button";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
@@ -19,9 +19,11 @@ import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import SlideUpModal from "../components/shared/SlideUpModal";
 import Toggle from "../components/shared/Toggle";
 import Table from "../components/shared/Table";
-import { fetchBusinessGroups } from "../store/businessGroupsSlice";
-import { fetchDepartments } from "../store/departmentsSlice";
 import userImage from "../assets/userimage.png";
+
+// Slices
+import { fetchAddresses, createAddress, updateAddress } from "../store/addressesSlice";
+import { fetchLookupValues } from "../store/lookupsSlice";
 
 const ASSIGNMENT_DATA = [
 	{ id: 1, title: "Current Assignment", type: "Full Time", effectiveFrom: "01 Jan 2023", status: "active" },
@@ -80,11 +82,64 @@ const QUALIFICATION_INITIAL_STATE = {
 
 const ProfilePage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("profile"));
 	const dispatch = useDispatch();
-	useSelector(state => state.businessGroups || {});
-	useSelector(state => state.departments || {});
-	const [activeTab, setActiveTab] = useState("assignment");
+	usePageTitle(t("profile.title"));
+
+	// State for profile data
+	const [activeTab, setActiveTab] = useState("general");
+	const [isViewProfileModalOpen, setIsViewProfileModalOpen] = useState(false);
+	const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
+
+	// Selectors
+	const { addresses, loading: loadingAddresses } = useSelector(state => state.addresses);
+	const { lookupValues } = useSelector(state => state.lookups);
+
+	// Local lookups state derived from Redux
+	const [localLookups, setLocalLookups] = useState({
+		addressTypes: [],
+		countries: [],
+		cities: [],
+	});
+
+	// build addresstypes options to use it at its floating select
+	const addressTypeOptions = useMemo(() => {
+		return (lookupValues?.ADDRESS_TYPE || []).map((item) => ({
+			value: item.id,
+			label: item.name,
+		}));
+	}, [lookupValues]);
+
+	const countriesTypeOptions = useMemo(() => {
+		console.log("test here",lookupValues);
+		return (lookupValues?.COUNTRY || []).map((item) => ({
+			value: item.id,
+			label: item.name,
+		}));
+
+	}, [lookupValues]);
+
+	const citiesTypeOptions = useMemo(() => {
+		return (lookupValues?.CITY || []).map((item) => ({
+			value: item.id,
+			label: item.name,
+		}));
+	}, [lookupValues]);
+
+
+	const PERSON_ID = 4; // Hardcoded for now
+
+	const [profileForm, setProfileForm] = useState({
+		firstNameEn: "Ahmed",
+		middleNameEn: "Mohamed",
+		lastNameEn: "Ali",
+		gender: "male",
+		maritalStatus: "single",
+		firstNameAr: "أحمد",
+		middleNameAr: "محمد",
+		lastNameAr: "علي",
+		address: "12 El Tayaran St.,Heliopolis, Cairo, Egypt",
+		addressType: "Home",
+	});
 
 	// Assignment modals
 	const [isViewAssignmentModalOpen, setIsViewAssignmentModalOpen] = useState(false);
@@ -105,20 +160,41 @@ const ProfilePage = () => {
 	const [qualificationForm, setQualificationForm] = useState(QUALIFICATION_INITIAL_STATE);
 	const [competencies, setCompetencies] = useState(COMPETENCIES_LIST);
 	const [isCompetenciesOpen, setIsCompetenciesOpen] = useState(false);
+
+	// Address Modals
+	const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
+	const [isEditAddressModalOpen, setIsEditAddressModalOpen] = useState(false);
+	const [selectedAddress, setSelectedAddress] = useState(null);
+	const [addressForm, setAddressForm] = useState({
+		addressId: null,
+		email: "",
+		isEmailMain: false,
+		phone: "",
+		isPhoneMain: false,
+		address: "",
+		isAddressMain: false,
+		addressType: "",
+		isAddressTypeMain: false,
+		countryId: "",
+		cityId: "",
+		lastUpdate: "",
+		isLastUpdateMain: false,
+	});
+
+	// Emergency Modals
+	const [isAddEmergencyModalOpen, setIsAddEmergencyModalOpen] = useState(false);
+	const [isEditEmergencyModalOpen, setIsEditEmergencyModalOpen] = useState(false);
+	const [selectedEmergency, setSelectedEmergency] = useState(null);
+	const [emergencyForm, setEmergencyForm] = useState({
+		name: "",
+		phone: "",
+		relationship: "",
+		contactType: "",
+	});
+
 	const [activeLevelDropdown, setActiveLevelDropdown] = useState(null);
 	const levelDropdownRef = React.useRef(null);
 
-	useEffect(() => {
-		document.title = `${t("profile.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
-
-	useEffect(() => {
-		dispatch(fetchBusinessGroups({ page_size: 100 }));
-		dispatch(fetchDepartments({ page: 1, page_size: 100 }));
-	}, [dispatch]);
 
 	// Close level dropdown when clicking outside
 	useEffect(() => {
@@ -142,6 +218,7 @@ const ProfilePage = () => {
 	}, [activeLevelDropdown]);
 
 	const tabItems = [
+		{ id: "general", label: t("profile.tabs.general") },
 		{ id: "assignment", label: t("profile.tabs.assignment") },
 		{ id: "contacts", label: t("profile.tabs.contacts") },
 		{ id: "qualifications", label: t("profile.tabs.qualifications") },
@@ -226,13 +303,53 @@ const ProfilePage = () => {
 		setIsEditQualificationModalOpen(true);
 	};
 
+	const handleAddAddress = () => {
+		setAddressForm({
+			email: "",
+			isEmailMain: false,
+			phone: "",
+			isPhoneMain: false,
+			address: "",
+			isAddressMain: false,
+			addressType: "",
+			isAddressTypeMain: false,
+			lastUpdate: "",
+			isLastUpdateMain: false,
+		});
+		setIsAddAddressModalOpen(true);
+	};
+
+
+	const handleAddEmergency = () => {
+		setEmergencyForm({
+			name: "",
+			phone: "",
+			relationship: "",
+			contactType: "",
+		});
+		setIsAddEmergencyModalOpen(true);
+	};
+
+	const handleEditEmergency = contact => {
+		setSelectedEmergency(contact);
+		// Note: The hardcoded data 'CONTACTS_DATA' has structure issues (layout in original code vs simple array). 
+		// Assuming we map correctly in render.
+		// For now simple mapping:
+		setEmergencyForm({
+			name: contact.name || "Mona Ahmed", // fallback as data might be mocked/hardcoded in render
+			phone: contact.phone || "01055544321",
+			relationship: contact.relationship || "Wife",
+			contactType: contact.contactType || "Family",
+		});
+		setIsEditEmergencyModalOpen(true);
+	};
+
 	const renderStatusBadge = status => {
 		const isActive = status === "active";
 		return (
 			<span
-				className={`px-3 py-1 rounded-full text-xs font-semibold ${
-					isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
-				}`}
+				className={`px-3 py-1 rounded-full text-xs font-semibold ${isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
+					}`}
 			>
 				{isActive ? t("common.active") : t("common.inactive")}
 			</span>
@@ -282,6 +399,111 @@ const ProfilePage = () => {
 			return currentTime > latestTime ? contact : latest;
 		}, null)?.id;
 	}, []);
+
+	useEffect(() => {
+		// Fetch Addresses
+		if (PERSON_ID) {
+			dispatch(fetchAddresses(PERSON_ID));
+		}
+
+		// Fetch initial Lookups
+		dispatch(fetchLookupValues({ lookupType: "ADDRESS_TYPE" }));
+		dispatch(fetchLookupValues({ lookupType: "COUNTRY" }));
+	}, [dispatch, PERSON_ID]);
+
+	// Sync Redux lookup values to local state for easier usage (optional, but requested in plan)
+	useEffect(() => {
+		if (lookupValues) {
+			setLocalLookups(prev => ({
+				...prev,
+				addressTypes: lookupValues["ADDRESS_TYPE"] || [],
+				countries: lookupValues["COUNTRY"] || [],
+				cities: lookupValues["CITY"] || [],
+			}));
+		}
+	}, [lookupValues]);
+
+	useEffect(() => {
+		console.log(localLookups);
+	}, [localLookups]);
+
+	// Fetch Cities when Country changes
+	// Fetch Cities when Country changes
+	const handleCountryChange = (countryId) => {
+		setAddressForm(prev => ({ ...prev, countryId, cityId: "" })); // Reset city when country changes
+		if (countryId) {
+			dispatch(fetchLookupValues({ lookupType: "CITY", parent: countryId }));
+		} else {
+			setLocalLookups(prev => ({ ...prev, cities: [] }));
+		}
+	};
+
+	const handleAddAddressSubmit = async () => {
+		const payload = {
+			person: PERSON_ID,
+			address_type: addressForm.addressType,
+			country: addressForm.countryId,
+			city: addressForm.cityId,
+			street: addressForm.address,
+			email: addressForm.email,
+			phone: addressForm.phone,
+			is_primary: addressForm.isAddressMain,
+			// Add other fields as needed by backend
+		};
+		const result = await dispatch(createAddress(payload));
+		if (createAddress.fulfilled.match(result)) {
+			setIsAddAddressModalOpen(false);
+			// Reset form handled by opening
+		}
+	};
+
+	const handleEditAddressSubmit = async () => {
+		const payload = {
+			person: PERSON_ID, // Might be needed for validation
+			address_type: addressForm.addressType,
+			country: addressForm.countryId,
+			city: addressForm.cityId,
+			street: addressForm.address,
+			email: addressForm.email,
+			phone: addressForm.phone,
+			is_primary: addressForm.isAddressMain,
+		};
+		const result = await dispatch(updateAddress({ id: addressForm.addressId, data: payload }));
+		if (updateAddress.fulfilled.match(result)) {
+			setIsEditAddressModalOpen(false);
+		}
+	};
+
+	const openAddAddressModal = () => {
+		setAddressForm({
+			addressId: null,
+			email: "", isEmailMain: false,
+			phone: "", isPhoneMain: false,
+			address: "", isAddressMain: false,
+			addressType: "", isAddressTypeMain: false,
+			countryId: "", cityId: "",
+			lastUpdate: "", isLastUpdateMain: false,
+		});
+		setIsAddAddressModalOpen(true);
+	};
+
+	const handleEditAddress = (row) => {
+		setAddressForm({
+			addressId: row.id,
+			email: row.email || "",
+			isEmailMain: row.is_primary || false, // Assuming mapping
+			phone: row.phone || "",
+			address: row.street || "",
+			addressType: row.address_type?.id || row.address_type, // Handle object or ID
+			countryId: row.country?.id || row.country,
+			cityId: row.city?.id || row.city,
+			lastUpdate: row.updated_at ? row.updated_at.split('T')[0] : "",
+		});
+		if (row.country?.id || row.country) {
+			dispatch(fetchLookupValues({ lookupType: "CITY", parent: row.country?.id || row.country }));
+		}
+		setIsEditAddressModalOpen(true);
+	};
 
 	const formatContactDate = dateString => {
 		if (!dateString) return "";
@@ -361,16 +583,14 @@ const ProfilePage = () => {
 											<button
 												type="button"
 												onClick={() => setActiveTab(tab.id)}
-												className={`flex items-center gap-3 pb-2 border-b-2 transition-colors whitespace-nowrap ${
-													isActive
-														? "border-[#1D7A8C] text-[#1D7A8C]"
-														: "border-transparent text-gray-500 hover:text-gray-700"
-												}`}
+												className={`flex items-center gap-3 pb-2 border-b-2 transition-colors whitespace-nowrap ${isActive
+													? "border-[#1D7A8C] text-[#1D7A8C]"
+													: "border-transparent text-gray-500 hover:text-gray-700"
+													}`}
 											>
 												<span
-													className={`w-2 h-2 rounded-full ${
-														isActive ? "bg-[#1D7A8C]" : "bg-gray-300"
-													}`}
+													className={`w-2 h-2 rounded-full ${isActive ? "bg-[#1D7A8C]" : "bg-gray-300"
+														}`}
 												/>
 												<span className="text-sm font-medium">{tab.label}</span>
 											</button>
@@ -383,163 +603,290 @@ const ProfilePage = () => {
 							</div>
 						</div>
 
+						{activeTab === "general" && (
+							<div className="space-y-6">
+								{/* Personal Information (English) */}
+								<div className="bg-white rounded-2xl shadow-lg p-6">
+
+									<CustomTable
+										title={t("profile.general.personalInfoEn")}
+										className="shadow-none"
+										columns={[
+											{
+												header: t("profile.general.labels.firstNameEn"),
+												accessor: "firstNameEn",
+												render: value => <span className="text-sm text-gray-700">{value}</span>,
+											},
+											{
+												header: t("profile.general.labels.middleNameEn"),
+												accessor: "middleNameEn",
+												render: value => <span className="text-sm text-gray-700">{value}</span>,
+											},
+											{
+												header: t("profile.general.labels.lastNameEn"),
+												accessor: "lastNameEn",
+												render: value => <span className="text-sm text-gray-700">{value}</span>,
+											},
+											{
+												header: t("profile.general.fields.gender"),
+												accessor: "gender",
+												render: value => (
+													<span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+														{value === "male" ? "Male" : "Female"}
+													</span>
+												),
+											},
+											{
+												header: t("profile.general.fields.maritalStatus"),
+												accessor: "maritalStatus",
+												render: value => (
+													<span className="text-sm text-gray-700">
+														{value.charAt(0).toUpperCase() + value.slice(1)}
+													</span>
+												),
+											},
+										]}
+										data={[profileForm]}
+									/>
+								</div>
+
+								{/* Personal Information (Arabic) */}
+								<div className="bg-white rounded-2xl shadow-lg p-6">
+
+									<div dir="rtl">
+										<CustomTable
+											title=
+											{t("profile.general.personalInfoAr")}
+											className="shadow-none"
+											columns={[
+												{
+													header: t("profile.general.labels.firstNameAr"),
+													accessor: "firstNameAr",
+													render: value => <span className="text-sm text-gray-700">{value}</span>,
+												},
+												{
+													header: t("profile.general.labels.middleNameAr"),
+													accessor: "middleNameAr",
+													render: value => <span className="text-sm text-gray-700">{value}</span>,
+												},
+												{
+													header: t("profile.general.labels.lastNameAr"),
+													accessor: "lastNameAr",
+													render: value => <span className="text-sm text-gray-700">{value}</span>,
+												},
+											]}
+											data={[profileForm]}
+										/>
+									</div>
+								</div>
+
+								{/* Address */}
+								<div className="bg-white rounded-2xl shadow-lg p-6">
+
+									<CustomTable
+										title={t("profile.general.address")}
+										className="shadow-none"
+										columns={[
+											{
+												header: t("profile.general.fields.address"),
+												accessor: "address",
+												render: value => <span className="text-sm text-gray-700">{value}</span>,
+											},
+											{
+												header: t("profile.general.fields.addressType"),
+												accessor: "addressType",
+												render: value => <span className="text-sm text-gray-700">{value}</span>,
+											},
+										]}
+										data={[profileForm]}
+									/>
+								</div>
+
+								<div className="flex justify-end gap-3 mt-6">
+									<Button
+										onClick={() => setIsViewProfileModalOpen(true)}
+										title={t("common.view")}
+										className="bg-white text-[#1D7A8C] border border-[#1D7A8C] hover:bg-gray-50"
+									/>
+									<Button
+										onClick={() => setIsEditProfileModalOpen(true)}
+										title={t("profile.modals.editAssignment").replace("Assignment", "Profile")}
+									/>
+								</div>
+							</div>
+						)}
+
 						{activeTab === "assignment" && (
 							<div className="bg-white rounded-2xl shadow-lg p-6">
-								<h3 className="text-lg font-semibold text-[#1D7A8C] mb-6  pl-3">
-									{t("profile.assignment.detailsTitle")}
-								</h3>
-								<div className="overflow-x-auto">
-									<table className="w-full text-sm">
-										<thead className="bg-gray-50">
-											<tr>
-												<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-													{t("profile.assignment.fields.title")}
-												</th>
-												<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-													{t("profile.assignment.fields.assignmentType")}
-												</th>
-												<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-													{t("profile.assignment.fields.effectiveFrom")}
-												</th>
-												<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-													{t("profile.status")}
-												</th>
-												<th className="text-center px-4 py-3 text-gray-600 font-semibold">
-													{t("profile.assignment.fields.action")}
-												</th>
-											</tr>
-										</thead>
-										<tbody className="divide-y divide-gray-100">
-											{ASSIGNMENT_DATA.map(assignment => (
-												<tr key={assignment.id} className="hover:bg-gray-50">
-													<td className="px-4 py-4 text-gray-700">{assignment.title}</td>
-													<td className="px-4 py-4 text-gray-700">{assignment.type}</td>
-													<td className="px-4 py-4 text-gray-700">
-														{assignment.effectiveFrom}
-													</td>
-													<td className="px-4 py-4">
-														{renderStatusBadge(assignment.status)}
-													</td>
-													<td className="px-4 py-4">
-														<div className="flex items-center justify-center gap-2">
-															<button
-																onClick={() => handleViewAssignment(assignment)}
-																className="text-[#1D7A8C] hover:text-[#155a66] p-1"
-															>
-																<HiOutlineEye className="w-5 h-5" />
-															</button>
-															<button
-																onClick={() => handleEditAssignment(assignment)}
-																className="text-[#1D7A8C] hover:text-[#155a66] p-1"
-															>
-																<HiOutlinePencilAlt className="w-5 h-5" />
-															</button>
-														</div>
-													</td>
-												</tr>
-											))}
-										</tbody>
-									</table>
-								</div>
+
+								<CustomTable
+									title={t("profile.assignment.detailsTitle")}
+									className="shadow-none"
+									columns={[
+										{
+											header: t("profile.assignment.fields.title"),
+											accessor: "title",
+											render: value => <span className="text-gray-700">{value}</span>,
+										},
+										{
+											header: t("profile.assignment.fields.assignmentType"),
+											accessor: "type",
+											render: value => <span className="text-gray-700">{value}</span>,
+										},
+										{
+											header: t("profile.assignment.fields.effectiveFrom"),
+											accessor: "effectiveFrom",
+											render: value => <span className="text-gray-700">{value}</span>,
+										},
+										{
+											header: t("profile.status"),
+											accessor: "status",
+											render: value => renderStatusBadge(value),
+										},
+									]}
+									data={ASSIGNMENT_DATA}
+									onView={handleViewAssignment}
+									onEdit={handleEditAssignment}
+								/>
 							</div>
 						)}
 
 						{activeTab === "contacts" && (
 							<div className="space-y-6">
 								{/* Address & Communication */}
-								<div className="bg-white rounded-2xl shadow-lg p-6">
-									<h4 className="text-lg font-semibold text-[#1D7A8C] mb-6  pl-3">
-										{t("profile.contacts.addressTitle")}
-									</h4>
+								<div className="bg-transparent rounded-2xl shadow-sm pb-6">
 									<div className="overflow-x-auto">
-										<table className="w-full text-sm">
-											<thead className="bg-gray-50">
-												<tr>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.contacts.table.email")}
-													</th>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.contacts.table.phone")}
-													</th>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.contacts.table.address")}
-													</th>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.contacts.table.addressType")}
-													</th>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.contacts.table.lastUpdate")}
-													</th>
-												</tr>
-											</thead>
-											<tbody className="divide-y divide-gray-100">
-												{CONTACTS_DATA.map(contact => {
-													const isLatest = contact.id === latestContactId;
-													const rowBorderClass = isLatest
-														? "border-l-4 border-r-4 border-[#187FC3] border-b-0"
-														: "";
-													const cellClass = isLatest
-														? "px-4 py-4 text-[#187FC3] cursor-pointer hover:underline"
-														: "px-4 py-4 text-gray-700";
-
-													return (
-														<tr
-															key={contact.id}
-															className={`hover:bg-gray-50 ${rowBorderClass}`}
+										<CustomTable
+											title={t("profile.contacts.addressTitle")}
+											className="shadow-none rounded-none"
+											hasLatestVersion={true}
+											isClosed={false}
+											columns={[
+												{
+													header: t("profile.contacts.table.email"),
+													accessor: "email", // Use "email" if available, dynamically fetched data doesn't seem to have email in the example?
+													render: value => <span>{value || "N/A"}</span>,
+												},
+												{
+													header: t("profile.contacts.table.phone"),
+													accessor: "phone", // Same for phone
+													render: value => <span>{value || "N/A"}</span>,
+												},
+												{
+													header: t("profile.contacts.table.address"),
+													accessor: "street", // Mapped from "street"
+													render: (_, row) => (
+														<span className="text-gray-700">
+															{row.street}
+															{row.city_name && `, ${row.city_name}`}
+															{row.country_name && `, ${row.country_name}`}
+														</span>
+													),
+												},
+												{
+													header: t("profile.contacts.table.addressType"),
+													accessor: "address_type_name",
+													render: value => <span>{value}</span>,
+												},
+												{
+													header: t("profile.contacts.table.lastUpdate"),
+													accessor: "updated_at",
+													render: value => (
+														<span className="text-gray-700">
+															{formatContactDate(value)}
+														</span>
+													),
+												},
+												{
+													header: t("profile.contacts.table.action"),
+													accessor: "action",
+													render: (_, row) => (
+														<button
+															onClick={() => handleEditAddress(row)}
+															className="text-gray-400 hover:text-gray-600 p-1"
 														>
-															<td className={cellClass}>{contact.email}</td>
-															<td className={cellClass}>{contact.phone}</td>
-															<td className={cellClass}>{contact.address}</td>
-															<td className={cellClass}>{contact.addressType}</td>
-															<td className={cellClass}>
-																{formatContactDate(contact.lastUpdate)}
-															</td>
-														</tr>
-													);
-												})}
-											</tbody>
-										</table>
+															<HiOutlinePencilAlt className="w-5 h-5" />
+														</button>
+													),
+												},
+											]}
+											data={addresses}
+											emptyMessage={loadingAddresses ? "Loading..." : "No addresses found"}
+										/>
+									</div>
+									<div className="flex justify-end pr-6 mt-4">
+										<Button
+											onClick={openAddAddressModal}
+											title={t("common.add")}
+											className="bg-white text-[#1D7A8C] border border-[#1D7A8C] hover:bg-gray-50 px-6"
+										/>
 									</div>
 								</div>
 
 								{/* Emergency / Family Contacts */}
-								<div className="bg-white rounded-2xl shadow-lg p-6">
-									<h4 className="text-lg font-semibold text-[#1D7A8C] mb-6  pl-3">
-										{t("profile.contacts.familyTitle")}
-									</h4>
-									<div className="overflow-x-auto">
-										<table className="w-full text-sm">
-											<thead className="bg-gray-50">
-												<tr>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.contacts.table.name")}
-													</th>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.contacts.table.phone")}
-													</th>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.contacts.table.relationship")}
-													</th>
-													<th className="text-left px-4 py-3 text-gray-600 font-semibold">
-														{t("profile.contacts.table.contactType")}
-													</th>
-												</tr>
-											</thead>
-											<tbody className="divide-y divide-gray-100">
-												<tr>
-													<td className="px-4 py-4 text-gray-700">Mona Ahmed</td>
-													<td className="px-4 py-4 text-gray-700">01055544321</td>
-													<td className="px-4 py-4 text-gray-700">Wife</td>
-													<td className="px-4 py-4 text-gray-700">Family</td>
-												</tr>
-												<tr>
-													<td className="px-4 py-4 text-gray-700">Ali Ahmed</td>
-													<td className="px-4 py-4 text-gray-700">01233322111</td>
-													<td className="px-4 py-4 text-gray-700">Brother</td>
-													<td className="px-4 py-4 text-gray-700">Emergency</td>
-												</tr>
-											</tbody>
-										</table>
+								<div className="bg-transparent rounded-2xl pb-6 shadow-lg">
+									<CustomTable
+										title={t("profile.contacts.familyTitle")}
+										className="shadow-none rounded-none"
+										hasLatestVersion={false}
+										isClosed={false}
+										columns={[
+											{
+												header: t("profile.contacts.table.name"),
+												accessor: "name",
+												render: value => <span className="text-gray-700">{value}</span>,
+											},
+											{
+												header: t("profile.contacts.table.phone"),
+												accessor: "phone",
+												render: value => <span className="text-gray-700">{value}</span>,
+											},
+											{
+												header: t("profile.contacts.table.relationship"),
+												accessor: "relationship",
+												render: value => <span className="text-gray-700">{value}</span>,
+											},
+											{
+												header: t("profile.contacts.table.contactType"),
+												accessor: "contactType",
+												render: value => <span className="text-gray-700">{value}</span>,
+											},
+											{
+												header: t("profile.contacts.table.action"),
+												accessor: "action",
+												render: (_, row) => (
+													<button
+														onClick={() => handleEditEmergency(row)}
+														className="text-gray-400 hover:text-gray-600 p-1"
+													>
+														<HiOutlinePencilAlt className="w-5 h-5" />
+													</button>
+												),
+											},
+										]}
+										data={[
+											{
+												id: 1,
+												name: "Mona Ahmed",
+												phone: "01055544321",
+												relationship: "Wife",
+												contactType: "Family",
+											},
+											{
+												id: 2,
+												name: "Ali Ahmed",
+												phone: "01233322111",
+												relationship: "Brother",
+												contactType: "Emergency",
+											},
+										]}
+									/>
+									<div className="flex justify-end pr-6 mt-4">
+										<Button
+											onClick={handleAddEmergency}
+											title={t("common.add")}
+											className="bg-white text-[#1D7A8C] border border-[#1D7A8C] hover:bg-gray-50 px-6"
+										/>
 									</div>
 								</div>
 							</div>
@@ -548,8 +895,9 @@ const ProfilePage = () => {
 						{activeTab === "qualifications" && (
 							<div className="space-y-4">
 								<div className="bg-white rounded-2xl shadow-lg p-6">
-									<Table
+									<CustomTable
 										className="shadow-none"
+										title={t("profile.qualifications.title")}
 										columns={[
 											{
 												header: t("profile.qualifications.table.type"),
@@ -637,6 +985,198 @@ const ProfilePage = () => {
 					</section>
 				</div>
 			</div>
+
+			{/* View Profile Modal */}
+			<SlideUpModal
+				isOpen={isViewProfileModalOpen}
+				onClose={() => setIsViewProfileModalOpen(false)}
+				title={t("common.view") + " Profile"}
+				maxWidth="760px"
+			>
+				<div className="py-6 space-y-6">
+					<div>
+						<h4 className="text-base font-semibold text-[#1D7A8C] mb-4">
+							{t("profile.general.personalInfoEn")}
+						</h4>
+						<div className="border-t border-gray-200 pt-4 space-y-3">
+							<div className="flex justify-between">
+								<span className="text-sm text-gray-500">{t("profile.general.fields.firstName")}</span>
+								<span className="text-sm font-medium text-gray-900">{profileForm.firstNameEn}</span>
+							</div>
+							<div className="flex justify-between">
+								<span className="text-sm text-gray-500">{t("profile.general.fields.middleName")}</span>
+								<span className="text-sm font-medium text-gray-900">{profileForm.middleNameEn}</span>
+							</div>
+							<div className="flex justify-between">
+								<span className="text-sm text-gray-500">{t("profile.general.fields.lastName")}</span>
+								<span className="text-sm font-medium text-gray-900">{profileForm.lastNameEn}</span>
+							</div>
+							<div className="flex justify-between">
+								<span className="text-sm text-gray-500">{t("profile.general.fields.gender")}</span>
+								<span className="text-sm font-medium text-[#1D7A8C] uppercase">{profileForm.gender}</span>
+							</div>
+							<div className="flex justify-between">
+								<span className="text-sm text-gray-500">{t("profile.general.fields.maritalStatus")}</span>
+								<span className="text-sm font-medium text-[#1D7A8C]">
+									{profileForm.maritalStatus.charAt(0).toUpperCase() + profileForm.maritalStatus.slice(1)}
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<div>
+						<h4 className="text-base font-semibold text-[#1D7A8C] mb-4">
+							{t("profile.general.personalInfoAr")}
+						</h4>
+						<div className="border-t border-gray-200 pt-4 space-y-3" dir="rtl">
+							<div className="flex justify-between">
+								<span className="text-sm text-gray-500">{t("profile.general.labels.firstNameAr")}</span>
+								<span className="text-sm font-medium text-gray-900">{profileForm.firstNameAr}</span>
+							</div>
+							<div className="flex justify-between">
+								<span className="text-sm text-gray-500">{t("profile.general.labels.middleNameAr")}</span>
+								<span className="text-sm font-medium text-gray-900">{profileForm.middleNameAr}</span>
+							</div>
+							<div className="flex justify-between">
+								<span className="text-sm text-gray-500">{t("profile.general.labels.lastNameAr")}</span>
+								<span className="text-sm font-medium text-gray-900">{profileForm.lastNameAr}</span>
+							</div>
+						</div>
+					</div>
+
+					<div>
+						<h4 className="text-base font-semibold text-[#1D7A8C] mb-4">
+							{t("profile.general.address")}
+						</h4>
+						<div className="border-t border-gray-200 pt-4 space-y-3">
+							<div className="flex justify-between">
+								<span className="text-sm text-gray-500">{t("profile.general.fields.address")}</span>
+								<span className="text-sm font-medium text-gray-900">{profileForm.address}</span>
+							</div>
+							<div className="flex justify-between">
+								<span className="text-sm text-gray-500">{t("profile.general.fields.addressType")}</span>
+								<span className="text-sm font-medium text-gray-900">{profileForm.addressType}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div className="flex justify-end pt-4 border-t border-gray-200 mt-4">
+					<Button
+						onClick={() => setIsViewProfileModalOpen(false)}
+						title={t("common.cancel")}
+						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none px-6"
+					/>
+				</div>
+			</SlideUpModal>
+
+			{/* Edit Profile Modal */}
+			<SlideUpModal
+				isOpen={isEditProfileModalOpen}
+				onClose={() => setIsEditProfileModalOpen(false)}
+				title="Edit Profile"
+				maxWidth="760px"
+			>
+				<div className="py-6 space-y-6">
+					<div>
+						<h4 className="text-sm font-bold text-gray-700 uppercase mb-4">
+							{t("profile.general.personalInfoEn").toUpperCase()}
+						</h4>
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<FloatingLabelInput
+								label={t("profile.general.fields.firstName")}
+								value={profileForm.firstNameEn}
+								onChange={e => setProfileForm(prev => ({ ...prev, firstNameEn: e.target.value }))}
+							/>
+							<FloatingLabelInput
+								label={t("profile.general.fields.middleName")}
+								value={profileForm.middleNameEn}
+								onChange={e => setProfileForm(prev => ({ ...prev, middleNameEn: e.target.value }))}
+							/>
+							<FloatingLabelInput
+								label={t("profile.general.fields.lastName")}
+								className="md:col-span-2"
+								value={profileForm.lastNameEn}
+								onChange={e => setProfileForm(prev => ({ ...prev, lastNameEn: e.target.value }))}
+							/>
+							<FloatingLabelSelect
+								label={t("profile.general.fields.gender")}
+								value={profileForm.gender}
+								onChange={e => setProfileForm(prev => ({ ...prev, gender: e.target.value }))}
+								options={[
+									{ value: "male", label: "Male" },
+									{ value: "female", label: "Female" },
+								]}
+							/>
+							<FloatingLabelSelect
+								label={t("profile.general.fields.maritalStatus")}
+								value={profileForm.maritalStatus}
+								onChange={e => setProfileForm(prev => ({ ...prev, maritalStatus: e.target.value }))}
+								options={[
+									{ value: "single", label: "Single" },
+									{ value: "married", label: "Married" },
+								]}
+							/>
+						</div>
+					</div>
+
+					<div>
+						<h4 className="text-sm font-bold text-gray-700 uppercase mb-4">
+							{t("profile.general.personalInfoAr").toUpperCase()}
+						</h4>
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-4" dir="rtl">
+							<FloatingLabelInput
+								label={t("profile.general.labels.firstNameAr")}
+								value={profileForm.firstNameAr}
+								onChange={e => setProfileForm(prev => ({ ...prev, firstNameAr: e.target.value }))}
+							/>
+							<FloatingLabelInput
+								label={t("profile.general.labels.middleNameAr")}
+								value={profileForm.middleNameAr}
+								onChange={e => setProfileForm(prev => ({ ...prev, middleNameAr: e.target.value }))}
+							/>
+							<FloatingLabelInput
+								label={t("profile.general.labels.lastNameAr")}
+								className="md:col-span-2"
+								value={profileForm.lastNameAr}
+								onChange={e => setProfileForm(prev => ({ ...prev, lastNameAr: e.target.value }))}
+							/>
+						</div>
+					</div>
+
+					<div>
+						<h4 className="text-sm font-bold text-gray-700 uppercase mb-4">
+							{t("profile.general.address").toUpperCase()}
+						</h4>
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<FloatingLabelInput
+								label={t("profile.general.fields.address")}
+								value={profileForm.address}
+								onChange={e => setProfileForm(prev => ({ ...prev, address: e.target.value }))}
+							/>
+							<FloatingLabelSelect
+								label={t("profile.general.fields.addressType")}
+								value={profileForm.addressType}
+								onChange={e => setProfileForm(prev => ({ ...prev, addressType: e.target.value }))}
+								options={[
+									{ value: "Home", label: "Home" },
+									{ value: "Office", label: "Office" },
+								]}
+							/>
+						</div>
+					</div>
+				</div>
+				<div className="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-4">
+					<Button
+						onClick={() => setIsEditProfileModalOpen(false)}
+						title={t("common.cancel")}
+						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none px-6"
+					/>
+					<Button
+						onClick={() => setIsEditProfileModalOpen(false)}
+						title={t("common.edit")}
+					/>
+				</div>
+			</SlideUpModal>
 
 			{/* View Assignment Modal */}
 			<SlideUpModal
@@ -818,7 +1358,7 @@ const ProfilePage = () => {
 							label={t("profile.qualifications.table.year")}
 							name="year"
 							value={selectedQualification?.year || ""}
-							onChange={() => {}}
+							onChange={() => { }}
 							disabled
 						/>
 						<FloatingLabelInput
@@ -1001,11 +1541,10 @@ const ProfilePage = () => {
 															);
 														}
 													}}
-													className={`w-6 h-6 flex items-center justify-center rounded-md border transition-colors ${
-														comp.selected
-															? "border-[#1D7A8C] bg-white text-[#1D7A8C]"
-															: "border-gray-300 bg-white text-gray-300 cursor-not-allowed"
-													}`}
+													className={`w-6 h-6 flex items-center justify-center rounded-md border transition-colors ${comp.selected
+														? "border-[#1D7A8C] bg-white text-[#1D7A8C]"
+														: "border-gray-300 bg-white text-gray-300 cursor-not-allowed"
+														}`}
 													disabled={!comp.selected}
 												>
 													<HiOutlineChevronDown className="w-3.5 h-3.5" />
@@ -1019,10 +1558,10 @@ const ProfilePage = () => {
 															prev.map(c =>
 																c.id === comp.id
 																	? {
-																			...c,
-																			selected: newSelected,
-																			level: newSelected ? c.level || "" : "",
-																	  }
+																		...c,
+																		selected: newSelected,
+																		level: newSelected ? c.level || "" : "",
+																	}
 																	: c
 															)
 														);
@@ -1030,11 +1569,10 @@ const ProfilePage = () => {
 															setActiveLevelDropdown(null);
 														}
 													}}
-													className={`w-6 h-6 flex items-center justify-center rounded-md border transition-colors ${
-														comp.selected
-															? "border-[#1D7A8C] bg-[#1D7A8C] text-white"
-															: "border-[#1D7A8C] bg-white text-[#1D7A8C]"
-													}`}
+													className={`w-6 h-6 flex items-center justify-center rounded-md border transition-colors ${comp.selected
+														? "border-[#1D7A8C] bg-[#1D7A8C] text-white"
+														: "border-[#1D7A8C] bg-white text-[#1D7A8C]"
+														}`}
 												>
 													<HiOutlineCheck className="w-4 h-4" />
 												</button>
@@ -1058,19 +1596,18 @@ const ProfilePage = () => {
 																			);
 																			setActiveLevelDropdown(null);
 																		}}
-																		className={`w-full text-center px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-																			isSelected
-																				? levelLower === "beginner"
-																					? "bg-orange-100 text-orange-600"
-																					: levelLower === "intermediate"
+																		className={`w-full text-center px-4 py-2 rounded-full text-sm font-medium transition-colors ${isSelected
+																			? levelLower === "beginner"
+																				? "bg-orange-100 text-orange-600"
+																				: levelLower === "intermediate"
 																					? "bg-blue-100 text-blue-600"
 																					: "bg-green-100 text-green-700"
-																				: levelLower === "beginner"
+																			: levelLower === "beginner"
 																				? "bg-orange-100 text-orange-600 hover:bg-orange-200"
 																				: levelLower === "intermediate"
-																				? "bg-blue-100 text-blue-600 hover:bg-blue-200"
-																				: "bg-green-100 text-green-700 hover:bg-green-200"
-																		}`}
+																					? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+																					: "bg-green-100 text-green-700 hover:bg-green-200"
+																			}`}
 																	>
 																		{level}
 																	</button>
@@ -1115,6 +1652,242 @@ const ProfilePage = () => {
 				<div className="flex items-center justify-end gap-3 py-4">
 					<Button onClick={() => setIsQualificationModalOpen(false)} title={t("common.cancel")} />
 					<Button onClick={handleQualificationSubmit} title={t("common.add")} className="shadow-none" />
+				</div>
+			</SlideUpModal>
+
+			{/* Add Address Modal */}
+			<SlideUpModal
+				isOpen={isAddAddressModalOpen}
+				onClose={() => setIsAddAddressModalOpen(false)}
+				title={t("profile.contacts.modals.addAddress")}
+				maxWidth="760px"
+			>
+				<div className="py-6 space-y-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<FloatingLabelInput
+							label={t("profile.contacts.table.email")}
+							name="email"
+							value={addressForm.email}
+							onChange={e => setAddressForm(prev => ({ ...prev, email: e.target.value }))}
+						/>
+						<FloatingLabelInput
+							label={t("profile.contacts.table.phone")}
+							name="phone"
+							value={addressForm.phone}
+							onChange={e => setAddressForm(prev => ({ ...prev, phone: e.target.value }))}
+						/>
+						<FloatingLabelSelect
+							label={t("profile.contacts.table.addressType")}
+							name="addressType"
+							value={addressForm.addressType}
+							onChange={e => setAddressForm(prev => ({ ...prev, addressType: e.target.value }))}
+							options={addressTypeOptions}
+						/>
+						<FloatingLabelSelect
+							label={t("profile.contacts.table.country")}
+							name="country"
+							value={addressForm.countryId}
+							onChange={e => handleCountryChange(e.target.value)}
+							options={countriesTypeOptions}
+						/>
+						<FloatingLabelSelect
+							label={t("profile.contacts.table.city")}
+							name="city"
+							value={addressForm.cityId}
+							onChange={e => setAddressForm(prev => ({ ...prev, cityId: e.target.value }))}
+							options={citiesTypeOptions}
+						/>
+						<FloatingLabelInput
+							label={t("profile.contacts.table.address")}
+							name="address"
+							value={addressForm.address}
+							onChange={e => setAddressForm(prev => ({ ...prev, address: e.target.value }))}
+						/>
+					</div>
+				</div>
+				<div className="flex justify-end pt-4 border-t border-gray-200 mt-2 gap-3">
+					<Button
+						onClick={() => setIsAddAddressModalOpen(false)}
+						title={t("common.cancel")}
+						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none px-6"
+					/>
+					<Button
+						onClick={handleAddAddressSubmit}
+						title={t("common.add")}
+						className="shadow-none px-8"
+					/>
+				</div>
+			</SlideUpModal>
+
+			{/* Edit Address Modal */}
+			<SlideUpModal
+				isOpen={isEditAddressModalOpen}
+				onClose={() => setIsEditAddressModalOpen(false)}
+				title={t("profile.contacts.modals.editAddress")}
+				maxWidth="760px"
+			>
+				<div className="py-6 space-y-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<FloatingLabelInput
+							label={t("profile.contacts.table.email")}
+							name="email"
+							value={addressForm.email}
+							onChange={e => setAddressForm(prev => ({ ...prev, email: e.target.value }))}
+						/>
+						<FloatingLabelInput
+							label={t("profile.contacts.table.phone")}
+							name="phone"
+							value={addressForm.phone}
+							onChange={e => setAddressForm(prev => ({ ...prev, phone: e.target.value }))}
+						/>
+						<FloatingLabelSelect
+							label={t("profile.contacts.table.addressType")}
+							name="addressType"
+							value={addressForm.addressType}
+							onChange={e => setAddressForm(prev => ({ ...prev, addressType: e.target.value }))}
+							options={localLookups.addressTypes.map(t => ({ value: t.id, label: t.nameEn }))}
+						/>
+						<FloatingLabelSelect
+							label={t("profile.contacts.table.country")}
+							name="country"
+							value={addressForm.countryId}
+							onChange={e => handleCountryChange(e.target.value)}
+							options={localLookups.countries.map(c => ({ value: c.id, label: c.nameEn }))}
+						/>
+						<FloatingLabelSelect
+							label={t("profile.contacts.table.city")}
+							name="city"
+							value={addressForm.cityId}
+							onChange={e => setAddressForm(prev => ({ ...prev, cityId: e.target.value }))}
+							options={localLookups.cities.map(c => ({ value: c.id, label: c.nameEn }))}
+						/>
+						<FloatingLabelInput
+							label={t("profile.contacts.table.address")}
+							name="address"
+							value={addressForm.address}
+							onChange={e => setAddressForm(prev => ({ ...prev, address: e.target.value }))}
+						/>
+					</div>
+				</div>
+				<div className="flex justify-end pt-4 border-t border-gray-200 mt-2 gap-3">
+					<Button
+						onClick={() => setIsEditAddressModalOpen(false)}
+						title={t("common.cancel")}
+						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none px-6"
+					/>
+					<Button
+						onClick={handleEditAddressSubmit}
+						title={t("common.edit")}
+						className="shadow-none px-8"
+					/>
+				</div>
+			</SlideUpModal>
+
+			{/* Add Emergency Modal */}
+			<SlideUpModal
+				isOpen={isAddEmergencyModalOpen}
+				onClose={() => setIsAddEmergencyModalOpen(false)}
+				title={t("profile.contacts.modals.addEmergency")}
+				maxWidth="760px"
+			>
+				<div className="py-6 space-y-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<FloatingLabelInput
+							label={t("profile.contacts.table.name")}
+							value={emergencyForm.name}
+							onChange={e => setEmergencyForm(prev => ({ ...prev, name: e.target.value }))}
+						/>
+						<FloatingLabelInput
+							label={t("profile.contacts.table.phone")}
+							value={emergencyForm.phone}
+							onChange={e => setEmergencyForm(prev => ({ ...prev, phone: e.target.value }))}
+						/>
+						<FloatingLabelSelect
+							label={t("profile.contacts.table.relationship")}
+							value={emergencyForm.relationship}
+							onChange={e => setEmergencyForm(prev => ({ ...prev, relationship: e.target.value }))}
+							options={[
+								{ value: "Wife", label: "Wife" },
+								{ value: "Brother", label: "Brother" },
+								{ value: "Father", label: "Father" },
+							]}
+						/>
+						<FloatingLabelSelect
+							label={t("profile.contacts.table.contactType")}
+							value={emergencyForm.contactType}
+							onChange={e => setEmergencyForm(prev => ({ ...prev, contactType: e.target.value }))}
+							options={[
+								{ value: "Family", label: "Family" },
+								{ value: "Emergency", label: "Emergency" },
+							]}
+						/>
+					</div>
+				</div>
+				<div className="flex justify-end pt-4 border-t border-gray-200 mt-2 gap-3">
+					<Button
+						onClick={() => setIsAddEmergencyModalOpen(false)}
+						title={t("common.cancel")}
+						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none px-6"
+					/>
+					<Button
+						onClick={() => setIsAddEmergencyModalOpen(false)}
+						title={t("common.add")}
+						className="shadow-none px-8"
+					/>
+				</div>
+			</SlideUpModal>
+
+			{/* Edit Emergency Modal */}
+			<SlideUpModal
+				isOpen={isEditEmergencyModalOpen}
+				onClose={() => setIsEditEmergencyModalOpen(false)}
+				title={t("profile.contacts.modals.editEmergency")}
+				maxWidth="760px"
+			>
+				<div className="py-6 space-y-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<FloatingLabelInput
+							label={t("profile.contacts.table.name")}
+							value={emergencyForm.name}
+							onChange={e => setEmergencyForm(prev => ({ ...prev, name: e.target.value }))}
+						/>
+						<FloatingLabelInput
+							label={t("profile.contacts.table.phone")}
+							value={emergencyForm.phone}
+							onChange={e => setEmergencyForm(prev => ({ ...prev, phone: e.target.value }))}
+						/>
+						<FloatingLabelSelect
+							label={t("profile.contacts.table.relationship")}
+							value={emergencyForm.relationship}
+							onChange={e => setEmergencyForm(prev => ({ ...prev, relationship: e.target.value }))}
+							options={[
+								{ value: "Wife", label: "Wife" },
+								{ value: "Brother", label: "Brother" },
+								{ value: "Father", label: "Father" },
+							]}
+						/>
+						<FloatingLabelSelect
+							label={t("profile.contacts.table.contactType")}
+							value={emergencyForm.contactType}
+							onChange={e => setEmergencyForm(prev => ({ ...prev, contactType: e.target.value }))}
+							options={[
+								{ value: "Family", label: "Family" },
+								{ value: "Emergency", label: "Emergency" },
+							]}
+						/>
+					</div>
+				</div>
+				<div className="flex justify-end pt-4 border-t border-gray-200 mt-2 gap-3">
+					<Button
+						onClick={() => setIsEditEmergencyModalOpen(false)}
+						title={t("common.cancel")}
+						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none px-6"
+					/>
+					<Button
+						onClick={() => setIsEditEmergencyModalOpen(false)}
+						title={t("common.edit")}
+						className="shadow-none px-8"
+					/>
 				</div>
 			</SlideUpModal>
 		</div>

@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 import { usePageTitle } from "../hooks/usePageTitle";
-import { HiTrendingUp, HiArrowLeft, HiPlus, HiClock } from "react-icons/hi";
+import { HiTrendingUp, HiPlus, HiSearch } from "react-icons/hi";
 
 import { parseApiError } from "../utils/errorHandler";
 
@@ -13,104 +13,109 @@ import Table from "../components/shared/Table";
 import Pagination from "../components/shared/Pagination";
 import ConfirmModal from "../components/shared/ConfirmModal";
 import SlideUpModal from "../components/shared/SlideUpModal";
-import HistoryModal from "../components/shared/HistoryModal";
-import FloatingLabelInput from "../components/shared/FloatingLabelInput";
-import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
+import CustomInput from "../components/shared/CustomInput";
+import CustomDropdown from "../components/shared/CustomDropdown";
 import Button from "../components/shared/Button";
+import Tabs from "../components/shared/Tabs";
 
 import {
 	fetchGrades,
-	fetchGradeById,
 	createGrade,
 	updateGrade,
 	deleteGrade,
-	createGradeRate,
-	updateGradeRate,
-	deleteGradeRate,
-	fetchGradeHistory,
+	fetchGradeRates,
+	fetchGradeNames,
+	fetchGradeRateTypes,
 	setPage as setGradePage,
-	setSelectedGrade,
-	clearSelectedGrade,
+	setRatesPage,
 } from "../store/gradesSlice";
-import { fetchBusinessGroups } from "../store/businessGroupsSlice";
-import { fetchCurrencies } from "../store/currenciesSlice";
+import { fetchOrganizations } from "../store/organizationsSlice";
 
 const GRADE_FORM_INITIAL = {
-	name: "",
 	code: "",
-	business_group: "",
-	effective_start_date: "",
-	effective_end_date: "",
+	grade_name_id: "",
+	organization_id: "",
+	sequence: "",
 };
 
-const RATE_FORM_INITIAL = {
+const INITIAL_FILTERS = {
+	search: "",
+	organization: "",
+};
+
+const INITIAL_RATES_FILTERS = {
+	grade: "",
 	rate_type: "",
-	rate_type_code: "",
-	currency: "",
-	min_amount: "",
-	max_amount: "",
-	fixed_amount: "",
-	effective_start_date: "",
-	effective_end_date: "",
 };
 
 const GradesAndRatesPage = () => {
-	const { t, i18n } = useTranslation();
-	usePageTitle(t("gradesAndRates"));
-	const isRtl = i18n.dir() === "rtl";
+	const { t } = useTranslation();
+	usePageTitle(t("gradesAndRates.title"));
 	const dispatch = useDispatch();
+
+	// Tab state
+	const [activeTab, setActiveTab] = useState("grades");
 
 	// Redux state
 	const {
 		grades,
-		selectedGrade,
 		gradeRates,
+		gradeNames,
+		gradeRateTypes,
 		loading: gradeLoading,
 		ratesLoading,
 		count: gradeCount,
 		page: gradePage,
 		hasNext: gradeHasNext,
 		hasPrevious: gradeHasPrevious,
+		ratesCount,
+		ratesPage,
+		ratesHasNext,
+		ratesHasPrevious,
 		creating: gradeCreating,
 		updating: gradeUpdating,
-		rateCreating,
-		rateUpdating,
 	} = useSelector(state => state.grades);
 
-	const { businessGroups } = useSelector(state => state.businessGroups);
-	const { currencies } = useSelector(state => state.currencies);
+	const { organizations } = useSelector(state => state.organizations);
 
 	// Local state
 	const [isGradeModalOpen, setIsGradeModalOpen] = useState(false);
-	const [isRateModalOpen, setIsRateModalOpen] = useState(false);
 	const [editingGrade, setEditingGrade] = useState(null);
-	const [editingRate, setEditingRate] = useState(null);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [itemToDelete, setItemToDelete] = useState(null);
-	const [deleteType, setDeleteType] = useState("grade"); // "grade" or "rate"
 	const [gradeFormData, setGradeFormData] = useState(GRADE_FORM_INITIAL);
-	const [rateFormData, setRateFormData] = useState(RATE_FORM_INITIAL);
 	const [formErrors, setFormErrors] = useState({});
 	const [localPageSize, setLocalPageSize] = useState(25);
-	const [isRangeBasedRate, setIsRangeBasedRate] = useState(false);
-	const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-	const [historyData, setHistoryData] = useState([]);
-	const [historyLoading, setHistoryLoading] = useState(false);
-	const [historyItem, setHistoryItem] = useState(null);
+	const [localRatesPageSize, setLocalRatesPageSize] = useState(25);
+	const [filters, setFilters] = useState(INITIAL_FILTERS);
+	const [ratesFilters, setRatesFilters] = useState(INITIAL_RATES_FILTERS);
 
 	// Fetch initial data
 	useEffect(() => {
-		dispatch(fetchBusinessGroups());
-		dispatch(fetchCurrencies());
-		dispatch(fetchGrades({ page: gradePage, page_size: localPageSize }));
-	}, [dispatch, gradePage, localPageSize]);
+		dispatch(fetchOrganizations({ is_business_group: true }));
+		dispatch(fetchGradeNames());
+		dispatch(fetchGradeRateTypes());
+	}, [dispatch]);
 
+	// Fetch grades when page or filters change
 	useEffect(() => {
-		document.title = `${t("gradesAndRates.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
+		if (activeTab === "grades") {
+			const params = { page: gradePage, page_size: localPageSize };
+			if (filters.search) params.search = filters.search;
+			if (filters.organization) params.organization = filters.organization;
+			dispatch(fetchGrades(params));
+		}
+	}, [dispatch, activeTab, gradePage, localPageSize, filters]);
+
+	// Fetch grade rates when on rates tab
+	useEffect(() => {
+		if (activeTab === "gradeRates") {
+			const params = { page: ratesPage, page_size: localRatesPageSize };
+			if (ratesFilters.grade) params.grade = ratesFilters.grade;
+			if (ratesFilters.rate_type) params.rate_type = ratesFilters.rate_type;
+			dispatch(fetchGradeRates(params));
+		}
+	}, [dispatch, activeTab, ratesPage, localRatesPageSize, ratesFilters]);
 
 	const handlePageChange = useCallback(
 		newPage => {
@@ -126,6 +131,41 @@ const GradesAndRatesPage = () => {
 		},
 		[dispatch]
 	);
+
+	const handleRatesPageChange = useCallback(
+		newPage => {
+			dispatch(setRatesPage(newPage));
+		},
+		[dispatch]
+	);
+
+	const handleRatesPageSizeChange = useCallback(
+		newPageSize => {
+			setLocalRatesPageSize(newPageSize);
+			dispatch(setRatesPage(1));
+		},
+		[dispatch]
+	);
+
+	const handleFilterChange = e => {
+		const { name, value } = e.target;
+		setFilters(prev => ({ ...prev, [name]: value }));
+		dispatch(setGradePage(1));
+	};
+
+	const handleRatesFilterChange = e => {
+		const { name, value } = e.target;
+		setRatesFilters(prev => ({ ...prev, [name]: value }));
+		dispatch(setRatesPage(1));
+	};
+
+	const handleSearch = () => {
+		dispatch(setGradePage(1));
+	};
+
+	const handleRatesSearch = () => {
+		dispatch(setRatesPage(1));
+	};
 
 	const formatDate = dateString => {
 		if (!dateString) return "-";
@@ -146,37 +186,42 @@ const GradesAndRatesPage = () => {
 		</span>
 	);
 
+	const renderBoolean = value => (
+		<span
+			className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+				value ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+			}`}
+		>
+			{value ? t("common.yes") : t("common.no")}
+		</span>
+	);
+
 	// Grades columns
 	const gradeColumns = [
-		{
-			header: t("gradesAndRates.grades.table.name"),
-			accessor: "name",
-			render: value => value || "-",
-		},
 		{
 			header: t("gradesAndRates.grades.table.code"),
 			accessor: "code",
 			render: value => value || "-",
 		},
 		{
-			header: t("gradesAndRates.grades.table.businessGroup"),
-			accessor: "business_group_name",
+			header: t("gradesAndRates.grades.table.gradeName"),
+			accessor: "grade_name_display",
 			render: value => value || "-",
 		},
 		{
-			header: t("gradesAndRates.grades.table.startDate"),
-			accessor: "effective_start_date",
-			render: value => formatDate(value),
+			header: t("gradesAndRates.grades.table.organizationCode"),
+			accessor: "organization_code",
+			render: value => value || "-",
 		},
 		{
-			header: t("gradesAndRates.grades.table.endDate"),
-			accessor: "effective_end_date",
-			render: value => formatDate(value),
+			header: t("gradesAndRates.grades.table.organization"),
+			accessor: "organization_name",
+			render: value => value || "-",
 		},
 		{
-			header: t("gradesAndRates.grades.table.ratesCount"),
-			accessor: "rates",
-			render: value => (Array.isArray(value) ? value.length : 0),
+			header: t("gradesAndRates.grades.table.sequence"),
+			accessor: "sequence",
+			render: value => value || "-",
 		},
 		{
 			header: t("gradesAndRates.grades.table.status"),
@@ -185,8 +230,13 @@ const GradesAndRatesPage = () => {
 		},
 	];
 
-	// Rate columns
-	const rateColumns = [
+	// Grade Rates columns (read-only table)
+	const gradeRatesColumns = [
+		{
+			header: t("gradesAndRates.gradeRates.table.gradeCode"),
+			accessor: "grade_code",
+			render: value => value || "-",
+		},
 		{
 			header: t("gradesAndRates.gradeRates.table.rateType"),
 			accessor: "rate_type_name",
@@ -198,21 +248,29 @@ const GradesAndRatesPage = () => {
 			render: value => value || "-",
 		},
 		{
+			header: t("gradesAndRates.gradeRates.table.hasRange"),
+			accessor: "has_range",
+			render: renderBoolean,
+		},
+		{
+			header: t("gradesAndRates.gradeRates.table.minAmount"),
+			accessor: "min_amount",
+			render: value => (value ? parseFloat(value).toLocaleString() : "-"),
+		},
+		{
+			header: t("gradesAndRates.gradeRates.table.maxAmount"),
+			accessor: "max_amount",
+			render: value => (value ? parseFloat(value).toLocaleString() : "-"),
+		},
+		{
+			header: t("gradesAndRates.gradeRates.table.fixedAmount"),
+			accessor: "fixed_amount",
+			render: value => (value ? parseFloat(value).toLocaleString() : "-"),
+		},
+		{
 			header: t("gradesAndRates.gradeRates.table.currency"),
 			accessor: "currency",
 			render: value => value || "-",
-		},
-		{
-			header: t("gradesAndRates.gradeRates.table.amount"),
-			accessor: "fixed_amount",
-			render: (value, row) => {
-				if (row.rate_type_has_range) {
-					return `${parseFloat(row.min_amount || 0).toLocaleString()} - ${parseFloat(
-						row.max_amount || 0
-					).toLocaleString()}`;
-				}
-				return value ? parseFloat(value).toLocaleString() : "-";
-			},
 		},
 		{
 			header: t("gradesAndRates.gradeRates.table.startDate"),
@@ -224,28 +282,89 @@ const GradesAndRatesPage = () => {
 			accessor: "effective_end_date",
 			render: value => formatDate(value),
 		},
+	];
+
+	// Grade Rate Types columns (read-only table)
+	const gradeRateTypesColumns = [
 		{
-			header: t("gradesAndRates.gradeRates.table.status"),
-			accessor: "status",
-			render: renderStatus,
+			header: t("gradesAndRates.gradeRateTypes.table.code"),
+			accessor: "code",
+			render: value => value || "-",
+		},
+		{
+			header: t("gradesAndRates.gradeRateTypes.table.name"),
+			accessor: "name",
+			render: value => value || "-",
+		},
+		{
+			header: t("gradesAndRates.gradeRateTypes.table.hasRange"),
+			accessor: "has_range",
+			render: renderBoolean,
+		},
+		{
+			header: t("gradesAndRates.gradeRateTypes.table.description"),
+			accessor: "description",
+			render: value => value || "-",
 		},
 	];
 
-	const businessGroupOptions = [
-		{ value: "", label: t("gradesAndRates.grades.form.selectBusinessGroup") },
-		...businessGroups.map(bg => ({
-			value: bg.id,
-			label: bg.name,
-		})),
-	];
+	// Business groups for filtering (organizations with is_business_group=true)
+	const businessGroups = organizations.filter(org => org.is_business_group);
 
-	const currencyOptions = [
-		{ value: "", label: t("gradesAndRates.gradeRates.form.selectCurrency") },
-		...currencies.map(currency => ({
-			value: currency.code,
-			label: `${currency.code} - ${currency.name}`,
-		})),
-	];
+	const filterOrganizationOptions = useMemo(
+		() => [
+			{ value: "", label: t("gradesAndRates.filters.allOrganizations") },
+			...businessGroups.map(org => ({
+				value: org.id,
+				label: org.name_display || org.name || org.code,
+			})),
+		],
+		[businessGroups, t]
+	);
+
+	const organizationOptions = useMemo(
+		() => [
+			{ value: "", label: t("gradesAndRates.grades.form.selectOrganization") },
+			...businessGroups.map(org => ({
+				value: org.id,
+				label: org.name_display || org.name || org.code,
+			})),
+		],
+		[businessGroups, t]
+	);
+
+	const gradeNameOptions = useMemo(
+		() => [
+			{ value: "", label: t("gradesAndRates.grades.form.selectGradeName") },
+			...gradeNames.map(gn => ({
+				value: gn.id,
+				label: gn.name,
+			})),
+		],
+		[gradeNames, t]
+	);
+
+	const filterGradeOptions = useMemo(
+		() => [
+			{ value: "", label: t("gradesAndRates.filters.allGrades") },
+			...grades.map(g => ({
+				value: g.id,
+				label: `${g.grade_name_display} (${g.code})`,
+			})),
+		],
+		[grades, t]
+	);
+
+	const filterRateTypeOptions = useMemo(
+		() => [
+			{ value: "", label: t("gradesAndRates.filters.allRateTypes") },
+			...gradeRateTypes.map(rt => ({
+				value: rt.id,
+				label: rt.name,
+			})),
+		],
+		[gradeRateTypes, t]
+	);
 
 	// Grade modal handlers
 	const handleCreateGrade = () => {
@@ -258,62 +377,19 @@ const GradesAndRatesPage = () => {
 	const handleEditGrade = item => {
 		setEditingGrade(item);
 		setGradeFormData({
-			name: item.name || "",
 			code: item.code || "",
-			business_group: item.business_group || "",
-			effective_start_date: item.effective_start_date || "",
-			effective_end_date: item.effective_end_date || "",
+			grade_name_id: item.grade_name || "",
+			organization_id: item.organization || "",
+			sequence: item.sequence || "",
 		});
 		setFormErrors({});
 		setIsGradeModalOpen(true);
-	};
-
-	const handleViewGradeRates = item => {
-		dispatch(setSelectedGrade(item));
-	};
-
-	const handleBackToGrades = () => {
-		dispatch(clearSelectedGrade());
 	};
 
 	const handleCloseGradeModal = () => {
 		setIsGradeModalOpen(false);
 		setEditingGrade(null);
 		setGradeFormData(GRADE_FORM_INITIAL);
-		setFormErrors({});
-	};
-
-	// Rate modal handlers
-	const handleCreateRate = () => {
-		setEditingRate(null);
-		setRateFormData(RATE_FORM_INITIAL);
-		setIsRangeBasedRate(false);
-		setFormErrors({});
-		setIsRateModalOpen(true);
-	};
-
-	const handleEditRate = item => {
-		setEditingRate(item);
-		setIsRangeBasedRate(item.rate_type_has_range);
-		setRateFormData({
-			rate_type: item.rate_type || "",
-			rate_type_code: item.rate_type_code || "",
-			currency: item.currency || "",
-			min_amount: item.min_amount || "",
-			max_amount: item.max_amount || "",
-			fixed_amount: item.fixed_amount || "",
-			effective_start_date: item.effective_start_date || "",
-			effective_end_date: item.effective_end_date || "",
-		});
-		setFormErrors({});
-		setIsRateModalOpen(true);
-	};
-
-	const handleCloseRateModal = () => {
-		setIsRateModalOpen(false);
-		setEditingRate(null);
-		setRateFormData(RATE_FORM_INITIAL);
-		setIsRangeBasedRate(false);
 		setFormErrors({});
 	};
 
@@ -325,45 +401,16 @@ const GradesAndRatesPage = () => {
 		}
 	};
 
-	const handleRateInputChange = e => {
-		const { name, value } = e.target;
-		setRateFormData(prev => ({ ...prev, [name]: value }));
-		if (formErrors[name]) {
-			setFormErrors(prev => ({ ...prev, [name]: "" }));
-		}
-	};
-
 	const validateGradeForm = () => {
 		const errors = {};
-		if (!gradeFormData.name.trim()) {
-			errors.name = t("gradesAndRates.grades.form.nameRequired");
+		if (!gradeFormData.grade_name_id) {
+			errors.grade_name_id = t("gradesAndRates.grades.form.gradeNameRequired");
 		}
-		if (!editingGrade && !gradeFormData.business_group) {
-			errors.business_group = t("gradesAndRates.grades.form.businessGroupRequired");
+		if (!editingGrade && !gradeFormData.organization_id) {
+			errors.organization_id = t("gradesAndRates.grades.form.organizationRequired");
 		}
-		setFormErrors(errors);
-		return Object.keys(errors).length === 0;
-	};
-
-	const validateRateForm = () => {
-		const errors = {};
-		if (!rateFormData.rate_type_code.trim()) {
-			errors.rate_type_code = t("gradesAndRates.gradeRates.form.rateTypeRequired");
-		}
-		if (!rateFormData.currency) {
-			errors.currency = t("gradesAndRates.gradeRates.form.currencyRequired");
-		}
-		if (isRangeBasedRate) {
-			if (!rateFormData.min_amount) {
-				errors.min_amount = t("gradesAndRates.gradeRates.form.minAmountRequired");
-			}
-			if (!rateFormData.max_amount) {
-				errors.max_amount = t("gradesAndRates.gradeRates.form.maxAmountRequired");
-			}
-		} else {
-			if (!rateFormData.fixed_amount) {
-				errors.fixed_amount = t("gradesAndRates.gradeRates.form.fixedAmountRequired");
-			}
+		if (!gradeFormData.sequence || parseInt(gradeFormData.sequence) < 1) {
+			errors.sequence = t("gradesAndRates.grades.form.sequenceRequired");
 		}
 		setFormErrors(errors);
 		return Object.keys(errors).length === 0;
@@ -375,70 +422,29 @@ const GradesAndRatesPage = () => {
 
 		try {
 			const payload = {
-				name: gradeFormData.name,
-				effective_start_date: gradeFormData.effective_start_date || undefined,
-				effective_end_date: gradeFormData.effective_end_date || undefined,
+				grade_name_id: parseInt(gradeFormData.grade_name_id),
+				sequence: parseInt(gradeFormData.sequence),
 			};
 
+			// Include code only if provided (backend auto-generates if omitted)
+			if (gradeFormData.code && gradeFormData.code.trim()) {
+				payload.code = gradeFormData.code.trim();
+			}
+
 			if (editingGrade) {
-				// code and business_group are read-only on update
+				// organization_id is read-only on update
 				await dispatch(updateGrade({ id: editingGrade.id, data: payload })).unwrap();
 				toast.success(t("gradesAndRates.grades.messages.updated"));
 			} else {
-				payload.business_group = gradeFormData.business_group;
-				if (gradeFormData.code) {
-					payload.code = gradeFormData.code;
-				}
+				payload.organization_id = parseInt(gradeFormData.organization_id);
 				await dispatch(createGrade(payload)).unwrap();
 				toast.success(t("gradesAndRates.grades.messages.created"));
 			}
-			dispatch(fetchGrades({ page: gradePage, page_size: localPageSize }));
+			const params = { page: gradePage, page_size: localPageSize };
+			if (filters.search) params.search = filters.search;
+			if (filters.organization) params.organization = filters.organization;
+			dispatch(fetchGrades(params));
 			handleCloseGradeModal();
-		} catch (error) {
-			toast.error(parseApiError(error, t, "gradesAndRates.messages.saveError"));
-		}
-	};
-
-	const handleRateSubmit = async e => {
-		e.preventDefault();
-		if (!validateRateForm()) return;
-
-		try {
-			const payload = {
-				rate_type_code: rateFormData.rate_type_code,
-				currency: rateFormData.currency,
-				effective_start_date: rateFormData.effective_start_date || undefined,
-				effective_end_date: rateFormData.effective_end_date || undefined,
-			};
-
-			if (isRangeBasedRate) {
-				payload.min_amount = rateFormData.min_amount;
-				payload.max_amount = rateFormData.max_amount;
-			} else {
-				payload.fixed_amount = rateFormData.fixed_amount;
-			}
-
-			if (editingRate) {
-				await dispatch(
-					updateGradeRate({
-						gradeId: selectedGrade.id,
-						rateId: editingRate.id,
-						data: payload,
-					})
-				).unwrap();
-				toast.success(t("gradesAndRates.gradeRates.messages.updated"));
-			} else {
-				await dispatch(
-					createGradeRate({
-						gradeId: selectedGrade.id,
-						data: payload,
-					})
-				).unwrap();
-				toast.success(t("gradesAndRates.gradeRates.messages.created"));
-			}
-			// Refresh the grade to get updated rates
-			dispatch(fetchGradeById(selectedGrade.id));
-			handleCloseRateModal();
 		} catch (error) {
 			toast.error(parseApiError(error, t, "gradesAndRates.messages.saveError"));
 		}
@@ -446,33 +452,18 @@ const GradesAndRatesPage = () => {
 
 	const handleDeleteGradeClick = item => {
 		setItemToDelete(item);
-		setDeleteType("grade");
-		setIsDeleteModalOpen(true);
-	};
-
-	const handleDeleteRateClick = item => {
-		setItemToDelete(item);
-		setDeleteType("rate");
 		setIsDeleteModalOpen(true);
 	};
 
 	const handleConfirmDelete = async () => {
 		if (!itemToDelete) return;
 		try {
-			if (deleteType === "grade") {
-				await dispatch(deleteGrade(itemToDelete.id)).unwrap();
-				toast.success(t("gradesAndRates.grades.messages.deleted"));
-				dispatch(fetchGrades({ page: gradePage, page_size: localPageSize }));
-			} else {
-				await dispatch(
-					deleteGradeRate({
-						gradeId: selectedGrade.id,
-						rateId: itemToDelete.id,
-					})
-				).unwrap();
-				toast.success(t("gradesAndRates.gradeRates.messages.deleted"));
-				dispatch(fetchGradeById(selectedGrade.id));
-			}
+			await dispatch(deleteGrade(itemToDelete.id)).unwrap();
+			toast.success(t("gradesAndRates.grades.messages.deleted"));
+			const params = { page: gradePage, page_size: localPageSize };
+			if (filters.search) params.search = filters.search;
+			if (filters.organization) params.organization = filters.organization;
+			dispatch(fetchGrades(params));
 			setIsDeleteModalOpen(false);
 			setItemToDelete(null);
 		} catch (error) {
@@ -485,322 +476,175 @@ const GradesAndRatesPage = () => {
 		setItemToDelete(null);
 	};
 
-	const handleViewHistory = async item => {
-		setHistoryItem(item);
-		setIsHistoryModalOpen(true);
-		setHistoryLoading(true);
-		try {
-			const result = await dispatch(fetchGradeHistory(item.id)).unwrap();
-			setHistoryData(result.results || []);
-		} catch (error) {
-			toast.error(parseApiError(error, t, "history.fetchError"));
-			setHistoryData([]);
-		} finally {
-			setHistoryLoading(false);
-		}
-	};
-
-	const handleCloseHistoryModal = () => {
-		setIsHistoryModalOpen(false);
-		setHistoryData([]);
-		setHistoryItem(null);
-	};
-
-	const historyColumns = [
-		{ header: t("gradesAndRates.grades.table.name"), accessor: "name" },
-		{ header: t("gradesAndRates.grades.table.code"), accessor: "code" },
-		{ header: t("gradesAndRates.grades.table.businessGroup"), accessor: "business_group_name" },
-		{ header: t("gradesAndRates.grades.table.status"), accessor: "status" },
+	// Tab definitions
+	const tabs = [
+		{ id: "grades", label: t("gradesAndRates.tabs.grades") },
+		{ id: "gradeRates", label: t("gradesAndRates.tabs.gradeRates") },
+		{ id: "gradeRateTypes", label: t("gradesAndRates.tabs.gradeRateTypes") },
 	];
 
-	const renderHistoryRates = rates => (
-		<div className="space-y-2">
-			{rates.map((rate, idx) => (
-				<div
-					key={rate.id || idx}
-					className="flex flex-wrap items-center gap-4 p-2 bg-gray-50 rounded-lg text-sm"
-				>
-					<span className="font-medium text-gray-700">{rate.rate_type_name || rate.rate_type_code}</span>
-					<span className="text-gray-500">{rate.currency}</span>
-					<span className="text-gray-900">
-						{rate.rate_type_has_range
-							? `${parseFloat(rate.min_amount || 0).toLocaleString()} - ${parseFloat(
-									rate.max_amount || 0
-							  ).toLocaleString()}`
-							: parseFloat(rate.fixed_amount || 0).toLocaleString()}
-					</span>
-					<span
-						className={`px-2 py-0.5 rounded-full text-xs ${
-							rate.status === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-						}`}
-					>
-						{rate.status === "active" ? t("common.active") : t("common.inactive")}
-					</span>
-				</div>
-			))}
-		</div>
-	);
-
-	const historyCustomActions = [
-		{
-			title: t("history.viewHistory"),
-			icon: <HiClock className="w-5 h-5 text-[#1D7A8C]" />,
-			onClick: handleViewHistory,
-		},
-	];
-
-	// If a grade is selected, show its rates
-	if (selectedGrade) {
-		return (
-			<div className="min-h-screen bg-gray-50">
-				<ToastContainer position="top-right" autoClose={3000} />
-
-				<PageHeader
-					icon={<HiTrendingUp className="w-8 h-8 text-white mr-3" />}
-					title={t("gradesAndRates.title")}
-					subtitle={t("gradesAndRates.subtitle")}
-				/>
-
-				<div className="p-6">
-					<div className="bg-white rounded-2xl shadow-lg p-6">
-						{/* Back button and Grade info */}
-						<div className="flex items-center justify-between mb-6">
-							<div className="flex items-center gap-4">
-								<button
-									onClick={handleBackToGrades}
-									className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-								>
-									<HiArrowLeft className={`w-5 h-5 text-gray-600 ${isRtl ? "rotate-180" : ""}`} />
-								</button>
-								<div>
-									<h2 className="text-2xl font-bold text-[#1D7A8C]">
-										{selectedGrade.name} ({selectedGrade.code})
-									</h2>
-									<p className="text-sm text-gray-500">
-										{t("gradesAndRates.gradeRates.title")} - {selectedGrade.business_group_name}
-									</p>
-								</div>
-							</div>
-							<Button
-								onClick={handleCreateRate}
-								icon={<HiPlus className="w-5 h-5" />}
-								title={t("gradesAndRates.gradeRates.createGradeRate")}
-								className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
-							/>
-						</div>
-
-						{/* Rates Table */}
-						<Table
-							columns={rateColumns}
-							data={gradeRates}
-							onEdit={handleEditRate}
-							onDelete={handleDeleteRateClick}
-							emptyMessage={t("gradesAndRates.gradeRates.table.emptyMessage")}
-							loading={ratesLoading}
-						/>
-					</div>
-				</div>
-
-				{/* Rate Modal */}
-				<SlideUpModal
-					isOpen={isRateModalOpen}
-					onClose={handleCloseRateModal}
-					title={
-						editingRate
-							? t("gradesAndRates.gradeRates.modal.editTitle")
-							: t("gradesAndRates.gradeRates.modal.createTitle")
-					}
-				>
-					<form onSubmit={handleRateSubmit} className="space-y-4 p-4">
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<FloatingLabelInput
-								label={t("gradesAndRates.gradeRates.form.rateTypeCode")}
-								name="rate_type_code"
-								value={rateFormData.rate_type_code}
-								onChange={handleRateInputChange}
-								error={formErrors.rate_type_code}
-								required
-								disabled={!!editingRate}
-							/>
-							<FloatingLabelSelect
-								label={t("gradesAndRates.gradeRates.form.currency")}
-								name="currency"
-								value={rateFormData.currency}
-								onChange={handleRateInputChange}
-								options={currencyOptions}
-								error={formErrors.currency}
-								required
-							/>
-						</div>
-
-						{/* Range type toggle */}
-						<div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-							<label className="text-sm font-medium text-gray-700">
-								{t("gradesAndRates.gradeRates.form.rateTypeLabel")}:
-							</label>
-							<div className="flex gap-4">
-								<label className="flex items-center gap-2 cursor-pointer">
-									<input
-										type="radio"
-										name="rateType"
-										checked={!isRangeBasedRate}
-										onChange={() => setIsRangeBasedRate(false)}
-										className="w-4 h-4 text-[#1D7A8C]"
-									/>
-									<span className="text-sm">{t("gradesAndRates.gradeRates.form.fixedAmount")}</span>
-								</label>
-								<label className="flex items-center gap-2 cursor-pointer">
-									<input
-										type="radio"
-										name="rateType"
-										checked={isRangeBasedRate}
-										onChange={() => setIsRangeBasedRate(true)}
-										className="w-4 h-4 text-[#1D7A8C]"
-									/>
-									<span className="text-sm">{t("gradesAndRates.gradeRates.form.rangeAmount")}</span>
-								</label>
-							</div>
-						</div>
-
-						{isRangeBasedRate ? (
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<FloatingLabelInput
-									label={t("gradesAndRates.gradeRates.form.minAmount")}
-									name="min_amount"
-									type="number"
-									step="0.01"
-									value={rateFormData.min_amount}
-									onChange={handleRateInputChange}
-									error={formErrors.min_amount}
-									required
-								/>
-								<FloatingLabelInput
-									label={t("gradesAndRates.gradeRates.form.maxAmount")}
-									name="max_amount"
-									type="number"
-									step="0.01"
-									value={rateFormData.max_amount}
-									onChange={handleRateInputChange}
-									error={formErrors.max_amount}
-									required
-								/>
-							</div>
-						) : (
-							<FloatingLabelInput
-								label={t("gradesAndRates.gradeRates.form.fixedAmount")}
-								name="fixed_amount"
-								type="number"
-								step="0.01"
-								value={rateFormData.fixed_amount}
-								onChange={handleRateInputChange}
-								error={formErrors.fixed_amount}
-								required
-							/>
-						)}
-
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<FloatingLabelInput
-								label={t("gradesAndRates.form.startDate")}
-								name="effective_start_date"
-								type="date"
-								value={rateFormData.effective_start_date}
-								onChange={handleRateInputChange}
-							/>
-							<FloatingLabelInput
-								label={t("gradesAndRates.form.endDate")}
-								name="effective_end_date"
-								type="date"
-								value={rateFormData.effective_end_date}
-								onChange={handleRateInputChange}
-							/>
-						</div>
-
-						<div className="flex justify-end gap-3 pt-4">
-							<Button
-								type="button"
-								onClick={handleCloseRateModal}
-								title={t("common.cancel")}
-								className="bg-gray-200 hover:bg-gray-300 text-gray-800"
-							/>
-							<Button
-								type="submit"
-								disabled={rateCreating || rateUpdating}
-								title={
-									rateCreating || rateUpdating
-										? t("common.saving")
-										: editingRate
-										? t("gradesAndRates.modal.update")
-										: t("gradesAndRates.gradeRates.modal.create")
-								}
-								className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
-							/>
-						</div>
-					</form>
-				</SlideUpModal>
-
-				{/* Delete Confirmation Modal */}
-				<ConfirmModal
-					isOpen={isDeleteModalOpen}
-					onClose={handleCancelDelete}
-					onConfirm={handleConfirmDelete}
-					title={t("gradesAndRates.deleteModal.title")}
-					message={t("gradesAndRates.deleteModal.message", {
-						name: itemToDelete?.rate_type_name || itemToDelete?.name,
-					})}
-					confirmText={t("gradesAndRates.deleteModal.confirm")}
-					cancelText={t("gradesAndRates.deleteModal.cancel")}
-					variant="danger"
-				/>
-			</div>
-		);
-	}
-
-	// Main grades list view
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<ToastContainer position="top-right" autoClose={3000} />
 
-			<PageHeader
-				icon={<HiTrendingUp className="w-8 h-8 text-white mr-3" />}
-				title={t("gradesAndRates.title")}
-				subtitle={t("gradesAndRates.subtitle")}
-			/>
+			<PageHeader icon={<HiTrendingUp className="w-8 h-8 text-white mr-3" />} title={t("gradesAndRates.title")} />
 
 			<div className="p-6">
-				<div className="bg-white rounded-2xl shadow-lg p-6">
-					<div className="flex justify-between items-center mb-6">
-						<h2 className="text-2xl font-bold text-[#1D7A8C]">{t("gradesAndRates.grades.title")}</h2>
-						<Button
-							onClick={handleCreateGrade}
-							icon={<HiPlus className="w-5 h-5" />}
-							title={t("gradesAndRates.grades.createGrade")}
-							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
-						/>
-					</div>
-
-					<Table
-						columns={gradeColumns}
-						data={grades}
-						onView={handleViewGradeRates}
-						onEdit={handleEditGrade}
-						onDelete={handleDeleteGradeClick}
-						customActions={historyCustomActions}
-						emptyMessage={t("gradesAndRates.grades.table.emptyMessage")}
-						loading={gradeLoading}
-					/>
-
-					<div className="mt-6">
-						<Pagination
-							currentPage={gradePage}
-							totalCount={gradeCount}
-							pageSize={localPageSize}
-							onPageChange={handlePageChange}
-							onPageSizeChange={handlePageSizeChange}
-							hasNext={gradeHasNext}
-							hasPrevious={gradeHasPrevious}
-						/>
-					</div>
+				{/* Tabs */}
+				<div className="mb-6">
+					<Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 				</div>
+
+				{/* Grades Tab */}
+				{activeTab === "grades" && (
+					<>
+						{/* Filters Section */}
+						<div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+							<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+								<CustomInput
+									label={t("gradesAndRates.filters.search")}
+									name="search"
+									value={filters.search}
+									onChange={handleFilterChange}
+									placeholder={t("gradesAndRates.searchPlaceholder")}
+								/>
+								<CustomDropdown
+									label={t("gradesAndRates.filters.organization")}
+									name="organization"
+									value={filters.organization}
+									onChange={handleFilterChange}
+									options={filterOrganizationOptions}
+									showBorder={true}
+								/>
+								<div className="flex items-end">
+									<Button
+										onClick={handleSearch}
+										icon={<HiSearch className="w-5 h-5" />}
+										title={t("common.search")}
+										className="bg-[#1D7A8C] hover:bg-[#156576] text-white w-full"
+									/>
+								</div>
+							</div>
+						</div>
+
+						{/* Table Section */}
+						<div className="bg-white rounded-2xl shadow-lg p-6">
+							<div className="flex justify-between items-center mb-6">
+								<h2 className="text-2xl font-bold text-[#1D7A8C]">
+									{t("gradesAndRates.grades.title")}
+								</h2>
+								<Button
+									onClick={handleCreateGrade}
+									icon={<HiPlus className="w-5 h-5" />}
+									title={t("gradesAndRates.grades.createGrade")}
+									className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
+								/>
+							</div>
+
+							<Table
+								columns={gradeColumns}
+								data={grades}
+								onEdit={handleEditGrade}
+								onDelete={handleDeleteGradeClick}
+								emptyMessage={t("gradesAndRates.grades.table.emptyMessage")}
+								loading={gradeLoading}
+							/>
+
+							<div className="mt-6">
+								<Pagination
+									currentPage={gradePage}
+									totalCount={gradeCount}
+									pageSize={localPageSize}
+									onPageChange={handlePageChange}
+									onPageSizeChange={handlePageSizeChange}
+									hasNext={gradeHasNext}
+									hasPrevious={gradeHasPrevious}
+								/>
+							</div>
+						</div>
+					</>
+				)}
+
+				{/* Grade Rates Tab */}
+				{activeTab === "gradeRates" && (
+					<>
+						{/* Filters Section */}
+						<div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+							<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+								<CustomDropdown
+									label={t("gradesAndRates.filters.grade")}
+									name="grade"
+									value={ratesFilters.grade}
+									onChange={handleRatesFilterChange}
+									options={filterGradeOptions}
+									showBorder={true}
+								/>
+								<CustomDropdown
+									label={t("gradesAndRates.filters.rateType")}
+									name="rate_type"
+									value={ratesFilters.rate_type}
+									onChange={handleRatesFilterChange}
+									options={filterRateTypeOptions}
+									showBorder={true}
+								/>
+								<div className="flex items-end">
+									<Button
+										onClick={handleRatesSearch}
+										icon={<HiSearch className="w-5 h-5" />}
+										title={t("common.search")}
+										className="bg-[#1D7A8C] hover:bg-[#156576] text-white w-full"
+									/>
+								</div>
+							</div>
+						</div>
+
+						{/* Table Section */}
+						<div className="bg-white rounded-2xl shadow-lg p-6">
+							<div className="flex justify-between items-center mb-6">
+								<h2 className="text-2xl font-bold text-[#1D7A8C]">
+									{t("gradesAndRates.gradeRates.title")}
+								</h2>
+							</div>
+
+							<Table
+								columns={gradeRatesColumns}
+								data={gradeRates}
+								emptyMessage={t("gradesAndRates.gradeRates.table.emptyMessage")}
+								loading={ratesLoading}
+							/>
+
+							<div className="mt-6">
+								<Pagination
+									currentPage={ratesPage}
+									totalCount={ratesCount}
+									pageSize={localRatesPageSize}
+									onPageChange={handleRatesPageChange}
+									onPageSizeChange={handleRatesPageSizeChange}
+									hasNext={ratesHasNext}
+									hasPrevious={ratesHasPrevious}
+								/>
+							</div>
+						</div>
+					</>
+				)}
+
+				{/* Grade Rate Types Tab */}
+				{activeTab === "gradeRateTypes" && (
+					<div className="bg-white rounded-2xl shadow-lg p-6">
+						<div className="flex justify-between items-center mb-6">
+							<h2 className="text-2xl font-bold text-[#1D7A8C]">
+								{t("gradesAndRates.gradeRateTypes.title")}
+							</h2>
+						</div>
+
+						<Table
+							columns={gradeRateTypesColumns}
+							data={gradeRateTypes}
+							emptyMessage={t("gradesAndRates.gradeRateTypes.table.emptyMessage")}
+							loading={gradeLoading}
+						/>
+					</div>
+				)}
 			</div>
 
 			{/* Grade Modal */}
@@ -812,54 +656,57 @@ const GradesAndRatesPage = () => {
 						? t("gradesAndRates.grades.modal.editTitle")
 						: t("gradesAndRates.grades.modal.createTitle")
 				}
+				maxWidth="600px"
 			>
 				<form onSubmit={handleGradeSubmit} className="space-y-4 p-4">
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<FloatingLabelInput
-							label={t("gradesAndRates.grades.form.name")}
-							name="name"
-							value={gradeFormData.name}
-							onChange={handleGradeInputChange}
-							error={formErrors.name}
-							required
-						/>
-						<FloatingLabelInput
-							label={t("gradesAndRates.grades.form.code")}
-							name="code"
-							value={gradeFormData.code}
-							onChange={handleGradeInputChange}
-							disabled={!!editingGrade}
-							placeholder={editingGrade ? "" : t("gradesAndRates.grades.form.codeAutoGenerated")}
-						/>
-					</div>
-
-					<FloatingLabelSelect
-						label={t("gradesAndRates.grades.form.businessGroup")}
-						name="business_group"
-						value={gradeFormData.business_group}
+					<CustomDropdown
+						label={t("gradesAndRates.grades.form.organization")}
+						name="organization_id"
+						value={gradeFormData.organization_id}
 						onChange={handleGradeInputChange}
-						options={businessGroupOptions}
-						error={formErrors.business_group}
+						options={organizationOptions}
+						error={formErrors.organization_id}
 						required={!editingGrade}
+						disabled={!!editingGrade}
+						bgColor="bg-[#fff]"
+					/>
+
+					<CustomInput
+						label={t("gradesAndRates.grades.form.code")}
+						name="code"
+						type="text"
+						maxLength="50"
+						value={gradeFormData.code}
+						onChange={handleGradeInputChange}
+						error={formErrors.code}
+						placeholder={t("gradesAndRates.grades.form.codePlaceholder")}
+						bgColor="bg-[#fff]"
 						disabled={!!editingGrade}
 					/>
 
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<FloatingLabelInput
-							label={t("gradesAndRates.form.startDate")}
-							name="effective_start_date"
-							type="date"
-							value={gradeFormData.effective_start_date}
-							onChange={handleGradeInputChange}
-						/>
-						<FloatingLabelInput
-							label={t("gradesAndRates.form.endDate")}
-							name="effective_end_date"
-							type="date"
-							value={gradeFormData.effective_end_date}
-							onChange={handleGradeInputChange}
-						/>
-					</div>
+					<CustomDropdown
+						label={t("gradesAndRates.grades.form.gradeName")}
+						name="grade_name_id"
+						value={gradeFormData.grade_name_id}
+						onChange={handleGradeInputChange}
+						options={gradeNameOptions}
+						error={formErrors.grade_name_id}
+						required
+						bgColor="bg-[#fff]"
+						showBorder={true}
+					/>
+
+					<CustomInput
+						label={t("gradesAndRates.grades.form.sequence")}
+						name="sequence"
+						type="number"
+						min="1"
+						value={gradeFormData.sequence}
+						onChange={handleGradeInputChange}
+						error={formErrors.sequence}
+						required
+						bgColor="bg-[#fff]"
+					/>
 
 					<div className="flex justify-end gap-3 pt-4">
 						<Button
@@ -875,8 +722,8 @@ const GradesAndRatesPage = () => {
 								gradeCreating || gradeUpdating
 									? t("common.saving")
 									: editingGrade
-									? t("gradesAndRates.modal.update")
-									: t("gradesAndRates.grades.modal.create")
+										? t("common.update")
+										: t("common.create")
 							}
 							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
 						/>
@@ -891,22 +738,11 @@ const GradesAndRatesPage = () => {
 				onConfirm={handleConfirmDelete}
 				title={t("gradesAndRates.deleteModal.title")}
 				message={t("gradesAndRates.deleteModal.message", {
-					name: itemToDelete?.name,
+					name: itemToDelete?.grade_name_display || itemToDelete?.code,
 				})}
-				confirmText={t("gradesAndRates.deleteModal.confirm")}
-				cancelText={t("gradesAndRates.deleteModal.cancel")}
+				confirmText={t("common.delete")}
+				cancelText={t("common.cancel")}
 				variant="danger"
-			/>
-
-			{/* History Modal */}
-			<HistoryModal
-				isOpen={isHistoryModalOpen}
-				onClose={handleCloseHistoryModal}
-				title={t("history.title", { name: historyItem?.name || "" })}
-				loading={historyLoading}
-				data={historyData}
-				columns={historyColumns}
-				renderRates={renderHistoryRates}
 			/>
 		</div>
 	);

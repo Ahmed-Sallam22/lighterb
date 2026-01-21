@@ -13,7 +13,7 @@ import { QUICK_ACTIONS, getQuickActionById } from "../constants/quickActions";
 
 const QuickActionDetail = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("quickActionDetail"));
+	usePageTitle(t("quickActionDetail.title"));
 	const { actionId } = useParams();
 	const navigate = useNavigate();
 

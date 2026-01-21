@@ -9,7 +9,7 @@ import AuthLogo from "../components/auth/AuthLogo";
 
 const ForgetPasswordPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("forgotPassword"));
+	usePageTitle(t("forgotPassword.title"));
 	const [email, setEmail] = useState("");
 	const navigate = useNavigate();
 

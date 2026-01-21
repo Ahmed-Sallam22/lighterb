@@ -27,7 +27,7 @@ import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 
 const CurrencyPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("currencies"));
+	usePageTitle(t("currencies.title"));
 	const dispatch = useDispatch();
 	const { currencies, count, page, hasNext, hasPrevious } = useSelector(state => state.currencies);
 	const [isModalOpen, setIsModalOpen] = useState(false);

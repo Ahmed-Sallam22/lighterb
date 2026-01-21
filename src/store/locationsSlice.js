@@ -17,6 +17,16 @@ export const fetchLocations = createAsyncThunk("locations/fetchLocations", async
 	}
 });
 
+// Fetch single location
+export const fetchLocation = createAsyncThunk("locations/fetchLocation", async (id, { rejectWithValue }) => {
+	try {
+		const response = await api.get(`/hr/work_structures/locations/${id}/`);
+		return response.data?.data || response.data;
+	} catch (error) {
+		return rejectWithValue(error.message || "Failed to fetch location");
+	}
+});
+
 // Create a new location
 export const createLocation = createAsyncThunk(
 	"locations/createLocation",
@@ -59,10 +69,37 @@ export const deleteLocation = createAsyncThunk("locations/deleteLocation", async
 	}
 });
 
+// Fetch countries from lookups API
+export const fetchCountriesLookup = createAsyncThunk(
+	"locations/fetchCountriesLookup",
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await api.get("/core/lookups/values/?lookup_type=COUNTRY");
+			return response.data?.data || response.data || [];
+		} catch (error) {
+			return rejectWithValue(error.message || "Failed to fetch countries");
+		}
+	}
+);
+
+// Fetch cities from lookups API (with parent country)
+export const fetchCitiesLookup = createAsyncThunk(
+	"locations/fetchCitiesLookup",
+	async (countryId, { rejectWithValue }) => {
+		try {
+			const response = await api.get(`/core/lookups/values/?lookup_type=CITY&parent=${countryId}`);
+			return response.data?.data || response.data || [];
+		} catch (error) {
+			return rejectWithValue(error.message || "Failed to fetch cities");
+		}
+	}
+);
+
 const locationsSlice = createSlice({
 	name: "locations",
 	initialState: {
 		locations: [],
+		currentLocation: null,
 		loading: false,
 		error: null,
 		count: 0,
@@ -73,6 +110,11 @@ const locationsSlice = createSlice({
 		updating: false,
 		deleting: false,
 		actionError: null,
+		// Lookups
+		countries: [],
+		cities: [],
+		countriesLoading: false,
+		citiesLoading: false,
 	},
 	reducers: {
 		setPage: (state, action) => {
@@ -81,6 +123,9 @@ const locationsSlice = createSlice({
 		clearError: state => {
 			state.error = null;
 			state.actionError = null;
+		},
+		clearCities: state => {
+			state.cities = [];
 		},
 	},
 	extraReducers: builder => {
@@ -101,7 +146,19 @@ const locationsSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			})
-
+			// Fetch single location
+			.addCase(fetchLocation.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchLocation.fulfilled, (state, action) => {
+				state.loading = false;
+				state.currentLocation = action.payload;
+			})
+			.addCase(fetchLocation.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
 			// Create location
 			.addCase(createLocation.pending, state => {
 				state.creating = true;
@@ -147,9 +204,35 @@ const locationsSlice = createSlice({
 			.addCase(deleteLocation.rejected, (state, action) => {
 				state.deleting = false;
 				state.actionError = action.payload;
+			})
+
+			// Fetch countries lookup
+			.addCase(fetchCountriesLookup.pending, state => {
+				state.countriesLoading = true;
+			})
+			.addCase(fetchCountriesLookup.fulfilled, (state, action) => {
+				state.countriesLoading = false;
+				state.countries = action.payload;
+			})
+			.addCase(fetchCountriesLookup.rejected, (state, action) => {
+				state.countriesLoading = false;
+				state.error = action.payload;
+			})
+
+			// Fetch cities lookup
+			.addCase(fetchCitiesLookup.pending, state => {
+				state.citiesLoading = true;
+			})
+			.addCase(fetchCitiesLookup.fulfilled, (state, action) => {
+				state.citiesLoading = false;
+				state.cities = action.payload;
+			})
+			.addCase(fetchCitiesLookup.rejected, (state, action) => {
+				state.citiesLoading = false;
+				state.error = action.payload;
 			});
 	},
 });
 
-export const { setPage, clearError } = locationsSlice.actions;
+export const { setPage, clearError, clearCities } = locationsSlice.actions;
 export default locationsSlice.reducer;

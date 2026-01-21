@@ -23,7 +23,7 @@ import { usePageTitle } from "../hooks/usePageTitle";
 
 const AssetsPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("assets"));
+	usePageTitle(t("assets.title"));
 
 	const { loading, error, statistics } = useState(
 		{ lines: [], loading: false, error: null, statistics: {} } // Placeholder state

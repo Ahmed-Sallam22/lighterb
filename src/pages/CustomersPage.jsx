@@ -48,7 +48,7 @@ const INITIAL_FILTERS_STATE = {
 
 const CustomersPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("customers"));
+	usePageTitle(t("customers.title"));
 	const dispatch = useDispatch();
 
 	const { customers = [], loading, error } = useSelector(state => state.customers || {});
@@ -127,13 +127,6 @@ const CustomersPage = () => {
 		}
 	}, [error]);
 
-	// Update browser title when translations load/ change
-	useEffect(() => {
-		document.title = `${title} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [title]);
 
 	// Transform API data for table display
 	const tableData = (customers || [])

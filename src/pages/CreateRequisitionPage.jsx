@@ -65,7 +65,7 @@ const createEmptyLineItem = () => ({
 
 const CreateRequisitionPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("createRequisition"));
+	usePageTitle(t("createRequisition.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -88,13 +88,6 @@ const CreateRequisitionPage = () => {
 		dispatch(fetchCatalogItems());
 	}, [dispatch]);
 
-	// Update page title
-	useEffect(() => {
-		document.title = `${t("createRequisition.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Show error toast
 	useEffect(() => {

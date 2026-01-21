@@ -40,7 +40,7 @@ const INITIAL_FORM_STATE = {
 
 const UOMPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("uom"));
+	usePageTitle(t("uom.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
@@ -89,13 +89,6 @@ const UOMPage = () => {
 		}
 	}, [error, actionError, dispatch]);
 
-	// Update page title
-	useEffect(() => {
-		document.title = `${t("uom.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	// Memoized type options with translations
 	const typeOptions = useMemo(

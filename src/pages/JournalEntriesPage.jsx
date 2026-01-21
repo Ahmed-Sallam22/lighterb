@@ -23,7 +23,7 @@ import DraftIcon from "../assets/icons/DraftIcon";
 
 const JournalEntriesPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("journalEntries"));
+	usePageTitle(t("journalEntries.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const dispatch = useDispatch();

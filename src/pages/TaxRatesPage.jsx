@@ -23,7 +23,7 @@ import { fetchCountries } from "../store/countriesSlice";
 
 const TaxRatesPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("taxRates"));
+	usePageTitle(t("taxRates.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 	const { taxRates, loading } = useSelector(state => state.taxRates);

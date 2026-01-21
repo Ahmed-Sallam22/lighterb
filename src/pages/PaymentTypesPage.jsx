@@ -44,7 +44,7 @@ const INITIAL_FORM_STATE = {
 
 const PaymentTypesPage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("paymentTypes"));
+	usePageTitle(t("paymentTypes.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 

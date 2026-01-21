@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { usePageTitle } from "../hooks/usePageTitle";
 import {
@@ -176,7 +176,7 @@ function FileUploadComponent() {
 
 const EmployeeDocumentsPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("employeeDocuments"));
+	usePageTitle(t("employeeDocuments.title"));
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 	const [selectedDoc, setSelectedDoc] = useState(null);
@@ -248,12 +248,6 @@ const EmployeeDocumentsPage = () => {
 		},
 	]);
 
-	useEffect(() => {
-		document.title = `${t("employeeDocuments.title")} - LightERP`;
-		return () => {
-			document.title = "LightERP";
-		};
-	}, [t]);
 
 	const docTypeOptions = useMemo(
 		() => [
