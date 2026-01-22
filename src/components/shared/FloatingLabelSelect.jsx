@@ -209,7 +209,7 @@ const FloatingLabelSelect = memo(
 							value={searchTerm}
 							onChange={e => setSearchTerm(e.target.value)}
 							placeholder="Search..."
-							className="w-full px-4 py-2 text-sm text-[#031b28] bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#48C1F0]/50 focus:border-[#48C1F0]"
+							className="w-full px-4 py-2 text-sm text-[#031b28] bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:ring-0"
 							onClick={e => e.stopPropagation()}
 						/>
 					</div>
@@ -237,7 +237,7 @@ const FloatingLabelSelect = memo(
 								className={`
 									w-full px-5 py-3 text-start text-base transition-colors duration-150
 									hover:bg-[#48C1F0]/10 focus:bg-[#48C1F0]/10 focus:outline-none
-									${option.value === value ? "bg-[#48C1F0]/20 text-[#031b28] font-semibold" : "text-[#031b28]"}
+									${option.value === value ? "bg-[#b7b6b6]/20 text-[#031b28] font-semibold" : "text-[#031b28]"}
 								`}
 							>
 								{option.label}

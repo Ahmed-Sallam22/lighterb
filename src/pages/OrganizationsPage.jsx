@@ -8,6 +8,7 @@ import { HiOfficeBuilding, HiSearch, HiShare } from "react-icons/hi";
 import { VscTypeHierarchySub } from "react-icons/vsc";
 
 import { parseApiError } from "../utils/errorHandler";
+import api from "../api/axios";
 
 import PageHeader from "../components/shared/PageHeader";
 import Table from "../components/shared/Table";
@@ -26,13 +27,13 @@ import {
 	deleteOrganization,
 	fetchOrganizationHierarchy,
 	fetchBusinessGroupsFromOrganizations,
-	fetchOrgClassifications,
-	fetchOrgNames,
 	setPage,
 } from "../store/organizationsSlice";
 import { fetchLocations } from "../store/locationsSlice";
-import MultiSelectDropdown from "../components/shared/MultiSelectDropdown";
-
+import { TbCoinRupee } from "react-icons/tb";
+import FloatingLabelInput from "../components/shared/FloatingLabelInput";
+import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
+/*
 const INITIAL_FORM_DATA = {
 	code: "",
 	name_id: "",
@@ -42,6 +43,18 @@ const INITIAL_FORM_DATA = {
 	work_end_time: "17:00",
 	organization_classification_ids: [],
 	effective_start_date: "",
+	effective_end_date: "",
+};
+*/
+
+const INITIAL_FORM_DATA = {
+	organization_name: "",
+	organization_type_id: "",
+	effective_start_date: "",
+	business_group_id: "",
+	location_id: "",
+	work_start_time: "09:00",
+	work_end_time: "17:00",
 	effective_end_date: "",
 };
 
@@ -71,8 +84,6 @@ const OrganizationsPage = () => {
 		updating,
 		hierarchy,
 		hierarchyLoading,
-		orgClassifications,
-		orgNames,
 	} = useSelector(state => state.organizations);
 
 	const { locations } = useSelector(state => state.locations);
@@ -88,14 +99,48 @@ const OrganizationsPage = () => {
 	const [isHierarchyModalOpen, setIsHierarchyModalOpen] = useState(false);
 	const [hierarchyItem, setHierarchyItem] = useState(null);
 	const [filters, setFilters] = useState(INITIAL_FILTERS);
+	const [organizationTypes, setOrganizationTypes] = useState([]);
+	const [typesLoading, setTypesLoading] = useState(false);
+
+	// if form has business_group_id, filter locations to those under the business group
+	useEffect(() => {
+		if (formData.business_group_id) {
+			dispatch(
+				fetchLocations({
+					page_size: 100,
+					status: "active",
+					organization: formData.business_group_id,
+				})
+			);
+		} else {
+			dispatch(fetchLocations({ page_size: 100, status: "active" }));
+		}
+	}, [dispatch, formData.business_group_id]);
 
 	// Fetch lookups on mount
+
+	// filter locations to whose business_group_name is not exist
+
 	useEffect(() => {
-		dispatch(fetchOrgClassifications());
-		dispatch(fetchOrgNames());
+		const fetchOrganizationTypes = async () => {
+			setTypesLoading(true);
+			try {
+				const response = await api.get("/core/lookups/values/", {
+					params: { lookup_type: "Organization Type" },
+				});
+				const data = response.data?.data || response.data;
+				setOrganizationTypes(data || []);
+			} catch (error) {
+				console.error("Failed to fetch organization types:", error);
+				toast.error(t("errors.generic"));
+			} finally {
+				setTypesLoading(false);
+			}
+		};
+		fetchOrganizationTypes();
 		dispatch(fetchLocations({ page_size: 100, status: "active" }));
 		dispatch(fetchBusinessGroupsFromOrganizations({ page_size: 100 }));
-	}, [dispatch]);
+	}, [dispatch, t]);
 
 	// Fetch data when filters change
 	useEffect(() => {
@@ -143,139 +188,103 @@ const OrganizationsPage = () => {
 		dispatch(fetchOrganizations(params));
 	};
 
-	const formatDate = dateString => {
-		if (!dateString) return "-";
-		const date = new Date(dateString);
-		return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-	};
-
-	const renderStatus = value => {
-		const isActive = value === "active";
-		return (
-			<span
-				className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-					isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-				}`}
-			>
-				<span
-					className={`w-2 h-2 rounded-full ${isRtl ? "ml-1.5" : "mr-1.5"} ${
-						isActive ? "bg-green-500" : "bg-gray-400"
-					}`}
-				></span>
-				{isActive ? t("common.active") : t("common.inactive")}
-			</span>
-		);
-	};
-
-	const renderOrgType = value => {
-		return (
-			<span
-				className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-					value ? "bg-[#E8F7FA] text-[#1D7A8C]" : "bg-gray-100 text-gray-600"
-				}`}
-			>
-				{value ? t("organizations.types.businessGroup") : ""}
-			</span>
-		);
-	};
-
 	// Organization columns
 	const columns = [
 		{
 			header: t("organizations.table.name"),
-			accessor: "name_display",
-			render: value => value || "-",
-		},
-		{
-			header: t("organizations.table.code"),
-			accessor: "code",
+			accessor: "organization_name",
 			render: value => value || "-",
 		},
 		{
 			header: t("organizations.table.type"),
-			accessor: "is_business_group",
-			render: renderOrgType,
+			accessor: "organization_type",
+			render: value => value || "-",
 		},
 		{
 			header: t("organizations.table.businessGroup"),
 			accessor: "business_group",
-			render: value => {
-				if (!value) return "-";
-				const bg = businessGroups.find(b => b.id === value);
-				return bg?.name_display || "-";
-			},
+			render: value => value || "-",
 		},
 		{
 			header: t("organizations.table.location"),
-			accessor: "location",
-			render: value => {
-				if (!value) return "-";
-				const loc = locations.find(l => l.id === value);
-				return loc?.name || "-";
-			},
+			accessor: "location_name",
+			render: value => value || "-",
 		},
 		{
-			header: t("organizations.table.workingHours"),
-			accessor: "working_hours",
-			render: value => (value ? `${value}h` : "-"),
+			header: t("organizations.table.workingHoursStart"),
+			accessor: "work_start_time",
+			render: value => value || "-",
+		},
+		{
+			header: t("organizations.table.workingHoursEnd"),
+			accessor: "work_end_time",
+			render: value => value || "-",
 		},
 		{
 			header: t("organizations.table.status"),
 			accessor: "status",
-			render: renderStatus,
+			render: value => value || "-",
 		},
 	];
 
 	// Dropdown options
 
-	const organizationNameOptions = useMemo(
+	const organizationTypeOptions = useMemo(
 		() => [
-			{ value: "", label: t("organizations.form.selectName") },
-			...orgNames.map(name => ({
-				value: name.id.toString(), // ✅
-				label: name.name,
+			{ value: "", label: t("organizations.form.selectType") },
+			...organizationTypes.map(type => ({
+				value: type.id.toString(),
+				label: type.name,
 			})),
 		],
-		[orgNames, t]
+		[organizationTypes, t]
 	);
 
-	const classificationOptions = useMemo(
-		() => [
-			...orgClassifications.map(cls => ({
-				value: cls.id,
-				label: cls.name,
-			})),
-		],
-		[orgClassifications]
-	);
-
-	// Check if name_id is business_group
+	// Check if organization_type is business_group
 	const isBusinessGroupType = useMemo(() => {
-		const selected = orgNames.find(n => n.id.toString() === formData.name_id);
-		return selected?.code === "BG";
-	}, [formData.name_id, orgNames]);
+		const selected = organizationTypes.find(t => t.id.toString() === formData.organization_type_id);
+		return selected?.name === "Business Groups";
+	}, [formData.organization_type_id, organizationTypes]);
 
 	const businessGroupOptions = useMemo(
 		() => [
 			{ value: "", label: t("organizations.form.selectBusinessGroup") },
 			...businessGroups.map(bg => ({
 				value: bg.id,
-				label: `${bg.name_display} - ${bg.code}`,
+				label: `${bg.organization_name}`,
 			})),
 		],
 		[businessGroups, t]
 	);
 
-	const locationOptions = useMemo(
-		() => [
+	const locationOptions = useMemo(() => {
+		// Filter locations based on organization type
+		let filteredLocations = locations;
+
+		// If creating a Business Group, only show locations without a business group
+		if (isBusinessGroupType) {
+			if (editingItem) {
+				console.log("yes");
+				filteredLocations = locations.filter(
+					loc => !loc.business_group_name || loc.id === formData.location_id
+				);
+			} else {
+				filteredLocations = locations.filter(loc => !loc.business_group_name);
+			}
+		}
+
+		// if (isBusinessGroupType && editingItem) {
+		// 	filteredLocations = locations.filter(loc => !loc.business_group_name || loc.id === editingItem.location_id);
+		// }
+
+		return [
 			{ value: "", label: t("organizations.form.selectLocation") },
-			...locations.map(loc => ({
+			...filteredLocations.map(loc => ({
 				value: loc.id,
-				label: loc.name,
+				label: loc.location_name,
 			})),
-		],
-		[locations, t]
-	);
+		];
+	}, [locations, t, isBusinessGroupType, editingItem]);
 
 	// Filter dropdown options (include "All" option)
 	const filterBusinessGroupOptions = useMemo(
@@ -283,7 +292,7 @@ const OrganizationsPage = () => {
 			{ value: "", label: t("organizations.filters.allBusinessGroups") },
 			...businessGroups.map(bg => ({
 				value: bg.id,
-				label: bg.name_display || bg.code,
+				label: bg.organization_name,
 			})),
 		],
 		[businessGroups, t]
@@ -294,7 +303,7 @@ const OrganizationsPage = () => {
 			{ value: "", label: t("organizations.filters.allLocations") },
 			...locations.map(loc => ({
 				value: loc.id,
-				label: loc.name,
+				label: loc.location_name,
 			})),
 		],
 		[locations, t]
@@ -312,20 +321,31 @@ const OrganizationsPage = () => {
 			setEditingItem(item);
 			// Fetch the full organization data from API
 			const orgData = await dispatch(fetchOrganization(item.id)).unwrap();
-			console.log("data", orgData);
-			// Keep organization_classification as an array for multi-select
-			const classificationIds = orgData.organization_classification || [];
-			setFormData({
-				code: orgData.code || "",
-				name_id: orgData.name ? orgData.name.toString() : "", // ✅ هنا الحل
-				business_group_id: orgData.business_group || "",
-				location_id: orgData.location || "",
+
+			// Find organization_type_id from the organization_type name
+			const orgType = organizationTypes.find(type => type.name === orgData.organization_type);
+			const orgTypeId = orgType ? orgType.id.toString() : "";
+
+			// Find business_group_id from the business_group name
+			let businessGroupId = "";
+			if (orgData.business_group) {
+				const bg = businessGroups.find(group => group.organization_name === orgData.business_group);
+				console.log(bg);
+				businessGroupId = bg ? bg.id : "";
+			}
+
+			const data = {
+				organization_name: orgData.organization_name || "",
+				organization_type_id: orgTypeId,
+				business_group_id: businessGroupId,
+				location_id: orgData.location ? orgData.location : "",
 				work_start_time: orgData.work_start_time ? orgData.work_start_time.substring(0, 5) : "09:00",
 				work_end_time: orgData.work_end_time ? orgData.work_end_time.substring(0, 5) : "17:00",
-				organization_classification_ids: classificationIds,
 				effective_start_date: orgData.effective_start_date || "",
 				effective_end_date: orgData.effective_end_date || "",
-			});
+			};
+
+			setFormData(data);
 			setFormErrors({});
 			setIsModalOpen(true);
 		} catch (error) {
@@ -344,9 +364,13 @@ const OrganizationsPage = () => {
 		const { name, value } = e.target;
 		setFormData(prev => {
 			const nextData = { ...prev, [name]: value };
-			// Reset business_group_id when name_id changes to Business Groups
-			if (name === "name_id" && value === "BG") {
-				nextData.business_group_id = "";
+
+			// Reset business_group_id when organization_type changes to Business Groups
+			if (name === "organization_type_id") {
+				const selected = organizationTypes.find(t => t.id.toString() === value);
+				if (selected?.name === "Business Groups") {
+					nextData.business_group_id = "";
+				}
 			}
 			return nextData;
 		});
@@ -357,13 +381,16 @@ const OrganizationsPage = () => {
 
 	const validateForm = () => {
 		const errors = {};
-		if (!formData.code.trim()) {
-			errors.code = t("common.required");
+		// organization_name is only required when creating
+		if (!editingItem && !formData.organization_name.trim()) {
+			errors.organization_name = t("common.required");
 		}
-		if (!formData.name_id) {
-			errors.name_id = t("common.required");
+		if (!formData.organization_type_id) {
+			errors.organization_type_id = t("common.required");
 		}
-		if (formData.name_id !== "BG" && !formData.business_group_id) {
+		// Validate business_group_id only if not creating/editing a Business Group
+		const selectedType = organizationTypes.find(t => t.id.toString() === formData.organization_type_id);
+		if (selectedType?.name !== "Business Groups" && !editingItem && !formData.business_group_id) {
 			errors.business_group_id = t("common.required");
 		}
 		setFormErrors(errors);
@@ -372,44 +399,69 @@ const OrganizationsPage = () => {
 
 	const handleSubmit = async e => {
 		e.preventDefault();
-		// if (!validateForm()) return;
+		if (!validateForm()) return;
 
 		try {
-			const isBusinessGroup = formData.name_id === "BG";
-
-			// Handle organization_classification_ids
-
-			console.log("hii");
-			const payload = {
-				code: formData.code,
-				name_id: parseInt(formData.name_id),
-				...(formData.location_id && { location_id: parseInt(formData.location_id) }),
-				...(formData.work_start_time && { work_start_time: formData.work_start_time }),
-				...(formData.work_end_time && { work_end_time: formData.work_end_time }),
-				...(formData.effective_start_date && { effective_start_date: formData.effective_start_date }),
-				...(formData.effective_end_date && { effective_end_date: formData.effective_end_date }),
-			};
-
-			// Handle organization_classification_ids - should be an array
-			if (formData.organization_classification_ids && formData.organization_classification_ids.length > 0) {
-				payload.organization_classification_ids = formData.organization_classification_ids.map(id =>
-					parseInt(id)
-				);
-			}
-			// For departments, add business_group_id
-			if (!isBusinessGroup) {
-				if (formData.business_group_id) {
-					payload.business_group_id = parseInt(formData.business_group_id);
-				}
-			}
-
 			if (editingItem) {
+				// For PATCH (update), only send updatable fields
+				const payload = {};
+
+				// Updatable fields only: location_id, work_start_time, work_end_time, effective_end_date
+				if (formData.location_id) {
+					payload.location_id = parseInt(formData.location_id);
+				}
+
+				if (formData.work_start_time) {
+					payload.work_start_time = formData.work_start_time;
+				}
+
+				if (formData.work_end_time) {
+					payload.work_end_time = formData.work_end_time;
+				}
+
+				if (formData.effective_end_date) {
+					payload.effective_end_date = formData.effective_end_date;
+				}
+
 				await dispatch(updateOrganization({ id: editingItem.id, data: payload })).unwrap();
 				toast.success(t("organizations.messages.updateSuccess"));
 			} else {
+				// For POST (create), use organization_type_id and all fields
+				const payload = {
+					organization_name: formData.organization_name,
+					organization_type_id: parseInt(formData.organization_type_id),
+				};
+
+				// Add optional fields only if they have values
+				if (formData.effective_start_date) {
+					payload.effective_start_date = formData.effective_start_date;
+				}
+
+				// For non-Business Groups, add business_group_id
+				if (!isBusinessGroupType && formData.business_group_id) {
+					payload.business_group_id = parseInt(formData.business_group_id);
+				}
+
+				if (formData.location_id) {
+					payload.location_id = parseInt(formData.location_id);
+				}
+
+				if (formData.work_start_time) {
+					payload.work_start_time = formData.work_start_time;
+				}
+
+				if (formData.work_end_time) {
+					payload.work_end_time = formData.work_end_time;
+				}
+
+				if (formData.effective_end_date) {
+					payload.effective_end_date = formData.effective_end_date;
+				}
+
 				await dispatch(createOrganization(payload)).unwrap();
 				toast.success(t("organizations.messages.createSuccess"));
 			}
+
 			// Refresh the list
 			const params = {
 				page,
@@ -475,8 +527,8 @@ const OrganizationsPage = () => {
 					<div
 						className={`w-3 h-3 rounded-full ${node.is_business_group ? "bg-[#1D7A8C]" : "bg-green-500"}`}
 					></div>
-					<span className="font-medium">{node.name}</span>
-					<span className="text-gray-500 text-sm">({node.code})</span>
+					<span className="font-medium">{node.organization_type}</span>
+					<span className="text-gray-500 text-sm">({node.organization_name})</span>
 					{node.working_hours && <span className="text-xs text-gray-400">{node.working_hours}h</span>}
 				</div>
 				{node.children && node.children.length > 0 && (
@@ -498,14 +550,14 @@ const OrganizationsPage = () => {
 			<div className="p-6">
 				<div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-						<CustomInput
+						<FloatingLabelInput
 							label={t("organizations.filters.search")}
 							name="search"
 							value={filters.search}
 							onChange={handleFilterChange}
 							placeholder={t("organizations.filters.searchPlaceholder")}
 						/>
-						<CustomDropdown
+						<FloatingLabelSelect
 							label={t("organizations.filters.businessGroup")}
 							name="business_group"
 							value={filters.business_group}
@@ -513,7 +565,7 @@ const OrganizationsPage = () => {
 							options={filterBusinessGroupOptions}
 							showBorder={true}
 						/>
-						<CustomDropdown
+						<FloatingLabelSelect
 							label={t("organizations.filters.location")}
 							name="location"
 							value={filters.location}
@@ -586,25 +638,26 @@ const OrganizationsPage = () => {
 				<form onSubmit={handleSubmit} className="space-y-4 p-4">
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<CustomInput
-							label={t("organizations.form.code")}
-							name="code"
-							value={formData.code}
+							label={t("organizations.form.organizationName")}
+							name="organization_name"
+							value={formData.organization_name}
 							onChange={handleInputChange}
-							error={formErrors.code}
-							disabled={!!editingItem}
+							error={formErrors.organization_name}
 							required={!editingItem}
+							disabled={!!editingItem}
 							bgColor="bg-[#fff]"
+							placeholder={t("organizations.form.organizationNamePlaceholder")}
 						/>
 
 						<CustomDropdown
-							label={t("organizations.form.name")}
-							name="name_id"
-							value={formData.name_id}
+							label={t("organizations.form.type")}
+							name="organization_type_id"
+							value={formData.organization_type_id}
 							onChange={handleInputChange}
-							options={organizationNameOptions}
-							error={formErrors.name_id}
-							required
-							disabled={!!editingItem}
+							options={organizationTypeOptions}
+							error={formErrors.organization_type_id}
+							required={!editingItem}
+							disabled={!!editingItem || typesLoading}
 							bgColor="bg-[#fff]"
 							showBorder={true}
 						/>
@@ -619,19 +672,13 @@ const OrganizationsPage = () => {
 								onChange={handleInputChange}
 								options={businessGroupOptions}
 								error={formErrors.business_group_id}
-								required
+								required={!editingItem}
+								disabled={!!editingItem}
 								bgColor="bg-[#fff]"
 								showBorder={true}
 							/>
 						</>
 					)}
-					<MultiSelectDropdown
-						label={t("organizations.form.classification")}
-						name="organization_classification_ids"
-						value={formData.organization_classification_ids}
-						onChange={handleInputChange}
-						options={classificationOptions}
-					/>
 
 					<CustomDropdown
 						label={t("organizations.form.location")}
@@ -669,6 +716,7 @@ const OrganizationsPage = () => {
 							type="date"
 							value={formData.effective_start_date}
 							onChange={handleInputChange}
+							disabled={!!editingItem}
 							bgColor="bg-[#fff]"
 						/>
 						<CustomInput

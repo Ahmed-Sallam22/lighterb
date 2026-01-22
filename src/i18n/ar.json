@@ -1,6 +1,6 @@
 {
   "home": {
-    "title": "لنبدأ",
+    "title": "لنبدأ مع",
     "quickActions": "الإجراءات السريعة",
     "quickActionsList": {
       "createRequisition": {
@@ -63,7 +63,9 @@
       "reports": "التقارير",
       "workStructure": "هيكل العمل",
       "fiscalPeriods": "الفترات المالية",
-      "banks": "البنوك"
+      "banks": "البنوك",
+      "personManagement": "إدارة الأفراد",
+      "workforceManagement": "إدارة القوى العاملة"
     },
     "cards": {
       "setup": {
@@ -3579,6 +3581,13 @@
       "jobs": {
         "title": "المسميات الوظيفية",
         "description": "تحديد المسميات والفئات والمتطلبات الوظيفية"
+      },
+      "employees": {
+        "title": "الموظفيين",
+        "description": "إدارة الموظفين ومعلوماتهم"
+      },
+      "persons": {
+        "title": "إدارة الأفراد"
       }
     }
   },
@@ -5109,7 +5118,9 @@
       "location": "الموقع",
       "workingHours": "ساعات العمل",
       "status": "الحالة",
-      "emptyMessage": "لا توجد منظمات"
+      "emptyMessage": "لا توجد منظمات",
+      "workingHoursStart": "تبدأ ساعات العمل",
+      "workingHoursEnd": "تنتهي ساعات العمل"
     },
     "types": {
       "businessGroup": "مجموعة أعمال",
@@ -5117,13 +5128,15 @@
     },
     "filters": {
       "search": "بحث",
-      "searchPlaceholder": "البحث بالكود أو الاسم...",
+      "searchPlaceholder": "البحث بالاسم...",
       "businessGroup": "مجموعة الأعمال",
       "allBusinessGroups": "جميع مجموعات الأعمال",
       "location": "الموقع",
       "allLocations": "جميع المواقع"
     },
     "form": {
+      "organizationName": "اسم المنظمة",
+      "organizationNamePlaceholder": "أدخل اسم المنظمة",
       "code": "الكود",
       "nameType": "نوع الاسم",
       "selectNameType": "اختر نوع الاسم",
@@ -5160,5 +5173,9 @@
       "title": "التسلسل الهرمي لـ {{name}}",
       "noData": "لا توجد بيانات تسلسل هرمي"
     }
+  },
+  "workforceManagement": {
+    "title": "إدارة القوى العاملة",
+    "subtitle": "إدارة القوى العاملة"
   }
 }

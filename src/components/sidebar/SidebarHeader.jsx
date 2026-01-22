@@ -1,11 +1,10 @@
 import React from 'react';
 import { MdClose } from 'react-icons/md';
-import logo from '../../constants';
-
+import LightLogo from '../../assets/lightLogo.svg?react';
 const SidebarHeader = ({ onClose }) => {
 	return (
 		<div className="flex items-center justify-between px-6 py-4 border-b border-white/15">
-			<img src={logo} alt="Light ERP Logo" className="w-32 h-auto" />
+			<LightLogo className="w-36 h-auto" />
 			<button
 				onClick={onClose}
 				className="rounded-full border border-white/30 p-1 text-white transition hover:bg-white/10"

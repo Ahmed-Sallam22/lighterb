@@ -81,6 +81,7 @@ const AbsenceSummaryPage = lazy(() => import("./pages/AbsenceSummaryPage"));
 const CheckListPage = lazy(() => import("./pages/CheckListPage"));
 const CompetenciesPage = lazy(() => import("./pages/CompetenciesPage"));
 const JobsPage = lazy(() => import("./pages/JobsPage"));
+const WorkforceManagementPage = lazy(() => import("./pages/WorkforceManagementPage"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -155,6 +156,7 @@ const App = () => {
 						<Route path="procurement/receiving-grn" element={<Receiving />} />
 						<Route path="procurement/receiving-grn/create" element={<CreateGRNPage />} />
 						<Route path="work-structure" element={<WorkStructurePage />} />
+						<Route path="workforce-management" element={<WorkforceManagementPage />} />
 						<Route path="organizations" element={<OrganizationsPage />} />
 						<Route path="departments" element={<DepartmentsPage />} />
 						<Route path="grades-and-rates" element={<GradesAndRatesPage />} />

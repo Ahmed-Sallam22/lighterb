@@ -29,15 +29,17 @@ import {
 	fetchCitiesLookup,
 	clearCities,
 } from "../store/locationsSlice";
-import { fetchOrganizations } from "../store/organizationsSlice";
+import { fetchBusinessGroupsFromOrganizations } from "../store/organizationsSlice";
+import CustomInput from "../components/shared/CustomInput";
+import CustomDropdown from "../components/shared/CustomDropdown";
 
 const FORM_INITIAL_STATE = {
-	name: "",
-	code: "",
+	location_name: "",
 	description: "",
-	organization_id: "",
+	business_group_id: "",
 	country_id: "",
 	city_id: "",
+	effective_from: "",
 	zone: "",
 	street: "",
 	building: "",
@@ -65,7 +67,7 @@ const LocationsPage = () => {
 		cities,
 		citiesLoading,
 	} = useSelector(state => state.locations);
-	const { organizations } = useSelector(state => state.organizations);
+	const { businessGroups } = useSelector(state => state.organizations);
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingItem, setEditingItem] = useState(null);
@@ -77,9 +79,9 @@ const LocationsPage = () => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [filterOrganization, setFilterOrganization] = useState("");
 
-	// Fetch organizations and countries on mount
+	// Fetch business groups and countries on mount
 	useEffect(() => {
-		dispatch(fetchOrganizations({ page_size: 100 }));
+		dispatch(fetchBusinessGroupsFromOrganizations({ page_size: 100, status: "active" }));
 		dispatch(fetchCountriesLookup());
 	}, [dispatch]);
 
@@ -97,7 +99,7 @@ const LocationsPage = () => {
 	// Fetch cities when country changes in form
 	useEffect(() => {
 		if (formData.country_id) {
-			dispatch(fetchCitiesLookup(formData.country_id));
+			dispatch(fetchCitiesLookup(countries.find(c => c.id === formData.country_id)?.name));
 		} else {
 			dispatch(clearCities());
 		}
@@ -139,17 +141,12 @@ const LocationsPage = () => {
 	const columns = [
 		{
 			header: t("locations.table.name"),
-			accessor: "name",
+			accessor: "location_name",
 			render: value => value || "-",
 		},
 		{
-			header: t("locations.table.code"),
-			accessor: "code",
-			render: value => value || "-",
-		},
-		{
-			header: t("locations.table.organization"),
-			accessor: "organization_name",
+			header: t("locations.table.businessGroup"),
+			accessor: "business_group_name",
 			render: value => value || "-",
 		},
 		{
@@ -169,11 +166,11 @@ const LocationsPage = () => {
 		},
 	];
 
-	const organizationOptions = [
-		{ value: "", label: t("locations.form.selectOrganization") },
-		...organizations.map(org => ({
-			value: org.id,
-			label: org.name_display || org.name,
+	const businessGroupOptions = [
+		{ value: "", label: t("locations.form.selectBusinessGroup") },
+		...businessGroups.map(bg => ({
+			value: bg.id,
+			label: bg.organization_name,
 		})),
 	];
 
@@ -205,14 +202,22 @@ const LocationsPage = () => {
 			setEditingItem(item);
 			// Fetch the full location data from API
 			const locationData = await dispatch(fetchLocation(item.id)).unwrap();
-			
+
+			// Find business_group_id from business_group_name
+			let businessGroupId = "";
+			if (locationData.business_group_name) {
+				const bg = businessGroups.find(group => group.organization_name === locationData.business_group_name);
+				console.log(bg)
+				businessGroupId = bg ? bg.id : "";
+			}
+
 			setFormData({
-				name: locationData.name || "",
-				code: locationData.code || "",
+				location_name: locationData.location_name || "",
 				description: locationData.description || "",
-				organization_id: locationData.organization || "",
-				country_id: locationData.country || "",
-				city_id: locationData.city || "",
+				business_group_id: businessGroupId,
+				country_id: locationData.country ? locationData.country : "",
+				city_id: locationData.city ? locationData.city : "",
+				effective_from: locationData.effective_from ? locationData.effective_from.substring(0, 16) : "",
 				zone: locationData.zone || "",
 				street: locationData.street || "",
 				building: locationData.building || "",
@@ -223,7 +228,7 @@ const LocationsPage = () => {
 			setFormErrors({});
 			// Fetch cities for the country
 			if (locationData.country) {
-				dispatch(fetchCitiesLookup(locationData.country));
+				dispatch(fetchCitiesLookup(countries.find(c => c.id === locationData.country)?.name));
 			}
 			setIsModalOpen(true);
 		} catch (error) {
@@ -255,14 +260,17 @@ const LocationsPage = () => {
 
 	const validateForm = () => {
 		const errors = {};
-		if (!formData.name.trim()) {
-			errors.name = t("common.required");
+		if (!formData.location_name.trim()) {
+			errors.location_name = t("common.required");
 		}
-		if (!editingItem && !formData.organization_id) {
-			errors.organization_id = t("common.required");
+		if (!formData.country_id) {
+			errors.country_id = t("common.required");
 		}
-		if (!editingItem && !formData.code.trim()) {
-			errors.code = t("common.required");
+		if (!formData.city_id) {
+			errors.city_id = t("common.required");
+		}
+		if (!editingItem && !formData.effective_from) {
+			errors.effective_from = t("common.required");
 		}
 		setFormErrors(errors);
 		return Object.keys(errors).length === 0;
@@ -274,37 +282,45 @@ const LocationsPage = () => {
 
 		try {
 			if (editingItem) {
-				// For update, send editable fields (organization_id and code cannot be changed)
+				// For update, send editable fields (business_group_id cannot be changed)
 				const payload = {
-					name: formData.name,
-					...(formData.description && { description: formData.description }),
-					...(formData.country_id && { country_id: parseInt(formData.country_id) }),
-					...(formData.city_id && { city_id: parseInt(formData.city_id) }),
-					zone: formData.zone || "",
-					street: formData.street || "",
-					building: formData.building || "",
-					floor: formData.floor || "",
-					office: formData.office || "",
-					po_box: formData.po_box || "",
+					location_name: formData.location_name,
+					country_id: parseInt(formData.country_id),
+					city_id: parseInt(formData.city_id),
 				};
+
+				// Add optional fields
+				if (formData.description) payload.description = formData.description;
+				if (formData.zone) payload.zone = formData.zone;
+				if (formData.street) payload.street = formData.street;
+				if (formData.building) payload.building = formData.building;
+				if (formData.floor) payload.floor = formData.floor;
+				if (formData.office) payload.office = formData.office;
+				if (formData.po_box) payload.po_box = formData.po_box;
 				await dispatch(updateLocation({ id: editingItem.id, data: payload })).unwrap();
 				toast.success(t("locations.messages.updateSuccess"));
 			} else {
 				// For create, include all required fields
 				const payload = {
-					organization_id: parseInt(formData.organization_id),
-					code: formData.code,
-					name: formData.name,
-					...(formData.description && { description: formData.description }),
-					...(formData.country_id && { country_id: parseInt(formData.country_id) }),
-					...(formData.city_id && { city_id: parseInt(formData.city_id) }),
-					zone: formData.zone || "",
-					street: formData.street || "",
-					building: formData.building || "",
-					floor: formData.floor || "",
-					office: formData.office || "",
-					po_box: formData.po_box || "",
+					location_name: formData.location_name,
+					country_id: parseInt(formData.country_id),
+					city_id: parseInt(formData.city_id),
+					effective_from: new Date(formData.effective_from).toISOString(),
 				};
+
+				// Add optional business_group_id
+				if (formData.business_group_id) {
+					payload.business_group_id = parseInt(formData.business_group_id);
+				}
+
+				// Add other optional fields
+				if (formData.description) payload.description = formData.description;
+				if (formData.zone) payload.zone = formData.zone;
+				if (formData.street) payload.street = formData.street;
+				if (formData.building) payload.building = formData.building;
+				if (formData.floor) payload.floor = formData.floor;
+				if (formData.office) payload.office = formData.office;
+				if (formData.po_box) payload.po_box = formData.po_box;
 				await dispatch(createLocation(payload)).unwrap();
 				toast.success(t("locations.messages.createSuccess"));
 			}
@@ -365,11 +381,11 @@ const LocationsPage = () => {
 								className="w-full md:w-64"
 							/>
 							<FloatingLabelSelect
-								label={t("locations.form.filterByOrganization")}
+								label={t("locations.form.filterByBusinessGroup")}
 								name="filterOrganization"
 								value={filterOrganization}
 								onChange={e => setFilterOrganization(e.target.value)}
-								options={organizationOptions}
+								options={businessGroupOptions}
 								className="w-full md:w-48"
 							/>
 							<Button
@@ -423,46 +439,54 @@ const LocationsPage = () => {
 					{/* Basic Information */}
 					<div className="mb-6">
 						<h3 className="text-lg font-semibold text-gray-700 mb-4">{t("locations.form.basicInfo")}</h3>
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<FloatingLabelInput
-								label={t("locations.form.name")}
-								name="name"
-								value={formData.name}
+						<div className="grid grid-cols-1 gap-4">
+							<CustomInput
+								label={t("locations.form.locationName")}
+								name="location_name"
+								value={formData.location_name}
 								onChange={handleInputChange}
-								error={formErrors.name}
+								error={formErrors.location_name}
 								required
-							/>
-							<FloatingLabelInput
-								label={t("locations.form.code")}
-								name="code"
-								value={formData.code}
-								onChange={handleInputChange}
-								error={formErrors.code}
-								disabled={!!editingItem}
-								required={!editingItem}
+								bgColor="bg-white"
 							/>
 						</div>
 						<div className="grid grid-cols-1 gap-4 mt-4">
-							<FloatingLabelInput
+							<CustomInput
 								label={t("locations.form.description")}
 								name="description"
 								value={formData.description}
 								onChange={handleInputChange}
+								bgColor="bg-white"
 							/>
 						</div>
-						{!editingItem && (
+
+						<>
 							<div className="grid grid-cols-1 gap-4 mt-4">
-								<FloatingLabelSelect
-									label={t("locations.form.organization")}
-									name="organization_id"
-									value={formData.organization_id}
+								<CustomDropdown
+									label={t("locations.form.businessGroup")}
+									name="business_group_id"
+									value={formData.business_group_id}
 									onChange={handleInputChange}
-									options={organizationOptions}
-									error={formErrors.organization_id}
-									required
+									options={businessGroupOptions}
+									error={formErrors.business_group_id}
+									disabled={!!editingItem}
+									bgColor="bg-white"
 								/>
 							</div>
-						)}
+							<div className="grid grid-cols-1 gap-4 mt-4">
+								<CustomInput
+									label={t("locations.form.effectiveFrom")}
+									name="effective_from"
+									type="datetime-local"
+									value={formData.effective_from}
+									onChange={handleInputChange}
+									error={formErrors.effective_from}
+									required
+									disabled={!!editingItem}
+									bgColor="bg-white"
+								/>
+							</div>
+						</>
 					</div>
 
 					{/* Location Details */}
@@ -471,20 +495,26 @@ const LocationsPage = () => {
 							{t("locations.form.locationDetails")}
 						</h3>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<FloatingLabelSelect
+							<CustomDropdown
 								label={t("locations.form.country")}
 								name="country_id"
 								value={formData.country_id}
 								onChange={handleInputChange}
 								options={countryOptions}
+								error={formErrors.country_id}
+								required
+								bgColor="bg-white"
 							/>
-							<FloatingLabelSelect
+							<CustomDropdown
 								label={t("locations.form.city")}
 								name="city_id"
 								value={formData.city_id}
 								onChange={handleInputChange}
 								options={cityOptions}
 								disabled={!formData.country_id || citiesLoading}
+								error={formErrors.city_id}
+								required
+								bgColor="bg-white"
 							/>
 						</div>
 					</div>
@@ -495,45 +525,51 @@ const LocationsPage = () => {
 							{t("locations.form.addressSection")}
 						</h3>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<FloatingLabelInput
+							<CustomInput
 								label={t("locations.form.zone")}
 								name="zone"
 								value={formData.zone}
 								onChange={handleInputChange}
+								bgColor="bg-white"
 							/>
-							<FloatingLabelInput
+							<CustomInput
 								label={t("locations.form.street")}
 								name="street"
 								value={formData.street}
 								onChange={handleInputChange}
+								bgColor="bg-white"
 							/>
 						</div>
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-							<FloatingLabelInput
+							<CustomInput
 								label={t("locations.form.building")}
 								name="building"
 								value={formData.building}
 								onChange={handleInputChange}
+								bgColor="bg-white"
 							/>
-							<FloatingLabelInput
+							<CustomInput
 								label={t("locations.form.floor")}
 								name="floor"
 								value={formData.floor}
 								onChange={handleInputChange}
+								bgColor="bg-white"
 							/>
-							<FloatingLabelInput
+							<CustomInput
 								label={t("locations.form.office")}
 								name="office"
 								value={formData.office}
 								onChange={handleInputChange}
+								bgColor="bg-white"
 							/>
 						</div>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-							<FloatingLabelInput
+							<CustomInput
 								label={t("locations.form.poBox")}
 								name="po_box"
 								value={formData.po_box}
 								onChange={handleInputChange}
+								bgColor="bg-white"
 							/>
 						</div>
 					</div>

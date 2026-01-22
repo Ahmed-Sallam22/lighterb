@@ -74,7 +74,7 @@ export const fetchCountriesLookup = createAsyncThunk(
 	"locations/fetchCountriesLookup",
 	async (_, { rejectWithValue }) => {
 		try {
-			const response = await api.get("/core/lookups/values/?lookup_type=COUNTRY");
+			const response = await api.get("/core/lookups/values/?lookup_type=Country");
 			return response.data?.data || response.data || [];
 		} catch (error) {
 			return rejectWithValue(error.message || "Failed to fetch countries");
@@ -85,9 +85,9 @@ export const fetchCountriesLookup = createAsyncThunk(
 // Fetch cities from lookups API (with parent country)
 export const fetchCitiesLookup = createAsyncThunk(
 	"locations/fetchCitiesLookup",
-	async (countryId, { rejectWithValue }) => {
+	async (countryName, { rejectWithValue }) => {
 		try {
-			const response = await api.get(`/core/lookups/values/?lookup_type=CITY&parent=${countryId}`);
+			const response = await api.get(`/core/lookups/values/?lookup_type=City&parent_name=${countryName}`);
 			return response.data?.data || response.data || [];
 		} catch (error) {
 			return rejectWithValue(error.message || "Failed to fetch cities");

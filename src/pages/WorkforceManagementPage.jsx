@@ -19,9 +19,9 @@ import { fetchGrades } from "../store/gradesSlice";
 import { fetchPositions } from "../store/positionsSlice";
 import { fetchJobs } from "../store/jobsSlice";
 
-const WorkStructurePage = () => {
+const WorkforceManagementPage = () => {
 	const { t } = useTranslation();
-	usePageTitle(t("workStructure.title"));
+	usePageTitle(t("workforceManagement.title"));
 	const { locale } = useLocale();
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -90,15 +90,6 @@ const WorkStructurePage = () => {
 			route: "/jobs",
 			bgColor: "bg-[#1D7A8C]",
 		},
-		{
-			id: "Employees",
-			title: t("workStructure.cards.employees.title"),
-			description: t("workStructure.cards.employees.description"),
-			icon: IoPeople,
-			total: jobsCount || 0,
-			route: "/employee-search",
-			bgColor: "bg-[#1D7A8C]",
-		},
 	];
 
 	const handleCardClick = route => {
@@ -109,8 +100,8 @@ const WorkStructurePage = () => {
 		<div className="min-h-screen bg-gray-50">
 			{/* Header Section */}
 			<PageHeader
-				title={t("workStructure.title")}
-				subtitle={t("workStructure.subtitle")}
+				title={t("workforceManagement.title")}
+				subtitle={t("workforceManagement.subtitle")}
 				icon={<RequisitionsHeadIcon width={32} height={30} className="text-[#28819C]" />}
 			/>
 
@@ -131,10 +122,7 @@ const WorkStructurePage = () => {
 									>
 										<IconComponent className="w-6 h-6 text-white" />
 									</div>
-									<div className={`text-right ${isRTL ? "text-left" : "text-right"}`}>
-										<div className="text-3xl font-bold text-gray-800">{card.total}</div>
-										<div className="text-sm text-gray-500">{t("workStructure.total")}</div>
-									</div>
+									
 								</div>
 								<div>
 									<h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-[#1D7A8C] transition-colors duration-200">
@@ -151,4 +139,4 @@ const WorkStructurePage = () => {
 	);
 };
 
-export default WorkStructurePage;
+export default WorkforceManagementPage;

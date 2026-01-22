@@ -1,6 +1,6 @@
 {
   "home": {
-    "title": "Let's get started",
+    "title": "Let's get started with",
     "quickActions": "Quick Actions",
     "quickActionsList": {
       "createRequisition": {
@@ -63,7 +63,9 @@
       "reports": "Reports",
       "workStructure": "Work Structure",
       "fiscalPeriods": "Fiscal Periods",
-      "banks": "Banks"
+      "banks": "Banks",
+      "personManagement": "Person Management",
+      "workforceManagement": "Workforce Management"
     },
     "cards": {
       "setup": {
@@ -3579,6 +3581,14 @@
       "jobs": {
         "title": "Jobs",
         "description": "Define job roles, titles, and requirements"
+      },
+      "employees": {
+        "title": "Employees",
+        "description": "Manage Employees and their info"
+      },
+      "persons": {
+        "title": "Person Management",
+        "description": "Manage Person and Info"
       }
     }
   },
@@ -3595,6 +3605,7 @@
       "code": "Code",
       "description": "Description",
       "organization": "Organization",
+      "businessGroup": "Business Group",
       "country": "Country",
       "city": "City",
       "zone": "Zone",
@@ -3611,6 +3622,7 @@
       "basicInfo": "Basic Information",
       "locationDetails": "Location Details",
       "addressSection": "Address Details",
+      "locationName": "Location Name",
       "name": "Location Name",
       "namePlaceholder": "Enter location name",
       "code": "Location Code",
@@ -3618,7 +3630,10 @@
       "description": "Description",
       "descriptionPlaceholder": "Enter description",
       "organization": "Organization",
+      "businessGroup": "Business Group (Optional)",
       "selectOrganization": "Select Organization",
+      "selectBusinessGroup": "Select Business Group",
+      "effectiveFrom": "Effective From",
       "country": "Country",
       "selectCountry": "Select Country",
       "city": "City",
@@ -3631,7 +3646,8 @@
       "poBox": "PO Box",
       "status": "Status",
       "nameRequired": "Name is required",
-      "filterByOrganization": "Filter by Organization"
+      "filterByOrganization": "Filter by Organization",
+      "filterByBusinessGroup": "Filter by Business Group"
     },
     "modal": {
       "createTitle": "Create Location",
@@ -5109,7 +5125,9 @@
       "location": "Location",
       "workingHours": "Working Hours",
       "status": "Status",
-      "emptyMessage": "No organizations found"
+      "emptyMessage": "No organizations found",
+      "workingHoursStart": "Working Hours Start",
+      "workingHoursEnd": "Working Hours End"
     },
     "types": {
       "businessGroup": "Business Group",
@@ -5117,13 +5135,15 @@
     },
     "filters": {
       "search": "Search",
-      "searchPlaceholder": "Search by code or name...",
+      "searchPlaceholder": "Search by name...",
       "businessGroup": "Business Group",
       "allBusinessGroups": "All Business Groups",
       "location": "Location",
       "allLocations": "All Locations"
     },
     "form": {
+      "organizationName": "Organization Name",
+      "organizationNamePlaceholder": "Enter organization name",
       "code": "Code",
       "nameType": "Name Type",
       "selectNameType": "Select Name Type",
@@ -5160,5 +5180,9 @@
       "title": "Hierarchy for {{name}}",
       "noData": "No hierarchy data available"
     }
+  },
+  "workforceManagement": {
+    "title": "Workforce Management",
+    "subtitle": "Manage Workforce"
   }
 }
