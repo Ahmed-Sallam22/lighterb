@@ -4016,7 +4016,8 @@
         "sequencePlaceholder": "Enter sequence number",
         "gradeNameRequired": "Grade name is required",
         "organizationRequired": "Organization is required",
-        "sequenceRequired": "Sequence is required and must be at least 1"
+        "sequenceRequired": "Sequence is required and must be at least 1",
+        "effectiveFromRequired": "Effective From is Required"
       },
       "modal": {
         "createTitle": "Create Grade",

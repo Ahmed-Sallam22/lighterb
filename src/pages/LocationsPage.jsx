@@ -217,7 +217,7 @@ const LocationsPage = () => {
 				business_group_id: businessGroupId,
 				country_id: locationData.country ? locationData.country : "",
 				city_id: locationData.city ? locationData.city : "",
-				effective_from: locationData.effective_from ? locationData.effective_from.substring(0, 16) : "",
+				effective_from: locationData.effective_from,
 				zone: locationData.zone || "",
 				street: locationData.street || "",
 				building: locationData.building || "",
@@ -305,7 +305,7 @@ const LocationsPage = () => {
 					location_name: formData.location_name,
 					country_id: parseInt(formData.country_id),
 					city_id: parseInt(formData.city_id),
-					effective_from: new Date(formData.effective_from).toISOString(),
+					effective_from: formData.effective_from,
 				};
 
 				// Add optional business_group_id
@@ -477,7 +477,7 @@ const LocationsPage = () => {
 								<CustomInput
 									label={t("locations.form.effectiveFrom")}
 									name="effective_from"
-									type="datetime-local"
+									type="date"
 									value={formData.effective_from}
 									onChange={handleInputChange}
 									error={formErrors.effective_from}

@@ -66,7 +66,7 @@ export const deleteGrade = createAsyncThunk("grades/deleteGrade", async (id, { r
 // Fetch grade names lookup from lookups API
 export const fetchGradeNames = createAsyncThunk("grades/fetchGradeNames", async (_, { rejectWithValue }) => {
 	try {
-		const response = await api.get("/core/lookups/values/?lookup_type=GRADE_NAME");
+		const response = await api.get("/core/lookups/values/?lookup_type=Grade Name");
 		return response.data?.data || response.data || [];
 	} catch (error) {
 		return rejectWithValue(error.message || "Failed to fetch grade names");

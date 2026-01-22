@@ -4009,7 +4009,8 @@
         "sequencePlaceholder": "أدخل رقم التسلسل",
         "gradeNameRequired": "اسم الدرجة مطلوب",
         "organizationRequired": "المنظمة مطلوبة",
-        "sequenceRequired": "التسلسل مطلوب ويجب أن يكون على الأقل 1"
+        "sequenceRequired": "التسلسل مطلوب ويجب أن يكون على الأقل 1",
+        "effectiveFromRequired": "مطلوب فعال من"
       },
       "modal": {
         "createTitle": "إنشاء درجة",

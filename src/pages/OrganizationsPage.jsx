@@ -188,6 +188,19 @@ const OrganizationsPage = () => {
 		dispatch(fetchOrganizations(params));
 	};
 
+	const renderStatus = value => (
+		<span
+			className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+				value === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+			}`}
+		>
+			<span
+				className={`w-2 h-2 rounded-full mr-1.5 ${value === "active" ? "bg-green-500" : "bg-gray-400"}`}
+			></span>
+			{value === "active" ? t("common.active") : t("common.inactive")}
+		</span>
+	);
+
 	// Organization columns
 	const columns = [
 		{
@@ -223,7 +236,7 @@ const OrganizationsPage = () => {
 		{
 			header: t("organizations.table.status"),
 			accessor: "status",
-			render: value => value || "-",
+			render: renderStatus,
 		},
 	];
 

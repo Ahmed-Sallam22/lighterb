@@ -32,10 +32,10 @@ import {
 import { fetchOrganizations } from "../store/organizationsSlice";
 
 const GRADE_FORM_INITIAL = {
-	code: "",
 	grade_name_id: "",
 	organization_id: "",
 	sequence: "",
+	effective_from: "",
 };
 
 const INITIAL_FILTERS = {
@@ -199,18 +199,8 @@ const GradesAndRatesPage = () => {
 	// Grades columns
 	const gradeColumns = [
 		{
-			header: t("gradesAndRates.grades.table.code"),
-			accessor: "code",
-			render: value => value || "-",
-		},
-		{
 			header: t("gradesAndRates.grades.table.gradeName"),
-			accessor: "grade_name_display",
-			render: value => value || "-",
-		},
-		{
-			header: t("gradesAndRates.grades.table.organizationCode"),
-			accessor: "organization_code",
+			accessor: "grade_name",
 			render: value => value || "-",
 		},
 		{
@@ -232,11 +222,6 @@ const GradesAndRatesPage = () => {
 
 	// Grade Rates columns (read-only table)
 	const gradeRatesColumns = [
-		{
-			header: t("gradesAndRates.gradeRates.table.gradeCode"),
-			accessor: "grade_code",
-			render: value => value || "-",
-		},
 		{
 			header: t("gradesAndRates.gradeRates.table.rateType"),
 			accessor: "rate_type_name",
@@ -316,7 +301,7 @@ const GradesAndRatesPage = () => {
 			{ value: "", label: t("gradesAndRates.filters.allOrganizations") },
 			...businessGroups.map(org => ({
 				value: org.id,
-				label: org.name_display || org.name || org.code,
+				label: org.organization_name,
 			})),
 		],
 		[businessGroups, t]
@@ -327,7 +312,7 @@ const GradesAndRatesPage = () => {
 			{ value: "", label: t("gradesAndRates.grades.form.selectOrganization") },
 			...businessGroups.map(org => ({
 				value: org.id,
-				label: org.name_display || org.name || org.code,
+				label: org.organization_name,
 			})),
 		],
 		[businessGroups, t]
@@ -349,7 +334,7 @@ const GradesAndRatesPage = () => {
 			{ value: "", label: t("gradesAndRates.filters.allGrades") },
 			...grades.map(g => ({
 				value: g.id,
-				label: `${g.grade_name_display} (${g.code})`,
+				label: `${g.grade_name} (${g.code})`,
 			})),
 		],
 		[grades, t]
@@ -377,10 +362,10 @@ const GradesAndRatesPage = () => {
 	const handleEditGrade = item => {
 		setEditingGrade(item);
 		setGradeFormData({
-			code: item.code || "",
 			grade_name_id: item.grade_name || "",
 			organization_id: item.organization || "",
 			sequence: item.sequence || "",
+			effective_from: item.effective_from || "",
 		});
 		setFormErrors({});
 		setIsGradeModalOpen(true);
@@ -412,6 +397,11 @@ const GradesAndRatesPage = () => {
 		if (!gradeFormData.sequence || parseInt(gradeFormData.sequence) < 1) {
 			errors.sequence = t("gradesAndRates.grades.form.sequenceRequired");
 		}
+
+		if (!gradeFormData.effective_from) {
+			errors.effective_from = t("gradesAndRates.grades.form.effectiveFromRequired");
+		}
+
 		setFormErrors(errors);
 		return Object.keys(errors).length === 0;
 	};
@@ -424,12 +414,8 @@ const GradesAndRatesPage = () => {
 			const payload = {
 				grade_name_id: parseInt(gradeFormData.grade_name_id),
 				sequence: parseInt(gradeFormData.sequence),
+				effective_from: gradeFormData.effective_from,
 			};
-
-			// Include code only if provided (backend auto-generates if omitted)
-			if (gradeFormData.code && gradeFormData.code.trim()) {
-				payload.code = gradeFormData.code.trim();
-			}
 
 			if (editingGrade) {
 				// organization_id is read-only on update
@@ -671,19 +657,6 @@ const GradesAndRatesPage = () => {
 						bgColor="bg-[#fff]"
 					/>
 
-					<CustomInput
-						label={t("gradesAndRates.grades.form.code")}
-						name="code"
-						type="text"
-						maxLength="50"
-						value={gradeFormData.code}
-						onChange={handleGradeInputChange}
-						error={formErrors.code}
-						placeholder={t("gradesAndRates.grades.form.codePlaceholder")}
-						bgColor="bg-[#fff]"
-						disabled={!!editingGrade}
-					/>
-
 					<CustomDropdown
 						label={t("gradesAndRates.grades.form.gradeName")}
 						name="grade_name_id"
@@ -705,6 +678,17 @@ const GradesAndRatesPage = () => {
 						onChange={handleGradeInputChange}
 						error={formErrors.sequence}
 						required
+						bgColor="bg-[#fff]"
+					/>
+					<CustomInput
+						label={t("locations.form.effectiveFrom")}
+						name="effective_from"
+						type="date"
+						value={gradeFormData.effective_from}
+						onChange={handleGradeInputChange}
+						error={formErrors.effective_from}
+						required
+						disabled={!!editingGrade}
 						bgColor="bg-[#fff]"
 					/>
 
@@ -738,7 +722,7 @@ const GradesAndRatesPage = () => {
 				onConfirm={handleConfirmDelete}
 				title={t("gradesAndRates.deleteModal.title")}
 				message={t("gradesAndRates.deleteModal.message", {
-					name: itemToDelete?.grade_name_display || itemToDelete?.code,
+					name: itemToDelete?.grade_name,
 				})}
 				confirmText={t("common.delete")}
 				cancelText={t("common.cancel")}
