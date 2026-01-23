@@ -142,7 +142,7 @@ export const fetchJobVersions = createAsyncThunk("jobs/fetchVersions", async (id
 // Fetch job categories from lookups API
 export const fetchJobCategories = createAsyncThunk("jobs/fetchCategories", async (_, { rejectWithValue }) => {
 	try {
-		const response = await api.get("/core/lookups/values/?lookup_type=JOB_CATEGORY");
+		const response = await api.get("/core/lookups/values/?lookup_type=Job Category");
 		return response.data?.data || response.data || [];
 	} catch (error) {
 		const errorMessage =
@@ -158,7 +158,7 @@ export const fetchJobCategories = createAsyncThunk("jobs/fetchCategories", async
 // Fetch job titles from lookups API
 export const fetchJobTitles = createAsyncThunk("jobs/fetchTitles", async (_, { rejectWithValue }) => {
 	try {
-		const response = await api.get("/core/lookups/values/?lookup_type=JOB_TITLE");
+		const response = await api.get("/core/lookups/values/?lookup_type=Job Title");
 		return response.data?.data || response.data || [];
 	} catch (error) {
 		const errorMessage =
@@ -174,7 +174,7 @@ export const fetchJobTitles = createAsyncThunk("jobs/fetchTitles", async (_, { r
 // Fetch job families from lookups API
 export const fetchJobFamilies = createAsyncThunk("jobs/fetchFamilies", async (_, { rejectWithValue }) => {
 	try {
-		const response = await api.get("/core/lookups/values/?lookup_type=JOB_FAMILY");
+		const response = await api.get("/core/lookups/values/?lookup_type=Job Family");
 		return response.data?.data || response.data || [];
 	} catch (error) {
 		const errorMessage =
@@ -190,7 +190,7 @@ export const fetchJobFamilies = createAsyncThunk("jobs/fetchFamilies", async (_,
 // Fetch functional areas from lookups API
 export const fetchFunctionalAreas = createAsyncThunk("jobs/fetchFunctionalAreas", async (_, { rejectWithValue }) => {
 	try {
-		const response = await api.get("/core/lookups/values/?lookup_type=FUNCTIONAL_AREA");
+		const response = await api.get("/core/lookups/values/?lookup_type=Functional Area");
 		return response.data?.data || response.data || [];
 	} catch (error) {
 		const errorMessage =
@@ -203,11 +203,12 @@ export const fetchFunctionalAreas = createAsyncThunk("jobs/fetchFunctionalAreas"
 	}
 });
 
-// Fetch competencies from lookups API
+// Fetch competencies from person/competencies API
 export const fetchCompetencies = createAsyncThunk("jobs/fetchCompetencies", async (_, { rejectWithValue }) => {
 	try {
-		const response = await api.get("/core/lookups/values/?lookup_type=COMPETENCY");
-		return response.data?.data || response.data || [];
+		const response = await api.get("/hr/person/competencies/?page_size=1000");
+		const data = response.data?.data || response.data;
+		return data?.results || data || [];
 	} catch (error) {
 		const errorMessage =
 			error.response?.data?.message ||
@@ -224,7 +225,7 @@ export const fetchProficiencyLevels = createAsyncThunk(
 	"jobs/fetchProficiencyLevels",
 	async (_, { rejectWithValue }) => {
 		try {
-			const response = await api.get("/core/lookups/values/?lookup_type=PROFICIENCY_LEVEL");
+			const response = await api.get("/core/lookups/values/?lookup_type=Proficiency Level");
 			return response.data?.data || response.data || [];
 		} catch (error) {
 			const errorMessage =
@@ -243,7 +244,7 @@ export const fetchQualificationTypes = createAsyncThunk(
 	"jobs/fetchQualificationTypes",
 	async (_, { rejectWithValue }) => {
 		try {
-			const response = await api.get("/core/lookups/values/?lookup_type=QUALIFICATION_TYPE");
+			const response = await api.get("/core/lookups/values/?lookup_type=Qualification Type");
 			return response.data?.data || response.data || [];
 		} catch (error) {
 			const errorMessage =
@@ -262,7 +263,7 @@ export const fetchQualificationTitles = createAsyncThunk(
 	"jobs/fetchQualificationTitles",
 	async (_, { rejectWithValue }) => {
 		try {
-			const response = await api.get("/core/lookups/values/?lookup_type=QUALIFICATION_TITLE");
+			const response = await api.get("/core/lookups/values/?lookup_type=Qualification Title");
 			return response.data?.data || response.data || [];
 		} catch (error) {
 			const errorMessage =

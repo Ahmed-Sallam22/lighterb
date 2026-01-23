@@ -82,6 +82,8 @@ const CheckListPage = lazy(() => import("./pages/CheckListPage"));
 const CompetenciesPage = lazy(() => import("./pages/CompetenciesPage"));
 const JobsPage = lazy(() => import("./pages/JobsPage"));
 const WorkforceManagementPage = lazy(() => import("./pages/WorkforceManagementPage"));
+const LookupTypesPage = lazy(() => import("./pages/LookupTypesPage"));
+const LookupValuesPage = lazy(() => import("./pages/LookupValuesPage"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -181,6 +183,8 @@ const App = () => {
 						<Route path="checklist" element={<CheckListPage />} />
 						<Route path="competencies" element={<CompetenciesPage />} />
 						<Route path="jobs" element={<JobsPage />} />
+						<Route path="lookups/types" element={<LookupTypesPage />} />
+						<Route path="lookups/values/:lookupTypeName" element={<LookupValuesPage />} />
 					</Route>
 				</Routes>
 			</Suspense>

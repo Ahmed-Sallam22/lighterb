@@ -73,6 +73,16 @@ export const fetchGradeNames = createAsyncThunk("grades/fetchGradeNames", async 
 	}
 });
 
+// Fetch currencies lookup from lookups API
+export const fetchCurrencies = createAsyncThunk("grades/fetchCurrencies", async (_, { rejectWithValue }) => {
+	try {
+		const response = await api.get("/core/lookups/values/?lookup_type=Currency");
+		return response.data?.data || response.data || [];
+	} catch (error) {
+		return rejectWithValue(error.message || "Failed to fetch currencies");
+	}
+});
+
 // Fetch grade rate types (lookup)
 export const fetchGradeRateTypes = createAsyncThunk("grades/fetchGradeRateTypes", async (_, { rejectWithValue }) => {
 	try {
@@ -81,6 +91,61 @@ export const fetchGradeRateTypes = createAsyncThunk("grades/fetchGradeRateTypes"
 		return data.results || data || [];
 	} catch (error) {
 		return rejectWithValue(error.message || "Failed to fetch grade rate types");
+	}
+});
+
+// Fetch single grade rate type by ID
+export const fetchGradeRateTypeById = createAsyncThunk(
+	"grades/fetchGradeRateTypeById",
+	async (id, { rejectWithValue }) => {
+		try {
+			const response = await api.get(`/hr/work_structures/grade-rate-types/${id}/`);
+			return response.data?.data || response.data;
+		} catch (error) {
+			return rejectWithValue(error.message || "Failed to fetch grade rate type");
+		}
+	}
+);
+
+// Create a grade rate type
+export const createGradeRateType = createAsyncThunk(
+	"grades/createGradeRateType",
+	async (rateTypeData, { rejectWithValue }) => {
+		try {
+			const response = await api.post("/hr/work_structures/grade-rate-types/", rateTypeData);
+			return response.data?.data || response.data;
+		} catch (error) {
+			if (error.data) {
+				return rejectWithValue(error.data);
+			}
+			return rejectWithValue(error.message || "Failed to create grade rate type");
+		}
+	}
+);
+
+// Update a grade rate type
+export const updateGradeRateType = createAsyncThunk(
+	"grades/updateGradeRateType",
+	async ({ id, data }, { rejectWithValue }) => {
+		try {
+			const response = await api.patch(`/hr/work_structures/grade-rate-types/${id}/`, data);
+			return response.data?.data || response.data;
+		} catch (error) {
+			if (error.data) {
+				return rejectWithValue(error.data);
+			}
+			return rejectWithValue(error.message || "Failed to update grade rate type");
+		}
+	}
+);
+
+// Delete a grade rate type
+export const deleteGradeRateType = createAsyncThunk("grades/deleteGradeRateType", async (id, { rejectWithValue }) => {
+	try {
+		await api.delete(`/hr/work_structures/grade-rate-types/${id}/`);
+		return id;
+	} catch (error) {
+		return rejectWithValue(error.message || "Failed to delete grade rate type");
 	}
 });
 
@@ -97,6 +162,16 @@ export const fetchGradeRates = createAsyncThunk("grades/fetchGradeRates", async 
 		};
 	} catch (error) {
 		return rejectWithValue(error.message || "Failed to fetch grade rates");
+	}
+});
+
+// Fetch single grade rate by ID
+export const fetchGradeRateById = createAsyncThunk("grades/fetchGradeRateById", async (id, { rejectWithValue }) => {
+	try {
+		const response = await api.get(`/hr/work_structures/grade-rates/${id}/`);
+		return response.data?.data || response.data;
+	} catch (error) {
+		return rejectWithValue(error.message || "Failed to fetch grade rate");
 	}
 });
 
@@ -307,6 +382,11 @@ const gradesSlice = createSlice({
 			// Fetch grade rate types
 			.addCase(fetchGradeRateTypes.fulfilled, (state, action) => {
 				state.gradeRateTypes = action.payload;
+			})
+
+			// Fetch currencies
+			.addCase(fetchCurrencies.fulfilled, (state, action) => {
+				state.currencies = action.payload;
 			})
 
 			// Create grade rate

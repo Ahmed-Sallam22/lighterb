@@ -26,8 +26,6 @@ import {
 	deleteJob,
 	fetchJobCategories,
 	fetchJobTitles,
-	fetchJobFamilies,
-	fetchFunctionalAreas,
 	fetchCompetencies,
 	fetchProficiencyLevels,
 	fetchQualificationTypes,
@@ -44,21 +42,19 @@ const FORM_INITIAL_STATE = {
 	business_group_id: "",
 	job_category_id: "",
 	job_title_id: "",
-	job_family_id: "",
 	job_description: "",
 	responsibilities: [],
-	functional_area_id: "",
 	competency_requirements: [],
 	qualification_requirements: [],
 	grade_ids: [],
 	effective_start_date: "",
+	new_start_date: "", // Used for editing
 };
 
 const INITIAL_FILTERS = {
 	search: "",
 	business_group: "",
 	category: "",
-	family: "",
 };
 
 const JobsPage = () => {
@@ -71,9 +67,10 @@ const JobsPage = () => {
 		currentJob,
 		jobCategories,
 		jobTitles,
-		jobFamilies,
-		functionalAreas,
-		// competencies, proficiencyLevels, qualificationTypes, qualificationTitles - available for complex array inputs
+		competencies,
+		proficiencyLevels,
+		qualificationTypes,
+		qualificationTitles,
 		loading,
 		detailLoading,
 		creating,
@@ -101,6 +98,14 @@ const JobsPage = () => {
 	const [filters, setFilters] = useState(INITIAL_FILTERS);
 	const [newResponsibility, setNewResponsibility] = useState("");
 
+	// Competency requirement form state
+	const [newCompetencyId, setNewCompetencyId] = useState("");
+	const [newProficiencyLevelId, setNewProficiencyLevelId] = useState("");
+
+	// Qualification requirement form state
+	const [newQualificationTypeId, setNewQualificationTypeId] = useState("");
+	const [newQualificationTitleId, setNewQualificationTitleId] = useState("");
+
 	// Versions modal state
 	const [isVersionsModalOpen, setIsVersionsModalOpen] = useState(false);
 	const [versionsData, setVersionsData] = useState([]);
@@ -112,8 +117,6 @@ const JobsPage = () => {
 		dispatch(fetchBusinessGroupsFromOrganizations({ page_size: 100 }));
 		dispatch(fetchJobCategories());
 		dispatch(fetchJobTitles());
-		dispatch(fetchJobFamilies());
-		dispatch(fetchFunctionalAreas());
 		dispatch(fetchCompetencies());
 		dispatch(fetchProficiencyLevels());
 		dispatch(fetchQualificationTypes());
@@ -130,7 +133,6 @@ const JobsPage = () => {
 		if (filters.search) params.search = filters.search;
 		if (filters.business_group) params.business_group = filters.business_group;
 		if (filters.category) params.category = filters.category;
-		if (filters.family) params.family = filters.family;
 
 		dispatch(fetchJobs(params));
 	}, [dispatch, page, localPageSize, filters]);
@@ -197,19 +199,9 @@ const JobsPage = () => {
 
 	const columns = [
 		{
-			header: t("jobs.table.code"),
-			accessor: "code",
-			render: value => <span className="font-medium text-gray-900">{value || "-"}</span>,
-		},
-		{
-			header: t("jobs.table.jobTitle"),
-			accessor: "job_title_name",
-			render: value => value || "-",
-		},
-		{
 			header: t("jobs.table.businessGroup"),
 			accessor: "business_group_name",
-			render: value => value || "-",
+			render: value => <span className="font-medium text-gray-900">{value || "-"}</span>,
 		},
 		{
 			header: t("jobs.table.category"),
@@ -217,19 +209,23 @@ const JobsPage = () => {
 			render: value => value || "-",
 		},
 		{
-			header: t("jobs.table.family"),
-			accessor: "job_family_name",
+			header: t("jobs.table.jobTitle"),
+			accessor: "job_title_name",
 			render: value => value || "-",
+		},
+		{
+			header: t("jobs.table.description"),
+			accessor: "job_description",
+			render: value => (
+				<span className="line-clamp-2 max-w-xs" title={value || ""}>
+					{value || "-"}
+				</span>
+			),
 		},
 		{
 			header: t("jobs.table.startDate"),
 			accessor: "effective_start_date",
 			render: value => formatDate(value),
-		},
-		{
-			header: t("jobs.table.status"),
-			accessor: "effective_end_date",
-			render: (value, row) => renderStatus(row.effective_start_date, value),
 		},
 	];
 
@@ -237,7 +233,7 @@ const JobsPage = () => {
 	const businessGroupOptions = useMemo(
 		() => [
 			{ value: "", label: t("jobs.form.selectBusinessGroup") },
-			...businessGroups.map(bg => ({ value: bg.id, label: `${bg.name_display} - ${bg.code}` })),
+			...businessGroups.map(bg => ({ value: bg.id, label: `${bg.organization_name}` })),
 		],
 		[businessGroups, t]
 	);
@@ -245,7 +241,7 @@ const JobsPage = () => {
 	const categoryOptions = useMemo(
 		() => [
 			{ value: "", label: t("jobs.form.selectCategory") },
-			...jobCategories.map(cat => ({ value: cat.id, label: cat.name || cat.name_display })),
+			...jobCategories.map(cat => ({ value: cat.id, label: cat.name || cat.organization_name })),
 		],
 		[jobCategories, t]
 	);
@@ -253,32 +249,48 @@ const JobsPage = () => {
 	const titleOptions = useMemo(
 		() => [
 			{ value: "", label: t("jobs.form.selectTitle") },
-			...jobTitles.map(title => ({ value: title.id, label: title.name || title.name_display })),
+			...jobTitles.map(title => ({ value: title.id, label: title.name || title.organization_name })),
 		],
 		[jobTitles, t]
 	);
 
-	const familyOptions = useMemo(
+	const competencyOptions = useMemo(
 		() => [
-			{ value: "", label: t("jobs.form.selectFamily") },
-			...jobFamilies.map(fam => ({ value: fam.id, label: fam.name || fam.name_display })),
+			{ value: "", label: t("jobs.form.selectCompetency") },
+			...competencies.map(comp => ({ value: comp.id, label: comp.name || comp.organization_name })),
 		],
-		[jobFamilies, t]
+		[competencies, t]
 	);
 
-	const functionalAreaOptions = useMemo(
+	const proficiencyLevelOptions = useMemo(
 		() => [
-			{ value: "", label: t("jobs.form.selectFunctionalArea") },
-			...functionalAreas.map(fa => ({ value: fa.id, label: fa.name || fa.name_display })),
+			{ value: "", label: t("jobs.form.selectProficiencyLevel") },
+			...proficiencyLevels.map(level => ({ value: level.id, label: level.name || level.organization_name })),
 		],
-		[functionalAreas, t]
+		[proficiencyLevels, t]
+	);
+
+	const qualificationTypeOptions = useMemo(
+		() => [
+			{ value: "", label: t("jobs.form.selectQualificationType") },
+			...qualificationTypes.map(type => ({ value: type.id, label: type.name || type.organization_name })),
+		],
+		[qualificationTypes, t]
+	);
+
+	const qualificationTitleOptions = useMemo(
+		() => [
+			{ value: "", label: t("jobs.form.selectQualificationTitle") },
+			...qualificationTitles.map(title => ({ value: title.id, label: title.name || title.organization_name })),
+		],
+		[qualificationTitles, t]
 	);
 
 	const gradeOptions = useMemo(
 		() =>
 			grades.map(grade => ({
 				value: grade.id,
-				label: `${grade.code} - ${grade.grade_name_display || grade.code}`,
+				label: `${grade.code} - ${grade.grade_organization_name || grade.code}`,
 			})),
 		[grades]
 	);
@@ -287,7 +299,7 @@ const JobsPage = () => {
 	const filterBusinessGroupOptions = useMemo(
 		() => [
 			{ value: "", label: t("jobs.filters.allBusinessGroups") },
-			...businessGroups.map(bg => ({ value: bg.id, label: bg.name_display || bg.name })),
+			...businessGroups.map(bg => ({ value: bg.id, label: bg.organization_name || bg.name })),
 		],
 		[businessGroups, t]
 	);
@@ -295,17 +307,9 @@ const JobsPage = () => {
 	const filterCategoryOptions = useMemo(
 		() => [
 			{ value: "", label: t("jobs.filters.allCategories") },
-			...jobCategories.map(cat => ({ value: cat.id, label: cat.name || cat.name_display })),
+			...jobCategories.map(cat => ({ value: cat.id, label: cat.name || cat.organization_name })),
 		],
 		[jobCategories, t]
-	);
-
-	const filterFamilyOptions = useMemo(
-		() => [
-			{ value: "", label: t("jobs.filters.allFamilies") },
-			...jobFamilies.map(fam => ({ value: fam.id, label: fam.name || fam.name_display })),
-		],
-		[jobFamilies, t]
 	);
 
 	const handleCreate = () => {
@@ -325,34 +329,32 @@ const JobsPage = () => {
 			const jobData = await dispatch(fetchJob(item.id)).unwrap();
 			setFormData({
 				code: jobData.code || "",
-				business_group_id: jobData.business_group || "",
-				job_category_id: jobData.job_category || "",
-				job_title_id: jobData.job_title || "",
-				job_family_id: jobData.job_family || "",
+				business_group_id: jobData.business_group_id || "",
+				job_category_id: jobData.job_category_id || "",
+				job_title_id: jobData.job_title_id || "",
 				job_description: jobData.job_description || "",
 				responsibilities: jobData.responsibilities || [],
-				functional_area_id: jobData.functional_area || "",
 				competency_requirements: jobData.competency_requirements || [],
 				qualification_requirements: jobData.qualification_requirements || [],
 				grade_ids: jobData.grades || [],
 				effective_start_date: jobData.effective_start_date || "",
+				new_start_date: "",
 			});
 		} catch (error) {
 			toast.error(parseApiError(error) || t("jobs.messages.fetchError"));
 			// Fallback to item data if fetch fails
 			setFormData({
 				code: item.code || "",
-				business_group_id: item.business_group || "",
-				job_category_id: item.job_category || "",
-				job_title_id: item.job_title || "",
-				job_family_id: item.job_family || "",
+				business_group_id: item.business_group_id || "",
+				job_category_id: item.job_category_id || "",
+				job_title_id: item.job_title_id || "",
 				job_description: item.job_description || "",
 				responsibilities: [],
-				functional_area_id: "",
 				competency_requirements: [],
 				qualification_requirements: [],
 				grade_ids: [],
 				effective_start_date: item.effective_start_date || "",
+				new_start_date: "",
 			});
 		}
 	};
@@ -373,6 +375,10 @@ const JobsPage = () => {
 		setFormData(FORM_INITIAL_STATE);
 		setFormErrors({});
 		setNewResponsibility("");
+		setNewCompetencyId("");
+		setNewProficiencyLevelId("");
+		setNewQualificationTypeId("");
+		setNewQualificationTitleId("");
 	};
 
 	const handleCloseViewModal = () => {
@@ -409,6 +415,66 @@ const JobsPage = () => {
 		}));
 	};
 
+	// Competency requirement handlers
+	const handleAddCompetencyRequirement = () => {
+		if (newCompetencyId && newProficiencyLevelId) {
+			const competency = competencies.find(c => c.id === parseInt(newCompetencyId));
+			const proficiencyLevel = proficiencyLevels.find(p => p.id === parseInt(newProficiencyLevelId));
+
+			setFormData(prev => ({
+				...prev,
+				competency_requirements: [
+					...prev.competency_requirements,
+					{
+						competency_id: parseInt(newCompetencyId),
+						competency_name: competency?.name || competency?.organization_name || "",
+						proficiency_level_id: parseInt(newProficiencyLevelId),
+						proficiency_level_name: proficiencyLevel?.name || proficiencyLevel?.organization_name || "",
+					},
+				],
+			}));
+			setNewCompetencyId("");
+			setNewProficiencyLevelId("");
+		}
+	};
+
+	const handleRemoveCompetencyRequirement = index => {
+		setFormData(prev => ({
+			...prev,
+			competency_requirements: prev.competency_requirements.filter((_, i) => i !== index),
+		}));
+	};
+
+	// Qualification requirement handlers
+	const handleAddQualificationRequirement = () => {
+		if (newQualificationTypeId && newQualificationTitleId) {
+			const qualType = qualificationTypes.find(t => t.id === parseInt(newQualificationTypeId));
+			const qualTitle = qualificationTitles.find(t => t.id === parseInt(newQualificationTitleId));
+
+			setFormData(prev => ({
+				...prev,
+				qualification_requirements: [
+					...prev.qualification_requirements,
+					{
+						qualification_type_id: parseInt(newQualificationTypeId),
+						qualification_type_name: qualType?.name || qualType?.organization_name || "",
+						qualification_title_id: parseInt(newQualificationTitleId),
+						qualification_title_name: qualTitle?.name || qualTitle?.organization_name || "",
+					},
+				],
+			}));
+			setNewQualificationTypeId("");
+			setNewQualificationTitleId("");
+		}
+	};
+
+	const handleRemoveQualificationRequirement = index => {
+		setFormData(prev => ({
+			...prev,
+			qualification_requirements: prev.qualification_requirements.filter((_, i) => i !== index),
+		}));
+	};
+
 	const validateForm = () => {
 		const errors = {};
 		if (!editingItem && !formData.code?.trim()) {
@@ -417,10 +483,13 @@ const JobsPage = () => {
 		if (!formData.business_group_id) {
 			errors.business_group_id = t("jobs.form.businessGroupRequired");
 		}
+		if (!formData.job_category_id) {
+			errors.job_category_id = t("jobs.form.categoryRequired");
+		}
 		if (!formData.job_title_id) {
 			errors.job_title_id = t("jobs.form.titleRequired");
 		}
-		if (!formData.effective_start_date) {
+		if (!editingItem && !formData.effective_start_date) {
 			errors.effective_start_date = t("jobs.form.startDateRequired");
 		}
 		setFormErrors(errors);
@@ -432,40 +501,70 @@ const JobsPage = () => {
 		if (!validateForm()) return;
 
 		try {
-			const submitData = {
-				business_group_id: formData.business_group_id,
-				job_title_id: formData.job_title_id,
-				job_description: formData.job_description,
-				effective_start_date: formData.effective_start_date,
-			};
-
-			if (formData.job_category_id) {
-				submitData.job_category_id = formData.job_category_id;
-			}
-			if (formData.job_family_id) {
-				submitData.job_family_id = formData.job_family_id;
-			}
-			if (formData.functional_area_id) {
-				submitData.functional_area_id = formData.functional_area_id;
-			}
-			if (formData.responsibilities && formData.responsibilities.length > 0) {
-				submitData.responsibilities = formData.responsibilities;
-			}
-			if (formData.competency_requirements && formData.competency_requirements.length > 0) {
-				submitData.competency_requirements = formData.competency_requirements;
-			}
-			if (formData.qualification_requirements && formData.qualification_requirements.length > 0) {
-				submitData.qualification_requirements = formData.qualification_requirements;
-			}
-			if (formData.grade_ids && formData.grade_ids.length > 0) {
-				submitData.grade_ids = formData.grade_ids.map(id => parseInt(id));
-			}
-
 			if (editingItem) {
-				await dispatch(updateJob({ id: editingItem.id, data: submitData })).unwrap();
+				// PATCH request - use new_start_date if provided
+				const updateData = {
+					job_category_id: formData.job_category_id,
+					job_title_id: formData.job_title_id,
+					job_description: formData.job_description,
+				};
+
+				if (formData.new_start_date) {
+					updateData.new_start_date = formData.new_start_date;
+				}
+				if (formData.responsibilities && formData.responsibilities.length > 0) {
+					updateData.responsibilities = formData.responsibilities;
+				}
+				if (formData.competency_requirements && formData.competency_requirements.length > 0) {
+					updateData.competency_requirements = formData.competency_requirements.map(req => ({
+						competency_id: req.competency_id,
+						proficiency_level_id: req.proficiency_level_id,
+					}));
+				}
+				if (formData.qualification_requirements && formData.qualification_requirements.length > 0) {
+					updateData.qualification_requirements = formData.qualification_requirements.map(req => ({
+						qualification_type_id: req.qualification_type_id,
+						qualification_title_id: req.qualification_title_id,
+					}));
+				}
+				if (formData.grade_ids && formData.grade_ids.length > 0) {
+					updateData.grade_ids = formData.grade_ids.map(id => parseInt(id));
+				}
+
+				await dispatch(updateJob({ id: editingItem.id, data: updateData })).unwrap();
 				toast.success(t("jobs.messages.updateSuccess"));
 			} else {
-				submitData.code = formData.code;
+				// POST request
+				const submitData = {
+					code: formData.code,
+					business_group_id: formData.business_group_id,
+					job_category_id: formData.job_category_id,
+					job_title_id: formData.job_title_id,
+					job_description: formData.job_description,
+				};
+
+				if (formData.effective_start_date) {
+					submitData.effective_start_date = formData.effective_start_date;
+				}
+				if (formData.responsibilities && formData.responsibilities.length > 0) {
+					submitData.responsibilities = formData.responsibilities;
+				}
+				if (formData.competency_requirements && formData.competency_requirements.length > 0) {
+					submitData.competency_requirements = formData.competency_requirements.map(req => ({
+						competency_id: req.competency_id,
+						proficiency_level_id: req.proficiency_level_id,
+					}));
+				}
+				if (formData.qualification_requirements && formData.qualification_requirements.length > 0) {
+					submitData.qualification_requirements = formData.qualification_requirements.map(req => ({
+						qualification_type_id: req.qualification_type_id,
+						qualification_title_id: req.qualification_title_id,
+					}));
+				}
+				if (formData.grade_ids && formData.grade_ids.length > 0) {
+					submitData.grade_ids = formData.grade_ids.map(id => parseInt(id));
+				}
+
 				await dispatch(createJob(submitData)).unwrap();
 				toast.success(t("jobs.messages.createSuccess"));
 			}
@@ -525,7 +624,7 @@ const JobsPage = () => {
 			<div className="p-6">
 				{/* Filters Section */}
 				<div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-					<div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+					<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 						<CustomInput
 							label={t("jobs.filters.search")}
 							name="search"
@@ -547,14 +646,6 @@ const JobsPage = () => {
 							value={filters.category}
 							onChange={handleFilterChange}
 							options={filterCategoryOptions}
-							showBorder={true}
-						/>
-						<CustomDropdown
-							label={t("jobs.filters.family")}
-							name="family"
-							value={filters.family}
-							onChange={handleFilterChange}
-							options={filterFamilyOptions}
 							showBorder={true}
 						/>
 						<div className="flex items-end">
@@ -655,42 +746,34 @@ const JobsPage = () => {
 							value={formData.job_category_id}
 							onChange={handleInputChange}
 							options={categoryOptions}
+							error={formErrors.job_category_id}
+							required
 							bgColor="bg-[#fff]"
 							showBorder={true}
 						/>
 					</div>
 
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<CustomDropdown
-							label={t("jobs.form.jobFamily")}
-							name="job_family_id"
-							value={formData.job_family_id}
+					{!editingItem ? (
+						<CustomInput
+							label={t("jobs.form.startDate")}
+							name="effective_start_date"
+							type="date"
+							value={formData.effective_start_date}
 							onChange={handleInputChange}
-							options={familyOptions}
+							error={formErrors.effective_start_date}
+							required
 							bgColor="bg-[#fff]"
-							showBorder={true}
 						/>
-						<CustomDropdown
-							label={t("jobs.form.functionalArea")}
-							name="functional_area_id"
-							value={formData.functional_area_id}
+					) : (
+						<CustomInput
+							label={t("jobs.form.newStartDate")}
+							name="new_start_date"
+							type="date"
+							value={formData.new_start_date}
 							onChange={handleInputChange}
-							options={functionalAreaOptions}
 							bgColor="bg-[#fff]"
-							showBorder={true}
 						/>
-					</div>
-
-					<CustomInput
-						label={t("jobs.form.startDate")}
-						name="effective_start_date"
-						type="date"
-						value={formData.effective_start_date}
-						onChange={handleInputChange}
-						error={formErrors.effective_start_date}
-						required
-						bgColor="bg-[#fff]"
-					/>
+					)}
 
 					<MultiSelectDropdown
 						label={t("jobs.form.grades")}
@@ -752,6 +835,118 @@ const JobsPage = () => {
 						</div>
 					</div>
 
+					{/* Competency Requirements */}
+					<div>
+						<label className="block text-sm font-medium text-gray-700 mb-2">
+							{t("jobs.form.competencyRequirements")}
+						</label>
+						<div className="space-y-2">
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+								<CustomDropdown
+									name="newCompetencyId"
+									value={newCompetencyId}
+									onChange={e => setNewCompetencyId(e.target.value)}
+									options={competencyOptions}
+									bgColor="bg-[#fff]"
+									showBorder={true}
+								/>
+								<CustomDropdown
+									name="newProficiencyLevelId"
+									value={newProficiencyLevelId}
+									onChange={e => setNewProficiencyLevelId(e.target.value)}
+									options={proficiencyLevelOptions}
+									bgColor="bg-[#fff]"
+									showBorder={true}
+								/>
+								<button
+									type="button"
+									onClick={handleAddCompetencyRequirement}
+									disabled={!newCompetencyId || !newProficiencyLevelId}
+									className="px-4 py-2 bg-[#1D7A8C] text-white rounded-lg hover:bg-[#156576] transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+								>
+									{t("common.add")}
+								</button>
+							</div>
+							{formData.competency_requirements.length > 0 && (
+								<ul className="space-y-2 mt-2">
+									{formData.competency_requirements.map((req, index) => (
+										<li
+											key={index}
+											className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+										>
+											<span className="text-gray-700">
+												{req.competency_name} - {req.proficiency_level_name}
+											</span>
+											<button
+												type="button"
+												onClick={() => handleRemoveCompetencyRequirement(index)}
+												className="text-red-500 hover:text-red-700 font-medium"
+											>
+												×
+											</button>
+										</li>
+									))}
+								</ul>
+							)}
+						</div>
+					</div>
+
+					{/* Qualification Requirements */}
+					<div>
+						<label className="block text-sm font-medium text-gray-700 mb-2">
+							{t("jobs.form.qualificationRequirements")}
+						</label>
+						<div className="space-y-2">
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+								<CustomDropdown
+									name="newQualificationTypeId"
+									value={newQualificationTypeId}
+									onChange={e => setNewQualificationTypeId(e.target.value)}
+									options={qualificationTypeOptions}
+									bgColor="bg-[#fff]"
+									showBorder={true}
+								/>
+								<CustomDropdown
+									name="newQualificationTitleId"
+									value={newQualificationTitleId}
+									onChange={e => setNewQualificationTitleId(e.target.value)}
+									options={qualificationTitleOptions}
+									bgColor="bg-[#fff]"
+									showBorder={true}
+								/>
+								<button
+									type="button"
+									onClick={handleAddQualificationRequirement}
+									disabled={!newQualificationTypeId || !newQualificationTitleId}
+									className="px-4 py-2 bg-[#1D7A8C] text-white rounded-lg hover:bg-[#156576] transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+								>
+									{t("common.add")}
+								</button>
+							</div>
+							{formData.qualification_requirements.length > 0 && (
+								<ul className="space-y-2 mt-2">
+									{formData.qualification_requirements.map((req, index) => (
+										<li
+											key={index}
+											className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+										>
+											<span className="text-gray-700">
+												{req.qualification_type_name} - {req.qualification_title_name}
+											</span>
+											<button
+												type="button"
+												onClick={() => handleRemoveQualificationRequirement(index)}
+												className="text-red-500 hover:text-red-700 font-medium"
+											>
+												×
+											</button>
+										</li>
+									))}
+								</ul>
+							)}
+						</div>
+					</div>
+
 					<CustomInput
 						label={t("jobs.form.description")}
 						name="job_description"
@@ -801,6 +996,20 @@ const JobsPage = () => {
 								</div>
 								<div>
 									<label className="text-sm font-medium text-gray-500">
+										{t("jobs.form.businessGroup")}
+									</label>
+									<p className="text-gray-900">{currentJob.business_group_name || "-"}</p>
+								</div>
+							</div>
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("jobs.form.jobCategory")}
+									</label>
+									<p className="text-gray-900">{currentJob.job_category_name || "-"}</p>
+								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
 										{t("jobs.form.jobTitle")}
 									</label>
 									<p className="text-gray-900">{currentJob.job_title_name || "-"}</p>
@@ -809,29 +1018,15 @@ const JobsPage = () => {
 							<div className="grid grid-cols-2 gap-4">
 								<div>
 									<label className="text-sm font-medium text-gray-500">
-										{t("jobs.form.businessGroup")}
-									</label>
-									<p className="text-gray-900">{currentJob.business_group_name || "-"}</p>
-								</div>
-								<div>
-									<label className="text-sm font-medium text-gray-500">
-										{t("jobs.form.jobCategory")}
-									</label>
-									<p className="text-gray-900">{currentJob.job_category_name || "-"}</p>
-								</div>
-							</div>
-							<div className="grid grid-cols-2 gap-4">
-								<div>
-									<label className="text-sm font-medium text-gray-500">
-										{t("jobs.form.jobFamily")}
-									</label>
-									<p className="text-gray-900">{currentJob.job_family_name || "-"}</p>
-								</div>
-								<div>
-									<label className="text-sm font-medium text-gray-500">
 										{t("jobs.form.startDate")}
 									</label>
 									<p className="text-gray-900">{formatDate(currentJob.effective_start_date)}</p>
+								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("jobs.form.endDate")}
+									</label>
+									<p className="text-gray-900">{formatDate(currentJob.effective_end_date)}</p>
 								</div>
 							</div>
 							<div>
@@ -840,14 +1035,28 @@ const JobsPage = () => {
 								</label>
 								<p className="text-gray-900">{currentJob.job_description || "-"}</p>
 							</div>
+							{currentJob.responsibilities?.length > 0 && (
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("jobs.form.responsibilities")}
+									</label>
+									<ul className="list-disc list-inside text-gray-900 mt-1">
+										{currentJob.responsibilities.map((resp, idx) => (
+											<li key={idx}>{resp}</li>
+										))}
+									</ul>
+								</div>
+							)}
 							{currentJob.competency_requirements?.length > 0 && (
 								<div>
 									<label className="text-sm font-medium text-gray-500">
 										{t("jobs.competencyRequirements")}
 									</label>
-									<ul className="list-disc list-inside text-gray-900">
+									<ul className="list-disc list-inside text-gray-900 mt-1">
 										{currentJob.competency_requirements.map((req, idx) => (
-											<li key={idx}>{req.name || req}</li>
+											<li key={idx}>
+												{req.competency_name} - {req.proficiency_level_name}
+											</li>
 										))}
 									</ul>
 								</div>
@@ -857,9 +1066,11 @@ const JobsPage = () => {
 									<label className="text-sm font-medium text-gray-500">
 										{t("jobs.qualificationRequirements")}
 									</label>
-									<ul className="list-disc list-inside text-gray-900">
+									<ul className="list-disc list-inside text-gray-900 mt-1">
 										{currentJob.qualification_requirements.map((req, idx) => (
-											<li key={idx}>{req.name || req}</li>
+											<li key={idx}>
+												{req.qualification_type_name} - {req.qualification_title_name}
+											</li>
 										))}
 									</ul>
 								</div>
@@ -869,9 +1080,9 @@ const JobsPage = () => {
 									<label className="text-sm font-medium text-gray-500">
 										{t("jobs.gradeDetails")}
 									</label>
-									<ul className="list-disc list-inside text-gray-900">
+									<ul className="list-disc list-inside text-gray-900 mt-1">
 										{currentJob.grade_details.map((grade, idx) => (
-											<li key={idx}>{grade.name || grade}</li>
+											<li key={idx}>{grade.name}</li>
 										))}
 									</ul>
 								</div>

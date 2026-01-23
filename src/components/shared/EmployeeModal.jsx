@@ -88,7 +88,7 @@ const EmployeeModal = ({ isOpen, onClose, mode = "create", employee = null, onSu
 	const organizationOptions = useMemo(() => {
 		return organizations.map(org => ({
 			value: org.id,
-			label: org.name_display || org.code || "Unnamed Organization",
+			label: org.organization_name || org.code || "Unnamed Organization",
 		}));
 	}, [organizations]);
 

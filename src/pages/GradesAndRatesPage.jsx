@@ -20,12 +20,22 @@ import Tabs from "../components/shared/Tabs";
 
 import {
 	fetchGrades,
+	fetchGradeById,
 	createGrade,
 	updateGrade,
 	deleteGrade,
 	fetchGradeRates,
+	fetchGradeRateById,
+	createGradeRate,
+	updateGradeRate,
+	deleteGradeRate,
 	fetchGradeNames,
 	fetchGradeRateTypes,
+	fetchGradeRateTypeById,
+	createGradeRateType,
+	updateGradeRateType,
+	deleteGradeRateType,
+	fetchCurrencies,
 	setPage as setGradePage,
 	setRatesPage,
 } from "../store/gradesSlice";
@@ -36,6 +46,22 @@ const GRADE_FORM_INITIAL = {
 	organization_id: "",
 	sequence: "",
 	effective_from: "",
+};
+
+const RATE_TYPE_FORM_INITIAL = {
+	code: "",
+	description: "",
+};
+
+const RATE_FORM_INITIAL = {
+	grade_id: "",
+	rate_type_id: "",
+	min_amount: "",
+	max_amount: "",
+	fixed_amount: "",
+	currency_id: "",
+	effective_start_date: "",
+	effective_end_date: "",
 };
 
 const INITIAL_FILTERS = {
@@ -62,6 +88,7 @@ const GradesAndRatesPage = () => {
 		gradeRates,
 		gradeNames,
 		gradeRateTypes,
+		currencies,
 		loading: gradeLoading,
 		ratesLoading,
 		count: gradeCount,
@@ -86,15 +113,32 @@ const GradesAndRatesPage = () => {
 	const [gradeFormData, setGradeFormData] = useState(GRADE_FORM_INITIAL);
 	const [formErrors, setFormErrors] = useState({});
 	const [localPageSize, setLocalPageSize] = useState(25);
-	const [localRatesPageSize, setLocalRatesPageSize] = useState(25);
+	const [localRatesPageSize, setLocalRatesPageSize] = useState(20);
 	const [filters, setFilters] = useState(INITIAL_FILTERS);
 	const [ratesFilters, setRatesFilters] = useState(INITIAL_RATES_FILTERS);
+
+	// Rate Type modal state
+	const [isRateTypeModalOpen, setIsRateTypeModalOpen] = useState(false);
+	const [editingRateType, setEditingRateType] = useState(null);
+	const [rateTypeFormData, setRateTypeFormData] = useState(RATE_TYPE_FORM_INITIAL);
+	const [rateTypeFormErrors, setRateTypeFormErrors] = useState({});
+	const [isDeleteRateTypeModalOpen, setIsDeleteRateTypeModalOpen] = useState(false);
+	const [rateTypeToDelete, setRateTypeToDelete] = useState(null);
+
+	// Rate modal state
+	const [isRateModalOpen, setIsRateModalOpen] = useState(false);
+	const [editingRate, setEditingRate] = useState(null);
+	const [rateFormData, setRateFormData] = useState(RATE_FORM_INITIAL);
+	const [rateFormErrors, setRateFormErrors] = useState({});
+	const [isDeleteRateModalOpen, setIsDeleteRateModalOpen] = useState(false);
+	const [rateToDelete, setRateToDelete] = useState(null);
 
 	// Fetch initial data
 	useEffect(() => {
 		dispatch(fetchOrganizations({ is_business_group: true }));
 		dispatch(fetchGradeNames());
 		dispatch(fetchGradeRateTypes());
+		dispatch(fetchCurrencies());
 	}, [dispatch]);
 
 	// Fetch grades when page or filters change
@@ -128,8 +172,12 @@ const GradesAndRatesPage = () => {
 		newPageSize => {
 			setLocalPageSize(newPageSize);
 			dispatch(setGradePage(1));
+			const params = { page: 1, page_size: newPageSize };
+			if (filters.search) params.search = filters.search;
+			if (filters.organization) params.organization = filters.organization;
+			dispatch(fetchGrades(params));
 		},
-		[dispatch]
+		[dispatch, filters]
 	);
 
 	const handleRatesPageChange = useCallback(
@@ -143,8 +191,12 @@ const GradesAndRatesPage = () => {
 		newPageSize => {
 			setLocalRatesPageSize(newPageSize);
 			dispatch(setRatesPage(1));
+			const params = { page: 1, page_size: newPageSize };
+			if (ratesFilters.grade) params.grade = ratesFilters.grade;
+			if (ratesFilters.rate_type) params.rate_type = ratesFilters.rate_type;
+			dispatch(fetchGradeRates(params));
 		},
-		[dispatch]
+		[dispatch, ratesFilters]
 	);
 
 	const handleFilterChange = e => {
@@ -223,11 +275,6 @@ const GradesAndRatesPage = () => {
 	// Grade Rates columns (read-only table)
 	const gradeRatesColumns = [
 		{
-			header: t("gradesAndRates.gradeRates.table.rateType"),
-			accessor: "rate_type_name",
-			render: value => value || "-",
-		},
-		{
 			header: t("gradesAndRates.gradeRates.table.rateCode"),
 			accessor: "rate_type_code",
 			render: value => value || "-",
@@ -277,16 +324,6 @@ const GradesAndRatesPage = () => {
 			render: value => value || "-",
 		},
 		{
-			header: t("gradesAndRates.gradeRateTypes.table.name"),
-			accessor: "name",
-			render: value => value || "-",
-		},
-		{
-			header: t("gradesAndRates.gradeRateTypes.table.hasRange"),
-			accessor: "has_range",
-			render: renderBoolean,
-		},
-		{
 			header: t("gradesAndRates.gradeRateTypes.table.description"),
 			accessor: "description",
 			render: value => value || "-",
@@ -334,7 +371,7 @@ const GradesAndRatesPage = () => {
 			{ value: "", label: t("gradesAndRates.filters.allGrades") },
 			...grades.map(g => ({
 				value: g.id,
-				label: `${g.grade_name} (${g.code})`,
+				label: `${g.grade_name} - ${g.organization_name}`,
 			})),
 		],
 		[grades, t]
@@ -345,10 +382,21 @@ const GradesAndRatesPage = () => {
 			{ value: "", label: t("gradesAndRates.filters.allRateTypes") },
 			...gradeRateTypes.map(rt => ({
 				value: rt.id,
-				label: rt.name,
+				label: rt.code,
 			})),
 		],
 		[gradeRateTypes, t]
+	);
+
+	const currencyOptions = useMemo(
+		() => [
+			{ value: "", label: t("gradesAndRates.gradeRates.form.selectCurrency") },
+			...(currencies || []).map(curr => ({
+				value: curr.id,
+				label: `${curr.name} - ${curr.description}`,
+			})),
+		],
+		[currencies, t]
 	);
 
 	// Grade modal handlers
@@ -359,16 +407,23 @@ const GradesAndRatesPage = () => {
 		setIsGradeModalOpen(true);
 	};
 
-	const handleEditGrade = item => {
-		setEditingGrade(item);
-		setGradeFormData({
-			grade_name_id: item.grade_name || "",
-			organization_id: item.organization || "",
-			sequence: item.sequence || "",
-			effective_from: item.effective_from || "",
-		});
-		setFormErrors({});
-		setIsGradeModalOpen(true);
+	const handleEditGrade = async item => {
+		try {
+			setEditingGrade(item);
+			// Fetch the full grade data from API
+			const gradeData = await dispatch(fetchGradeById(item.id)).unwrap();
+
+			setGradeFormData({
+				grade_name_id: gradeData.grade_name_id ? gradeData.grade_name_id : "",
+				organization_id: gradeData.organization ? gradeData.organization : "",
+				sequence: gradeData.sequence ? gradeData.sequence.toString() : "",
+				effective_from: gradeData.effective_from || "",
+			});
+			setFormErrors({});
+			setIsGradeModalOpen(true);
+		} catch (error) {
+			toast.error(parseApiError(error, t, "errors.generic"));
+		}
 	};
 
 	const handleCloseGradeModal = () => {
@@ -411,18 +466,22 @@ const GradesAndRatesPage = () => {
 		if (!validateGradeForm()) return;
 
 		try {
-			const payload = {
-				grade_name_id: parseInt(gradeFormData.grade_name_id),
-				sequence: parseInt(gradeFormData.sequence),
-				effective_from: gradeFormData.effective_from,
-			};
-
 			if (editingGrade) {
-				// organization_id is read-only on update
+				// For PATCH: only send updatable fields (grade_name_id and sequence)
+				const payload = {
+					grade_name_id: parseInt(gradeFormData.grade_name_id),
+					sequence: parseInt(gradeFormData.sequence),
+				};
 				await dispatch(updateGrade({ id: editingGrade.id, data: payload })).unwrap();
 				toast.success(t("gradesAndRates.grades.messages.updated"));
 			} else {
-				payload.organization_id = parseInt(gradeFormData.organization_id);
+				// For POST: send all required fields
+				const payload = {
+					grade_name_id: parseInt(gradeFormData.grade_name_id),
+					organization_id: parseInt(gradeFormData.organization_id),
+					sequence: parseInt(gradeFormData.sequence),
+					effective_from: gradeFormData.effective_from,
+				};
 				await dispatch(createGrade(payload)).unwrap();
 				toast.success(t("gradesAndRates.grades.messages.created"));
 			}
@@ -460,6 +519,254 @@ const GradesAndRatesPage = () => {
 	const handleCancelDelete = () => {
 		setIsDeleteModalOpen(false);
 		setItemToDelete(null);
+	};
+
+	// Rate Type handlers
+	const handleCreateRateType = () => {
+		setEditingRateType(null);
+		setRateTypeFormData(RATE_TYPE_FORM_INITIAL);
+		setRateTypeFormErrors({});
+		setIsRateTypeModalOpen(true);
+	};
+
+	const handleEditRateType = async item => {
+		try {
+			setEditingRateType(item);
+			const rateTypeData = await dispatch(fetchGradeRateTypeById(item.id)).unwrap();
+			setRateTypeFormData({
+				code: rateTypeData.code || "",
+				description: rateTypeData.description || "",
+			});
+			setRateTypeFormErrors({});
+			setIsRateTypeModalOpen(true);
+		} catch (error) {
+			toast.error(parseApiError(error, t, "errors.generic"));
+		}
+	};
+
+	const handleCloseRateTypeModal = () => {
+		setIsRateTypeModalOpen(false);
+		setEditingRateType(null);
+		setRateTypeFormData(RATE_TYPE_FORM_INITIAL);
+		setRateTypeFormErrors({});
+	};
+
+	const handleRateTypeInputChange = e => {
+		const { name, value } = e.target;
+		setRateTypeFormData(prev => ({ ...prev, [name]: value }));
+		if (rateTypeFormErrors[name]) {
+			setRateTypeFormErrors(prev => ({ ...prev, [name]: "" }));
+		}
+	};
+
+	const validateRateTypeForm = () => {
+		const errors = {};
+		if (!rateTypeFormData.code?.trim()) {
+			errors.code = t("gradesAndRates.gradeRateTypes.form.codeRequired");
+		}
+		if (!rateTypeFormData.description?.trim()) {
+			errors.description = t("gradesAndRates.gradeRateTypes.form.descriptionRequired");
+		}
+		setRateTypeFormErrors(errors);
+		return Object.keys(errors).length === 0;
+	};
+
+	const handleRateTypeSubmit = async e => {
+		e.preventDefault();
+		if (!validateRateTypeForm()) return;
+
+		try {
+			const payload = {
+				code: rateTypeFormData.code.trim(),
+				description: rateTypeFormData.description.trim(),
+			};
+
+			if (editingRateType) {
+				await dispatch(updateGradeRateType({ id: editingRateType.id, data: payload })).unwrap();
+				toast.success(t("gradesAndRates.gradeRateTypes.messages.updated"));
+			} else {
+				await dispatch(createGradeRateType(payload)).unwrap();
+				toast.success(t("gradesAndRates.gradeRateTypes.messages.created"));
+			}
+			dispatch(fetchGradeRateTypes());
+			handleCloseRateTypeModal();
+		} catch (error) {
+			toast.error(parseApiError(error, t, "gradesAndRates.messages.saveError"));
+		}
+	};
+
+	const handleDeleteRateTypeClick = item => {
+		setRateTypeToDelete(item);
+		setIsDeleteRateTypeModalOpen(true);
+	};
+
+	const handleConfirmDeleteRateType = async () => {
+		if (!rateTypeToDelete) return;
+		try {
+			await dispatch(deleteGradeRateType(rateTypeToDelete.id)).unwrap();
+			toast.success(t("gradesAndRates.gradeRateTypes.messages.deleted"));
+			dispatch(fetchGradeRateTypes());
+			setIsDeleteRateTypeModalOpen(false);
+			setRateTypeToDelete(null);
+		} catch (error) {
+			toast.error(parseApiError(error, t, "gradesAndRates.messages.deleteError"));
+		}
+	};
+
+	const handleCancelDeleteRateType = () => {
+		setIsDeleteRateTypeModalOpen(false);
+		setRateTypeToDelete(null);
+	};
+
+	// Rate handlers
+	const handleCreateRate = () => {
+		setEditingRate(null);
+		setRateFormData(RATE_FORM_INITIAL);
+		setRateFormErrors({});
+		setIsRateModalOpen(true);
+	};
+
+	const handleEditRate = async item => {
+		try {
+			setEditingRate(item);
+			const rateData = await dispatch(fetchGradeRateById(item.id)).unwrap();
+			setRateFormData({
+				grade_id: rateData.grade || "",
+				rate_type_id: rateData.rate_type || "",
+				min_amount: rateData.min_amount || "",
+				max_amount: rateData.max_amount || "",
+				fixed_amount: rateData.fixed_amount || "",
+				currency_id: rateData.currency_id || "",
+				effective_start_date: rateData.effective_start_date || "",
+				effective_end_date: rateData.effective_end_date || "",
+			});
+			setRateFormErrors({});
+			setIsRateModalOpen(true);
+		} catch (error) {
+			toast.error(parseApiError(error, t, "errors.generic"));
+		}
+	};
+
+	const handleCloseRateModal = () => {
+		setIsRateModalOpen(false);
+		setEditingRate(null);
+		setRateFormData(RATE_FORM_INITIAL);
+		setRateFormErrors({});
+	};
+
+	const handleRateInputChange = e => {
+		const { name, value } = e.target;
+		setRateFormData(prev => ({ ...prev, [name]: value }));
+		if (rateFormErrors[name]) {
+			setRateFormErrors(prev => ({ ...prev, [name]: "" }));
+		}
+	};
+
+	const validateRateForm = () => {
+		const errors = {};
+		if (!rateFormData.grade_id) {
+			errors.grade_id = t("gradesAndRates.gradeRates.form.gradeRequired");
+		}
+		if (!rateFormData.rate_type_id) {
+			errors.rate_type_id = t("gradesAndRates.gradeRates.form.rateTypeRequired");
+		}
+		if (!rateFormData.currency_id) {
+			errors.currency_id = t("gradesAndRates.gradeRates.form.currencyRequired");
+		}
+
+		// Validate that either fixed amount or min/max is provided
+		const hasFixed = rateFormData.fixed_amount && parseFloat(rateFormData.fixed_amount) > 0;
+		const hasRange =
+			rateFormData.min_amount &&
+			rateFormData.max_amount &&
+			parseFloat(rateFormData.min_amount) > 0 &&
+			parseFloat(rateFormData.max_amount) > 0;
+
+		if (!hasFixed && !hasRange) {
+			errors.fixed_amount = t("gradesAndRates.gradeRates.form.amountRequired");
+		}
+
+		if (hasRange && parseFloat(rateFormData.min_amount) >= parseFloat(rateFormData.max_amount)) {
+			errors.max_amount = t("gradesAndRates.gradeRates.form.maxGreaterThanMin");
+		}
+
+		setRateFormErrors(errors);
+		return Object.keys(errors).length === 0;
+	};
+
+	const handleRateSubmit = async e => {
+		e.preventDefault();
+		if (!validateRateForm()) return;
+
+		try {
+			const payload = {
+				grade_id: parseInt(rateFormData.grade_id),
+				currency_id: parseInt(rateFormData.currency_id),
+			};
+
+			// Only include rate_type_id for POST (not updatable in PATCH)
+			if (!editingRate) {
+				payload.rate_type_id = parseInt(rateFormData.rate_type_id);
+			}
+
+			// Add amounts
+			if (rateFormData.fixed_amount && parseFloat(rateFormData.fixed_amount) > 0) {
+				payload.fixed_amount = parseFloat(rateFormData.fixed_amount);
+			} else {
+				payload.min_amount = parseFloat(rateFormData.min_amount);
+				payload.max_amount = parseFloat(rateFormData.max_amount);
+			}
+
+			// Add optional dates
+			if (rateFormData.effective_start_date) {
+				payload.effective_start_date = rateFormData.effective_start_date;
+			}
+			if (rateFormData.effective_end_date) {
+				payload.effective_end_date = rateFormData.effective_end_date;
+			}
+
+			if (editingRate) {
+				await dispatch(updateGradeRate({ id: editingRate.id, data: payload })).unwrap();
+				toast.success(t("gradesAndRates.gradeRates.messages.updated"));
+			} else {
+				await dispatch(createGradeRate(payload)).unwrap();
+				toast.success(t("gradesAndRates.gradeRates.messages.created"));
+			}
+
+			const params = { page: ratesPage, page_size: localRatesPageSize };
+			if (ratesFilters.grade) params.grade = ratesFilters.grade;
+			if (ratesFilters.rate_type) params.rate_type = ratesFilters.rate_type;
+			dispatch(fetchGradeRates(params));
+			handleCloseRateModal();
+		} catch (error) {
+			toast.error(parseApiError(error, t, "gradesAndRates.messages.saveError"));
+		}
+	};
+
+	const handleDeleteRateClick = item => {
+		setRateToDelete(item);
+		setIsDeleteRateModalOpen(true);
+	};
+
+	const handleConfirmDeleteRate = async () => {
+		if (!rateToDelete) return;
+		try {
+			await dispatch(deleteGradeRate(rateToDelete.id)).unwrap();
+			toast.success(t("gradesAndRates.gradeRates.messages.deleted"));
+			const params = { page: ratesPage, page_size: localRatesPageSize };
+			if (ratesFilters.grade) params.grade = ratesFilters.grade;
+			if (ratesFilters.rate_type) params.rate_type = ratesFilters.rate_type;
+			dispatch(fetchGradeRates(params));
+			setIsDeleteRateModalOpen(false);
+			setRateToDelete(null);
+		} catch (error) {
+			toast.error(parseApiError(error, t, "gradesAndRates.messages.deleteError"));
+		}
+	};
+
+	const handleCancelDeleteRate = () => {
+		setIsDeleteRateModalOpen(false);
+		setRateToDelete(null);
 	};
 
 	// Tab definitions
@@ -590,11 +897,19 @@ const GradesAndRatesPage = () => {
 								<h2 className="text-2xl font-bold text-[#1D7A8C]">
 									{t("gradesAndRates.gradeRates.title")}
 								</h2>
+								<Button
+									onClick={handleCreateRate}
+									icon={<HiPlus className="w-5 h-5" />}
+									title={t("gradesAndRates.gradeRates.createRate")}
+									className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
+								/>
 							</div>
 
 							<Table
 								columns={gradeRatesColumns}
 								data={gradeRates}
+								onEdit={handleEditRate}
+								onDelete={handleDeleteRateClick}
 								emptyMessage={t("gradesAndRates.gradeRates.table.emptyMessage")}
 								loading={ratesLoading}
 							/>
@@ -621,11 +936,19 @@ const GradesAndRatesPage = () => {
 							<h2 className="text-2xl font-bold text-[#1D7A8C]">
 								{t("gradesAndRates.gradeRateTypes.title")}
 							</h2>
+							<Button
+								onClick={handleCreateRateType}
+								icon={<HiPlus className="w-5 h-5" />}
+								title={t("gradesAndRates.gradeRateTypes.createRateType")}
+								className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
+							/>
 						</div>
 
 						<Table
 							columns={gradeRateTypesColumns}
 							data={gradeRateTypes}
+							onEdit={handleEditRateType}
+							onDelete={handleDeleteRateTypeClick}
 							emptyMessage={t("gradesAndRates.gradeRateTypes.table.emptyMessage")}
 							loading={gradeLoading}
 						/>
@@ -723,6 +1046,205 @@ const GradesAndRatesPage = () => {
 				title={t("gradesAndRates.deleteModal.title")}
 				message={t("gradesAndRates.deleteModal.message", {
 					name: itemToDelete?.grade_name,
+				})}
+				confirmText={t("common.delete")}
+				cancelText={t("common.cancel")}
+				variant="danger"
+			/>
+
+			{/* Rate Type Modal */}
+			<SlideUpModal
+				isOpen={isRateTypeModalOpen}
+				onClose={handleCloseRateTypeModal}
+				title={
+					editingRateType
+						? t("gradesAndRates.gradeRateTypes.modal.editTitle")
+						: t("gradesAndRates.gradeRateTypes.modal.createTitle")
+				}
+				maxWidth="600px"
+			>
+				<form onSubmit={handleRateTypeSubmit} className="space-y-4 p-4">
+					<CustomInput
+						label={t("gradesAndRates.gradeRateTypes.form.code")}
+						name="code"
+						value={rateTypeFormData.code}
+						onChange={handleRateTypeInputChange}
+						error={rateTypeFormErrors.code}
+						required
+						bgColor="bg-[#fff]"
+					/>
+
+					<CustomInput
+						label={t("gradesAndRates.gradeRateTypes.form.description")}
+						name="description"
+						value={rateTypeFormData.description}
+						onChange={handleRateTypeInputChange}
+						error={rateTypeFormErrors.description}
+						required
+						bgColor="bg-[#fff]"
+					/>
+
+					<div className="flex justify-end gap-3 pt-4">
+						<Button
+							type="button"
+							onClick={handleCloseRateTypeModal}
+							title={t("common.cancel")}
+							className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+						/>
+						<Button
+							type="submit"
+							title={editingRateType ? t("common.update") : t("common.create")}
+							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
+						/>
+					</div>
+				</form>
+			</SlideUpModal>
+
+			{/* Delete Rate Type Confirmation Modal */}
+			<ConfirmModal
+				isOpen={isDeleteRateTypeModalOpen}
+				onClose={handleCancelDeleteRateType}
+				onConfirm={handleConfirmDeleteRateType}
+				title={t("gradesAndRates.gradeRateTypes.deleteModal.title")}
+				message={t("gradesAndRates.gradeRateTypes.deleteModal.message", {
+					name: rateTypeToDelete?.name,
+				})}
+				confirmText={t("common.delete")}
+				cancelText={t("common.cancel")}
+				variant="danger"
+			/>
+
+			{/* Rate Modal */}
+			<SlideUpModal
+				isOpen={isRateModalOpen}
+				onClose={handleCloseRateModal}
+				title={
+					editingRate
+						? t("gradesAndRates.gradeRates.modal.editTitle")
+						: t("gradesAndRates.gradeRates.modal.createTitle")
+				}
+				maxWidth="700px"
+			>
+				<form onSubmit={handleRateSubmit} className="space-y-4 p-4">
+					<CustomDropdown
+						label={t("gradesAndRates.gradeRates.form.grade")}
+						name="grade_id"
+						value={rateFormData.grade_id}
+						onChange={handleRateInputChange}
+						options={filterGradeOptions}
+						error={rateFormErrors.grade_id}
+						required
+						bgColor="bg-[#fff]"
+						showBorder={true}
+					/>
+
+					<CustomDropdown
+						label={t("gradesAndRates.gradeRates.form.rateType")}
+						name="rate_type_id"
+						value={rateFormData.rate_type_id}
+						onChange={handleRateInputChange}
+						options={filterRateTypeOptions}
+						error={rateFormErrors.rate_type_id}
+						required
+						disabled={!!editingRate}
+						bgColor="bg-[#fff]"
+						showBorder={true}
+					/>
+
+					<CustomDropdown
+						label={t("gradesAndRates.gradeRates.form.currency")}
+						name="currency_id"
+						value={rateFormData.currency_id}
+						onChange={handleRateInputChange}
+						options={currencyOptions}
+						error={rateFormErrors.currency_id}
+						required
+						bgColor="bg-[#fff]"
+						showBorder={true}
+					/>
+
+					<div className="grid grid-cols-2 gap-4">
+						<CustomInput
+							label={t("gradesAndRates.gradeRates.form.minAmount")}
+							name="min_amount"
+							type="number"
+							step="0.01"
+							min="0"
+							value={rateFormData.min_amount}
+							onChange={handleRateInputChange}
+							error={rateFormErrors.min_amount}
+							bgColor="bg-[#fff]"
+						/>
+
+						<CustomInput
+							label={t("gradesAndRates.gradeRates.form.maxAmount")}
+							name="max_amount"
+							type="number"
+							step="0.01"
+							min="0"
+							value={rateFormData.max_amount}
+							onChange={handleRateInputChange}
+							error={rateFormErrors.max_amount}
+							bgColor="bg-[#fff]"
+						/>
+					</div>
+
+					<CustomInput
+						label={t("gradesAndRates.gradeRates.form.fixedAmount")}
+						name="fixed_amount"
+						type="number"
+						step="0.01"
+						min="0"
+						value={rateFormData.fixed_amount}
+						onChange={handleRateInputChange}
+						error={rateFormErrors.fixed_amount}
+						bgColor="bg-[#fff]"
+					/>
+
+					<div className="grid grid-cols-2 gap-4">
+						<CustomInput
+							label={t("gradesAndRates.gradeRates.form.effectiveStartDate")}
+							name="effective_start_date"
+							type="date"
+							value={rateFormData.effective_start_date}
+							onChange={handleRateInputChange}
+							bgColor="bg-[#fff]"
+						/>
+
+						<CustomInput
+							label={t("gradesAndRates.gradeRates.form.effectiveEndDate")}
+							name="effective_end_date"
+							type="date"
+							value={rateFormData.effective_end_date}
+							onChange={handleRateInputChange}
+							bgColor="bg-[#fff]"
+						/>
+					</div>
+
+					<div className="flex justify-end gap-3 pt-4">
+						<Button
+							type="button"
+							onClick={handleCloseRateModal}
+							title={t("common.cancel")}
+							className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+						/>
+						<Button
+							type="submit"
+							title={editingRate ? t("common.update") : t("common.create")}
+							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
+						/>
+					</div>
+				</form>
+			</SlideUpModal>
+
+			{/* Delete Rate Confirmation Modal */}
+			<ConfirmModal
+				isOpen={isDeleteRateModalOpen}
+				onClose={handleCancelDeleteRate}
+				onConfirm={handleConfirmDeleteRate}
+				title={t("gradesAndRates.gradeRates.deleteModal.title")}
+				message={t("gradesAndRates.gradeRates.deleteModal.message", {
+					name: rateToDelete?.rate_type_name,
 				})}
 				confirmText={t("common.delete")}
 				cancelText={t("common.cancel")}

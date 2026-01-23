@@ -49,6 +49,7 @@ import employeesReducer from "./employeesSlice";
 import lookupsReducer from "./lookupsSlice";
 import addressesReducer from "./addressesSlice";
 import personTypesReducer from "./personTypesSlice";
+import competenciesReducer from "./competenciesSlice";
 
 export const store = configureStore({
 	reducer: {
@@ -102,6 +103,7 @@ export const store = configureStore({
 		lookups: lookupsReducer,
 		addresses: addressesReducer,
 		personTypes: personTypesReducer,
+		competencies: competenciesReducer,
 	},
 });
 

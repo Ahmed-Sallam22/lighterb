@@ -781,7 +781,7 @@ const OrganizationsPage = () => {
 			<SlideUpModal
 				isOpen={isHierarchyModalOpen}
 				onClose={handleCloseHierarchyModal}
-				title={t("organizations.hierarchy.title", { name: hierarchyItem?.name_display || "" })}
+				title={t("organizations.hierarchy.title", { name: hierarchyItem?.organization_name || "" })}
 			>
 				<div className="p-4">
 					{hierarchyLoading ? (

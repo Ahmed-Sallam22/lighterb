@@ -211,7 +211,7 @@ const PositionsPage = () => {
 		},
 		{
 			header: t("positions.table.gradeName"),
-			accessor: "grade_name_display",
+			accessor: "grade_name",
 			render: value => value || "-",
 		},
 		{
@@ -232,7 +232,7 @@ const PositionsPage = () => {
 			{ value: "", label: t("positions.form.selectOrganization") },
 			...organizations.map(org => ({
 				value: org.id,
-				label: org.name_display + " - " + org.code,
+				label: org.organization_name + " - " + org.code,
 			})),
 		],
 		[organizations, t]
@@ -378,7 +378,7 @@ const PositionsPage = () => {
 			{ value: "", label: t("positions.filters.allOrganizations") },
 			...organizations.map(org => ({
 				value: org.id,
-				label: org.name_display || org.code,
+				label: org.organization_name || org.code,
 			})),
 		],
 		[organizations, t]
@@ -962,7 +962,7 @@ const PositionsPage = () => {
 									<div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
 										<div>
 											<span className="font-medium">{t("positions.versionsModal.grade")}:</span>{" "}
-											{version.grade_name_display || "-"}
+											{version.grade_organization_name || "-"}
 										</div>
 										<div>
 											<span className="font-medium">
