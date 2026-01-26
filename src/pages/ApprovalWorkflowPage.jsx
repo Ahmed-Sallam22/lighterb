@@ -78,7 +78,6 @@ const ApprovalWorkflowPage = () => {
 		dispatch(fetchWorkflowTemplates(params));
 	}, [dispatch, page, localPageSize, filters]);
 
-
 	// Pagination handlers
 	const handlePageChange = useCallback(
 		newPage => {
@@ -516,13 +515,13 @@ const ApprovalWorkflowPage = () => {
 						{/* Timestamps */}
 						<div className="flex justify-between text-sm text-gray-500 pt-4 border-t">
 							<span>
-								{t("approvalWorkflow.details.createdAt")}:{" "}
+								{t("approvalWorkflow.details.createdAt")}:
 								{currentTemplate.created_at
 									? new Date(currentTemplate.created_at).toLocaleString()
 									: "-"}
 							</span>
 							<span>
-								{t("approvalWorkflow.details.updatedAt")}:{" "}
+								{t("approvalWorkflow.details.updatedAt")}:
 								{currentTemplate.updated_at
 									? new Date(currentTemplate.updated_at).toLocaleString()
 									: "-"}

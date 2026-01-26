@@ -95,7 +95,6 @@ const CreateGRNPage = () => {
 		};
 	}, [dispatch]);
 
-
 	// Fetch PO details when PO is selected
 	useEffect(() => {
 		if (!formData.po_header_id) {
@@ -467,13 +466,13 @@ const CreateGRNPage = () => {
 														{/* Quantity Info */}
 														<div className="flex items-center gap-4 text-sm">
 															<div className="text-gray-500">
-																{t("createGRN.lines.ordered")}:{" "}
+																{t("createGRN.lines.ordered")}:
 																<span className="font-medium text-gray-700">
 																	{item.quantity}
 																</span>
 															</div>
 															<div className="text-gray-500">
-																{t("createGRN.lines.received")}:{" "}
+																{t("createGRN.lines.received")}:
 																<span className="font-medium text-gray-700">
 																	{item.quantity_received}
 																</span>
@@ -581,7 +580,7 @@ const CreateGRNPage = () => {
 															{/* Unit Info */}
 															<div className="mt-3 flex justify-between text-sm text-gray-600">
 																<span>
-																	{t("createGRN.lines.unitOfMeasure")}:{" "}
+																	{t("createGRN.lines.unitOfMeasure")}:
 																	{item.unit_of_measure_code}
 																</span>
 																<span>

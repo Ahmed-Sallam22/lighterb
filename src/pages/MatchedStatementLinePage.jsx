@@ -486,10 +486,10 @@ const MatchedStatementLinePage = () => {
 											selectedMatch.match_status === "MATCHED"
 												? "bg-green-100 text-green-800"
 												: selectedMatch.match_status === "PARTIAL"
-												? "bg-blue-100 text-blue-800"
-												: selectedMatch.match_status === "UNMATCHED"
-												? "bg-red-100 text-red-800"
-												: "bg-yellow-100 text-yellow-800"
+													? "bg-blue-100 text-blue-800"
+													: selectedMatch.match_status === "UNMATCHED"
+														? "bg-red-100 text-red-800"
+														: "bg-yellow-100 text-yellow-800"
 										}`}
 									>
 										{t(`matches.matchStatus.${selectedMatch.match_status?.toLowerCase()}`) ||
@@ -847,7 +847,7 @@ const MatchedStatementLinePage = () => {
 											)}
 											{payment.total_allocated !== undefined && (
 												<p className="text-xs text-gray-500 mt-1 ml-6">
-													<span className="font-medium">Allocated:</span>{" "}
+													<span className="font-medium">Allocated:</span>
 													{parseFloat(payment.total_allocated || 0).toLocaleString()}
 												</p>
 											)}

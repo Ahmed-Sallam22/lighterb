@@ -84,6 +84,8 @@ const JobsPage = lazy(() => import("./pages/JobsPage"));
 const WorkforceManagementPage = lazy(() => import("./pages/WorkforceManagementPage"));
 const LookupTypesPage = lazy(() => import("./pages/LookupTypesPage"));
 const LookupValuesPage = lazy(() => import("./pages/LookupValuesPage"));
+const BudgetsPage = lazy(() => import("./pages/BudgetsPage"));
+const BudgetDetailsPage = lazy(() => import("./pages/BudgetDetailsPage"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -185,6 +187,8 @@ const App = () => {
 						<Route path="jobs" element={<JobsPage />} />
 						<Route path="lookups/types" element={<LookupTypesPage />} />
 						<Route path="lookups/values/:lookupTypeName" element={<LookupValuesPage />} />
+						<Route path="budgets" element={<BudgetsPage />} />
+						<Route path="budgets/:budgetId" element={<BudgetDetailsPage />} />
 					</Route>
 				</Routes>
 			</Suspense>

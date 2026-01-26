@@ -154,7 +154,7 @@ const JournalEntryDetailModal = ({ isOpen, journalId, onClose }) => {
 						{journal.balance_difference && parseFloat(journal.balance_difference) !== 0 && (
 							<div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
 								<p className="text-yellow-800 text-sm font-medium">
-									{t("journalDetail.balanceDifference")}:{" "}
+									{t("journalDetail.balanceDifference")}:
 									{formatCurrency(journal.balance_difference, journal.currency_code)}
 								</p>
 							</div>
@@ -219,9 +219,9 @@ const JournalEntryDetailModal = ({ isOpen, journalId, onClose }) => {
 																	<div key={idx} className="text-xs">
 																		<span className="font-medium text-gray-700">
 																			{segment.segment_type_name}:
-																		</span>{" "}
+																		</span>
 																		<span className="text-gray-600">
-																			{segment.segment_code} -{" "}
+																			{segment.segment_code} -
 																			{segment.segment_alias}
 																		</span>
 																	</div>

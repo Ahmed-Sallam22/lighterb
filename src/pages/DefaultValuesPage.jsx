@@ -582,11 +582,11 @@ const DefaultValuesPage = () => {
 								</label>
 								<div className="bg-gray-50 rounded-lg p-4">
 									<p className="text-sm text-gray-600 mb-3">
-										<span className="font-medium">{t("defaultValues.details.combinationId")}:</span>{" "}
+										<span className="font-medium">{t("defaultValues.details.combinationId")}:</span>
 										{selectedCombination.segment_details.combination_id}
 									</p>
 									<p className="text-sm text-gray-600 mb-3">
-										<span className="font-medium">{t("defaultValues.details.description")}:</span>{" "}
+										<span className="font-medium">{t("defaultValues.details.description")}:</span>
 										{selectedCombination.segment_details.description || "-"}
 									</p>
 									<div className="space-y-2">

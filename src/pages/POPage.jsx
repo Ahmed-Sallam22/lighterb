@@ -79,7 +79,6 @@ const POPage = () => {
 	const [poToCancel, setPoToCancel] = useState(null);
 	const [cancellationReason, setCancellationReason] = useState("");
 
-
 	// Fetch PO list
 	useEffect(() => {
 		const params = {
@@ -561,7 +560,7 @@ const POPage = () => {
 													</div>
 												</td>
 												<td className="px-4 py-3 text-gray-700">
-													{parseFloat(item.quantity).toLocaleString()}{" "}
+													{parseFloat(item.quantity).toLocaleString()}
 													{item.unit_of_measure_code}
 												</td>
 												<td className="px-4 py-3 text-gray-700">
@@ -602,7 +601,7 @@ const POPage = () => {
 							<div className="flex justify-between items-center pt-2 border-t border-gray-200">
 								<span className="text-lg font-semibold text-gray-900">{t("poPage.modal.total")}</span>
 								<span className="text-lg font-bold text-[#28819C]">
-									{currentPO.currency_code}{" "}
+									{currentPO.currency_code}
 									{parseFloat(currentPO.total_amount || 0).toLocaleString(undefined, {
 										minimumFractionDigits: 2,
 									})}
@@ -613,11 +612,11 @@ const POPage = () => {
 						{/* Timestamps */}
 						<div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
 							<div>
-								<span className="font-medium">{t("poPage.modal.createdAt")}:</span>{" "}
+								<span className="font-medium">{t("poPage.modal.createdAt")}:</span>
 								{new Date(currentPO.created_at).toLocaleString()}
 							</div>
 							<div>
-								<span className="font-medium">{t("poPage.modal.updatedAt")}:</span>{" "}
+								<span className="font-medium">{t("poPage.modal.updatedAt")}:</span>
 								{new Date(currentPO.updated_at).toLocaleString()}
 							</div>
 						</div>

@@ -463,11 +463,11 @@ const RequisitionDetailsModal = ({ isOpen, requisitionId, prType, onClose }) => 
 						<div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
 							<div className="flex flex-wrap gap-6 justify-between text-xs text-gray-500">
 								<div>
-									<span className="font-medium">{t("requisitions.details.createdAt")}:</span>{" "}
+									<span className="font-medium">{t("requisitions.details.createdAt")}:</span>
 									{formatDateTime(requisition.created_at)}
 								</div>
 								<div>
-									<span className="font-medium">{t("requisitions.details.updatedAt")}:</span>{" "}
+									<span className="font-medium">{t("requisitions.details.updatedAt")}:</span>
 									{formatDateTime(requisition.updated_at)}
 								</div>
 							</div>

@@ -47,6 +47,7 @@ import matchesReducer from "./matchesSlice";
 import jobsReducer from "./jobsSlice";
 import employeesReducer from "./employeesSlice";
 import lookupsReducer from "./lookupsSlice";
+import lookupManagementReducer from "./lookupManagementSlice";
 import addressesReducer from "./addressesSlice";
 import personTypesReducer from "./personTypesSlice";
 import competenciesReducer from "./competenciesSlice";
@@ -101,6 +102,7 @@ export const store = configureStore({
 		jobs: jobsReducer,
 		employees: employeesReducer,
 		lookups: lookupsReducer,
+		lookupManagement: lookupManagementReducer,
 		addresses: addressesReducer,
 		personTypes: personTypesReducer,
 		competencies: competenciesReducer,

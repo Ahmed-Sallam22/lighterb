@@ -298,8 +298,8 @@ const PaymentDetailsModal = ({ isOpen, paymentId, type = "AR", onClose }) => {
 																alloc.invoice_payment_status === "PAID"
 																	? "bg-green-100 text-green-800"
 																	: alloc.invoice_payment_status === "PARTIALLY_PAID"
-																	? "bg-yellow-100 text-yellow-800"
-																	: "bg-gray-100 text-gray-600"
+																		? "bg-yellow-100 text-yellow-800"
+																		: "bg-gray-100 text-gray-600"
 															}`}
 														>
 															{alloc.invoice_payment_status?.replace("_", " ") ||
@@ -337,14 +337,14 @@ const PaymentDetailsModal = ({ isOpen, paymentId, type = "AR", onClose }) => {
 										</h3>
 										<div className="flex items-center gap-4 text-sm">
 											<span className="text-gray-500">
-												{t("paymentDetails.fields.date")}:{" "}
+												{t("paymentDetails.fields.date")}:
 												<span className="text-gray-700 font-medium">
 													{payment.gl_entry_details.date}
 												</span>
 											</span>
 											{payment.gl_entry_details.memo && (
 												<span className="text-gray-500">
-													{t("paymentDetails.fields.memo")}:{" "}
+													{t("paymentDetails.fields.memo")}:
 													<span className="text-gray-700 font-medium">
 														{payment.gl_entry_details.memo}
 													</span>
@@ -458,7 +458,7 @@ const PaymentDetailsModal = ({ isOpen, paymentId, type = "AR", onClose }) => {
 										<div className="flex items-center gap-3">
 											<div className="w-3 h-3 rounded-full bg-blue-500"></div>
 											<span className="text-sm text-gray-600">
-												{t("paymentDetails.timeline.submitted")}:{" "}
+												{t("paymentDetails.timeline.submitted")}:
 												<span className="font-medium">
 													{formatDateTime(payment.submitted_for_approval_at)}
 												</span>
@@ -469,7 +469,7 @@ const PaymentDetailsModal = ({ isOpen, paymentId, type = "AR", onClose }) => {
 										<div className="flex items-center gap-3">
 											<div className="w-3 h-3 rounded-full bg-green-500"></div>
 											<span className="text-sm text-gray-600">
-												{t("paymentDetails.timeline.approved")}:{" "}
+												{t("paymentDetails.timeline.approved")}:
 												<span className="font-medium">
 													{formatDateTime(payment.approved_at)}
 												</span>
@@ -480,7 +480,7 @@ const PaymentDetailsModal = ({ isOpen, paymentId, type = "AR", onClose }) => {
 										<div className="flex items-center gap-3">
 											<div className="w-3 h-3 rounded-full bg-red-500"></div>
 											<span className="text-sm text-gray-600">
-												{t("paymentDetails.timeline.rejected")}:{" "}
+												{t("paymentDetails.timeline.rejected")}:
 												<span className="font-medium">
 													{formatDateTime(payment.rejected_at)}
 												</span>

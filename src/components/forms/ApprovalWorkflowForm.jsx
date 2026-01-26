@@ -348,7 +348,7 @@ const ApprovalWorkflowForm = () => {
 								<div className="flex-1 min-w-0">
 									<h4 className="text-base font-semibold text-[#28819C]">{stage.name}</h4>
 									<p className="text-sm text-gray-500">
-										{stage.decision_policy} • {getRoleName(stage.required_role)} •{" "}
+										{stage.decision_policy} • {getRoleName(stage.required_role)} •
 										{stage.required_role
 											? t("approvalWorkflow.form.requiredLevel")
 											: t("approvalWorkflow.form.requiredLevel")}

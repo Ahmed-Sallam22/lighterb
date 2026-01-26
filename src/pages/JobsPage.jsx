@@ -48,6 +48,7 @@ const FORM_INITIAL_STATE = {
 	qualification_requirements: [],
 	grade_ids: [],
 	effective_start_date: "",
+	effective_end_date: "",
 	new_start_date: "", // Used for editing
 };
 
@@ -227,6 +228,11 @@ const JobsPage = () => {
 			accessor: "effective_start_date",
 			render: value => formatDate(value),
 		},
+		{
+			header: t("jobs.table.endDate"),
+			accessor: "effective_end_date",
+			render: value => formatDate(value),
+		},
 	];
 
 	// Dropdown options for form
@@ -338,6 +344,7 @@ const JobsPage = () => {
 				qualification_requirements: jobData.qualification_requirements || [],
 				grade_ids: jobData.grades || [],
 				effective_start_date: jobData.effective_start_date || "",
+				effective_end_date: jobData.effective_end_date || "",
 				new_start_date: "",
 			});
 		} catch (error) {
@@ -354,6 +361,7 @@ const JobsPage = () => {
 				qualification_requirements: [],
 				grade_ids: [],
 				effective_start_date: item.effective_start_date || "",
+				effective_end_date: item.effective_end_date || "",
 				new_start_date: "",
 			});
 		}
@@ -492,6 +500,9 @@ const JobsPage = () => {
 		if (!editingItem && !formData.effective_start_date) {
 			errors.effective_start_date = t("jobs.form.startDateRequired");
 		}
+		if (!editingItem && !formData.effective_end_date) {
+			errors.effective_end_date = t("jobs.form.endDateRequired");
+		}
 		setFormErrors(errors);
 		return Object.keys(errors).length === 0;
 	};
@@ -545,6 +556,9 @@ const JobsPage = () => {
 
 				if (formData.effective_start_date) {
 					submitData.effective_start_date = formData.effective_start_date;
+				}
+				if (formData.effective_end_date) {
+					submitData.effective_end_date = formData.effective_end_date;
 				}
 				if (formData.responsibilities && formData.responsibilities.length > 0) {
 					submitData.responsibilities = formData.responsibilities;
@@ -774,6 +788,16 @@ const JobsPage = () => {
 							bgColor="bg-[#fff]"
 						/>
 					)}
+
+					<CustomInput
+						label={t("jobs.form.endDate")}
+						name="effective_end_date"
+						type="date"
+						value={formData.effective_end_date}
+						onChange={handleInputChange}
+						error={formErrors.effective_end_date}
+						bgColor="bg-[#fff]"
+					/>
 
 					<MultiSelectDropdown
 						label={t("jobs.form.grades")}
@@ -1028,6 +1052,12 @@ const JobsPage = () => {
 									</label>
 									<p className="text-gray-900">{formatDate(currentJob.effective_end_date)}</p>
 								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("jobs.form.endDate")}
+									</label>
+									<p className="text-gray-900">{formatDate(currentJob.effective_end_date)}</p>
+								</div>
 							</div>
 							<div>
 								<label className="text-sm font-medium text-gray-500">
@@ -1151,13 +1181,13 @@ const JobsPage = () => {
 												{version.job_title_name || "-"}
 											</td>
 											<td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-												{formatDate(version.effective_start_date)}
+												{formatDate(version.effective_end_date)}
 											</td>
 											<td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
 												{formatDate(version.effective_end_date)}
 											</td>
 											<td className="px-4 py-3 whitespace-nowrap text-sm">
-												{renderStatus(version.effective_start_date, version.effective_end_date)}
+												{renderStatus(version.effective_end_date, version.effective_end_date)}
 											</td>
 										</tr>
 									))}

@@ -20,7 +20,7 @@ export const fetchPositions = createAsyncThunk("positions/fetchPositions", async
 // Fetch position titles lookup
 export const fetchPositionTitles = createAsyncThunk("positions/fetchPositionTitles", async (_, { rejectWithValue }) => {
 	try {
-		const response = await api.get("/core/lookups/values/?lookup_type=POSITION_TITLE");
+		const response = await api.get("/core/lookups/values/?lookup_type=Position Title");
 		return response.data?.data || response.data || [];
 	} catch (error) {
 		return rejectWithValue(error.message || "Failed to fetch position titles");
@@ -30,7 +30,7 @@ export const fetchPositionTitles = createAsyncThunk("positions/fetchPositionTitl
 // Fetch position types lookup
 export const fetchPositionTypes = createAsyncThunk("positions/fetchPositionTypes", async (_, { rejectWithValue }) => {
 	try {
-		const response = await api.get("/core/lookups/values/?lookup_type=POSITION_TYPE");
+		const response = await api.get("/core/lookups/values/?lookup_type=Position Type");
 		return response.data?.data || response.data || [];
 	} catch (error) {
 		return rejectWithValue(error.message || "Failed to fetch position types");
@@ -42,7 +42,7 @@ export const fetchPositionStatuses = createAsyncThunk(
 	"positions/fetchPositionStatuses",
 	async (_, { rejectWithValue }) => {
 		try {
-			const response = await api.get("/core/lookups/values/?lookup_type=POSITION_STATUS");
+			const response = await api.get("/core/lookups/values/?lookup_type=Position Status");
 			return response.data?.data || response.data || [];
 		} catch (error) {
 			return rejectWithValue(error.message || "Failed to fetch position statuses");
@@ -50,46 +50,10 @@ export const fetchPositionStatuses = createAsyncThunk(
 	}
 );
 
-// Fetch position categories lookup
-export const fetchPositionCategories = createAsyncThunk(
-	"positions/fetchPositionCategories",
-	async (_, { rejectWithValue }) => {
-		try {
-			const response = await api.get("/core/lookups/values/?lookup_type=POSITION_CATEGORY");
-			return response.data?.data || response.data || [];
-		} catch (error) {
-			return rejectWithValue(error.message || "Failed to fetch position categories");
-		}
-	}
-);
-
-// Fetch position families lookup
-export const fetchPositionFamilies = createAsyncThunk(
-	"positions/fetchPositionFamilies",
-	async (_, { rejectWithValue }) => {
-		try {
-			const response = await api.get("/core/lookups/values/?lookup_type=POSITION_FAMILY");
-			return response.data?.data || response.data || [];
-		} catch (error) {
-			return rejectWithValue(error.message || "Failed to fetch position families");
-		}
-	}
-);
-
-// Fetch position sync lookup
-export const fetchPositionSyncs = createAsyncThunk("positions/fetchPositionSyncs", async (_, { rejectWithValue }) => {
-	try {
-		const response = await api.get("/core/lookups/values/?lookup_type=POSITION_SYNC");
-		return response.data?.data || response.data || [];
-	} catch (error) {
-		return rejectWithValue(error.message || "Failed to fetch position syncs");
-	}
-});
-
 // Fetch payroll lookup
 export const fetchPayrolls = createAsyncThunk("positions/fetchPayrolls", async (_, { rejectWithValue }) => {
 	try {
-		const response = await api.get("/core/lookups/values/?lookup_type=PAYROLL");
+		const response = await api.get("/core/lookups/values/?lookup_type=Payroll");
 		return response.data?.data || response.data || [];
 	} catch (error) {
 		return rejectWithValue(error.message || "Failed to fetch payrolls");
@@ -99,12 +63,72 @@ export const fetchPayrolls = createAsyncThunk("positions/fetchPayrolls", async (
 // Fetch salary basis lookup
 export const fetchSalaryBases = createAsyncThunk("positions/fetchSalaryBases", async (_, { rejectWithValue }) => {
 	try {
-		const response = await api.get("/core/lookups/values/?lookup_type=SALARY_BASIS");
+		const response = await api.get("/core/lookups/values/?lookup_type=Salary Basis");
 		return response.data?.data || response.data || [];
 	} catch (error) {
 		return rejectWithValue(error.message || "Failed to fetch salary bases");
 	}
 });
+
+// Fetch single position by ID
+export const fetchPosition = createAsyncThunk("positions/fetchPosition", async (id, { rejectWithValue }) => {
+	try {
+		const response = await api.get(`/hr/work_structures/positions/${id}/`);
+		return response.data?.data || response.data;
+	} catch (error) {
+		return rejectWithValue(error.message || "Failed to fetch position");
+	}
+});
+
+// Fetch competencies from person/competencies API
+export const fetchCompetencies = createAsyncThunk("positions/fetchCompetencies", async (_, { rejectWithValue }) => {
+	try {
+		const response = await api.get("/hr/person/competencies/?page_size=1000");
+		const data = response.data?.data || response.data;
+		return data?.results || data || [];
+	} catch (error) {
+		return rejectWithValue(error.message || "Failed to fetch competencies");
+	}
+});
+
+// Fetch proficiency levels from lookups API
+export const fetchProficiencyLevels = createAsyncThunk(
+	"positions/fetchProficiencyLevels",
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await api.get("/core/lookups/values/?lookup_type=Proficiency Level");
+			return response.data?.data || response.data || [];
+		} catch (error) {
+			return rejectWithValue(error.message || "Failed to fetch proficiency levels");
+		}
+	}
+);
+
+// Fetch qualification types from lookups API
+export const fetchQualificationTypes = createAsyncThunk(
+	"positions/fetchQualificationTypes",
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await api.get("/core/lookups/values/?lookup_type=Qualification Type");
+			return response.data?.data || response.data || [];
+		} catch (error) {
+			return rejectWithValue(error.message || "Failed to fetch qualification types");
+		}
+	}
+);
+
+// Fetch qualification titles from lookups API
+export const fetchQualificationTitles = createAsyncThunk(
+	"positions/fetchQualificationTitles",
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await api.get("/core/lookups/values/?lookup_type=Qualification Title");
+			return response.data?.data || response.data || [];
+		} catch (error) {
+			return rejectWithValue(error.message || "Failed to fetch qualification titles");
+		}
+	}
+);
 
 // Create a new position
 export const createPosition = createAsyncThunk(
@@ -199,7 +223,9 @@ const positionsSlice = createSlice({
 	name: "positions",
 	initialState: {
 		positions: [],
+		currentPosition: null,
 		loading: false,
+		detailLoading: false,
 		error: null,
 		count: 0,
 		page: 1,
@@ -217,11 +243,12 @@ const positionsSlice = createSlice({
 		positionTitles: [],
 		positionTypes: [],
 		positionStatuses: [],
-		positionCategories: [],
-		positionFamilies: [],
-		positionSyncs: [],
 		payrolls: [],
 		salaryBases: [],
+		competencies: [],
+		proficiencyLevels: [],
+		qualificationTypes: [],
+		qualificationTitles: [],
 		lookupsLoading: false,
 	},
 	reducers: {
@@ -231,6 +258,9 @@ const positionsSlice = createSlice({
 		clearError: state => {
 			state.error = null;
 			state.actionError = null;
+		},
+		clearCurrentPosition: state => {
+			state.currentPosition = null;
 		},
 	},
 	extraReducers: builder => {
@@ -299,6 +329,20 @@ const positionsSlice = createSlice({
 				state.actionError = action.payload;
 			})
 
+			// Fetch single position
+			.addCase(fetchPosition.pending, state => {
+				state.detailLoading = true;
+				state.error = null;
+			})
+			.addCase(fetchPosition.fulfilled, (state, action) => {
+				state.detailLoading = false;
+				state.currentPosition = action.payload;
+			})
+			.addCase(fetchPosition.rejected, (state, action) => {
+				state.detailLoading = false;
+				state.error = action.payload;
+			})
+
 			// Fetch position hierarchy
 			.addCase(fetchPositionHierarchy.pending, state => {
 				state.treeLoading = true;
@@ -364,45 +408,6 @@ const positionsSlice = createSlice({
 				state.error = action.payload;
 			})
 
-			// Fetch position categories
-			.addCase(fetchPositionCategories.pending, state => {
-				state.lookupsLoading = true;
-			})
-			.addCase(fetchPositionCategories.fulfilled, (state, action) => {
-				state.lookupsLoading = false;
-				state.positionCategories = action.payload;
-			})
-			.addCase(fetchPositionCategories.rejected, (state, action) => {
-				state.lookupsLoading = false;
-				state.error = action.payload;
-			})
-
-			// Fetch position families
-			.addCase(fetchPositionFamilies.pending, state => {
-				state.lookupsLoading = true;
-			})
-			.addCase(fetchPositionFamilies.fulfilled, (state, action) => {
-				state.lookupsLoading = false;
-				state.positionFamilies = action.payload;
-			})
-			.addCase(fetchPositionFamilies.rejected, (state, action) => {
-				state.lookupsLoading = false;
-				state.error = action.payload;
-			})
-
-			// Fetch position syncs
-			.addCase(fetchPositionSyncs.pending, state => {
-				state.lookupsLoading = true;
-			})
-			.addCase(fetchPositionSyncs.fulfilled, (state, action) => {
-				state.lookupsLoading = false;
-				state.positionSyncs = action.payload;
-			})
-			.addCase(fetchPositionSyncs.rejected, (state, action) => {
-				state.lookupsLoading = false;
-				state.error = action.payload;
-			})
-
 			// Fetch payrolls
 			.addCase(fetchPayrolls.pending, state => {
 				state.lookupsLoading = true;
@@ -427,9 +432,29 @@ const positionsSlice = createSlice({
 			.addCase(fetchSalaryBases.rejected, (state, action) => {
 				state.lookupsLoading = false;
 				state.error = action.payload;
+			})
+
+			// Fetch competencies
+			.addCase(fetchCompetencies.fulfilled, (state, action) => {
+				state.competencies = action.payload;
+			})
+
+			// Fetch proficiency levels
+			.addCase(fetchProficiencyLevels.fulfilled, (state, action) => {
+				state.proficiencyLevels = action.payload;
+			})
+
+			// Fetch qualification types
+			.addCase(fetchQualificationTypes.fulfilled, (state, action) => {
+				state.qualificationTypes = action.payload;
+			})
+
+			// Fetch qualification titles
+			.addCase(fetchQualificationTitles.fulfilled, (state, action) => {
+				state.qualificationTitles = action.payload;
 			});
 	},
 });
 
-export const { setPage, clearError } = positionsSlice.actions;
+export const { setPage, clearError, clearCurrentPosition } = positionsSlice.actions;
 export default positionsSlice.reducer;

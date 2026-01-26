@@ -91,7 +91,6 @@ const CreatePoPage = () => {
 		dispatch(fetchTaxRates());
 	}, [dispatch]);
 
-
 	// Fetch PR items when PO type changes
 	useEffect(() => {
 		const fetchPRItems = async () => {
@@ -710,7 +709,7 @@ const CreatePoPage = () => {
 															{/* Line Total */}
 															<div className="mt-3 flex justify-end">
 																<span className="text-sm text-gray-600">
-																	{t("createPO.lines.lineTotal")}:{" "}
+																	{t("createPO.lines.lineTotal")}:
 																	<span className="font-semibold text-gray-900">
 																		{(
 																			(parseFloat(details.quantity_to_convert) ||

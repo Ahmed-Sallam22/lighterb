@@ -261,14 +261,14 @@ const OneTimeSupplierInvoiceDetailsModal = ({ isOpen, invoiceId, onClose }) => {
 										</h3>
 										<div className="flex items-center gap-4 text-sm">
 											<span className="text-gray-500">
-												Date:{" "}
+												Date:
 												<span className="text-gray-700 font-medium">
 													{invoice.journal_entry.date}
 												</span>
 											</span>
 											{invoice.journal_entry.memo && (
 												<span className="text-gray-500">
-													Memo:{" "}
+													Memo:
 													<span className="text-gray-700 font-medium">
 														{invoice.journal_entry.memo}
 													</span>

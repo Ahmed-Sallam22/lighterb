@@ -65,7 +65,7 @@ export const deleteBusinessGroup = createAsyncThunk(
 	}
 );
 
-// Fetch business group history
+//  business group history
 export const fetchBusinessGroupHistory = createAsyncThunk(
 	"businessGroups/fetchBusinessGroupHistory",
 	async (businessGroupId, { rejectWithValue }) => {

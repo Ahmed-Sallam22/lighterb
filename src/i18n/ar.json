@@ -4185,7 +4185,8 @@
 			"positionName": "اسم المنصب",
 			"gradeName": "الدرجة",
 			"positionFamily": "عائلة المنصب",
-			"positionCategory": "فئة المنصب"
+			"positionCategory": "فئة المنصب",
+			"positionSync": "مزامنة المنصب"
 		},
 		"form": {
 			"name": "الاسم",
@@ -4229,11 +4230,20 @@
 			"payroll": "الرواتب",
 			"selectPayroll": "اختر نظام الرواتب",
 			"salaryBasis": "أساس الراتب",
-			"selectSalaryBasis": "اختر أساس الراتب"
+			"selectSalaryBasis": "اختر أساس الراتب",
+			"newStartDate": "تاريخ البداية الجديد",
+			"endDate": "تاريخ النهاية",
+			"competencyRequirements": "متطلبات الكفاءة",
+			"qualificationRequirements": "متطلبات المؤهلات",
+			"selectCompetency": "اختر الكفاءة",
+			"selectProficiencyLevel": "اختر مستوى الإتقان",
+			"selectQualificationType": "اختر نوع المؤهل",
+			"selectQualificationTitle": "اختر عنوان المؤهل"
 		},
 		"modal": {
 			"createTitle": "إضافة وظيفة جديدة",
 			"editTitle": "تعديل الوظيفة",
+			"viewTitle": "تفاصيل المنصب",
 			"create": "إنشاء منصب",
 			"update": "تحديث منصب"
 		},
@@ -4256,8 +4266,10 @@
 			"deleted": "تم حذف المنصب بنجاح",
 			"saveError": "فشل حفظ الموقف",
 			"updated": "تم تحديث المنصب بنجاح",
-			"versionsError": "فشل تحميل سجل الإصدارات"
+			"versionsError": "فشل تحميل سجل الإصدارات",
+			"fetchError": "فشل تحميل تفاصيل المنصب"
 		},
+		"noData": "لا تتوفر بيانات المنصب",
 		"deleteModal": {
 			"title": "حذف الوظيفة",
 			"message": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
@@ -5244,5 +5256,78 @@
 	},
 	"login": {
 		"title": "تسجيل الدخول"
+	},
+	"lookupTypes": {
+		"title": "أنواع القوائم المرجعية",
+		"filters": {
+			"search": "بحث",
+			"searchPlaceholder": "البحث بالاسم..."
+		},
+		"table": {
+			"name": "الاسم",
+			"description": "الوصف",
+			"empty": "لا توجد أنواع قوائم مرجعية"
+		},
+		"actions": {
+			"create": "إنشاء نوع قائمة مرجعية"
+		},
+		"form": {
+			"name": "الاسم",
+			"description": "الوصف",
+			"errors": {
+				"nameRequired": "الاسم مطلوب"
+			}
+		},
+		"modal": {
+			"createTitle": "إنشاء نوع قائمة مرجعية",
+			"editTitle": "تعديل نوع قائمة مرجعية"
+		},
+		"deleteModal": {
+			"title": "حذف نوع القائمة المرجعية",
+			"message": "هل أنت متأكد من حذف نوع القائمة المرجعية '{{name}}'؟ لا يمكن التراجع عن هذا الإجراء."
+		}
+	},
+	"lookupValues": {
+		"title": "قيم القوائم المرجعية",
+		"filters": {
+			"lookupType": "نوع القائمة المرجعية",
+			"allTypes": "جميع الأنواع",
+			"parentName": "اسم الأصل",
+			"parentNamePlaceholder": "تصفية حسب اسم الأصل..."
+		},
+		"table": {
+			"lookupType": "نوع القائمة",
+			"name": "الاسم",
+			"description": "الوصف",
+			"sequence": "الترتيب",
+			"parentName": "الأصل",
+			"isActive": "نشط",
+			"empty": "لا توجد قيم قوائم مرجعية"
+		},
+		"actions": {
+			"create": "إنشاء قيمة قائمة مرجعية"
+		},
+		"form": {
+			"lookupType": "نوع القائمة المرجعية",
+			"selectLookupType": "اختر نوع القائمة المرجعية",
+			"name": "الاسم",
+			"sequence": "الترتيب",
+			"description": "الوصف",
+			"parent": "القيمة الأصل",
+			"noParent": "لا يوجد أصل",
+			"errors": {
+				"lookupTypeRequired": "نوع القائمة المرجعية مطلوب",
+				"nameRequired": "الاسم مطلوب",
+				"sequenceRequired": "الترتيب مطلوب"
+			}
+		},
+		"modal": {
+			"createTitle": "إنشاء قيمة قائمة مرجعية",
+			"editTitle": "تعديل قيمة قائمة مرجعية"
+		},
+		"deleteModal": {
+			"title": "حذف قيمة القائمة المرجعية",
+			"message": "هل أنت متأكد من حذف قيمة القائمة المرجعية '{{name}}'؟ لا يمكن التراجع عن هذا الإجراء."
+		}
 	}
 }

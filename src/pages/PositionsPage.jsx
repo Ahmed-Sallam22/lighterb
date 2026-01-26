@@ -4,7 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 import { usePageTitle } from "../hooks/usePageTitle";
-import { HiBriefcase, HiClock, HiSearch } from "react-icons/hi";
+import { HiBriefcase, HiClock, HiSearch, HiPlus, HiEye } from "react-icons/hi";
 
 import { parseApiError } from "../utils/errorHandler";
 
@@ -19,6 +19,7 @@ import Button from "../components/shared/Button";
 
 import {
 	fetchPositions,
+	fetchPosition,
 	createPosition,
 	updatePosition,
 	deletePosition,
@@ -26,18 +27,19 @@ import {
 	fetchPositionTitles,
 	fetchPositionTypes,
 	fetchPositionStatuses,
-	fetchPositionCategories,
-	fetchPositionFamilies,
-	fetchPositionSyncs,
 	fetchPayrolls,
 	fetchSalaryBases,
+	fetchCompetencies,
+	fetchProficiencyLevels,
+	fetchQualificationTypes,
+	fetchQualificationTitles,
 	setPage,
+	clearCurrentPosition,
 } from "../store/positionsSlice";
-import { fetchOrganizations } from "../store/organizationsSlice";
+import { fetchDepartmentsFromOrganizations } from "../store/organizationsSlice";
 import { fetchJobs } from "../store/jobsSlice";
 import { fetchLocations } from "../store/locationsSlice";
 import { fetchGrades } from "../store/gradesSlice";
-
 const INITIAL_FORM_DATA = {
 	code: "",
 	organization_id: "",
@@ -49,13 +51,15 @@ const INITIAL_FORM_DATA = {
 	grade_id: "",
 	full_time_equivalent: "1.00",
 	head_count: "1",
-	position_family_id: "",
-	position_category_id: "",
+	position_sync: false,
 	reports_to_id: "",
-	position_sync_id: "",
 	payroll_id: "",
 	salary_basis_id: "",
+	competency_requirements: [],
+	qualification_requirements: [],
 	effective_start_date: "",
+	effective_end_date: "",
+	new_start_date: "",
 };
 
 const INITIAL_FILTERS = {
@@ -66,9 +70,8 @@ const INITIAL_FILTERS = {
 };
 
 const PositionsPage = () => {
-	const { t, i18n } = useTranslation();
+	const { t } = useTranslation();
 	usePageTitle(t("positions.title"));
-	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
 	const {
@@ -83,18 +86,23 @@ const PositionsPage = () => {
 		positionTitles,
 		positionTypes,
 		positionStatuses,
-		positionCategories,
-		positionFamilies,
-		positionSyncs,
 		payrolls,
 		salaryBases,
+		currentPosition,
+		detailLoading,
+		competencies,
+		proficiencyLevels,
+		qualificationTypes,
+		qualificationTitles,
 	} = useSelector(state => state.positions);
-	const { organizations } = useSelector(state => state.organizations);
+
+	const { departments: organizations } = useSelector(state => state.organizations);
 	const { jobs } = useSelector(state => state.jobs);
 	const { locations } = useSelector(state => state.locations);
 	const { grades } = useSelector(state => state.grades);
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 	const [editingItem, setEditingItem] = useState(null);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [itemToDelete, setItemToDelete] = useState(null);
@@ -102,6 +110,14 @@ const PositionsPage = () => {
 	const [formErrors, setFormErrors] = useState({});
 	const [localPageSize, setLocalPageSize] = useState(25);
 	const [filters, setFilters] = useState(INITIAL_FILTERS);
+
+	// Competency requirement form state
+	const [newCompetencyId, setNewCompetencyId] = useState("");
+	const [newProficiencyLevelId, setNewProficiencyLevelId] = useState("");
+
+	// Qualification requirement form state
+	const [newQualificationTypeId, setNewQualificationTypeId] = useState("");
+	const [newQualificationTitleId, setNewQualificationTitleId] = useState("");
 
 	// Versions modal state
 	const [isVersionsModalOpen, setIsVersionsModalOpen] = useState(false);
@@ -124,27 +140,28 @@ const PositionsPage = () => {
 	}, [dispatch, page, localPageSize, filters]);
 
 	useEffect(() => {
-		dispatch(fetchOrganizations({ page_size: 100 }));
-		dispatch(fetchJobs({ page_size: 100 }));
-		dispatch(fetchLocations({ page_size: 100, status: "active" }));
-		dispatch(fetchGrades({ page_size: 100 }));
+		// dispatch(fetchOrganizations({ page_size: 100, is_business_group: false }));
+		dispatch(fetchDepartmentsFromOrganizations({ page_size: 100 }));
+		// dispatch(fetchGrades({ page_size: 100 }));
 		// Fetch position lookups
 		dispatch(fetchPositionTitles());
 		dispatch(fetchPositionTypes());
 		dispatch(fetchPositionStatuses());
-		dispatch(fetchPositionCategories());
-		dispatch(fetchPositionFamilies());
-		dispatch(fetchPositionSyncs());
 		dispatch(fetchPayrolls());
 		dispatch(fetchSalaryBases());
+		// Fetch competency and qualification lookups
+		dispatch(fetchCompetencies());
+		dispatch(fetchProficiencyLevels());
+		dispatch(fetchQualificationTypes());
+		dispatch(fetchQualificationTitles());
 	}, [dispatch]);
 
-	// fetch locations based on the organization selected
+	// fetch locations based on the organization selected in filters
 	useEffect(() => {
-		if (formData.organization_id) {
-			dispatch(fetchLocations({ page_size: 100, organization: formData.organization_id, status: "active" }));
+		if (filters.organization) {
+			dispatch(fetchLocations({ page_size: 100, organization: filters.organization, status: "active" }));
 		}
-	}, [dispatch, formData.organization_id]);
+	}, [dispatch, filters.organization]);
 
 	const handlePageChange = useCallback(
 		newPage => {
@@ -160,6 +177,52 @@ const PositionsPage = () => {
 		},
 		[dispatch]
 	);
+
+	// fetch jobs based on the organization selected in filters
+	useEffect(() => {
+		if (filters.organization) {
+			dispatch(fetchJobs({ page_size: 100, organization: filters.organization }));
+		}
+	}, [dispatch, filters.organization]);
+
+	// fetch jobs based on the organization selected in form create edit
+	useEffect(() => {
+		if (formData.organization_id) {
+			dispatch(
+				fetchJobs({
+					page_size: 100,
+					business_group: organizations.find(org => org.id === parseInt(formData.organization_id))
+						?.business_group_id,
+				})
+			);
+		}
+	}, [dispatch, formData.organization_id, organizations]);
+
+	useEffect(() => {
+		if (formData.organization_id) {
+			dispatch(
+				fetchGrades({
+					page_size: 100,
+					business_group: organizations.find(org => org.id === parseInt(formData.organization_id))
+						?.business_group_id,
+				})
+			);
+		}
+	}, [dispatch, formData.organization_id, organizations]);
+
+	useEffect(() => {
+		if (formData.organization_id) {
+			dispatch(
+				fetchLocations({
+					page_size: 100,
+					business_group: organizations.find(org => org.id === parseInt(formData.organization_id))
+						?.business_group_id,
+
+					status: "active",
+				})
+			);
+		}
+	}, [dispatch, formData.organization_id, organizations]);
 
 	const handleFilterChange = e => {
 		const { name, value } = e.target;
@@ -179,11 +242,6 @@ const PositionsPage = () => {
 
 	// Table columns based on API response
 	const columns = [
-		{
-			header: t("positions.table.orgCode"),
-			accessor: "organization_code",
-			render: value => value || "-",
-		},
 		{
 			header: t("positions.table.orgName"),
 			accessor: "organization_name",
@@ -215,14 +273,9 @@ const PositionsPage = () => {
 			render: value => value || "-",
 		},
 		{
-			header: t("positions.table.positionFamily"),
-			accessor: "position_family_name",
-			render: value => value || "-",
-		},
-		{
-			header: t("positions.table.positionCategory"),
-			accessor: "position_category_name",
-			render: value => value || "-",
+			header: t("positions.table.positionSync"),
+			accessor: "position_sync",
+			render: value => (value ? t("common.yes") : t("common.no")),
 		},
 	];
 
@@ -232,7 +285,7 @@ const PositionsPage = () => {
 			{ value: "", label: t("positions.form.selectOrganization") },
 			...organizations.map(org => ({
 				value: org.id,
-				label: org.organization_name + " - " + org.code,
+				label: org.organization_name,
 			})),
 		],
 		[organizations, t]
@@ -243,7 +296,7 @@ const PositionsPage = () => {
 			{ value: "", label: t("positions.form.selectJob") },
 			...jobs.map(job => ({
 				value: job.id,
-				label: job.job_title_name || job.code,
+				label: job.job_title_name + " - " + job.job_category_name,
 			})),
 		],
 		[jobs, t]
@@ -254,7 +307,7 @@ const PositionsPage = () => {
 			{ value: "", label: t("positions.form.selectLocation") },
 			...locations.map(loc => ({
 				value: loc.id,
-				label: loc.name,
+				label: loc.location_name,
 			})),
 		],
 		[locations, t]
@@ -265,7 +318,7 @@ const PositionsPage = () => {
 			{ value: "", label: t("positions.form.selectGrade") },
 			...grades.map(grade => ({
 				value: grade.id,
-				label: grade.name || grade.code,
+				label: grade.grade_name,
 			})),
 		],
 		[grades, t]
@@ -304,28 +357,6 @@ const PositionsPage = () => {
 		[positionStatuses, t]
 	);
 
-	const positionCategoryOptions = useMemo(
-		() => [
-			{ value: "", label: t("positions.form.selectPositionCategory") },
-			...positionCategories.map(item => ({
-				value: item.id,
-				label: item.name,
-			})),
-		],
-		[positionCategories, t]
-	);
-
-	const positionFamilyOptions = useMemo(
-		() => [
-			{ value: "", label: t("positions.form.selectPositionFamily") },
-			...positionFamilies.map(item => ({
-				value: item.id,
-				label: item.name,
-			})),
-		],
-		[positionFamilies, t]
-	);
-
 	const reportsToOptions = useMemo(
 		() => [
 			{ value: "", label: t("positions.form.selectReportsTo") },
@@ -339,15 +370,48 @@ const PositionsPage = () => {
 		[positions, editingItem, t]
 	);
 
-	const positionSyncOptions = useMemo(
+	const competencyOptions = useMemo(
 		() => [
-			{ value: "", label: t("positions.form.selectPositionSync") },
-			...positionSyncs.map(item => ({
+			{ value: "", label: t("positions.form.selectCompetency") },
+			...competencies.map(item => ({
+				value: item.id,
+				label: item.name || item.organization_name,
+			})),
+		],
+		[competencies, t]
+	);
+
+	const proficiencyLevelOptions = useMemo(
+		() => [
+			{ value: "", label: t("positions.form.selectProficiencyLevel") },
+			...proficiencyLevels.map(item => ({
 				value: item.id,
 				label: item.name,
 			})),
 		],
-		[positionSyncs, t]
+		[proficiencyLevels, t]
+	);
+
+	const qualificationTypeOptions = useMemo(
+		() => [
+			{ value: "", label: t("positions.form.selectQualificationType") },
+			...qualificationTypes.map(item => ({
+				value: item.id,
+				label: item.name,
+			})),
+		],
+		[qualificationTypes, t]
+	);
+
+	const qualificationTitleOptions = useMemo(
+		() => [
+			{ value: "", label: t("positions.form.selectQualificationTitle") },
+			...qualificationTitles.map(item => ({
+				value: item.id,
+				label: item.name,
+			})),
+		],
+		[qualificationTitles, t]
 	);
 
 	const payrollOptions = useMemo(
@@ -400,7 +464,7 @@ const PositionsPage = () => {
 			{ value: "", label: t("positions.filters.allLocations") },
 			...locations.map(loc => ({
 				value: loc.id,
-				label: loc.name,
+				label: loc.location_name,
 			})),
 		],
 		[locations, t]
@@ -410,32 +474,56 @@ const PositionsPage = () => {
 		setEditingItem(null);
 		setFormData(INITIAL_FORM_DATA);
 		setFormErrors({});
+		setNewCompetencyId("");
+		setNewProficiencyLevelId("");
+		setNewQualificationTypeId("");
+		setNewQualificationTitleId("");
 		setIsModalOpen(true);
 	};
 
-	const handleEdit = item => {
-		setEditingItem(item);
-		setFormData({
-			code: item.code || "",
-			organization_id: item.organization || "",
-			job_id: item.job || "",
-			position_title_id: item.position_title || "",
-			position_type_id: item.position_type || "",
-			position_status_id: item.position_status || "",
-			location_id: item.location || "",
-			grade_id: item.grade || "",
-			full_time_equivalent: item.full_time_equivalent || "1.00",
-			head_count: item.head_count?.toString() || "1",
-			position_family_id: item.position_family || "",
-			position_category_id: item.position_category || "",
-			reports_to_id: item.reports_to || "",
-			position_sync_id: item.position_sync || "",
-			payroll_id: item.payroll || "",
-			salary_basis_id: item.salary_basis || "",
-			effective_start_date: item.effective_start_date || "",
-		});
-		setFormErrors({});
-		setIsModalOpen(true);
+	const handleEdit = async item => {
+		try {
+			const positionData = await dispatch(fetchPosition(item.id)).unwrap();
+			setEditingItem(item);
+			setFormData({
+				code: positionData.code || "",
+				organization_id: positionData.organization_id || "",
+				job_id: positionData.job_id || "",
+				position_title_id: positionData.position_title_id || "",
+				position_type_id: positionData.position_type_id || "",
+				position_status_id: positionData.position_status_id || "",
+				location_id: positionData.location_id || "",
+				grade_id: positionData.grade_id || "",
+				full_time_equivalent: positionData.full_time_equivalent || "1.00",
+				head_count: positionData.head_count?.toString() || "1",
+				reports_to_id: positionData.reports_to_id || "",
+				position_sync: positionData.position_sync || false,
+				payroll_id: positionData.payroll_id || "",
+				salary_basis_id: positionData.salary_basis_id || "",
+				new_start_date: positionData.effective_start_date || "",
+				effective_end_date: positionData.effective_end_date || "",
+				competency_requirements: positionData.competency_requiremnets || [],
+				qualification_requirements: positionData.qualification_requirements || [],
+			});
+			setFormErrors({});
+			setNewCompetencyId("");
+			setNewProficiencyLevelId("");
+			setNewQualificationTypeId("");
+			setNewQualificationTitleId("");
+			setIsModalOpen(true);
+		} catch (error) {
+			toast.error(parseApiError(error, t, "positions.messages.fetchError"));
+		}
+	};
+
+	const handleView = async item => {
+		await dispatch(fetchPosition(item.id));
+		setIsViewModalOpen(true);
+	};
+
+	const handleCloseViewModal = () => {
+		setIsViewModalOpen(false);
+		dispatch(clearCurrentPosition());
 	};
 
 	const handleCloseModal = () => {
@@ -443,6 +531,10 @@ const PositionsPage = () => {
 		setEditingItem(null);
 		setFormData(INITIAL_FORM_DATA);
 		setFormErrors({});
+		setNewCompetencyId("");
+		setNewProficiencyLevelId("");
+		setNewQualificationTypeId("");
+		setNewQualificationTitleId("");
 	};
 
 	const handleInputChange = e => {
@@ -483,35 +575,160 @@ const PositionsPage = () => {
 		return Object.keys(errors).length === 0;
 	};
 
+	// Competency requirement handlers
+	const handleAddCompetencyRequirement = () => {
+		if (newCompetencyId && newProficiencyLevelId) {
+			const competency = competencies.find(c => c.id === parseInt(newCompetencyId));
+			const proficiencyLevel = proficiencyLevels.find(p => p.id === parseInt(newProficiencyLevelId));
+
+			setFormData(prev => ({
+				...prev,
+				competency_requirements: [
+					...prev.competency_requirements,
+					{
+						competency_id: parseInt(newCompetencyId),
+						competency_name: competency?.name || competency?.organization_name || "",
+						proficiency_level_id: parseInt(newProficiencyLevelId),
+						proficiency_level_name: proficiencyLevel?.name || proficiencyLevel?.organization_name || "",
+					},
+				],
+			}));
+			setNewCompetencyId("");
+			setNewProficiencyLevelId("");
+		}
+	};
+
+	const handleRemoveCompetencyRequirement = index => {
+		setFormData(prev => ({
+			...prev,
+			competency_requirements: prev.competency_requirements.filter((_, i) => i !== index),
+		}));
+	};
+
+	// Qualification requirement handlers
+	const handleAddQualificationRequirement = () => {
+		if (newQualificationTypeId && newQualificationTitleId) {
+			const qualType = qualificationTypes.find(t => t.id === parseInt(newQualificationTypeId));
+			const qualTitle = qualificationTitles.find(t => t.id === parseInt(newQualificationTitleId));
+
+			setFormData(prev => ({
+				...prev,
+				qualification_requirements: [
+					...prev.qualification_requirements,
+					{
+						qualification_type_id: parseInt(newQualificationTypeId),
+						qualification_type_name: qualType?.name || qualType?.organization_name || "",
+						qualification_title_id: parseInt(newQualificationTitleId),
+						qualification_title_name: qualTitle?.name || qualTitle?.organization_name || "",
+					},
+				],
+			}));
+			setNewQualificationTypeId("");
+			setNewQualificationTitleId("");
+		}
+	};
+
+	const handleRemoveQualificationRequirement = index => {
+		setFormData(prev => ({
+			...prev,
+			qualification_requirements: prev.qualification_requirements.filter((_, i) => i !== index),
+		}));
+	};
+
 	const handleSubmit = async e => {
 		e.preventDefault();
 		if (!validateForm()) return;
 
 		try {
-			const payload = {
-				code: formData.code,
-				organization_id: parseInt(formData.organization_id),
-				job_id: parseInt(formData.job_id),
-				position_title_id: parseInt(formData.position_title_id),
-				position_type_id: parseInt(formData.position_type_id),
-				position_status_id: parseInt(formData.position_status_id),
-				location_id: parseInt(formData.location_id),
-				grade_id: parseInt(formData.grade_id),
-				full_time_equivalent: parseFloat(formData.full_time_equivalent) || 1.0,
-				head_count: parseInt(formData.head_count) || 1,
-				...(formData.position_family_id && { position_family_id: parseInt(formData.position_family_id) }),
-				...(formData.position_category_id && { position_category_id: parseInt(formData.position_category_id) }),
-				...(formData.reports_to_id && { reports_to_id: parseInt(formData.reports_to_id) }),
-				...(formData.position_sync_id && { position_sync_id: parseInt(formData.position_sync_id) }),
-				...(formData.payroll_id && { payroll_id: parseInt(formData.payroll_id) }),
-				...(formData.salary_basis_id && { salary_basis_id: parseInt(formData.salary_basis_id) }),
-				...(formData.effective_start_date && { effective_start_date: formData.effective_start_date }),
-			};
-
 			if (editingItem) {
-				await dispatch(updatePosition({ id: editingItem.id, data: payload })).unwrap();
+				// PATCH request - use new_start_date if provided
+				const updateData = {
+					organization_id: parseInt(formData.organization_id),
+					job_id: parseInt(formData.job_id),
+					position_title_id: parseInt(formData.position_title_id),
+					position_type_id: parseInt(formData.position_type_id),
+					position_status_id: parseInt(formData.position_status_id),
+					location_id: parseInt(formData.location_id),
+					grade_id: parseInt(formData.grade_id),
+					full_time_equivalent: parseFloat(formData.full_time_equivalent) || 1.0,
+					head_count: parseInt(formData.head_count) || 1,
+					position_sync: formData.position_sync,
+				};
+
+				if (formData.new_start_date) {
+					updateData.new_start_date = formData.new_start_date;
+				}
+				if (formData.effective_end_date) {
+					updateData.effective_end_date = formData.effective_end_date;
+				}
+				if (formData.reports_to_id) {
+					updateData.reports_to_id = parseInt(formData.reports_to_id);
+				}
+				if (formData.payroll_id) {
+					updateData.payroll_id = parseInt(formData.payroll_id);
+				}
+				if (formData.salary_basis_id) {
+					updateData.salary_basis_id = parseInt(formData.salary_basis_id);
+				}
+				if (formData.competency_requirements && formData.competency_requirements.length > 0) {
+					updateData.competency_requirements = formData.competency_requirements.map(req => ({
+						competency_id: req.competency_id,
+						proficiency_level_id: req.proficiency_level_id,
+					}));
+				}
+				if (formData.qualification_requirements && formData.qualification_requirements.length > 0) {
+					updateData.qualification_requirements = formData.qualification_requirements.map(req => ({
+						qualification_type_id: req.qualification_type_id,
+						qualification_title_id: req.qualification_title_id,
+					}));
+				}
+
+				await dispatch(updatePosition({ id: editingItem.id, data: updateData })).unwrap();
 				toast.success(t("positions.messages.updateSuccess"));
 			} else {
+				// POST request
+				const payload = {
+					code: formData.code,
+					organization_id: parseInt(formData.organization_id),
+					job_id: parseInt(formData.job_id),
+					position_title_id: parseInt(formData.position_title_id),
+					position_type_id: parseInt(formData.position_type_id),
+					position_status_id: parseInt(formData.position_status_id),
+					location_id: parseInt(formData.location_id),
+					grade_id: parseInt(formData.grade_id),
+					full_time_equivalent: parseFloat(formData.full_time_equivalent) || 1.0,
+					head_count: parseInt(formData.head_count) || 1,
+					position_sync: formData.position_sync,
+				};
+
+				if (formData.reports_to_id) {
+					payload.reports_to_id = parseInt(formData.reports_to_id);
+				}
+				if (formData.payroll_id) {
+					payload.payroll_id = parseInt(formData.payroll_id);
+				}
+				if (formData.salary_basis_id) {
+					payload.salary_basis_id = parseInt(formData.salary_basis_id);
+				}
+				if (formData.effective_start_date) {
+					payload.effective_start_date = formData.effective_start_date;
+				}
+				if (formData.effective_end_date) {
+					payload.effective_end_date = formData.effective_end_date;
+				}
+				if (formData.competency_requirements && formData.competency_requirements.length > 0) {
+					payload.competency_requirements = formData.competency_requirements.map(req => ({
+						competency_id: req.competency_id,
+						proficiency_level_id: req.proficiency_level_id,
+					}));
+				}
+				if (formData.qualification_requirements && formData.qualification_requirements.length > 0) {
+					payload.qualification_requirements = formData.qualification_requirements.map(req => ({
+						qualification_type_id: req.qualification_type_id,
+						qualification_title_id: req.qualification_title_id,
+					}));
+				}
+
 				await dispatch(createPosition(payload)).unwrap();
 				toast.success(t("positions.messages.createSuccess"));
 			}
@@ -576,6 +793,11 @@ const PositionsPage = () => {
 	};
 
 	const customActions = [
+		{
+			title: t("common.view"),
+			icon: <HiEye className="w-5 h-5 text-[#1D7A8C]" />,
+			onClick: handleView,
+		},
 		{
 			title: t("positions.viewVersions"),
 			icon: <HiClock className="w-5 h-5 text-[#1D7A8C]" />,
@@ -815,50 +1037,34 @@ const PositionsPage = () => {
 						/>
 					</div>
 
-					{/* Row 6: Position Category & Position Family */}
+					{/* Row 6: Reports To & Position Sync */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<CustomDropdown
-							label={t("positions.form.positionCategory")}
-							name="position_category_id"
-							value={formData.position_category_id}
+							label={t("positions.form.reportsTo")}
+							name="reports_to_id"
+							value={formData.reports_to_id}
 							onChange={handleInputChange}
-							options={positionCategoryOptions}
+							options={reportsToOptions}
 							bgColor="bg-[#fff]"
 							showBorder={true}
 						/>
-						<CustomDropdown
-							label={t("positions.form.positionFamily")}
-							name="position_family_id"
-							value={formData.position_family_id}
-							onChange={handleInputChange}
-							options={positionFamilyOptions}
-							bgColor="bg-[#fff]"
-							showBorder={true}
-						/>
+						<div className="flex items-center gap-2 pt-6">
+							<input
+								type="checkbox"
+								id="position_sync"
+								name="position_sync"
+								checked={formData.position_sync}
+								onChange={e => setFormData(prev => ({ ...prev, position_sync: e.target.checked }))}
+								className="w-4 h-4 text-[#1D7A8C] border-gray-300 rounded focus:ring-[#1D7A8C]"
+							/>
+							<label htmlFor="position_sync" className="text-sm font-medium text-gray-700">
+								{t("positions.form.positionSync")}
+							</label>
+						</div>
 					</div>
 
-					{/* Row 7: Reports To */}
-					<CustomDropdown
-						label={t("positions.form.reportsTo")}
-						name="reports_to_id"
-						value={formData.reports_to_id}
-						onChange={handleInputChange}
-						options={reportsToOptions}
-						bgColor="bg-[#fff]"
-						showBorder={true}
-					/>
-
-					{/* Row 8: Position Sync, Payroll, Salary Basis */}
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-						<CustomDropdown
-							label={t("positions.form.positionSync")}
-							name="position_sync_id"
-							value={formData.position_sync_id}
-							onChange={handleInputChange}
-							options={positionSyncOptions}
-							bgColor="bg-[#fff]"
-							showBorder={true}
-						/>
+					{/* Row 7: Payroll & Salary Basis */}
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<CustomDropdown
 							label={t("positions.form.payroll")}
 							name="payroll_id"
@@ -879,15 +1085,149 @@ const PositionsPage = () => {
 						/>
 					</div>
 
-					{/* Row 9: Start Date */}
+					{/* Row 8: Start Date (create) / New Start Date (edit) */}
+					{editingItem ? (
+						<CustomInput
+							label={t("positions.form.newStartDate")}
+							name="new_start_date"
+							type="date"
+							value={formData.new_start_date}
+							onChange={handleInputChange}
+							bgColor="bg-[#fff]"
+						/>
+					) : (
+						<CustomInput
+							label={t("positions.form.startDate")}
+							name="effective_start_date"
+							type="date"
+							value={formData.effective_start_date}
+							onChange={handleInputChange}
+							bgColor="bg-[#fff]"
+						/>
+					)}
+					{/* End Date */}
 					<CustomInput
-						label={t("positions.form.startDate")}
-						name="effective_start_date"
+						label={t("positions.form.endDate")}
+						name="effective_end_date"
 						type="date"
-						value={formData.effective_start_date}
+						value={formData.effective_end_date}
 						onChange={handleInputChange}
 						bgColor="bg-[#fff]"
 					/>
+
+					{/* Competency Requirements Section */}
+					<div>
+						<label className="block text-sm font-medium text-gray-700 mb-2">
+							{t("positions.form.competencyRequirements")}
+						</label>
+						<div className="space-y-2">
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+								<CustomDropdown
+									name="newCompetencyId"
+									value={newCompetencyId}
+									onChange={e => setNewCompetencyId(e.target.value)}
+									options={competencyOptions}
+									bgColor="bg-[#fff]"
+									showBorder={true}
+								/>
+								<CustomDropdown
+									name="newProficiencyLevelId"
+									value={newProficiencyLevelId}
+									onChange={e => setNewProficiencyLevelId(e.target.value)}
+									options={proficiencyLevelOptions}
+									bgColor="bg-[#fff]"
+									showBorder={true}
+								/>
+								<button
+									type="button"
+									onClick={handleAddCompetencyRequirement}
+									disabled={!newCompetencyId || !newProficiencyLevelId}
+									className="px-4 py-2 bg-[#1D7A8C] text-white rounded-lg hover:bg-[#156576] transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+								>
+									<HiPlus className="w-4 h-4" />
+									{t("common.add")}
+								</button>
+							</div>
+							{formData.competency_requirements.length > 0 && (
+								<ul className="space-y-2 mt-2">
+									{formData.competency_requirements.map((req, index) => (
+										<li
+											key={index}
+											className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+										>
+											<span className="text-gray-700">
+												{req.competency_name} - {req.proficiency_level_name}
+											</span>
+											<button
+												type="button"
+												onClick={() => handleRemoveCompetencyRequirement(index)}
+												className="text-red-500 hover:text-red-700 font-medium"
+											>
+												×
+											</button>
+										</li>
+									))}
+								</ul>
+							)}
+						</div>
+					</div>
+
+					{/* Qualification Requirements Section */}
+					<div>
+						<label className="block text-sm font-medium text-gray-700 mb-2">
+							{t("positions.form.qualificationRequirements")}
+						</label>
+						<div className="space-y-2">
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+								<CustomDropdown
+									name="newQualificationTypeId"
+									value={newQualificationTypeId}
+									onChange={e => setNewQualificationTypeId(e.target.value)}
+									options={qualificationTypeOptions}
+									bgColor="bg-[#fff]"
+									showBorder={true}
+								/>
+								<CustomDropdown
+									name="newQualificationTitleId"
+									value={newQualificationTitleId}
+									onChange={e => setNewQualificationTitleId(e.target.value)}
+									options={qualificationTitleOptions}
+									bgColor="bg-[#fff]"
+									showBorder={true}
+								/>
+								<button
+									type="button"
+									onClick={handleAddQualificationRequirement}
+									disabled={!newQualificationTypeId || !newQualificationTitleId}
+									className="px-4 py-2 bg-[#1D7A8C] text-white rounded-lg hover:bg-[#156576] transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+								>
+									<HiPlus className="w-4 h-4" />
+									{t("common.add")}
+								</button>
+							</div>
+							{formData.qualification_requirements.length > 0 && (
+								<ul className="space-y-2 mt-2">
+									{formData.qualification_requirements.map((req, index) => (
+										<li
+											key={index}
+											className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+										>
+											<span className="text-gray-700">
+												{req.qualification_type_name} - {req.qualification_title_name}
+											</span>
+											<button
+												type="button"
+												onClick={() => handleRemoveQualificationRequirement(index)}
+												className="text-red-500 hover:text-red-700 font-medium"
+											>
+												×
+											</button>
+										</li>
+									))}
+								</ul>
+							)}
+						</div>
+					</div>
 
 					<div className="flex justify-end gap-3 pt-4">
 						<Button
@@ -910,6 +1250,175 @@ const PositionsPage = () => {
 						/>
 					</div>
 				</form>
+			</SlideUpModal>
+
+			{/* View Modal */}
+			<SlideUpModal
+				isOpen={isViewModalOpen}
+				onClose={handleCloseViewModal}
+				title={t("positions.modal.viewTitle")}
+				maxWidth="800px"
+			>
+				<div className="p-4 space-y-4">
+					{detailLoading ? (
+						<div className="flex justify-center py-8">
+							<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1D7A8C]"></div>
+						</div>
+					) : currentPosition ? (
+						<>
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.code")}
+									</label>
+									<p className="text-gray-900">{currentPosition.code || "-"}</p>
+								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.organization")}
+									</label>
+									<p className="text-gray-900">{currentPosition.organization_name || "-"}</p>
+								</div>
+							</div>
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.job")}
+									</label>
+									<p className="text-gray-900">{currentPosition.job_title_name || "-"}</p>
+								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.positionTitle")}
+									</label>
+									<p className="text-gray-900">{currentPosition.position_title_name || "-"}</p>
+								</div>
+							</div>
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.positionType")}
+									</label>
+									<p className="text-gray-900">{currentPosition.position_type_name || "-"}</p>
+								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.positionStatus")}
+									</label>
+									<p className="text-gray-900">{currentPosition.position_status_name || "-"}</p>
+								</div>
+							</div>
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.location")}
+									</label>
+									<p className="text-gray-900">{currentPosition.location_name || "-"}</p>
+								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.grade")}
+									</label>
+									<p className="text-gray-900">{currentPosition.grade_name || "-"}</p>
+								</div>
+							</div>
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.fte")}
+									</label>
+									<p className="text-gray-900">{currentPosition.full_time_equivalent || "-"}</p>
+								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.headCount")}
+									</label>
+									<p className="text-gray-900">{currentPosition.head_count || "-"}</p>
+								</div>
+							</div>
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.endDate")}
+									</label>
+									<p className="text-gray-900">{formatDate(currentPosition.effective_end_date)}</p>
+								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.startDate")}
+									</label>
+									<p className="text-gray-900">{formatDate(currentPosition.effective_end_date)}</p>
+								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.endDate")}
+									</label>
+									<p className="text-gray-900">{formatDate(currentPosition.effective_end_date)}</p>
+								</div>
+							</div>
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.positionSync")}
+									</label>
+									<p className="text-gray-900">
+										{currentPosition.position_sync ? t("common.yes") : t("common.no")}
+									</p>
+								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.reportsTo")}
+									</label>
+									<p className="text-gray-900">{currentPosition.reports_to_position_name || "-"}</p>
+								</div>
+							</div>
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.payroll")}
+									</label>
+									<p className="text-gray-900">{currentPosition.payroll_name || "-"}</p>
+								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.salaryBasis")}
+									</label>
+									<p className="text-gray-900">{currentPosition.salary_basis_name || "-"}</p>
+								</div>
+							</div>
+							{currentPosition.competency_requirements?.length > 0 && (
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.competencyRequirements")}
+									</label>
+									<ul className="list-disc list-inside text-gray-900 mt-1">
+										{currentPosition.competency_requirements.map((req, idx) => (
+											<li key={idx}>
+												{req.competency_name} - {req.proficiency_level_name}
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
+							{currentPosition.qualification_requirements?.length > 0 && (
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.qualificationRequirements")}
+									</label>
+									<ul className="list-disc list-inside text-gray-900 mt-1">
+										{currentPosition.qualification_requirements.map((req, idx) => (
+											<li key={idx}>
+												{req.qualification_type_name} - {req.qualification_title_name}
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
+						</>
+					) : (
+						<p className="text-gray-500 text-center py-8">{t("positions.noData")}</p>
+					)}
+				</div>
 			</SlideUpModal>
 
 			{/* Delete Confirmation Modal */}
@@ -961,17 +1470,21 @@ const PositionsPage = () => {
 									</div>
 									<div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
 										<div>
-											<span className="font-medium">{t("positions.versionsModal.grade")}:</span>{" "}
+											<span className="font-medium">{t("positions.versionsModal.grade")}:</span>
 											{version.grade_organization_name || "-"}
 										</div>
 										<div>
 											<span className="font-medium">
 												{t("positions.versionsModal.startDate")}:
-											</span>{" "}
+											</span>
 											{formatDate(version.effective_start_date)}
 										</div>
 										<div>
-											<span className="font-medium">{t("positions.versionsModal.endDate")}:</span>{" "}
+											<span className="font-medium">{t("positions.versionsModal.endDate")}:</span>
+											{formatDate(version.effective_end_date)}
+										</div>
+										<div>
+											<span className="font-medium">{t("positions.versionsModal.endDate")}:</span>
 											{formatDate(version.effective_end_date)}
 										</div>
 									</div>

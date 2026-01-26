@@ -119,11 +119,13 @@ export const fetchDepartmentsFromOrganizations = createAsyncThunk(
 	async (params = {}, { rejectWithValue }) => {
 		try {
 			const response = await api.get("/hr/work_structures/organizations/", {
-				params: { ...params, is_business_group: false },
+				params: { ...params },
 			});
 			const data = response.data?.data || response.data;
 			return {
-				results: data.results || data || [],
+				// results: data.results || data || [],
+				results: data.results.filter(org => !org.is_business_group)
+				 || data || [],
 				count: data.count || 0,
 				next: data.next,
 				previous: data.previous,

@@ -4192,7 +4192,8 @@
 			"positionName": "Position Name",
 			"gradeName": "Grade",
 			"positionFamily": "Position Family",
-			"positionCategory": "Position Category"
+			"positionCategory": "Position Category",
+			"positionSync": "Position Sync"
 		},
 		"form": {
 			"name": "Name",
@@ -4236,11 +4237,20 @@
 			"payroll": "Payroll",
 			"selectPayroll": "Select Payroll",
 			"salaryBasis": "Salary Basis",
-			"selectSalaryBasis": "Select Salary Basis"
+			"selectSalaryBasis": "Select Salary Basis",
+			"newStartDate": "New Start Date",
+			"endDate": "End Date",
+			"competencyRequirements": "Competency Requirements",
+			"qualificationRequirements": "Qualification Requirements",
+			"selectCompetency": "Select Competency",
+			"selectProficiencyLevel": "Select Proficiency Level",
+			"selectQualificationType": "Select Qualification Type",
+			"selectQualificationTitle": "Select Qualification Title"
 		},
 		"modal": {
 			"createTitle": "Create Position",
 			"editTitle": "Edit Position",
+			"viewTitle": "Position Details",
 			"create": "Create Position",
 			"update": "Update Position"
 		},
@@ -4263,8 +4273,10 @@
 			"updateError": "Failed to update position",
 			"saveError": "Failed to save position",
 			"deleteError": "Failed to delete position",
-			"versionsError": "Failed to load version history"
+			"versionsError": "Failed to load version history",
+			"fetchError": "Failed to load position details"
 		},
+		"noData": "No position data available",
 		"deleteModal": {
 			"title": "Delete Position",
 			"message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
@@ -5251,5 +5263,78 @@
 	},
 	"login": {
 		"title": "Login"
+	},
+	"lookupTypes": {
+		"title": "Lookup Types",
+		"filters": {
+			"search": "Search",
+			"searchPlaceholder": "Search by name..."
+		},
+		"table": {
+			"name": "Name",
+			"description": "Description",
+			"empty": "No lookup types found"
+		},
+		"actions": {
+			"create": "Create Lookup Type"
+		},
+		"form": {
+			"name": "Name",
+			"description": "Description",
+			"errors": {
+				"nameRequired": "Name is required"
+			}
+		},
+		"modal": {
+			"createTitle": "Create Lookup Type",
+			"editTitle": "Edit Lookup Type"
+		},
+		"deleteModal": {
+			"title": "Delete Lookup Type",
+			"message": "Are you sure you want to delete the lookup type '{{name}}'? This action cannot be undone."
+		}
+	},
+	"lookupValues": {
+		"title": "Lookup Values",
+		"filters": {
+			"lookupType": "Lookup Type",
+			"allTypes": "All Types",
+			"parentName": "Parent Name",
+			"parentNamePlaceholder": "Filter by parent name..."
+		},
+		"table": {
+			"lookupType": "Lookup Type",
+			"name": "Name",
+			"description": "Description",
+			"sequence": "Sequence",
+			"parentName": "Parent",
+			"isActive": "Active",
+			"empty": "No lookup values found"
+		},
+		"actions": {
+			"create": "Create Lookup Value"
+		},
+		"form": {
+			"lookupType": "Lookup Type",
+			"selectLookupType": "Select Lookup Type",
+			"name": "Name",
+			"sequence": "Sequence",
+			"description": "Description",
+			"parent": "Parent Value",
+			"noParent": "No Parent",
+			"errors": {
+				"lookupTypeRequired": "Lookup type is required",
+				"nameRequired": "Name is required",
+				"sequenceRequired": "Sequence is required"
+			}
+		},
+		"modal": {
+			"createTitle": "Create Lookup Value",
+			"editTitle": "Edit Lookup Value"
+		},
+		"deleteModal": {
+			"title": "Delete Lookup Value",
+			"message": "Are you sure you want to delete the lookup value '{{name}}'? This action cannot be undone."
+		}
 	}
 }

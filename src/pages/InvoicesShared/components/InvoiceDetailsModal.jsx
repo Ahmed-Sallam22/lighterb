@@ -16,7 +16,7 @@ const InvoiceDetailsModal = ({ isOpen, invoiceId, type = "AP", onClose }) => {
 	const [error, setError] = useState(null);
 	const [invoice, setInvoice] = useState(null);
 
-	const {t} = useTranslation();
+	const { t } = useTranslation();
 
 	useEffect(() => {
 		if (!isOpen || !invoiceId) return;
@@ -254,14 +254,14 @@ const InvoiceDetailsModal = ({ isOpen, invoiceId, type = "AP", onClose }) => {
 										</h3>
 										<div className="flex items-center gap-4 text-sm">
 											<span className="text-gray-500">
-												Date:{" "}
+												Date:
 												<span className="text-gray-700 font-medium">
 													{invoice.journal_entry.date}
 												</span>
 											</span>
 											{invoice.journal_entry.memo && (
 												<span className="text-gray-500">
-													Memo:{" "}
+													Memo:
 													<span className="text-gray-700 font-medium">
 														{invoice.journal_entry.memo}
 													</span>
@@ -341,7 +341,7 @@ const InvoiceDetailsModal = ({ isOpen, invoiceId, type = "AP", onClose }) => {
 																			key={segIdx}
 																			className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
 																		>
-																			{key}:{" "}
+																			{key}:
 																			{typeof value === "object"
 																				? JSON.stringify(value)
 																				: value}

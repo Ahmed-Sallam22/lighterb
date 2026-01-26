@@ -42,7 +42,7 @@ const ApprovalStepCard = ({ step, actionLoading, onApprove, onReject }) => {
 					</div>
 					<div className="flex-1">
 						<p className="text-base font-semibold text-[#1f4560]">
-							{t("procurementApprovalDetail.step")} {workflowStep?.sequence}:{" "}
+							{t("procurementApprovalDetail.step")} {workflowStep?.sequence}:
 							{workflowStep?.name || t("procurementApprovalDetail.na")}
 						</p>
 						<p className="text-sm text-gray-500 mt-1">

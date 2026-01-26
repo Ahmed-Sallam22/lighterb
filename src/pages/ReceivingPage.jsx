@@ -60,7 +60,6 @@ const ReceivingPage = () => {
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [grnToDelete, setGrnToDelete] = useState(null);
 
-
 	// Fetch GRN list
 	useEffect(() => {
 		const params = {
@@ -381,12 +380,12 @@ const ReceivingPage = () => {
 													</div>
 												</td>
 												<td className="px-4 py-3 text-gray-700">
-													{parseFloat(line.quantity_ordered).toLocaleString()}{" "}
+													{parseFloat(line.quantity_ordered).toLocaleString()}
 													{line.unit_of_measure_code}
 												</td>
 												<td className="px-4 py-3">
 													<span className="font-semibold text-green-600">
-														{parseFloat(line.quantity_received).toLocaleString()}{" "}
+														{parseFloat(line.quantity_received).toLocaleString()}
 														{line.unit_of_measure_code}
 													</span>
 													<span className="text-xs text-gray-500 ml-2">
@@ -529,11 +528,11 @@ const ReceivingPage = () => {
 						{/* Timestamps */}
 						<div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
 							<div>
-								<span className="font-medium">{t("receivingPage.modal.createdAt")}:</span>{" "}
+								<span className="font-medium">{t("receivingPage.modal.createdAt")}:</span>
 								{new Date(currentGRN.created_at).toLocaleString()}
 							</div>
 							<div>
-								<span className="font-medium">{t("receivingPage.modal.createdBy")}:</span>{" "}
+								<span className="font-medium">{t("receivingPage.modal.createdBy")}:</span>
 								{currentGRN.created_by_name}
 							</div>
 						</div>
