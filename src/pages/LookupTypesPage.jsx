@@ -283,13 +283,9 @@ const LookupTypesPage = () => {
 		<ErpPageTemplate title={t("lookupTypes.title")} showBackButton={false}>
 			{/* Success/Error Messages */}
 			{success && (
-				<div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
-					{success}
-				</div>
+				<div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">{success}</div>
 			)}
-			{error && (
-				<div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">{error}</div>
-			)}
+			{error && <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">{error}</div>}
 
 			{/* Filters Section */}
 			<div className="mb-6 bg-white rounded-lg shadow p-4">
@@ -374,7 +370,12 @@ const LookupTypesPage = () => {
 								/>
 
 								<div className="flex justify-end gap-3 pt-4">
-									<Button type="button" onClick={handleCloseModal} variant="secondary" disabled={creating || updating}>
+									<Button
+										type="button"
+										onClick={handleCloseModal}
+										variant="secondary"
+										disabled={creating || updating}
+									>
 										{t("common.cancel")}
 									</Button>
 									<Button type="submit" variant="primary" disabled={creating || updating}>

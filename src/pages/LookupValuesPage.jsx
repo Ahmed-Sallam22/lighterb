@@ -313,7 +313,7 @@ const LookupValuesPage = () => {
 
 	const parentValueOptions = useMemo(() => {
 		const options = [{ value: "", label: t("lookupValues.form.noParent") }];
-		
+
 		// Get potential parent values from the current list
 		// Only show values that could be parents (same type or related)
 		if (formData.lookup_type) {
@@ -327,7 +327,7 @@ const LookupValuesPage = () => {
 				}))
 			);
 		}
-		
+
 		return options;
 	}, [lookupValues, formData.lookup_type, editingValue, t]);
 
@@ -392,13 +392,9 @@ const LookupValuesPage = () => {
 		<ErpPageTemplate title={t("lookupValues.title")} showBackButton={false}>
 			{/* Success/Error Messages */}
 			{success && (
-				<div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
-					{success}
-				</div>
+				<div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">{success}</div>
 			)}
-			{error && (
-				<div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">{error}</div>
-			)}
+			{error && <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">{error}</div>}
 
 			{/* Filters Section */}
 			<div className="mb-6 bg-white rounded-lg shadow p-4">
@@ -518,7 +514,12 @@ const LookupValuesPage = () => {
 								/>
 
 								<div className="flex justify-end gap-3 pt-4">
-									<Button type="button" onClick={handleCloseModal} variant="secondary" disabled={creating || updating}>
+									<Button
+										type="button"
+										onClick={handleCloseModal}
+										variant="secondary"
+										disabled={creating || updating}
+									>
 										{t("common.cancel")}
 									</Button>
 									<Button type="submit" variant="primary" disabled={creating || updating}>

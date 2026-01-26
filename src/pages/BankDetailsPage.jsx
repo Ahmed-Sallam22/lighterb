@@ -809,11 +809,11 @@ const BankDetailsPage = () => {
 								<div>
 									<p className="text-sm text-gray-500">{t("bankDetails.header.statistics")}</p>
 									<p className="font-semibold text-gray-900">
-										{branchCount || selectedBank.total_branches || 0}{" "}
+										{branchCount || selectedBank.total_branches || 0}
 										{t("bankDetails.header.branches")}
 									</p>
 									<p className="text-sm text-gray-600">
-										{accountCount || selectedBank.total_accounts || 0}{" "}
+										{accountCount || selectedBank.total_accounts || 0}
 										{t("bankDetails.header.accounts")}
 									</p>
 								</div>
@@ -1310,7 +1310,7 @@ const BankDetailsPage = () => {
 							<p className="font-semibold text-gray-900">{balanceUpdateAccount.account_name}</p>
 							<p className="text-sm text-gray-600 font-mono">{balanceUpdateAccount.account_number}</p>
 							<p className="text-lg font-bold text-green-600 mt-2">
-								{t("bankDetails.balanceModal.currentBalance")}: {balanceUpdateAccount.currency_code}{" "}
+								{t("bankDetails.balanceModal.currentBalance")}: {balanceUpdateAccount.currency_code}
 								{parseFloat(balanceUpdateAccount.current_balance || 0).toLocaleString(undefined, {
 									minimumFractionDigits: 2,
 								})}
