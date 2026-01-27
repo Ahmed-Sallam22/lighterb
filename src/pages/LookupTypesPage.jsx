@@ -1,15 +1,20 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-// import { Plus, Search, X } from "lucide-react";
-import { Plus, Search, X } from "react-icons/fi";
-import ErpPageTemplate from "../components/ErpPageTemplate";
+import { useNavigate } from "react-router";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { FaPlus, FaSearch, FaTimes, FaList, FaEye } from "react-icons/fa";
+import { HiViewList } from "react-icons/hi";
+
+import PageHeader from "../components/shared/PageHeader";
 import CustomTable from "../components/shared/CustomTable";
 import Pagination from "../components/shared/Pagination";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import FloatingLabelTextarea from "../components/shared/FloatingLabelTextarea";
 import Button from "../components/shared/Button";
 import ConfirmModal from "../components/shared/ConfirmModal";
+import SlideUpModal from "../components/shared/SlideUpModal";
 import { usePageTitle } from "../hooks/usePageTitle";
 import {
 	fetchLookupTypesList,
@@ -35,6 +40,7 @@ const LookupTypesPage = () => {
 	const { t } = useTranslation();
 	usePageTitle(t("lookupTypes.title"));
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	// Redux state
 	const {
@@ -252,6 +258,20 @@ const LookupTypesPage = () => {
 		setTypeToDelete(null);
 	};
 
+	const handleViewValues = item => {
+		// Navigate to lookup values page with the lookup type filter
+		navigate(`/lookups/values/${encodeURIComponent(item.name)}`);
+	};
+
+	// Custom actions for the table
+	const customActions = [
+		{
+			title: t("lookupTypes.actions.viewValues"),
+			icon: <FaEye className="w-5 h-5 text-[#1D7A8C]" />,
+			onClick: handleViewValues,
+		},
+	];
+
 	// Table columns
 	const columns = [
 		{
@@ -266,141 +286,148 @@ const LookupTypesPage = () => {
 		},
 	];
 
-	const actions = [
-		{
-			label: t("common.edit"),
-			onClick: handleEditType,
-			variant: "secondary",
-		},
-		{
-			label: t("common.delete"),
-			onClick: handleDeleteClick,
-			variant: "danger",
-		},
-	];
+	// Show success/error toast
+	useEffect(() => {
+		if (success) {
+			toast.success(success);
+		}
+	}, [success]);
+
+	useEffect(() => {
+		if (error) {
+			toast.error(error);
+		}
+	}, [error]);
 
 	return (
-		<ErpPageTemplate title={t("lookupTypes.title")} showBackButton={false}>
-			{/* Success/Error Messages */}
-			{success && (
-				<div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">{success}</div>
-			)}
-			{error && <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">{error}</div>}
+		<div className="min-h-screen bg-gray-50">
+			<ToastContainer position="top-right" autoClose={3000} />
+			<PageHeader icon={<HiViewList className="w-8 h-8 text-white mr-3" />} title={t("lookupTypes.title")} />
 
-			{/* Filters Section */}
-			<div className="mb-6 bg-white rounded-lg shadow p-4">
-				<div className="flex items-end gap-4">
-					<div className="flex-1">
-						<FloatingLabelInput
-							label={t("lookupTypes.filters.search")}
-							name="search"
-							value={filters.search}
-							onChange={handleFilterChange}
-							placeholder={t("lookupTypes.filters.searchPlaceholder")}
-						/>
-					</div>
-					<Button onClick={handleSearch} variant="primary" className="h-[42px]">
-						<Search size={18} className="mr-2" />
-						{t("common.search")}
-					</Button>
-					{filters.search && (
-						<Button onClick={handleClearSearch} variant="secondary" className="h-[42px]">
-							<X size={18} className="mr-2" />
-							{t("common.clear")}
-						</Button>
-					)}
-					<Button onClick={handleCreateType} variant="primary" className="h-[42px]">
-						<Plus size={18} className="mr-2" />
-						{t("lookupTypes.actions.create")}
-					</Button>
-				</div>
-			</div>
-
-			{/* Table Section */}
-			<div className="bg-white rounded-lg shadow">
-				<CustomTable
-					columns={columns}
-					data={lookupTypes}
-					actions={actions}
-					loading={typesLoading}
-					emptyMessage={t("lookupTypes.table.empty")}
-				/>
-
-				{/* Pagination */}
-				{typesCount > 0 && (
-					<div className="p-4 border-t">
-						<Pagination
-							currentPage={typesPage}
-							totalItems={typesCount}
-							pageSize={localPageSize}
-							onPageChange={handlePageChange}
-							onPageSizeChange={handlePageSizeChange}
-							hasNext={typesHasNext}
-							hasPrevious={typesHasPrevious}
-						/>
-					</div>
-				)}
-			</div>
-
-			{/* Create/Edit Modal */}
-			{isModalOpen && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-					<div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-						<div className="p-6">
-							<h2 className="text-2xl font-bold mb-6">
-								{editingType ? t("lookupTypes.modal.editTitle") : t("lookupTypes.modal.createTitle")}
-							</h2>
-
-							<form onSubmit={handleSubmit} className="space-y-4">
-								<FloatingLabelInput
-									label={t("lookupTypes.form.name")}
-									name="name"
-									value={formData.name}
-									onChange={handleInputChange}
-									error={formErrors.name}
-									required
-								/>
-
-								<FloatingLabelTextarea
-									label={t("lookupTypes.form.description")}
-									name="description"
-									value={formData.description}
-									onChange={handleInputChange}
-									rows={3}
-								/>
-
-								<div className="flex justify-end gap-3 pt-4">
-									<Button
-										type="button"
-										onClick={handleCloseModal}
-										variant="secondary"
-										disabled={creating || updating}
-									>
-										{t("common.cancel")}
-									</Button>
-									<Button type="submit" variant="primary" disabled={creating || updating}>
-										{creating || updating ? t("common.saving") : t("common.save")}
-									</Button>
-								</div>
-							</form>
+			<div className="p-6">
+				{/* Filters Section */}
+				<div className="mb-6 bg-white rounded-2xl shadow-lg p-6">
+					<div className="flex items-end gap-4">
+						<div className="flex-1">
+							<FloatingLabelInput
+								label={t("lookupTypes.filters.search")}
+								name="search"
+								value={filters.search}
+								onChange={handleFilterChange}
+								placeholder={t("lookupTypes.filters.searchPlaceholder")}
+							/>
 						</div>
+						<Button
+							onClick={handleSearch}
+							icon={<FaSearch className="w-5 h-5" />}
+							title={t("common.search")}
+							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
+						/>
+						{filters.search && (
+							<Button
+								onClick={handleClearSearch}
+								icon={<FaTimes className="w-5 h-5" />}
+								title={t("common.clear")}
+								className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+							/>
+						)}
+						<Button
+							onClick={handleCreateType}
+							icon={<FaPlus className="w-5 h-5" />}
+							title={t("lookupTypes.actions.create")}
+							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
+						/>
 					</div>
 				</div>
-			)}
 
-			{/* Delete Confirmation Modal */}
-			<ConfirmModal
-				isOpen={isDeleteModalOpen}
-				onClose={handleCancelDelete}
-				onConfirm={handleConfirmDelete}
-				title={t("lookupTypes.deleteModal.title")}
-				message={t("lookupTypes.deleteModal.message", { name: typeToDelete?.name })}
-				confirmText={t("common.delete")}
-				cancelText={t("common.cancel")}
-				variant="danger"
-				loading={deleting}
-			/>
-		</ErpPageTemplate>
+				{/* Table Section */}
+				<div className="bg-white rounded-2xl shadow-lg p-6">
+					<div className="flex justify-between items-center mb-6">
+						<h2 className="text-2xl font-bold text-[#1D7A8C]">{t("lookupTypes.title")}</h2>
+					</div>
+
+					<CustomTable
+						columns={columns}
+						data={lookupTypes}
+						onEdit={handleEditType}
+						onDelete={handleDeleteClick}
+						customActions={customActions}
+						loading={typesLoading}
+						emptyMessage={t("lookupTypes.table.empty")}
+					/>
+
+					{/* Pagination */}
+					{typesCount > 0 && (
+						<div className="mt-6">
+							<Pagination
+								currentPage={typesPage}
+								totalCount={typesCount}
+								pageSize={localPageSize}
+								onPageChange={handlePageChange}
+								onPageSizeChange={handlePageSizeChange}
+								hasNext={typesHasNext}
+								hasPrevious={typesHasPrevious}
+							/>
+						</div>
+					)}
+				</div>
+
+				{/* Create/Edit Modal */}
+				<SlideUpModal
+					isOpen={isModalOpen}
+					onClose={handleCloseModal}
+					title={editingType ? t("lookupTypes.modal.editTitle") : t("lookupTypes.modal.createTitle")}
+				>
+					<form onSubmit={handleSubmit} className="space-y-4 p-4">
+						<FloatingLabelInput
+							label={t("lookupTypes.form.name")}
+							name="name"
+							value={formData.name}
+							onChange={handleInputChange}
+							error={formErrors.name}
+							required
+						/>
+
+						<FloatingLabelTextarea
+							label={t("lookupTypes.form.description")}
+							name="description"
+							value={formData.description}
+							onChange={handleInputChange}
+							rows={3}
+						/>
+
+						<div className="flex justify-end gap-3 pt-4">
+							<Button
+								type="button"
+								onClick={handleCloseModal}
+								title={t("common.cancel")}
+								className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+								disabled={creating || updating}
+							/>
+							<Button
+								type="submit"
+								title={creating || updating ? t("common.saving") : t("common.save")}
+								className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
+								disabled={creating || updating}
+							/>
+						</div>
+					</form>
+				</SlideUpModal>
+
+				{/* Delete Confirmation Modal */}
+				<ConfirmModal
+					isOpen={isDeleteModalOpen}
+					onClose={handleCancelDelete}
+					onConfirm={handleConfirmDelete}
+					title={t("lookupTypes.deleteModal.title")}
+					message={t("lookupTypes.deleteModal.message", { name: typeToDelete?.name })}
+					confirmText={t("common.delete")}
+					cancelText={t("common.cancel")}
+					variant="danger"
+					loading={deleting}
+				/>
+			</div>
+		</div>
 	);
 };
 

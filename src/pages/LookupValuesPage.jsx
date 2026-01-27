@@ -1,8 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import { Plus, Search, X } from "react-icons/fi";
-import ErpPageTemplate from "../components/ErpPageTemplate";
+import { useSearchParams } from "react-router";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { FaPlus, FaSearch, FaTimes, FaList, FaEye } from "react-icons/fa";
+import { HiViewList } from "react-icons/hi";
+import PageHeader from "../components/shared/PageHeader";
 import CustomTable from "../components/shared/CustomTable";
 import Pagination from "../components/shared/Pagination";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
@@ -10,6 +14,7 @@ import FloatingLabelTextarea from "../components/shared/FloatingLabelTextarea";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import Button from "../components/shared/Button";
 import ConfirmModal from "../components/shared/ConfirmModal";
+import SlideUpModal from "../components/shared/SlideUpModal";
 import { usePageTitle } from "../hooks/usePageTitle";
 import {
 	fetchLookupValuesList,
@@ -40,6 +45,7 @@ const LookupValuesPage = () => {
 	const { t } = useTranslation();
 	usePageTitle(t("lookupValues.title"));
 	const dispatch = useDispatch();
+	const [searchParams] = useSearchParams();
 
 	// Redux state
 	const {
@@ -66,7 +72,10 @@ const LookupValuesPage = () => {
 	const [formData, setFormData] = useState(VALUE_FORM_INITIAL);
 	const [formErrors, setFormErrors] = useState({});
 	const [localPageSize, setLocalPageSize] = useState(25);
-	const [filters, setFilters] = useState(INITIAL_FILTERS);
+	const [filters, setFilters] = useState({
+		lookupType: searchParams.get("type") || INITIAL_FILTERS.lookupType,
+		parentName: INITIAL_FILTERS.parentName,
+	});
 
 	// Fetch lookup types for dropdown
 	useEffect(() => {
@@ -375,176 +384,182 @@ const LookupValuesPage = () => {
 		},
 	];
 
-	const actions = [
-		{
-			label: t("common.edit"),
-			onClick: handleEditValue,
-			variant: "secondary",
-		},
-		{
-			label: t("common.delete"),
-			onClick: handleDeleteClick,
-			variant: "danger",
-		},
-	];
+	// Show success/error toast
+	useEffect(() => {
+		if (success) {
+			toast.success(success);
+		}
+	}, [success]);
+
+	useEffect(() => {
+		if (error) {
+			toast.error(error);
+		}
+	}, [error]);
 
 	return (
-		<ErpPageTemplate title={t("lookupValues.title")} showBackButton={false}>
-			{/* Success/Error Messages */}
-			{success && (
-				<div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">{success}</div>
-			)}
-			{error && <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">{error}</div>}
+		<div className="min-h-screen bg-gray-50">
+			<ToastContainer position="top-right" autoClose={3000} />
+			<PageHeader icon={<HiViewList className="w-8 h-8 text-white mr-3" />} title={t("lookupValues.title")} />
 
-			{/* Filters Section */}
-			<div className="mb-6 bg-white rounded-lg shadow p-4">
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-					<FloatingLabelSelect
-						label={t("lookupValues.filters.lookupType")}
-						name="lookupType"
-						value={filters.lookupType}
-						onChange={handleFilterChange}
-						options={lookupTypeOptions}
-					/>
-					<FloatingLabelInput
-						label={t("lookupValues.filters.parentName")}
-						name="parentName"
-						value={filters.parentName}
-						onChange={handleFilterChange}
-						placeholder={t("lookupValues.filters.parentNamePlaceholder")}
-					/>
-				</div>
-				<div className="flex items-center gap-4">
-					<Button onClick={handleSearch} variant="primary">
-						<Search size={18} className="mr-2" />
-						{t("common.search")}
-					</Button>
-					{(filters.lookupType || filters.parentName) && (
-						<Button onClick={handleClearFilters} variant="secondary">
-							<X size={18} className="mr-2" />
-							{t("common.clear")}
-						</Button>
-					)}
-					<Button onClick={handleCreateValue} variant="primary" className="ml-auto">
-						<Plus size={18} className="mr-2" />
-						{t("lookupValues.actions.create")}
-					</Button>
-				</div>
-			</div>
-
-			{/* Table Section */}
-			<div className="bg-white rounded-lg shadow">
-				<CustomTable
-					columns={columns}
-					data={lookupValues}
-					actions={actions}
-					loading={valuesLoading}
-					emptyMessage={t("lookupValues.table.empty")}
-				/>
-
-				{/* Pagination */}
-				{valuesCount > 0 && (
-					<div className="p-4 border-t">
-						<Pagination
-							currentPage={valuesPage}
-							totalItems={valuesCount}
-							pageSize={localPageSize}
-							onPageChange={handlePageChange}
-							onPageSizeChange={handlePageSizeChange}
-							hasNext={valuesHasNext}
-							hasPrevious={valuesHasPrevious}
+			<div className="p-6">
+				{/* Filters Section */}
+				<div className="mb-6 bg-white rounded-lg shadow p-4">
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+						<FloatingLabelSelect
+							label={t("lookupValues.filters.lookupType")}
+							name="lookupType"
+							value={filters.lookupType}
+							onChange={handleFilterChange}
+							options={lookupTypeOptions}
+						/>
+						<FloatingLabelInput
+							label={t("lookupValues.filters.parentName")}
+							name="parentName"
+							value={filters.parentName}
+							onChange={handleFilterChange}
+							placeholder={t("lookupValues.filters.parentNamePlaceholder")}
 						/>
 					</div>
-				)}
-			</div>
-
-			{/* Create/Edit Modal */}
-			{isModalOpen && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-					<div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-						<div className="p-6">
-							<h2 className="text-2xl font-bold mb-6">
-								{editingValue ? t("lookupValues.modal.editTitle") : t("lookupValues.modal.createTitle")}
-							</h2>
-
-							<form onSubmit={handleSubmit} className="space-y-4">
-								<FloatingLabelSelect
-									label={t("lookupValues.form.lookupType")}
-									name="lookup_type"
-									value={formData.lookup_type}
-									onChange={handleInputChange}
-									options={lookupTypeFormOptions}
-									error={formErrors.lookup_type}
-									required
-								/>
-
-								<FloatingLabelInput
-									label={t("lookupValues.form.name")}
-									name="name"
-									value={formData.name}
-									onChange={handleInputChange}
-									error={formErrors.name}
-									required
-								/>
-
-								<FloatingLabelInput
-									label={t("lookupValues.form.sequence")}
-									name="sequence"
-									type="number"
-									value={formData.sequence}
-									onChange={handleInputChange}
-									error={formErrors.sequence}
-									required
-								/>
-
-								<FloatingLabelTextarea
-									label={t("lookupValues.form.description")}
-									name="description"
-									value={formData.description}
-									onChange={handleInputChange}
-									rows={3}
-								/>
-
-								<FloatingLabelSelect
-									label={t("lookupValues.form.parent")}
-									name="parent"
-									value={formData.parent}
-									onChange={handleInputChange}
-									options={parentValueOptions}
-								/>
-
-								<div className="flex justify-end gap-3 pt-4">
-									<Button
-										type="button"
-										onClick={handleCloseModal}
-										variant="secondary"
-										disabled={creating || updating}
-									>
-										{t("common.cancel")}
-									</Button>
-									<Button type="submit" variant="primary" disabled={creating || updating}>
-										{creating || updating ? t("common.saving") : t("common.save")}
-									</Button>
-								</div>
-							</form>
-						</div>
+					<div className="flex items-center gap-4">
+						<Button
+							onClick={handleSearch}
+							icon={<FaSearch className="w-5 h-5" />}
+							title={t("common.search")}
+							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
+						/>
+						{(filters.lookupType || filters.parentName) && (
+							<Button
+								onClick={handleClearFilters}
+								icon={<FaTimes className="w-5 h-5" />}
+								title={t("common.clear")}
+								className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+							/>
+						)}
+						<Button
+							onClick={handleCreateValue}
+							icon={<FaPlus className="w-5 h-5" />}
+							title={t("lookupValues.actions.create")}
+							className="bg-[#1D7A8C] hover:bg-[#156576] text-white ml-auto"
+						/>
 					</div>
 				</div>
-			)}
 
-			{/* Delete Confirmation Modal */}
-			<ConfirmModal
-				isOpen={isDeleteModalOpen}
-				onClose={handleCancelDelete}
-				onConfirm={handleConfirmDelete}
-				title={t("lookupValues.deleteModal.title")}
-				message={t("lookupValues.deleteModal.message", { name: valueToDelete?.name })}
-				confirmText={t("common.delete")}
-				cancelText={t("common.cancel")}
-				variant="danger"
-				loading={deleting}
-			/>
-		</ErpPageTemplate>
+				{/* Table Section */}
+				<div className="bg-white rounded-2xl shadow-lg p-6">
+					<div className="flex justify-between items-center mb-6">
+						<h2 className="text-2xl font-bold text-[#1D7A8C]">{t("lookupValues.title")}</h2>
+					</div>
+
+					<CustomTable
+						columns={columns}
+						data={lookupValues}
+						onEdit={handleEditValue}
+						onDelete={handleDeleteClick}
+						loading={valuesLoading}
+						emptyMessage={t("lookupValues.table.empty")}
+					/>
+
+					{/* Pagination */}
+					{valuesCount > 0 && (
+						<div className="mt-6">
+							<Pagination
+								currentPage={valuesPage}
+								totalCount={valuesCount}
+								pageSize={localPageSize}
+								onPageChange={handlePageChange}
+								onPageSizeChange={handlePageSizeChange}
+								hasNext={valuesHasNext}
+								hasPrevious={valuesHasPrevious}
+							/>
+						</div>
+					)}
+				</div>
+
+				{/* Create/Edit Modal */}
+				<SlideUpModal
+					isOpen={isModalOpen}
+					onClose={handleCloseModal}
+					title={editingValue ? t("lookupValues.modal.editTitle") : t("lookupValues.modal.createTitle")}
+				>
+					<form onSubmit={handleSubmit} className="space-y-4 p-4">
+						<FloatingLabelSelect
+							label={t("lookupValues.form.lookupType")}
+							name="lookup_type"
+							value={formData.lookup_type}
+							onChange={handleInputChange}
+							options={lookupTypeFormOptions}
+							error={formErrors.lookup_type}
+							required
+						/>
+
+						<FloatingLabelInput
+							label={t("lookupValues.form.name")}
+							name="name"
+							value={formData.name}
+							onChange={handleInputChange}
+							error={formErrors.name}
+							required
+						/>
+
+						<FloatingLabelInput
+							label={t("lookupValues.form.sequence")}
+							name="sequence"
+							type="number"
+							value={formData.sequence}
+							onChange={handleInputChange}
+							error={formErrors.sequence}
+							required
+						/>
+
+						<FloatingLabelTextarea
+							label={t("lookupValues.form.description")}
+							name="description"
+							value={formData.description}
+							onChange={handleInputChange}
+							rows={3}
+						/>
+
+						<FloatingLabelSelect
+							label={t("lookupValues.form.parent")}
+							name="parent"
+							value={formData.parent}
+							onChange={handleInputChange}
+							options={parentValueOptions}
+						/>
+
+						<div className="flex justify-end gap-3 pt-4">
+							<Button
+								type="button"
+								onClick={handleCloseModal}
+								title={t("common.cancel")}
+								className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+								disabled={creating || updating}
+							/>
+							<Button
+								type="submit"
+								title={creating || updating ? t("common.saving") : t("common.save")}
+								className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
+								disabled={creating || updating}
+							/>
+						</div>
+					</form>
+				</SlideUpModal>
+
+				{/* Delete Confirmation Modal */}
+				<ConfirmModal
+					isOpen={isDeleteModalOpen}
+					onClose={handleCancelDelete}
+					onConfirm={handleConfirmDelete}
+					title={t("lookupValues.deleteModal.title")}
+					message={t("lookupValues.deleteModal.message", { name: valueToDelete?.name })}
+					confirmText={t("common.delete")}
+					cancelText={t("common.cancel")}
+					variant="danger"
+					loading={deleting}
+				/>
+			</div>
+		</div>
 	);
 };
 
