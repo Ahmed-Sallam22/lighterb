@@ -65,7 +65,8 @@
       "fiscalPeriods": "Fiscal Periods",
       "banks": "Banks",
       "personManagement": "Person Management",
-      "workforceManagement": "Workforce Management"
+      "workforceManagement": "Workforce Management",
+      "budgets": "Budgets"
     },
     "cards": {
       "setup": {
@@ -1215,6 +1216,32 @@
       "rejectionReason": "Rejection Reason",
       "createdAt": "Created",
       "updatedAt": "Last Updated"
+    },
+    "attachments": {
+      "title": "Attachments",
+      "uploadAttachment": "Upload Attachment",
+      "viewAttachments": "View Attachments",
+      "selectFile": "Select File",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter a description for this attachment...",
+      "upload": "Upload",
+      "uploading": "Uploading...",
+      "download": "Download",
+      "delete": "Delete",
+      "noAttachments": "No attachments found",
+      "deleteTitle": "Delete Attachment",
+      "deleteMessage": "Are you sure you want to delete \"{{fileName}}\"? This action cannot be undone.",
+      "confirmDelete": "Are you sure you want to delete this attachment?",
+      "messages": {
+        "uploadSuccess": "Attachment uploaded successfully",
+        "deleteSuccess": "Attachment deleted successfully"
+      },
+      "errors": {
+        "noFile": "Please select a file to upload",
+        "uploadFailed": "Failed to upload attachment",
+        "deleteFailed": "Failed to delete attachment",
+        "downloadFailed": "Failed to download attachment"
+      }
     },
     "newRequisition": {
       "title": "New Requisition",
@@ -2866,7 +2893,13 @@
       "label": "Goods Receipt",
       "placeholder": "Select goods receipt",
       "helper": "Found goods receipts needing invoices. Select one to auto-populate invoice details.",
-      "selectManual": "Manual Entry (No GRN)"
+      "selectManual": "Manual Entry (No GRN)",
+      "loadingDetails": "Loading GRN details...",
+      "grnNumber": "GRN Number",
+      "supplierName": "Supplier",
+      "poNumber": "PO Number",
+      "totalAmount": "Total Amount",
+      "autoFilledMessage": "Form auto-filled with {{count}} line items from GRN"
     },
     "variancePreview": {
       "title": "Variance Preview",
@@ -2884,7 +2917,9 @@
       "lineTotal": "Line Total",
       "subtotal": "Subtotal",
       "taxAmount": "Tax Amount",
-      "total": "Total"
+      "total": "Total",
+      "withinTolerance": "Variance within acceptable tolerance - Ready to create invoice",
+      "exceedsTolerance": "Variance exceeds tolerance - Review before proceeding"
     },
     "details": {
       "title": "Invoice Details",
@@ -2952,18 +2987,24 @@
       "creating": "Creating...",
       "createInvoice": "Create Invoice",
       "loadingPreview": "Loading Preview...",
-      "waitingForPreview": "Select GRN to Preview"
+      "waitingForPreview": "Select GRN to Preview",
+      "validateVariance": "Validate Variance",
+      "validating": "Validating...",
+      "validated": "✓ Validated"
     },
     "messages": {
       "itemRemoved": "Item removed",
       "requiredFields": "Please fill all required fields",
+      "requiredFieldsForValidation": "Please fill invoice date and currency before validation",
       "noItems": "Please add at least one item",
       "noGlLines": "Please add at least one GL distribution line",
       "glNotBalanced": "GL distribution lines are not balanced. Debits must equal Credits.",
       "totalsMismatch": "Invoice total ({{invoiceTotal}}) must match GL distribution total ({{glTotal}})",
       "apCreated": "AP Invoice created successfully",
       "arCreated": "AR Invoice created successfully",
-      "createFailed": "Failed to create invoice"
+      "createFailed": "Failed to create invoice",
+      "varianceValidated": "Variance validated successfully",
+      "varianceValidationFailed": "Failed to validate variance. Please check the details and try again."
     }
   },
   "countries": {
@@ -3354,7 +3395,8 @@
     "subtitle": "Create a new purchase requisition",
     "tabs": {
       "generalInfo": "General Information",
-      "lineItems": "Line Items"
+      "lineItems": "Line Items",
+      "segments": "GL Segments"
     },
     "form": {
       "prType": "PR Type",
@@ -3403,6 +3445,13 @@
       "notesPlaceholder": "Enter item notes",
       "lineTotal": "Line Total",
       "totalEstimatedAmount": "Total Estimated Amount"
+    },
+    "segments": {
+      "title": "GL Segment Distribution",
+      "subtitle": "Select GL segment values for this requisition",
+      "selectSegment": "Select segment value",
+      "noSegmentTypes": "No segment types configured",
+      "selectedSegments": "Selected Segments"
     },
     "actions": {
       "cancel": "Cancel",
@@ -3813,6 +3862,34 @@
       "confirmError": "Failed to confirm Purchase Order",
       "cancelled": "Purchase Order cancelled successfully",
       "cancelError": "Failed to cancel Purchase Order"
+    },
+    "validation": {
+      "reasonRequired": "Cancellation reason is required"
+    },
+    "attachments": {
+      "title": "Attachments",
+      "uploadAttachment": "Upload Attachment",
+      "viewAttachments": "View Attachments",
+      "selectFile": "Select File",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter a description for this attachment...",
+      "upload": "Upload",
+      "uploading": "Uploading...",
+      "download": "Download",
+      "delete": "Delete",
+      "noAttachments": "No attachments found",
+      "deleteTitle": "Delete Attachment",
+      "deleteMessage": "Are you sure you want to delete \"{{fileName}}\"? This action cannot be undone.",
+      "messages": {
+        "uploadSuccess": "Attachment uploaded successfully",
+        "deleteSuccess": "Attachment deleted successfully"
+      },
+      "errors": {
+        "noFile": "Please select a file to upload",
+        "uploadFailed": "Failed to upload attachment",
+        "deleteFailed": "Failed to delete attachment",
+        "downloadFailed": "Failed to download attachment"
+      }
     }
   },
   "receivingPage": {
@@ -5877,5 +5954,8 @@
     "week": "Week",
     "month": "Month",
     "year": "Year"
+  },
+  "purchaseOrders": {
+    "title": "Purchase Order"
   }
 }

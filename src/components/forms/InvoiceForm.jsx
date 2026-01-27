@@ -16,7 +16,7 @@ import { fetchCustomers } from "../../store/customersSlice";
 import { fetchSuppliers } from "../../store/suppliersSlice";
 import { fetchTaxRates } from "../../store/taxRatesSlice";
 import { fetchCountries } from "../../store/countriesSlice";
-import { fetchGRNs } from "../../store/grnSlice";
+import { fetchGRNs, fetchGRNDetails, clearCurrentGRN } from "../../store/grnSlice";
 import { fetchDefaultGLSegments, clearDefaultGLSegments } from "../../store/defaultCombinationsSlice";
 // Static country options with ids expected by backend
 // const countries = [
@@ -51,7 +51,15 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 	} = useSelector(state => (isAPInvoice ? state.apInvoices : state.arInvoices));
 	const { defaultGLSegments } = useSelector(state => state.defaultCombinations);
 	// GRN state for AP invoices
-	const { grnList = [], loading: grnLoading } = useSelector(state => state.grn || {});
+	const {
+		grnList = [],
+		loading: grnLoading,
+		currentGRN,
+		detailsLoading: grnDetailsLoading,
+	} = useSelector(state => state.grn || {});
+
+	// Validation state for variance preview
+	const [isValidated, setIsValidated] = useState(false);
 
 	const countries = fetchedCountries.map(country => ({
 		value: country.id,
@@ -108,6 +116,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 			dispatch(clearDefaultGLSegments());
 			if (isAPInvoice) {
 				dispatch(clearVariancePreview());
+				dispatch(clearCurrentGRN());
 			}
 		};
 	}, [dispatch, isAPInvoice]);
@@ -160,78 +169,74 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 	// GRN options for AP invoices
 	const grnOptions = [
 		{ value: "", label: t("invoiceForm.goodsReceipt.selectManual") },
-		...grnList.map(grn => ({
-			value: grn.id,
-			label: `${grn.grn_number || `GRN-${grn.id}`} • ${grn.supplier_name || "Unknown Supplier"}`,
-		})),
+		...grnList
+			.filter(grn => !grn.has_invoice)
+			.map(grn => ({
+				value: grn.id,
+				label: `${grn.grn_number || `GRN-${grn.id}`} • ${grn.supplier_name || "Unknown Supplier"}`,
+			})),
 	];
 
-	// Handle GRN selection change
+	// Handle GRN selection change - fetch GRN details to auto-fill form
 	const handleGRNChange = useCallback(
 		async e => {
 			const grnId = e.target.value;
 			setSelectedGRN(grnId);
+			setIsValidated(false); // Reset validation when GRN changes
+			dispatch(clearVariancePreview()); // Clear any previous variance preview
 
 			if (grnId) {
-				setIsFromGRN(true);
+				setIsFromGRN(true);d
 				// Clear existing items when selecting GRN
 				setItems([]);
-				// Prepare variance preview request
-				const previewData = {
-					goods_receipt_id: parseInt(grnId),
-					date: invoiceForm.date || new Date().toISOString().split("T")[0],
-					currency_id: invoiceForm.currency ? parseInt(invoiceForm.currency) : 1,
-					tax_amount: "0.00",
-					journal_entry: {
-						date: invoiceForm.date || new Date().toISOString().split("T")[0],
-						currency_id: invoiceForm.currency ? parseInt(invoiceForm.currency) : 1,
-						memo: invoiceForm.memo || "Invoice from GRN",
-						lines: glLines.map(line => ({
-							amount: String(parseFloat(line.amount || 0).toFixed(2)),
-							type: line.type,
-							segments: (line.segments || [])
-								.filter(seg => seg.segment_code)
-								.map(seg => ({
-									segment_type_id: seg.segment_type_id,
-									segment_code: seg.segment_code,
-								})),
-						})),
-					},
-				};
-				dispatch(fetchVariancePreview(previewData));
+				// Fetch GRN details to auto-fill the form
+				try {
+					await dispatch(fetchGRNDetails(parseInt(grnId))).unwrap();
+				} catch (error) {
+					const errorMessage =
+						typeof error === "string" ? error : error?.message || "Failed to load GRN details";
+					toast.error(errorMessage, {
+						autoClose: 8000,
+					});
+					setIsFromGRN(false);
+					setSelectedGRN("");
+				}
 			} else {
 				setIsFromGRN(false);
-				dispatch(clearVariancePreview());
+				dispatch(clearCurrentGRN());
 			}
 		},
-		[dispatch, invoiceForm.date, invoiceForm.currency, invoiceForm.memo, glLines]
+		[dispatch]
 	);
 
-	// Populate items from variance preview
+	// Populate form from GRN details when currentGRN is loaded
 	useEffect(() => {
-		if (variancePreview?.preview?.items && isFromGRN) {
-			const previewItems = variancePreview.preview.items.map((item, idx) => ({
-				id: Date.now() + idx,
-				name: item.name,
-				description: item.description,
-				quantity: String(item.quantity_received || 0),
-				unit_price: String(item.unit_price || 0),
-				tax_rate_id: "",
-				tax_rate: null,
-				tax_country: "",
-				tax_category: "",
-			}));
-			setItems(previewItems);
-
-			// Also set supplier from preview if available
-			if (variancePreview.preview.supplier_id) {
+		if (currentGRN && isFromGRN) {
+			// Set supplier from GRN (read-only)
+			if (currentGRN.supplier) {
 				setInvoiceForm(prev => ({
 					...prev,
-					supplier: String(variancePreview.preview.supplier_id),
+					supplier: currentGRN.supplier,
 				}));
 			}
+
+			// Populate items from GRN lines
+			if (currentGRN.lines && currentGRN.lines.length > 0) {
+				const grnItems = currentGRN.lines.map((line, idx) => ({
+					id: Date.now() + idx,
+					name: line.item_name || "",
+					description: line.item_description || "",
+					quantity: String(line.quantity_received || 0),
+					unit_price: String(line.unit_price || 0),
+					tax_rate_id: "",
+					tax_rate: null,
+					tax_country: "",
+					tax_category: "",
+				}));
+				setItems(grnItems);
+			}
 		}
-	}, [variancePreview, isFromGRN]);
+	}, [currentGRN, isFromGRN]);
 
 	// Calculate invoice totals
 	const invoiceSubtotal = items.reduce((sum, item) => {
@@ -249,6 +254,59 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 	}, 0);
 
 	const invoiceTotalAmount = invoiceSubtotal + invoiceTaxAmount;
+
+	// Handle variance validation button click
+	const handleValidateVariance = useCallback(async () => {
+		if (!selectedGRN || !invoiceForm.date || !invoiceForm.currency) {
+			toast.error(t("invoiceForm.messages.requiredFieldsForValidation"));
+			return;
+		}
+
+		const previewData = {
+			goods_receipt_id: parseInt(selectedGRN),
+			date: invoiceForm.date,
+			currency_id: parseInt(invoiceForm.currency),
+			tax_amount: invoiceTaxAmount.toFixed(2),
+			journal_entry: {
+				date: invoiceForm.date,
+				currency_id: parseInt(invoiceForm.currency),
+				memo: invoiceForm.memo || "Invoice from GRN",
+				lines: glLines.map(line => ({
+					amount: String(parseFloat(line.amount || 0).toFixed(2)),
+					type: line.type,
+					segments: (line.segments || [])
+						.filter(seg => seg.segment_code)
+						.map(seg => ({
+							segment_type_id: seg.segment_type_id,
+							segment_code: seg.segment_code,
+						})),
+				})),
+			},
+		};
+
+		try {
+			await dispatch(fetchVariancePreview(previewData)).unwrap();
+			toast.success(t("invoiceForm.messages.varianceValidated") || "Variance validated successfully");
+		} catch (error) {
+			const errorMessage =
+				typeof error === "string"
+					? error
+					: error?.message ||
+						t("invoiceForm.messages.varianceValidationFailed") ||
+						"Failed to validate variance";
+			toast.error(errorMessage, {
+				autoClose: 8000,
+			});
+			setIsValidated(false);
+		}
+	}, [dispatch, selectedGRN, invoiceForm.date, invoiceForm.currency, invoiceForm.memo, invoiceTaxAmount, glLines, t]);
+
+	// Mark as validated when variance preview is successful
+	useEffect(() => {
+		if (variancePreview && !variancePreviewError && isFromGRN) {
+			setIsValidated(true);
+		}
+	}, [variancePreview, variancePreviewError, isFromGRN]);
 
 	// Convert default GL segments from API format to GLLinesSection format
 	const getDefaultCreditSegments = () => {
@@ -540,162 +598,48 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 						/>
 						<p className="text-xs text-[#7A9098]">{t("invoiceForm.goodsReceipt.helper")}</p>
 
-						{/* Variance Preview Section */}
-						{isFromGRN && variancePreviewLoading && (
+						{/* GRN Details Loading */}
+						{isFromGRN && grnDetailsLoading && (
 							<div className="flex items-center justify-center py-4">
 								<div className="w-6 h-6 border-2 border-[#28819C] border-t-transparent rounded-full animate-spin"></div>
 								<span className="ml-2 text-sm text-gray-500">
-									{t("invoiceForm.variancePreview.loading")}
+									{t("invoiceForm.goodsReceipt.loadingDetails")}
 								</span>
 							</div>
 						)}
 
-						{isFromGRN && variancePreviewError && (
-							<div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-								<p className="text-sm text-red-600">{variancePreviewError}</p>
-							</div>
-						)}
-
-						{isFromGRN && variancePreview && !variancePreviewLoading && (
-							<div className="p-4 bg-blue-50 border border-blue-200 rounded-xl space-y-4">
-								<h4 className="font-semibold text-[#0d5f7a]">
-									{t("invoiceForm.variancePreview.title")}
-								</h4>
-
-								{/* GRN Info */}
+						{/* GRN Info Summary */}
+						{isFromGRN && currentGRN && !grnDetailsLoading && (
+							<div className="p-4 bg-green-50 border border-green-200 rounded-xl">
 								<div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
 									<div>
 										<span className="text-gray-500">
-											{t("invoiceForm.variancePreview.grnNumber")}:
+											{t("invoiceForm.goodsReceipt.grnNumber")}:
 										</span>
-										<p className="font-medium">{variancePreview.preview?.grn_number}</p>
+										<p className="font-medium">{currentGRN.grn_number}</p>
 									</div>
 									<div>
 										<span className="text-gray-500">
-											{t("invoiceForm.variancePreview.supplier")}:
+											{t("invoiceForm.goodsReceipt.supplierName")}:
 										</span>
-										<p className="font-medium">{variancePreview.preview?.supplier_name}</p>
+										<p className="font-medium">{currentGRN.supplier_name}</p>
+									</div>
+									<div>
+										<span className="text-gray-500">{t("invoiceForm.goodsReceipt.poNumber")}:</span>
+										<p className="font-medium">{currentGRN.po_number}</p>
 									</div>
 									<div>
 										<span className="text-gray-500">
-											{t("invoiceForm.variancePreview.poNumber")}:
+											{t("invoiceForm.goodsReceipt.totalAmount")}:
 										</span>
-										<p className="font-medium">{variancePreview.preview?.po_number}</p>
-									</div>
-									<div>
-										<span className="text-gray-500">
-											{t("invoiceForm.variancePreview.poDate")}:
-										</span>
-										<p className="font-medium">{variancePreview.preview?.po_date}</p>
+										<p className="font-medium">{currentGRN.total_amount}</p>
 									</div>
 								</div>
-
-								{/* Variance Info */}
-								<div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm border-t border-blue-200 pt-4">
-									<div>
-										<span className="text-gray-500">
-											{t("invoiceForm.variancePreview.poTotal")}:
-										</span>
-										<p className="font-medium">{variancePreview.po_total?.toFixed(2)}</p>
-									</div>
-									<div>
-										<span className="text-gray-500">
-											{t("invoiceForm.variancePreview.invoiceTotal")}:
-										</span>
-										<p className="font-medium">{variancePreview.invoice_total?.toFixed(2)}</p>
-									</div>
-									<div>
-										<span className="text-gray-500">
-											{t("invoiceForm.variancePreview.varianceAmount")}:
-										</span>
-										<p
-											className={`font-medium ${variancePreview.variance_amount > 0 ? "text-amber-600" : "text-green-600"}`}
-										>
-											{variancePreview.variance_amount?.toFixed(2)}
-										</p>
-									</div>
-									<div>
-										<span className="text-gray-500">
-											{t("invoiceForm.variancePreview.variancePercentage")}:
-										</span>
-										<p
-											className={`font-medium ${variancePreview.variance_percentage > 5 ? "text-red-600" : variancePreview.variance_percentage > 0 ? "text-amber-600" : "text-green-600"}`}
-										>
-											{variancePreview.variance_percentage?.toFixed(2)}%
-										</p>
-									</div>
-								</div>
-
-								{/* Items Preview */}
-								{variancePreview.preview?.items?.length > 0 && (
-									<div className="border-t border-blue-200 pt-4">
-										<h5 className="font-medium text-gray-700 mb-2">
-											{t("invoiceForm.variancePreview.items")}
-										</h5>
-										<div className="overflow-x-auto">
-											<table className="w-full text-sm">
-												<thead>
-													<tr className="border-b border-blue-200">
-														<th className="text-left py-2">
-															{t("invoiceForm.items.name")}
-														</th>
-														<th className="text-right py-2">
-															{t("invoiceForm.variancePreview.qtyReceived")}
-														</th>
-														<th className="text-right py-2">
-															{t("invoiceForm.items.unitPrice")}
-														</th>
-														<th className="text-right py-2">
-															{t("invoiceForm.variancePreview.lineTotal")}
-														</th>
-													</tr>
-												</thead>
-												<tbody>
-													{variancePreview.preview.items.map((item, idx) => (
-														<tr key={idx} className="border-b border-blue-100">
-															<td className="py-2">{item.name}</td>
-															<td className="text-right py-2">
-																{item.quantity_received}
-															</td>
-															<td className="text-right py-2">
-																{item.unit_price?.toFixed(2)}
-															</td>
-															<td className="text-right py-2">
-																{item.line_total?.toFixed(2)}
-															</td>
-														</tr>
-													))}
-												</tbody>
-												<tfoot>
-													<tr className="font-semibold">
-														<td colSpan="3" className="py-2 text-right">
-															{t("invoiceForm.variancePreview.subtotal")}:
-														</td>
-														<td className="py-2 text-right">
-															{variancePreview.preview.subtotal?.toFixed(2)}
-														</td>
-													</tr>
-													<tr>
-														<td colSpan="3" className="py-2 text-right">
-															{t("invoiceForm.variancePreview.taxAmount")}:
-														</td>
-														<td className="py-2 text-right">
-															{variancePreview.preview.tax_amount?.toFixed(2)}
-														</td>
-													</tr>
-													<tr className="font-bold text-[#0d5f7a]">
-														<td colSpan="3" className="py-2 text-right">
-															{t("invoiceForm.variancePreview.total")}:
-														</td>
-														<td className="py-2 text-right">
-															{variancePreview.preview.total?.toFixed(2)}
-														</td>
-													</tr>
-												</tfoot>
-											</table>
-										</div>
-									</div>
-								)}
+								<p className="text-xs text-green-600 mt-2">
+									{t("invoiceForm.goodsReceipt.autoFilledMessage", {
+										count: currentGRN.lines?.length || 0,
+									})}
+								</p>
 							</div>
 						)}
 					</div>
@@ -712,6 +656,7 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 						onChange={handleInvoiceChange}
 						options={isAPInvoice ? supplierOptions : customerOptions}
 						required
+						disabled={isAPInvoice && isFromGRN}
 						placeholder={
 							isAPInvoice
 								? t("invoiceForm.details.selectSupplier")
@@ -1072,6 +1017,72 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 				)}
 			</Card>
 
+			{/* Variance Preview Section - Only shown when from GRN and validated */}
+			{isFromGRN && variancePreview && isValidated && (
+				<Card title={t("invoiceForm.variancePreview.title")}>
+					<div className="p-4 bg-blue-50 border border-blue-200 rounded-xl space-y-4">
+						{/* Variance Info */}
+						<div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+							<div>
+								<span className="text-gray-500">{t("invoiceForm.variancePreview.poTotal")}:</span>
+								<p className="font-medium">{variancePreview.po_total?.toFixed(2)}</p>
+							</div>
+							<div>
+								<span className="text-gray-500">{t("invoiceForm.variancePreview.invoiceTotal")}:</span>
+								<p className="font-medium">{variancePreview.invoice_total?.toFixed(2)}</p>
+							</div>
+							<div>
+								<span className="text-gray-500">
+									{t("invoiceForm.variancePreview.varianceAmount")}:
+								</span>
+								<p
+									className={`font-medium ${variancePreview.variance_amount > 0 ? "text-amber-600" : "text-green-600"}`}
+								>
+									{variancePreview.variance_amount?.toFixed(2)}
+								</p>
+							</div>
+							<div>
+								<span className="text-gray-500">
+									{t("invoiceForm.variancePreview.variancePercentage")}:
+								</span>
+								<p
+									className={`font-medium ${variancePreview.variance_percentage > 5 ? "text-red-600" : variancePreview.variance_percentage > 0 ? "text-amber-600" : "text-green-600"}`}
+								>
+									{variancePreview.variance_percentage?.toFixed(2)}%
+								</p>
+							</div>
+						</div>
+
+						{/* Variance Status Message */}
+						<div className="border-t border-blue-200 pt-3">
+							{variancePreview.variance_percentage <= 5 ? (
+								<span className="inline-flex items-center gap-1 text-green-600 text-sm font-medium">
+									<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+										<path
+											fillRule="evenodd"
+											d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+											clipRule="evenodd"
+										/>
+									</svg>
+									{t("invoiceForm.variancePreview.withinTolerance")}
+								</span>
+							) : (
+								<span className="inline-flex items-center gap-1 text-amber-600 text-sm font-medium">
+									<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+										<path
+											fillRule="evenodd"
+											d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+											clipRule="evenodd"
+										/>
+									</svg>
+									{t("invoiceForm.variancePreview.exceedsTolerance")}
+								</span>
+							)}
+						</div>
+					</div>
+				</Card>
+			)}
+
 			{/* Action Buttons */}
 			<div className="mt-6 flex flex-wrap justify-end gap-3">
 				<Button
@@ -1080,23 +1091,34 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 					className="px-6 py-2 rounded-full border border-[#7A9098] text-[#7A9098] font-semibold hover:bg-[#f1f5f8] transition-colors bg-transparent shadow-none hover:shadow-none"
 					title={t("invoiceForm.actions.cancel")}
 				/>
+
+				{/* Validate Button - Only shown when from GRN and not yet validated */}
+				{isFromGRN && (
+					<Button
+						type="button"
+						onClick={handleValidateVariance}
+						disabled={variancePreviewLoading || !invoiceForm.date || !invoiceForm.currency}
+						className={`px-6 py-2 rounded-full font-semibold transition-transform ${
+							isValidated
+								? "bg-green-600 hover:bg-green-700 text-white"
+								: "bg-amber-500 hover:bg-amber-600 text-white"
+						} disabled:opacity-50 disabled:cursor-not-allowed`}
+						title={
+							variancePreviewLoading
+								? t("invoiceForm.actions.validating")
+								: isValidated
+									? t("invoiceForm.actions.validated")
+									: t("invoiceForm.actions.validateVariance")
+						}
+					/>
+				)}
+
 				<Button
 					type="button"
 					onClick={handleSubmit}
-					disabled={
-						invoiceLoading ||
-						(isFromGRN && (variancePreviewLoading || variancePreviewError || !variancePreview))
-					}
+					disabled={invoiceLoading || (isFromGRN && !isValidated)}
 					className="px-8 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-					title={
-						invoiceLoading
-							? t("invoiceForm.actions.creating")
-							: isFromGRN && variancePreviewLoading
-								? t("invoiceForm.actions.loadingPreview")
-								: isFromGRN && !variancePreview
-									? t("invoiceForm.actions.waitingForPreview")
-									: t("invoiceForm.actions.createInvoice")
-					}
+					title={invoiceLoading ? t("invoiceForm.actions.creating") : t("invoiceForm.actions.createInvoice")}
 				/>
 			</div>
 

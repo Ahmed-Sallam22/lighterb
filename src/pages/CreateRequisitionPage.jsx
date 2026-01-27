@@ -18,6 +18,7 @@ import RequisitionsHeadIcon from "../ui/icons/RequisitionsHeadIcon";
 import { createRequisition, clearError } from "../store/requisitionsSlice";
 import { fetchUOMs } from "../store/uomSlice";
 import { fetchCatalogItems } from "../store/catalogItemsSlice";
+import { fetchSegmentTypes, fetchSegmentValues } from "../store/segmentsSlice";
 
 import { FiPlus, FiTrash2 } from "react-icons/fi";
 
@@ -74,6 +75,7 @@ const CreateRequisitionPage = () => {
 	const { creating, actionError } = useSelector(state => state.requisitions || {});
 	const { uoms = [] } = useSelector(state => state.uom || {});
 	const { items: catalogItems = [] } = useSelector(state => state.catalogItems || {});
+	const { types: segmentTypes = [], values: segmentValues = [] } = useSelector(state => state.segments);
 
 	// Local state
 	const [activeTab, setActiveTab] = useState("general");
@@ -81,13 +83,23 @@ const CreateRequisitionPage = () => {
 	const [lineItems, setLineItems] = useState([createEmptyLineItem()]);
 	const [formErrors, setFormErrors] = useState({});
 	const [lineItemErrors, setLineItemErrors] = useState({});
+	const [segments, setSegments] = useState([]);
 
-	// Fetch UOMs and catalog items on mount
+	// Fetch UOMs, catalog items, and segment types on mount
 	useEffect(() => {
 		dispatch(fetchUOMs({ is_active: true }));
 		dispatch(fetchCatalogItems());
+		dispatch(fetchSegmentTypes());
 	}, [dispatch]);
 
+	// Fetch segment values (all at once to avoid state overwriting)
+	useEffect(() => {
+		if (segmentTypes.length > 0) {
+			// Fetch all segment values without filtering by type
+			// The API will return all values and we'll group them client-side
+			dispatch(fetchSegmentValues({ is_active: true, page_size: 1000 }));
+		}
+	}, [dispatch, segmentTypes]);
 
 	// Show error toast
 	useEffect(() => {
@@ -107,6 +119,7 @@ const CreateRequisitionPage = () => {
 		() => [
 			{ id: "general", label: t("createRequisition.tabs.generalInfo") },
 			{ id: "lineItems", label: t("createRequisition.tabs.lineItems"), disabled: !isPrTypeSelected },
+			{ id: "segments", label: t("createRequisition.tabs.segments") },
 		],
 		[t, isPrTypeSelected]
 	);
@@ -192,6 +205,19 @@ const CreateRequisitionPage = () => {
 
 	const handleAddLineItem = useCallback(() => {
 		setLineItems(prev => [...prev, createEmptyLineItem()]);
+	}, []);
+
+	const handleSegmentChange = useCallback((segmentTypeId, segmentCode) => {
+		setSegments(prev => {
+			const existing = prev.find(s => s.segment_type_id === segmentTypeId);
+			if (existing) {
+				// Update existing segment
+				return prev.map(s => (s.segment_type_id === segmentTypeId ? { ...s, segment_code: segmentCode } : s));
+			} else {
+				// Add new segment
+				return [...prev, { segment_type_id: segmentTypeId, segment_code: segmentCode }];
+			}
+		});
 	}, []);
 
 	// Handle tab change with validation
@@ -336,6 +362,12 @@ const CreateRequisitionPage = () => {
 
 				return lineItem;
 			}),
+			segments: segments
+				.filter(s => s.segment_code)
+				.map(s => ({
+					segment_type_id: s.segment_type_id,
+					segment_code: s.segment_code,
+				})),
 		};
 
 		try {
@@ -351,7 +383,7 @@ const CreateRequisitionPage = () => {
 		} catch {
 			// Error handled by Redux
 		}
-	}, [formData, lineItems, validateGeneralInfo, validateLineItems, dispatch, navigate, t]);
+	}, [formData, lineItems, segments, validateGeneralInfo, validateLineItems, dispatch, navigate, t]);
 
 	const handleCancel = useCallback(() => {
 		navigate("/requisitions");
@@ -451,6 +483,185 @@ const CreateRequisitionPage = () => {
 			/>
 		</div>
 	);
+
+	// Render Segments Tab
+	const renderSegmentsTab = () => {
+		// Group segment values by segment type
+		const segmentValuesByType = {};
+		segmentValues.forEach(value => {
+			if (!segmentValuesByType[value.segment_type]) {
+				segmentValuesByType[value.segment_type] = [];
+			}
+			segmentValuesByType[value.segment_type].push(value);
+		});
+
+		console.log("Segment Types:", segmentTypes);
+		console.log("Segment Values:", segmentValues);
+		console.log("Grouped by Type:", segmentValuesByType);
+
+		return (
+			<div className="space-y-6">
+				{/* Header with gradient */}
+				<div className="bg-gradient-to-r from-[#28819C] to-[#48C1F0] rounded-2xl p-6 text-white shadow-lg">
+					<div className="flex items-center gap-3 mb-2">
+						<svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+							/>
+						</svg>
+						<div>
+							<h3 className="text-2xl font-bold">{t("createRequisition.segments.title")}</h3>
+							<p className="text-blue-100 text-sm mt-1">{t("createRequisition.segments.subtitle")}</p>
+						</div>
+					</div>
+				</div>
+
+				{segmentTypes.length === 0 ? (
+					<div className="text-center py-16">
+						<svg
+							className="w-20 h-20 mx-auto text-gray-300 mb-4"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={1.5}
+								d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+							/>
+						</svg>
+						<p className="text-gray-500 text-lg font-medium">
+							{t("createRequisition.segments.noSegmentTypes")}
+						</p>
+					</div>
+				) : (
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-5">
+						{segmentTypes.map((segmentType, index) => {
+							const values = segmentValuesByType[segmentType.id] || [];
+							const selectedSegment = segments.find(s => s.segment_type_id === segmentType.id);
+							const isRequired = segmentType.is_required;
+
+							console.log(`Segment Type: ${segmentType.segment_name} (ID: ${segmentType.id})`);
+							console.log("Values for this type:", values);
+
+							const options = [
+								{ value: "", label: t("createRequisition.segments.selectSegment") },
+								...values.map(val => ({
+									value: val.code,
+									label: `${val.code} - ${val.alias}`,
+								})),
+							];
+
+							// Color palette for cards
+							const colors = [
+								"border-blue-200 bg-blue-50/50",
+								"border-purple-200 bg-purple-50/50",
+								"border-green-200 bg-green-50/50",
+								"border-amber-200 bg-amber-50/50",
+								"border-pink-200 bg-pink-50/50",
+								"border-indigo-200 bg-indigo-50/50",
+							];
+							const cardColor = colors[index % colors.length];
+
+							return (
+								<div
+									key={segmentType.id}
+									className={`border-2 rounded-xl p-5 transition-all hover:shadow-md ${cardColor}`}
+								>
+									<div className="flex items-center justify-between mb-3">
+										<div className="flex items-center gap-2">
+											<div className="w-2 h-2 bg-[#28819C] rounded-full"></div>
+											<h4 className="font-semibold text-gray-700 text-sm">
+												{segmentType.segment_name}
+												{isRequired && <span className="text-red-500 ml-1">*</span>}
+											</h4>
+										</div>
+										<span className="text-xs bg-white/70 px-2 py-1 rounded-full text-gray-600 font-medium">
+											{values.length} options
+										</span>
+									</div>
+									<FloatingLabelSelect
+										id={`segment_${segmentType.id}`}
+										label={""}
+										value={selectedSegment?.segment_code || ""}
+										onChange={e => handleSegmentChange(segmentType.id, e.target.value)}
+										options={options}
+									/>
+									{segmentType.description && (
+										<p className="text-xs text-gray-500 mt-2 italic">{segmentType.description}</p>
+									)}
+								</div>
+							);
+						})}
+					</div>
+				)}
+
+				{/* Selected Segments Summary */}
+				{segments.filter(s => s.segment_code).length > 0 && (
+					<div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200 shadow-sm">
+						<div className="flex items-center gap-2 mb-4">
+							<svg
+								className="w-6 h-6 text-green-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+							<h4 className="font-bold text-gray-800 text-lg">
+								{t("createRequisition.segments.selectedSegments")}
+							</h4>
+							<span className="ml-auto bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+								{segments.filter(s => s.segment_code).length} / {segmentTypes.length}
+							</span>
+						</div>
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+							{segments
+								.filter(s => s.segment_code)
+								.map(segment => {
+									const segmentType = segmentTypes.find(st => st.id === segment.segment_type_id);
+									const segmentValue = segmentValues.find(
+										sv =>
+											sv.segment_type === segment.segment_type_id &&
+											sv.code === segment.segment_code
+									);
+									return (
+										<div
+											key={segment.segment_type_id}
+											className="bg-white rounded-lg p-4 shadow-sm border border-green-100"
+										>
+											<div className="flex items-start gap-3">
+												<div className="w-1.5 h-full bg-green-500 rounded-full"></div>
+												<div className="flex-1">
+													<p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">
+														{segmentType?.segment_name}
+													</p>
+													<p className="text-[#28819C] font-bold text-sm">
+														{segment.segment_code}
+													</p>
+													<p className="text-gray-700 text-xs mt-1">
+														{segmentValue?.alias || "Unknown"}
+													</p>
+												</div>
+											</div>
+										</div>
+									);
+								})}
+						</div>
+					</div>
+				)}
+			</div>
+		);
+	};
 
 	// Render Line Items Tab
 	const renderLineItemsTab = () => (
@@ -608,6 +819,7 @@ const CreateRequisitionPage = () => {
 				<Card className="p-6">
 					{activeTab === "general" && renderGeneralInfoTab()}
 					{activeTab === "lineItems" && renderLineItemsTab()}
+					{activeTab === "segments" && renderSegmentsTab()}
 
 					{/* Action Buttons */}
 					<div className="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-200">

@@ -15,4 +15,6 @@ export const getHomeRoutes = t => [
 	{ name: t("home.routes.workforceManagement"), key: "Workforce Management", path: "/workforce-management" },
 	{ name: t("home.routes.fiscalPeriods"), key: "Fiscal Periods", path: "/fiscal-periods" },
 	{ name: t("home.routes.banks"), key: "Banks", path: "/banks" },
+
+	{ name: t("home.routes.budgets"), key: "Budgets", path: "/budgets" },
 ];

@@ -65,7 +65,8 @@
       "fiscalPeriods": "الفترات المالية",
       "banks": "البنوك",
       "personManagement": "إدارة الأفراد",
-      "workforceManagement": "إدارة القوى العاملة"
+      "workforceManagement": "إدارة القوى العاملة",
+      "budgets": "الميزانيات"
     },
     "cards": {
       "setup": {
@@ -1215,6 +1216,32 @@
       "rejectionReason": "سبب الرفض",
       "createdAt": "تاريخ الإنشاء",
       "updatedAt": "آخر تحديث"
+    },
+    "attachments": {
+      "title": "المرفقات",
+      "uploadAttachment": "رفع مرفق",
+      "viewAttachments": "عرض المرفقات",
+      "selectFile": "اختر ملف",
+      "description": "الوصف",
+      "descriptionPlaceholder": "أدخل وصفاً لهذا المرفق...",
+      "upload": "رفع",
+      "uploading": "جاري الرفع...",
+      "download": "تحميل",
+      "delete": "حذف",
+      "noAttachments": "لا توجد مرفقات",
+      "deleteTitle": "حذف المرفق",
+      "deleteMessage": "هل أنت متأكد من حذف \"{{fileName}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+      "confirmDelete": "هل أنت متأكد من حذف هذا المرفق؟",
+      "messages": {
+        "uploadSuccess": "تم رفع المرفق بنجاح",
+        "deleteSuccess": "تم حذف المرفق بنجاح"
+      },
+      "errors": {
+        "noFile": "يرجى اختيار ملف للرفع",
+        "uploadFailed": "فشل رفع المرفق",
+        "deleteFailed": "فشل حذف المرفق",
+        "downloadFailed": "فشل تحميل المرفق"
+      }
     },
     "newRequisition": {
       "title": "طلب شراء جديد",
@@ -2866,7 +2893,13 @@
       "label": "إيصال البضاعة",
       "placeholder": "اختر إيصال البضاعة",
       "helper": "تم العثور على إيصالات بضاعة تحتاج إلى فواتير. اختر واحدًا لملء تفاصيل الفاتورة تلقائيًا.",
-      "selectManual": "إدخال يدوي (بدون إيصال بضاعة)"
+      "selectManual": "إدخال يدوي (بدون إيصال بضاعة)",
+      "loadingDetails": "جاري تحميل تفاصيل إيصال البضاعة...",
+      "grnNumber": "رقم إيصال البضاعة",
+      "supplierName": "المورد",
+      "poNumber": "رقم أمر الشراء",
+      "totalAmount": "المبلغ الإجمالي",
+      "autoFilledMessage": "تم ملء النموذج تلقائيًا بـ {{count}} بند من إيصال البضاعة"
     },
     "variancePreview": {
       "title": "معاينة الفرق",
@@ -2884,7 +2917,9 @@
       "lineTotal": "إجمالي البند",
       "subtotal": "المجموع الفرعي",
       "taxAmount": "قيمة الضريبة",
-      "total": "الإجمالي"
+      "total": "الإجمالي",
+      "withinTolerance": "الفرق ضمن الحد المقبول - جاهز لإنشاء الفاتورة",
+      "exceedsTolerance": "الفرق يتجاوز الحد المسموح - يرجى المراجعة قبل المتابعة"
     },
     "details": {
       "title": "تفاصيل الفاتورة",
@@ -2952,18 +2987,24 @@
       "creating": "جاري الإنشاء...",
       "createInvoice": "إنشاء الفاتورة",
       "loadingPreview": "جاري تحميل المعاينة...",
-      "waitingForPreview": "اختر إيصال بضاعة للمعاينة"
+      "waitingForPreview": "اختر إيصال بضاعة للمعاينة",
+      "validateVariance": "التحقق من الفرق",
+      "validating": "جاري التحقق...",
+      "validated": "✓ تم التحقق"
     },
     "messages": {
       "itemRemoved": "تم حذف البند",
       "requiredFields": "يرجى ملء جميع الحقول المطلوبة",
+      "requiredFieldsForValidation": "يرجى ملء تاريخ الفاتورة والعملة قبل التحقق",
       "noItems": "يرجى إضافة بند واحد على الأقل",
       "noGlLines": "يرجى إضافة بند توزيع واحد على الأقل لدفتر الأستاذ",
       "glNotBalanced": "بنود توزيع دفتر الأستاذ غير متوازنة. يجب أن يساوي المدين الدائن.",
       "totalsMismatch": "إجمالي الفاتورة ({{invoiceTotal}}) يجب أن يطابق إجمالي توزيع دفتر الأستاذ ({{glTotal}})",
       "apCreated": "تم إنشاء فاتورة الشراء بنجاح",
       "arCreated": "تم إنشاء فاتورة المبيعات بنجاح",
-      "createFailed": "فشل إنشاء الفاتورة"
+      "createFailed": "فشل إنشاء الفاتورة",
+      "varianceValidated": "تم التحقق من الفرق بنجاح",
+      "varianceValidationFailed": "فشل التحقق من الفرق. يرجى التحقق من التفاصيل والمحاولة مرة أخرى."
     }
   },
   "countries": {
@@ -3354,7 +3395,8 @@
     "subtitle": "إنشاء طلب شراء جديد",
     "tabs": {
       "generalInfo": "المعلومات العامة",
-      "lineItems": "بنود الطلب"
+      "lineItems": "بنود الطلب",
+      "segments": "شرائح دفتر الأستاذ"
     },
     "form": {
       "prType": "نوع الطلب",
@@ -3403,6 +3445,13 @@
       "notesPlaceholder": "أدخل ملاحظات البند",
       "lineTotal": "إجمالي البند",
       "totalEstimatedAmount": "المبلغ التقديري الإجمالي"
+    },
+    "segments": {
+      "title": "توزيع شرائح دفتر الأستاذ",
+      "subtitle": "اختر قيم شرائح دفتر الأستاذ لهذا الطلب",
+      "selectSegment": "اختر قيمة الشريحة",
+      "noSegmentTypes": "لم يتم تكوين أنواع الشرائح",
+      "selectedSegments": "الشرائح المحددة"
     },
     "actions": {
       "cancel": "إلغاء",
@@ -3652,6 +3701,34 @@
       "confirmError": "فشل في تأكيد أمر الشراء",
       "cancelled": "تم إلغاء أمر الشراء بنجاح",
       "cancelError": "فشل في إلغاء أمر الشراء"
+    },
+    "validation": {
+      "reasonRequired": "سبب الإلغاء مطلوب"
+    },
+    "attachments": {
+      "title": "المرفقات",
+      "uploadAttachment": "رفع مرفق",
+      "viewAttachments": "عرض المرفقات",
+      "selectFile": "اختر ملف",
+      "description": "الوصف",
+      "descriptionPlaceholder": "أدخل وصفاً لهذا المرفق...",
+      "upload": "رفع",
+      "uploading": "جاري الرفع...",
+      "download": "تحميل",
+      "delete": "حذف",
+      "noAttachments": "لا توجد مرفقات",
+      "deleteTitle": "حذف المرفق",
+      "deleteMessage": "هل أنت متأكد من حذف \"{{fileName}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+      "messages": {
+        "uploadSuccess": "تم رفع المرفق بنجاح",
+        "deleteSuccess": "تم حذف المرفق بنجاح"
+      },
+      "errors": {
+        "noFile": "يرجى اختيار ملف للرفع",
+        "uploadFailed": "فشل رفع المرفق",
+        "deleteFailed": "فشل حذف المرفق",
+        "downloadFailed": "فشل تحميل المرفق"
+      }
     }
   },
   "receivingPage": {
@@ -5877,5 +5954,8 @@
     },
     "subtitle": "إضافة موظف جديد إلى النظام",
     "title": "إنشاء موظف"
+  },
+  "purchaseOrders": {
+    "title": "أمر شراء"
   }
 }
