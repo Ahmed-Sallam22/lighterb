@@ -56,14 +56,16 @@ src/
 
 1. Clone the repository
 2. Install dependencies:
-   ```bash
-   npm install
-   ```
+
+    ```bash
+    npm install
+    ```
 
 3. Start the development server:
-   ```bash
-   npm run dev
-   ```
+
+    ```bash
+    npm run dev
+    ```
 
 4. Open your browser and navigate to `http://localhost:5173`
 
@@ -77,9 +79,11 @@ src/
 ## Features & Routes
 
 ### Layout
+
 - **MainLayout**: Consistent layout wrapper for all pages with Navbar and Footer
 
 ### Navigation (Navbar)
+
 - Menu icon for navigation
 - Logo with link to home
 - Search functionality with dropdown
@@ -89,37 +93,45 @@ src/
 ### Pages
 
 #### Home (`/`)
+
 - Welcome title with Light ERP branding
 - Horizontal scrolling navigation bar (10 visible routes)
 - Feature cards with icons, titles, and descriptions
 - Smooth animations and hover effects
 
 #### Dashboard (`/dashboard`)
+
 - Statistics overview cards
 - Real-time metrics display
 
 #### Projects (`/projects`)
+
 - Project cards with status and progress bars
 - Visual completion tracking
 
 #### Tasks (`/tasks`)
+
 - Task table with priorities and due dates
 - Assignee information
 
 #### Team (`/team`)
+
 - Team member directory
 - Profile cards with roles and contact info
 
 #### Settings (`/settings`)
+
 - Profile settings
 - Notification preferences
 - Save functionality
 
 #### Additional Routes
+
 - Calendar, Reports, Analytics, Documents, Messages, Notifications, Help
 - (Placeholder pages ready for implementation)
 
 ### Footer
+
 - Copyright information
 - Company logo
 
@@ -144,8 +156,8 @@ theme: {
 
 ## React Compiler
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The React Compiler is not checked on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
 ## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules checked. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

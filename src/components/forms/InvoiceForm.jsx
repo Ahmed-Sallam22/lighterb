@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
@@ -10,12 +10,13 @@ import FloatingLabelSelect from "../shared/FloatingLabelSelect";
 import GLLinesSection from "../shared/GLLinesSection";
 import Button from "../shared/Button";
 import { createARInvoice } from "../../store/arInvoicesSlice";
-import { createAPInvoice } from "../../store/apInvoicesSlice";
+import { createAPInvoice, fetchVariancePreview, clearVariancePreview } from "../../store/apInvoicesSlice";
 import { fetchCurrencies } from "../../store/currenciesSlice";
 import { fetchCustomers } from "../../store/customersSlice";
 import { fetchSuppliers } from "../../store/suppliersSlice";
 import { fetchTaxRates } from "../../store/taxRatesSlice";
 import { fetchCountries } from "../../store/countriesSlice";
+import { fetchGRNs } from "../../store/grnSlice";
 import { fetchDefaultGLSegments, clearDefaultGLSegments } from "../../store/defaultCombinationsSlice";
 // Static country options with ids expected by backend
 // const countries = [
@@ -25,19 +26,13 @@ import { fetchDefaultGLSegments, clearDefaultGLSegments } from "../../store/defa
 // 	{ value: 4, code: "SA", label: "Saudi Arabia (SA)" },
 // ];
 
-const paymentTermsOptions = [
-	{ value: "NET30", label: "Net 30 Days" },
-	{ value: "NET60", label: "Net 60 Days" },
-	{ value: "NET90", label: "Net 90 Days" },
-	{ value: "IMMEDIATE", label: "Immediate" },
-	{ value: "COD", label: "Cash on Delivery" },
-];
-
-const goodsReceiptOptions = [
-	{ value: "manual", label: "Manual Entry" },
-	{ value: "gr-1219", label: "GR-1219 • Warehouse A" },
-	{ value: "gr-1411", label: "GR-1411 • Abu Dhabi Port" },
-];
+// Static country options with ids expected by backend
+// const countries = [
+// 	{ value: 1, code: "AE", label: "United Arab Emirates (AE)" },
+// 	{ value: 2, code: "US", label: "United States (US)" },
+// 	{ value: 3, code: "GB", label: "United Kingdom (GB)" },
+// 	{ value: 4, code: "SA", label: "Saudi Arabia (SA)" },
+// ];
 
 const InvoiceForm = ({ isAPInvoice = false }) => {
 	const navigate = useNavigate();
@@ -48,8 +43,12 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 	const { suppliers } = useSelector(state => state.suppliers);
 	const { taxRates } = useSelector(state => state.taxRates);
 	const { countries: fetchedCountries } = useSelector(state => state.countries);
-	const { loading: invoiceLoading } = useSelector(state => (isAPInvoice ? state.apInvoices : state.arInvoices));
+	const { loading: invoiceLoading, variancePreview, variancePreviewLoading, variancePreviewError } = useSelector(
+		state => (isAPInvoice ? state.apInvoices : state.arInvoices)
+	);
 	const { defaultGLSegments } = useSelector(state => state.defaultCombinations);
+	// GRN state for AP invoices
+	const { grnList = [], loading: grnLoading } = useSelector(state => state.grn || {});
 
 	const countries = fetchedCountries.map(country => ({
 		value: country.id,
@@ -81,7 +80,9 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 		memo: "",
 	});
 
-	const [goodsReceipt, setGoodsReceipt] = useState("");
+	// GRN selection state (for AP Invoice)
+	const [selectedGRN, setSelectedGRN] = useState("");
+	const [isFromGRN, setIsFromGRN] = useState(false);
 
 	// Track if default segments have been applied to avoid duplicate application
 	const [defaultSegmentsApplied, setDefaultSegmentsApplied] = useState(false);
@@ -92,12 +93,19 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 		dispatch(fetchCustomers());
 		dispatch(fetchSuppliers());
 		dispatch(fetchCountries());
+		// Fetch GRNs for AP invoices
+		if (isAPInvoice) {
+			dispatch(fetchGRNs({ page: 1, page_size: 100 }));
+		}
 		// Fetch default GL segments for the invoice type
 		const transactionType = isAPInvoice ? "AP_INVOICE" : "AR_INVOICE";
 		dispatch(fetchDefaultGLSegments(transactionType));
 
 		return () => {
 			dispatch(clearDefaultGLSegments());
+			if (isAPInvoice) {
+				dispatch(clearVariancePreview());
+			}
 		};
 	}, [dispatch, isAPInvoice]);
 
@@ -145,6 +153,82 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 		value: supplier.id,
 		label: supplier.name || `Supplier ${supplier.id}`,
 	}));
+
+	// GRN options for AP invoices
+	const grnOptions = [
+		{ value: "", label: t("invoiceForm.goodsReceipt.selectManual") },
+		...grnList.map(grn => ({
+			value: grn.id,
+			label: `${grn.grn_number || `GRN-${grn.id}`} • ${grn.supplier_name || "Unknown Supplier"}`,
+		})),
+	];
+
+	// Handle GRN selection change
+	const handleGRNChange = useCallback(
+		async e => {
+			const grnId = e.target.value;
+			setSelectedGRN(grnId);
+
+			if (grnId) {
+				setIsFromGRN(true);
+				// Clear existing items when selecting GRN
+				setItems([]);
+				// Prepare variance preview request
+				const previewData = {
+					goods_receipt_id: parseInt(grnId),
+					date: invoiceForm.date || new Date().toISOString().split("T")[0],
+					currency_id: invoiceForm.currency ? parseInt(invoiceForm.currency) : 1,
+					tax_amount: "0.00",
+					journal_entry: {
+						date: invoiceForm.date || new Date().toISOString().split("T")[0],
+						currency_id: invoiceForm.currency ? parseInt(invoiceForm.currency) : 1,
+						memo: invoiceForm.memo || "Invoice from GRN",
+						lines: glLines.map(line => ({
+							amount: String(parseFloat(line.amount || 0).toFixed(2)),
+							type: line.type,
+							segments: (line.segments || [])
+								.filter(seg => seg.segment_code)
+								.map(seg => ({
+									segment_type_id: seg.segment_type_id,
+									segment_code: seg.segment_code,
+								})),
+						})),
+					},
+				};
+				dispatch(fetchVariancePreview(previewData));
+			} else {
+				setIsFromGRN(false);
+				dispatch(clearVariancePreview());
+			}
+		},
+		[dispatch, invoiceForm.date, invoiceForm.currency, invoiceForm.memo, glLines]
+	);
+
+	// Populate items from variance preview
+	useEffect(() => {
+		if (variancePreview?.preview?.items && isFromGRN) {
+			const previewItems = variancePreview.preview.items.map((item, idx) => ({
+				id: Date.now() + idx,
+				name: item.name,
+				description: item.description,
+				quantity: String(item.quantity_received || 0),
+				unit_price: String(item.unit_price || 0),
+				tax_rate_id: "",
+				tax_rate: null,
+				tax_country: "",
+				tax_category: "",
+			}));
+			setItems(previewItems);
+
+			// Also set supplier from preview if available
+			if (variancePreview.preview.supplier_id) {
+				setInvoiceForm(prev => ({
+					...prev,
+					supplier: String(variancePreview.preview.supplier_id),
+				}));
+			}
+		}
+	}, [variancePreview, isFromGRN]);
 
 	// Calculate invoice totals
 	const invoiceSubtotal = items.reduce((sum, item) => {
@@ -439,21 +523,129 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 	return (
 		<div className="max-w-6xl mx-auto mt-5 pb-10 space-y-5">
 			{/* Goods Receipt Link (AP Invoice Only) */}
-			{/* {isAPInvoice && (
+			{isAPInvoice && (
 				<Card title={t("invoiceForm.goodsReceipt.title")} subtitle={t("invoiceForm.goodsReceipt.subtitle")}>
 					<div className="grid grid-cols-1 gap-6">
 						<FloatingLabelSelect
 							label={t("invoiceForm.goodsReceipt.label")}
 							name="goodsReceipt"
-							value={goodsReceipt}
-							onChange={e => setGoodsReceipt(e.target.value)}
-							options={goodsReceiptOptions}
+							value={selectedGRN}
+							onChange={handleGRNChange}
+							options={grnOptions}
 							placeholder={t("invoiceForm.goodsReceipt.placeholder")}
+							disabled={grnLoading}
 						/>
 						<p className="text-xs text-[#7A9098]">{t("invoiceForm.goodsReceipt.helper")}</p>
+
+						{/* Variance Preview Section */}
+						{isFromGRN && variancePreviewLoading && (
+							<div className="flex items-center justify-center py-4">
+								<div className="w-6 h-6 border-2 border-[#28819C] border-t-transparent rounded-full animate-spin"></div>
+								<span className="ml-2 text-sm text-gray-500">{t("invoiceForm.variancePreview.loading")}</span>
+							</div>
+						)}
+
+						{isFromGRN && variancePreviewError && (
+							<div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+								<p className="text-sm text-red-600">{variancePreviewError}</p>
+							</div>
+						)}
+
+						{isFromGRN && variancePreview && !variancePreviewLoading && (
+							<div className="p-4 bg-blue-50 border border-blue-200 rounded-xl space-y-4">
+								<h4 className="font-semibold text-[#0d5f7a]">{t("invoiceForm.variancePreview.title")}</h4>
+
+								{/* GRN Info */}
+								<div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+									<div>
+										<span className="text-gray-500">{t("invoiceForm.variancePreview.grnNumber")}:</span>
+										<p className="font-medium">{variancePreview.preview?.grn_number}</p>
+									</div>
+									<div>
+										<span className="text-gray-500">{t("invoiceForm.variancePreview.supplier")}:</span>
+										<p className="font-medium">{variancePreview.preview?.supplier_name}</p>
+									</div>
+									<div>
+										<span className="text-gray-500">{t("invoiceForm.variancePreview.poNumber")}:</span>
+										<p className="font-medium">{variancePreview.preview?.po_number}</p>
+									</div>
+									<div>
+										<span className="text-gray-500">{t("invoiceForm.variancePreview.poDate")}:</span>
+										<p className="font-medium">{variancePreview.preview?.po_date}</p>
+									</div>
+								</div>
+
+								{/* Variance Info */}
+								<div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm border-t border-blue-200 pt-4">
+									<div>
+										<span className="text-gray-500">{t("invoiceForm.variancePreview.poTotal")}:</span>
+										<p className="font-medium">{variancePreview.po_total?.toFixed(2)}</p>
+									</div>
+									<div>
+										<span className="text-gray-500">{t("invoiceForm.variancePreview.invoiceTotal")}:</span>
+										<p className="font-medium">{variancePreview.invoice_total?.toFixed(2)}</p>
+									</div>
+									<div>
+										<span className="text-gray-500">{t("invoiceForm.variancePreview.varianceAmount")}:</span>
+										<p className={`font-medium ${variancePreview.variance_amount > 0 ? "text-amber-600" : "text-green-600"}`}>
+											{variancePreview.variance_amount?.toFixed(2)}
+										</p>
+									</div>
+									<div>
+										<span className="text-gray-500">{t("invoiceForm.variancePreview.variancePercentage")}:</span>
+										<p className={`font-medium ${variancePreview.variance_percentage > 5 ? "text-red-600" : variancePreview.variance_percentage > 0 ? "text-amber-600" : "text-green-600"}`}>
+											{variancePreview.variance_percentage?.toFixed(2)}%
+										</p>
+									</div>
+								</div>
+
+								{/* Items Preview */}
+								{variancePreview.preview?.items?.length > 0 && (
+									<div className="border-t border-blue-200 pt-4">
+										<h5 className="font-medium text-gray-700 mb-2">{t("invoiceForm.variancePreview.items")}</h5>
+										<div className="overflow-x-auto">
+											<table className="w-full text-sm">
+												<thead>
+													<tr className="border-b border-blue-200">
+														<th className="text-left py-2">{t("invoiceForm.items.name")}</th>
+														<th className="text-right py-2">{t("invoiceForm.variancePreview.qtyReceived")}</th>
+														<th className="text-right py-2">{t("invoiceForm.items.unitPrice")}</th>
+														<th className="text-right py-2">{t("invoiceForm.variancePreview.lineTotal")}</th>
+													</tr>
+												</thead>
+												<tbody>
+													{variancePreview.preview.items.map((item, idx) => (
+														<tr key={idx} className="border-b border-blue-100">
+															<td className="py-2">{item.name}</td>
+															<td className="text-right py-2">{item.quantity_received}</td>
+															<td className="text-right py-2">{item.unit_price?.toFixed(2)}</td>
+															<td className="text-right py-2">{item.line_total?.toFixed(2)}</td>
+														</tr>
+													))}
+												</tbody>
+												<tfoot>
+													<tr className="font-semibold">
+														<td colSpan="3" className="py-2 text-right">{t("invoiceForm.variancePreview.subtotal")}:</td>
+														<td className="py-2 text-right">{variancePreview.preview.subtotal?.toFixed(2)}</td>
+													</tr>
+													<tr>
+														<td colSpan="3" className="py-2 text-right">{t("invoiceForm.variancePreview.taxAmount")}:</td>
+														<td className="py-2 text-right">{variancePreview.preview.tax_amount?.toFixed(2)}</td>
+													</tr>
+													<tr className="font-bold text-[#0d5f7a]">
+														<td colSpan="3" className="py-2 text-right">{t("invoiceForm.variancePreview.total")}:</td>
+														<td className="py-2 text-right">{variancePreview.preview.total?.toFixed(2)}</td>
+													</tr>
+												</tfoot>
+											</table>
+										</div>
+									</div>
+								)}
+							</div>
+						)}
 					</div>
 				</Card>
-			)} */}
+			)}
 
 			{/* Invoice Details */}
 			<Card title={t("invoiceForm.details.title")}>
@@ -836,9 +1028,17 @@ const InvoiceForm = ({ isAPInvoice = false }) => {
 				<Button
 					type="button"
 					onClick={handleSubmit}
-					disabled={invoiceLoading}
+					disabled={invoiceLoading || (isFromGRN && (variancePreviewLoading || variancePreviewError || !variancePreview))}
 					className="px-8 py-2 rounded-full bg-[#0d5f7a] text-white font-semibold shadow-lg hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-					title={invoiceLoading ? t("invoiceForm.actions.creating") : t("invoiceForm.actions.createInvoice")}
+					title={
+						invoiceLoading
+							? t("invoiceForm.actions.creating")
+							: isFromGRN && variancePreviewLoading
+							? t("invoiceForm.actions.loadingPreview")
+							: isFromGRN && !variancePreview
+							? t("invoiceForm.actions.waitingForPreview")
+							: t("invoiceForm.actions.createInvoice")
+					}
 				/>
 			</div>
 

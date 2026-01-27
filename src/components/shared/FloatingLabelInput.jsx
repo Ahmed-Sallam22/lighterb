@@ -192,16 +192,16 @@ const FloatingLabelInput = memo(({
 						</button>
 					)}
 					{/* Error Message */}
+				</div>
+			</div>
 					{hasError && (
 						<p
 							id={errorId}
-							className="absolute -bottom-6 start-1 text-xs text-gray-500"
+							className="ml-3 text-xs text-gray-500"
 						>
 							{error}
 						</p>
 					)}
-				</div>
-			</div>
 		</div>
 	);
 });

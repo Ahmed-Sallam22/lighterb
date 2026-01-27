@@ -15,7 +15,7 @@
  * @param {string} fallbackKey - Fallback translation key if error parsing fails
  * @returns {string} - Localized error message
  */
-export const parseApiError = (error, t, fallbackKey = "errors.generic") => {
+export const parseApiError = (error, t , fallbackKey = "errors.generic") => {
 	// If error is a string, try to parse it
 	if (typeof error === "string") {
 		try {

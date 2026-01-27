@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { usePageTitle } from "../hooks/usePageTitle";
 
@@ -11,16 +12,9 @@ import CustomInput from "../components/shared/CustomInput";
 import CustomStatus from "../components/shared/CustomStatus";
 import Button from "../components/shared/Button";
 import EmployeeModal from "../components/shared/EmployeeModal";
-import SlideUpModal from "../components/shared/SlideUpModal";
+import ConfirmModal from "../components/shared/ConfirmModal";
 
-import {
-	fetchEmployees,
-	createEmployee,
-	fetchEmployeeById,
-	setPage,
-	clearError,
-	clearSelectedEmployee,
-} from "../store/employeesSlice";
+import { fetchEmployees, createEmployee, deleteEmployee, setPage, clearError } from "../store/employeesSlice";
 import SearchIcon from "../assets/icons/search.svg?react";
 
 const INITIAL_FILTERS = {
@@ -33,13 +27,13 @@ const EmployeeSearchPage = () => {
 	const { t } = useTranslation();
 	usePageTitle(t("employeeSearch.title"));
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	const {
 		employees = [],
-		selectedEmployee: viewEmployee,
 		loading,
-		loadingEmployee,
 		creating,
+		deleting,
 		error,
 		actionError,
 		count: totalCount,
@@ -57,8 +51,9 @@ const EmployeeSearchPage = () => {
 	const [modalMode, setModalMode] = useState("create");
 	const [selectedEmployee, setSelectedEmployee] = useState(null);
 
-	// View modal state
-	const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+	// Delete modal state
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [employeeToDelete, setEmployeeToDelete] = useState(null);
 
 	useEffect(() => {
 		const params = {
@@ -147,25 +142,41 @@ const EmployeeSearchPage = () => {
 	};
 
 	const handleCreateEmployee = () => {
-		setModalMode("create");
-		setSelectedEmployee(null);
-		setIsModalOpen(true);
+		// Navigate to the create employee page
+		navigate("/create-employee");
 	};
 
 	const handleViewEmployee = employee => {
-		dispatch(fetchEmployeeById(employee.id));
-		setIsViewModalOpen(true);
-	};
-
-	const handleCloseViewModal = () => {
-		setIsViewModalOpen(false);
-		dispatch(clearSelectedEmployee());
+		// Navigate to profile page with employee ID
+		navigate(`/profile/${employee.id}`);
 	};
 
 	const handleEditEmployee = employee => {
 		setModalMode("edit");
 		setSelectedEmployee(employee);
 		setIsModalOpen(true);
+	};
+
+	const handleDeleteClick = employee => {
+		setEmployeeToDelete(employee);
+		setIsDeleteModalOpen(true);
+	};
+
+	const handleConfirmDelete = async () => {
+		if (!employeeToDelete) return;
+		try {
+			await dispatch(deleteEmployee(employeeToDelete.id)).unwrap();
+			toast.success(t("employeeSearch.messages.deleteSuccess"));
+			setIsDeleteModalOpen(false);
+			setEmployeeToDelete(null);
+		} catch {
+			// Error handled in useEffect
+		}
+	};
+
+	const handleCancelDelete = () => {
+		setIsDeleteModalOpen(false);
+		setEmployeeToDelete(null);
 	};
 
 	const handleModalClose = () => {
@@ -238,6 +249,7 @@ const EmployeeSearchPage = () => {
 						emptyMessage={loading ? t("common.loading") : t("employeeSearch.table.empty")}
 						onView={handleViewEmployee}
 						onEdit={handleEditEmployee}
+						onDelete={handleDeleteClick}
 					/>
 
 					<div className="mt-4 flex items-center justify-end">
@@ -245,7 +257,7 @@ const EmployeeSearchPage = () => {
 							onClick={handleCreateEmployee}
 							title={t("employeeSearch.buttons.createEmployee")}
 							className="shadow-none border border-[#28819C] bg-white text-[#28819C] hover:bg-[#E8F7FA]"
-							disabled={creating}
+							disabled={creating || deleting}
 						/>
 					</div>
 				</div>
@@ -267,91 +279,19 @@ const EmployeeSearchPage = () => {
 				</div>
 			</div>
 
-			{/* View Employee Modal */}
-			<SlideUpModal
-				isOpen={isViewModalOpen}
-				onClose={handleCloseViewModal}
-				title={t("employeeSearch.modal.viewTitle")}
-			>
-				{loadingEmployee ? (
-					<div className="flex items-center justify-center py-8">
-						<span className="text-gray-500">{t("common.loading")}</span>
-					</div>
-				) : viewEmployee ? (
-					<div className="py-4">
-						<h3 className="text-lg font-semibold text-[#1D7A8C] mb-4 border-b pb-2">
-							{t("employeeSearch.modal.employeeDetails")}
-						</h3>
-						<div className="space-y-3">
-							<div className="flex justify-between items-center py-2 border-b border-gray-100">
-								<span className="text-gray-500">{t("employeeSearch.modal.fields.employeeNumber")}</span>
-								<span className="font-medium text-gray-800">{viewEmployee.employee_number || "-"}</span>
-							</div>
-							<div className="flex justify-between items-center py-2 border-b border-gray-100">
-								<span className="text-gray-500">{t("employeeSearch.modal.fields.employeeName")}</span>
-								<span className="font-medium text-gray-800">{viewEmployee.person_name || "-"}</span>
-							</div>
-							<div className="flex justify-between items-center py-2 border-b border-gray-100">
-								<span className="text-gray-500">{t("employeeSearch.table.status")}</span>
-								<span
-									className={`px-3 py-1 rounded-full text-xs font-semibold ${
-										viewEmployee.status === "active"
-											? "bg-green-100 text-green-700"
-											: "bg-gray-100 text-gray-600"
-									}`}
-								>
-									{viewEmployee.status === "active" ? t("common.active") : t("common.inactive")}
-								</span>
-							</div>
-							<div className="flex justify-between items-center py-2 border-b border-gray-100">
-								<span className="text-gray-500">{t("employeeSearch.table.employeeType")}</span>
-								<span className="font-medium text-gray-800">
-									{viewEmployee.employee_type_name || "-"}
-								</span>
-							</div>
-							<div className="flex justify-between items-center py-2 border-b border-gray-100">
-								<span className="text-gray-500">{t("employeeSearch.table.organization")}</span>
-								<span className="font-medium text-gray-800">
-									{viewEmployee.current_organization_name || "-"}
-								</span>
-							</div>
-							<div className="flex justify-between items-center py-2 border-b border-gray-100">
-								<span className="text-gray-500">{t("employeeSearch.modal.fields.position")}</span>
-								<span className="font-medium text-gray-800">
-									{viewEmployee.current_position_name || "-"}
-								</span>
-							</div>
-							<div className="flex justify-between items-center py-2 border-b border-gray-100">
-								<span className="text-gray-500">{t("employeeSearch.table.hireDate")}</span>
-								<span className="font-medium text-gray-800">{viewEmployee.hire_date || "-"}</span>
-							</div>
-							<div className="flex justify-between items-center py-2 border-b border-gray-100">
-								<span className="text-gray-500">
-									{t("employeeSearch.modal.fields.effectiveStartDate")}
-								</span>
-								<span className="font-medium text-gray-800">
-									{viewEmployee.effective_start_date || "-"}
-								</span>
-							</div>
-							<div className="flex justify-between items-center py-2">
-								<span className="text-gray-500">
-									{t("employeeSearch.modal.fields.effectiveEndDate")}
-								</span>
-								<span className="font-medium text-gray-800">
-									{viewEmployee.effective_end_date || "-"}
-								</span>
-							</div>
-						</div>
-						<div className="flex justify-end pt-4 mt-4 border-t">
-							<Button
-								onClick={handleCloseViewModal}
-								title={t("common.cancel")}
-								className="bg-white text-gray-700 border border-gray-200 hover:bg-gray-100 shadow-none"
-							/>
-						</div>
-					</div>
-				) : null}
-			</SlideUpModal>
+			{/* Delete Confirmation Modal */}
+			<ConfirmModal
+				isOpen={isDeleteModalOpen}
+				onClose={handleCancelDelete}
+				onConfirm={handleConfirmDelete}
+				title={t("employeeSearch.deleteModal.title")}
+				message={t("employeeSearch.deleteModal.message", {
+					name: employeeToDelete?.person_name || employeeToDelete?.employee_number,
+				})}
+				confirmText={t("common.delete")}
+				cancelText={t("common.cancel")}
+				variant="danger"
+			/>
 
 			<EmployeeModal
 				isOpen={isModalOpen}

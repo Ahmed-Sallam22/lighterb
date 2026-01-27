@@ -502,10 +502,13 @@
 		"create": "Create",
 		"add": "Add",
 		"update": "Update",
+		"updating": "Updating...",
 		"delete": "Delete",
+		"deleting": "Deleting...",
 		"edit": "Edit",
 		"view": "View",
 		"close": "Close",
+		"activating": "Activating...",
 		"active": "Active",
 		"inactive": "Inactive",
 		"required": "This field is required",
@@ -513,7 +516,11 @@
 		"success": "Operation successful",
 		"loading": "Loading...",
 		"refresh": "Refresh",
-		"search": "Search"
+		"search": "Search",
+		"select": "Select",
+		"optional": "Optional",
+		"back": "Back",
+		"creating": "Creating"
 	},
 	"history": {
 		"title": "History - {{name}}",
@@ -567,8 +574,14 @@
 		"messages": {
 			"createSuccess": "Employee created successfully",
 			"updateSuccess": "Employee updated successfully",
+			"deleteSuccess": "Employee deleted successfully",
 			"createError": "Failed to create employee",
-			"updateError": "Failed to update employee"
+			"updateError": "Failed to update employee",
+			"deleteError": "Failed to delete employee"
+		},
+		"deleteModal": {
+			"title": "Delete Employee",
+			"message": "Are you sure you want to delete {{name}}? This action cannot be undone."
 		},
 		"modal": {
 			"createTitle": "Create Employee",
@@ -608,6 +621,7 @@
 		"subtitle": "Personal Profile",
 		"personalInformation": "Personal Information",
 		"employeeNo": "Employee No",
+		"employeeNotFound": "Employee not found",
 		"status": "Status",
 		"hireDate": "Hire Date",
 		"primaryAssignment": "Primary Assignment",
@@ -615,6 +629,7 @@
 		"tabs": {
 			"general": "General",
 			"assignment": "Assignment",
+			"contracts": "Contracts",
 			"contacts": "Contacts",
 			"qualifications": "Qualifications",
 			"organization": "Organization"
@@ -624,28 +639,127 @@
 			"grade": "Grade G7",
 			"detailsTitle": "Assignment Details",
 			"organizationTitle": "Organization Info",
+			"noAssignments": "No assignments found",
 			"fields": {
 				"title": "Title",
 				"type": "Assignment Type",
 				"assignmentType": "Assignment Type",
+				"assignmentNo": "Assignment No",
+				"position": "Position",
+				"job": "Job",
+				"department": "Department",
+				"grade": "Grade",
 				"effectiveFrom": "Effective From",
+				"effectiveTo": "Effective End Date",
 				"assignmentStatus": "Assignment Status",
 				"status": "Assignment Status",
 				"businessGroup": "Business Group",
-				"department": "Department",
 				"location": "Location",
 				"manager": "Manager",
-				"action": "Action"
+				"action": "Action",
+				"actionReason": "Action Reason",
+				"isPrimary": "Primary Assignment",
+				"primary": "Primary",
+				"requiredFields": "Required Fields",
+				"optionalFields": "Optional Fields",
+				"lineManager": "Line Manager",
+				"projectManager": "Project Manager",
+				"payroll": "Payroll",
+				"salaryBasis": "Salary Basis",
+				"contract": "Contract",
+				"probationPeriodStart": "Probation Period Start",
+				"probationPeriod": "Probation Period",
+				"terminationNoticePeriod": "Termination Notice Period",
+				"hourlySalaried": "Hourly/Salaried",
+				"workingFrequency": "Working Frequency",
+				"workStartTime": "Work Start Time",
+				"workEndTime": "Work End Time",
+				"workFromHome": "Work From Home",
+				"isManager": "Is Manager",
+				"employmentConfirmationDate": "Employment Confirmation Date"
+			},
+			"placeholders": {
+				"businessGroupId": "Select Business Group",
+				"departmentId": "Select Department",
+				"jobId": "Select Job",
+				"positionId": "Select Position",
+				"gradeId": "Select Grade"
 			},
 			"currentAssignment": "Current Assignment",
 			"fullTime": "Full Time",
 			"actions": {
 				"view": "View Assignment",
-				"update": "Update Assignment"
+				"update": "Update Assignment",
+				"create": "Create Assignment",
+				"createFirst": "Create First Assignment"
+			},
+			"modals": {
+				"createTitle": "Create New Assignment",
+				"editTitle": "Edit Assignment",
+				"viewTitle": "View Assignment"
+			},
+			"messages": {
+				"createSuccess": "Assignment created successfully",
+				"createError": "Failed to create assignment",
+				"updateSuccess": "Assignment updated successfully",
+				"updateError": "Failed to update assignment",
+				"deleteSuccess": "Assignment deleted successfully",
+				"deleteError": "Failed to delete assignment",
+				"confirmDelete": "Are you sure you want to delete this assignment?"
+			},
+			"errors": {
+				"noEmployee": "No employee selected",
+				"noAssignment": "No assignment selected"
 			},
 			"statuses": {
 				"active": "Active",
 				"inactive": "Inactive"
+			}
+		},
+		"contracts": {
+			"detailsTitle": "Contract Details",
+			"noContracts": "No contracts found",
+			"fields": {
+				"reference": "Reference",
+				"position": "Position",
+				"startDate": "Start Date",
+				"endDate": "End Date",
+				"duration": "Duration",
+				"period": "Period",
+				"salary": "Salary",
+				"status": "Status",
+				"contractStatus": "Contract Status",
+				"contractEndReason": "Contract End Reason",
+				"endReason": "End Reason",
+				"description": "Description",
+				"effectiveStartDate": "Effective Start Date",
+				"effectiveEndDate": "Effective End Date",
+				"extension": "Extension",
+				"extensionDuration": "Extension Duration",
+				"extensionPeriod": "Extension Period",
+				"extensionStartDate": "Extension Start Date",
+				"extensionEndDate": "Extension End Date"
+			},
+			"actions": {
+				"view": "View Contract",
+				"create": "Create Contract",
+				"createFirst": "Create First Contract",
+				"edit": "Edit Contract",
+				"delete": "Delete Contract"
+			},
+			"modals": {
+				"createTitle": "Create New Contract",
+				"editTitle": "Edit Contract",
+				"viewTitle": "View Contract"
+			},
+			"messages": {
+				"contractCreated": "Contract created successfully",
+				"contractCreateFailed": "Failed to create contract",
+				"contractUpdated": "Contract updated successfully",
+				"contractUpdateFailed": "Failed to update contract",
+				"contractDeleted": "Contract deleted successfully",
+				"contractDeleteFailed": "Failed to delete contract",
+				"confirmDeleteContract": "Are you sure you want to delete this contract?"
 			}
 		},
 		"organization": {
@@ -661,13 +775,21 @@
 		"general": {
 			"personalInfoEn": "Personal Information (English)",
 			"personalInfoAr": "Personal Information (Arabic)",
+			"basicInfo": "Basic Information",
 			"address": "Address",
 			"fields": {
 				"firstName": "First Name",
 				"middleName": "Middle Name",
 				"lastName": "Last Name",
+				"title": "Title",
 				"gender": "Gender",
 				"maritalStatus": "Marital Status",
+				"dateOfBirth": "Date of Birth",
+				"nationality": "Nationality",
+				"nationalId": "National ID",
+				"religion": "Religion",
+				"bloodType": "Blood Type",
+				"email": "Email Address",
 				"address": "Address",
 				"addressType": "Address Type"
 			},
@@ -745,13 +867,17 @@
 			},
 			"actions": {
 				"add": "Add Qualification"
-			}
+			},
+			"title": "Title"
 		},
 		"modals": {
 			"updateAssignment": "Update Assignment",
 			"viewAssignment": "View Assignment",
 			"editAssignment": "Edit Assignment",
 			"assignmentDetails": "Assignment Details",
+			"viewContract": "View Contract",
+			"editContract": "Edit Contract",
+			"contractDetails": "Contract Details",
 			"addQualification": "Add Qualification",
 			"fields": {
 				"effectiveDate": "Effective Date",
@@ -766,7 +892,9 @@
 				"qualifications": "Qualifications",
 				"issuer": "Issuer",
 				"year": "Year",
-				"status": "Status"
+				"status": "Status",
+				"contractStatus": "Contract Status",
+				"contractEndReason": "Contract End Reason"
 			},
 			"options": {
 				"jobTitles": {
@@ -792,6 +920,12 @@
 					"partTime": "Part Time",
 					"contract": "Contract"
 				},
+				"periods": {
+					"days": "Days",
+					"weeks": "Weeks",
+					"months": "Months",
+					"years": "Years"
+				},
 				"qualificationTypes": {
 					"certificate": "Certificate",
 					"course": "Course",
@@ -801,7 +935,12 @@
 					"expired": "Expired"
 				}
 			}
-		}
+		},
+		"messages": {
+			"contractCreated": "Contract Created",
+			"contractCreateFailed": "Contract Create Failed"
+		},
+		"notPrimary": "Not Primary"
 	},
 	"employeeDocuments": {
 		"title": "Employee Document",
@@ -2711,7 +2850,26 @@
 			"subtitle": "Select Goods Receipt Needing Invoice",
 			"label": "Goods Receipt",
 			"placeholder": "Select goods receipt",
-			"helper": "Found goods receipts needing invoices. Select one to auto-populate invoice details."
+			"helper": "Found goods receipts needing invoices. Select one to auto-populate invoice details.",
+			"selectManual": "Manual Entry (No GRN)"
+		},
+		"variancePreview": {
+			"title": "Variance Preview",
+			"loading": "Loading variance preview...",
+			"grnNumber": "GRN Number",
+			"supplier": "Supplier",
+			"poNumber": "PO Number",
+			"poDate": "PO Date",
+			"poTotal": "PO Total",
+			"invoiceTotal": "Invoice Total",
+			"varianceAmount": "Variance Amount",
+			"variancePercentage": "Variance %",
+			"items": "Items from GRN",
+			"qtyReceived": "Qty Received",
+			"lineTotal": "Line Total",
+			"subtotal": "Subtotal",
+			"taxAmount": "Tax Amount",
+			"total": "Total"
 		},
 		"details": {
 			"title": "Invoice Details",
@@ -2777,7 +2935,9 @@
 		"actions": {
 			"cancel": "Cancel",
 			"creating": "Creating...",
-			"createInvoice": "Create Invoice"
+			"createInvoice": "Create Invoice",
+			"loadingPreview": "Loading Preview...",
+			"waitingForPreview": "Select GRN to Preview"
 		},
 		"messages": {
 			"itemRemoved": "Item removed",
@@ -3255,6 +3415,166 @@
 		},
 		"messages": {
 			"createSuccess": "Requisition created successfully"
+		}
+	},
+	"createEmployee": {
+		"title": "Create Employee",
+		"subtitle": "Add a new employee to the system",
+		"steps": {
+			"personal": "Personal Info",
+			"details": "Details",
+			"employment": "Employment"
+		},
+		"sections": {
+			"personalInfo": "Personal Information",
+			"personalDetails": "Personal Details",
+			"arabicNames": "Arabic Names",
+			"employmentDetails": "Employment Details"
+		},
+		"fields": {
+			"firstName": "First Name",
+			"middleName": "Middle Name",
+			"lastName": "Last Name",
+			"dateOfBirth": "Date of Birth",
+			"gender": "Gender",
+			"nationality": "Nationality",
+			"maritalStatus": "Marital Status",
+			"nationalId": "National ID",
+			"title": "Title",
+			"firstNameArabic": "First Name (Arabic)",
+			"middleNameArabic": "Middle Name (Arabic)",
+			"lastNameArabic": "Last Name (Arabic)",
+			"religion": "Religion",
+			"bloodType": "Blood Type",
+			"employeeNumber": "Employee Number",
+			"employeeType": "Employee Type",
+			"effectiveStartDate": "Effective Start Date",
+			"hireDate": "Hire Date",
+			"email": "Email Address"
+		},
+		"placeholders": {
+			"employeeType": "Select Employee Type",
+			"hireDateDefault": "Defaults to effective start date",
+			"employeeNumberAuto": "Auto-generated if not provided"
+		},
+		"hints": {
+			"employeeNumber": "Leave blank to auto-generate employee number (EMP-XXXXXX format)"
+		},
+		"errors": {
+			"firstNameRequired": "First name is required",
+			"lastNameRequired": "Last name is required",
+			"emailRequired": "Email is required",
+			"invalidEmail": "Please enter a valid email address",
+			"dateOfBirthRequired": "Date of birth is required",
+			"genderRequired": "Gender is required",
+			"maritalStatusRequired": "Marital status is required",
+			"nationalityRequired": "Nationality is required",
+			"employeeTypeRequired": "Employee type is required",
+			"effectiveStartDateRequired": "Effective start date is required"
+		},
+		"actions": {
+			"previous": "Previous",
+			"next": "Next",
+			"cancel": "Cancel",
+			"create": "Create Employee",
+			"creating": "Creating..."
+		},
+		"messages": {
+			"createSuccess": "Employee created successfully",
+			"createError": "Failed to create employee",
+			"completeCurrentStep": "Please complete the current step first",
+			"checkAllSteps": "Please check all steps for errors"
+		}
+	},
+	"createAssignment": {
+		"title": "Create Assignment",
+		"subtitle": "Create a new assignment for an employee",
+		"steps": {
+			"basic": "Basic Info",
+			"organization": "Organization",
+			"status": "Status",
+			"compensation": "Compensation",
+			"probation": "Probation"
+		},
+		"sections": {
+			"basicInfo": "Basic Assignment Information",
+			"organization": "Organization Details",
+			"statusManagers": "Status & Managers",
+			"compensation": "Compensation & Schedule",
+			"workSchedule": "Work Schedule",
+			"probation": "Probation & Confirmation"
+		},
+		"fields": {
+			"assignmentNo": "Assignment Number",
+			"title": "Title",
+			"effectiveStartDate": "Effective Start Date",
+			"effectiveEndDate": "Effective End Date",
+			"primaryAssignment": "Primary Assignment",
+			"businessGroup": "Business Group",
+			"department": "Department",
+			"job": "Job",
+			"position": "Position",
+			"grade": "Grade",
+			"assignmentStatus": "Assignment Status",
+			"actionReason": "Action Reason",
+			"lineManager": "Line Manager",
+			"projectManager": "Project Manager",
+			"isManager": "Is Manager",
+			"payroll": "Payroll",
+			"salaryBasis": "Salary Basis",
+			"contract": "Contract",
+			"hourlySalaried": "Hourly/Salaried",
+			"workingFrequency": "Working Frequency",
+			"workStartTime": "Work Start Time",
+			"workEndTime": "Work End Time",
+			"workFromHome": "Work From Home",
+			"probationPeriodStart": "Probation Period Start",
+			"probationPeriod": "Probation Period",
+			"terminationNoticePeriod": "Termination Notice Period",
+			"employmentConfirmationDate": "Employment Confirmation Date"
+		},
+		"placeholders": {
+			"businessGroup": "Select Business Group",
+			"department": "Select Department",
+			"job": "Select Job",
+			"position": "Select Position",
+			"grade": "Select Grade",
+			"assignmentStatus": "Select Assignment Status",
+			"actionReason": "Select Action Reason",
+			"selectManager": "Select Manager",
+			"payroll": "Select Payroll",
+			"salaryBasis": "Select Salary Basis",
+			"contract": "Select Contract",
+			"hourlySalaried": "Select Type",
+			"workingFrequency": "Select Frequency",
+			"probationPeriod": "Select Probation Period",
+			"terminationNoticePeriod": "Select Notice Period"
+		},
+		"errors": {
+			"assignmentNoRequired": "Assignment number is required",
+			"effectiveStartDateRequired": "Effective start date is required",
+			"businessGroupRequired": "Business group is required",
+			"departmentRequired": "Department is required",
+			"noEmployee": "No employee selected",
+			"selectEmployeeFirst": "Please select an employee first to create an assignment"
+		},
+		"actions": {
+			"previous": "Previous",
+			"next": "Next",
+			"cancel": "Cancel",
+			"create": "Create Assignment",
+			"creating": "Creating...",
+			"goToEmployees": "Go to Employee Search"
+		},
+		"messages": {
+			"createSuccess": "Assignment created successfully",
+			"createError": "Failed to create assignment",
+			"completeCurrentStep": "Please complete the current step first",
+			"checkAllSteps": "Please check all steps for errors"
+		},
+		"options": {
+			"salaried": "Salaried",
+			"hourly": "Hourly"
 		}
 	},
 	"createGRN": {
@@ -4239,7 +4559,6 @@
 			"salaryBasis": "Salary Basis",
 			"selectSalaryBasis": "Select Salary Basis",
 			"newStartDate": "New Start Date",
-			"endDate": "End Date",
 			"competencyRequirements": "Competency Requirements",
 			"qualificationRequirements": "Qualification Requirements",
 			"selectCompetency": "Select Competency",
@@ -5336,5 +5655,211 @@
 			"title": "Delete Lookup Value",
 			"message": "Are you sure you want to delete the lookup value '{{name}}'? This action cannot be undone."
 		}
+	},
+	"budgets": {
+		"title": "Budgets",
+		"subtitle": "Manage budget headers and allocations",
+		"listTitle": "Budget List",
+		"createBudget": "Create Budget",
+		"filters": {
+			"search": "Search",
+			"searchPlaceholder": "Search by code or name...",
+			"status": "Status",
+			"allStatuses": "All Statuses"
+		},
+		"statuses": {
+			"draft": "Draft",
+			"active": "Active",
+			"closed": "Closed"
+		},
+		"controlLevels": {
+			"none": "No Control",
+			"track_only": "Track Only",
+			"advisory": "Advisory",
+			"absolute": "Absolute Control"
+		},
+		"table": {
+			"budgetCode": "Budget Code",
+			"budgetName": "Budget Name",
+			"period": "Period",
+			"currency": "Currency",
+			"totalBudget": "Total Budget",
+			"utilization": "Utilization",
+			"status": "Status",
+			"segments": "Segments",
+			"emptyMessage": "No budgets found"
+		},
+		"form": {
+			"budgetCode": "Budget Code",
+			"budgetName": "Budget Name",
+			"description": "Description",
+			"startDate": "Start Date",
+			"endDate": "End Date",
+			"currency": "Currency",
+			"selectCurrency": "Select Currency",
+			"defaultControlLevel": "Default Control Level",
+			"notes": "Notes",
+			"segmentValues": "Segment Values",
+			"addSegment": "Add Segment",
+			"noSegments": "No segment values added. Click 'Add Segment' to add one.",
+			"segmentType": "Segment Type",
+			"selectSegmentType": "Select Segment Type",
+			"segmentValue": "Segment Value",
+			"selectSegmentValue": "Select Segment Value",
+			"selectSegmentTypeFirst": "Select a segment type first",
+			"controlLevel": "Control Level"
+		},
+		"modal": {
+			"createTitle": "Create New Budget"
+		},
+		"validation": {
+			"codeRequired": "Budget code is required",
+			"nameRequired": "Budget name is required",
+			"startDateRequired": "Start date is required",
+			"endDateRequired": "End date is required",
+			"currencyRequired": "Currency is required",
+			"budgetNameRequired": "Budget Name Required"
+		},
+		"actions": {
+			"close": "Close Budget",
+			"deactivate": "Deactivate"
+		},
+		"deleteModal": {
+			"title": "Delete Budget",
+			"message": "Are you sure you want to delete budget '{{code}}'? This action cannot be undone."
+		},
+		"closeModal": {
+			"title": "Close Budget",
+			"message": "Are you sure you want to close budget '{{code}}'? Closed budgets cannot be modified."
+		},
+		"deactivateModal": {
+			"title": "Deactivate Budget",
+			"message": "Are you sure you want to deactivate budget '{{code}}'?"
+		},
+		"messages": {
+			"fetchError": "Failed to fetch budgets",
+			"createSuccess": "Budget created successfully",
+			"createError": "Failed to create budget",
+			"deleteSuccess": "Budget deleted successfully",
+			"deleteError": "Failed to delete budget",
+			"closeSuccess": "Budget closed successfully",
+			"closeError": "Failed to close budget",
+			"deactivateSuccess": "Budget deactivated successfully",
+			"deactivateError": "Failed to deactivate budget"
+		}
+	},
+	"budgetDetails": {
+		"title": "Budget Details",
+		"backToBudgets": "Back to Budgets",
+		"notFound": "Budget not found",
+		"downloadTemplate": "Download Template",
+		"downloading": "Downloading...",
+		"importFromExcel": "Import from Excel",
+		"editBudget": "Edit Budget",
+		"editBudgetTitle": "Edit Budget Information",
+		"activateBudget": "Activate Budget",
+		"editSegmentTitle": "Edit Budget Segment",
+		"tabs": {
+			"info": "Information",
+			"segments": "Budget Segments"
+		},
+		"info": {
+			"title": "Budget Information",
+			"period": "Budget Period",
+			"currency": "Currency",
+			"totalBudget": "Total Budget",
+			"available": "Available",
+			"utilization": "Utilization",
+			"status": "Status",
+			"controlLevel": "Control Level",
+			"isActive": "Active",
+			"description": "Description",
+			"notes": "Notes",
+			"amountsSummary": "Budget Amounts Summary",
+			"totalEncumbered": "Total Encumbered",
+			"totalActual": "Total Actual",
+			"timestamps": "Audit Information",
+			"createdAt": "Created At",
+			"createdBy": "Created By",
+			"activatedAt": "Activated At",
+			"activatedBy": "Activated By",
+			"segmentValuesPreview": "Segment Values",
+			"andMore": "...and {{count}} more"
+		},
+		"segments": {
+			"title": "Budget Segments",
+			"addSegment": "Add Segment",
+			"addSegmentTitle": "Add Budget Segment",
+			"emptyMessage": "No budget segments found"
+		},
+		"segmentsTable": {
+			"segmentCode": "Segment Code",
+			"segmentName": "Segment Name",
+			"segmentType": "Type",
+			"controlLevel": "Control Level",
+			"hasBudgetAmount": "Has Budget",
+			"budgetAmount": "Budget Amount",
+			"available": "Available",
+			"utilization": "Utilization"
+		},
+		"form": {
+			"segmentType": "Segment Type",
+			"selectSegmentType": "Select Segment Type",
+			"segmentValue": "Segment Value",
+			"selectSegmentValue": "Select Segment Value",
+			"selectSegmentTypeFirst": "Select a segment type first",
+			"controlLevel": "Control Level",
+			"notes": "Notes",
+			"isActive": "Is Active"
+		},
+		"validation": {
+			"segmentValueRequired": "Segment value is required"
+		},
+		"deleteSegmentModal": {
+			"title": "Delete Budget Segment",
+			"message": "Are you sure you want to delete the segment '{{code}}'? This action cannot be undone."
+		},
+		"activateModal": {
+			"title": "Activate Budget",
+			"message": "Are you sure you want to activate this budget? Once activated, you cannot edit the budget header information. You can only edit segment details.",
+			"confirm": "Activate"
+		},
+		"import": {
+			"title": "Import Budget from Excel",
+			"instructions": "Upload Excel File",
+			"instructionsDesc": "Upload an Excel file (.xlsx or .xls) with budget amounts. The file should match the downloaded template format.",
+			"clickToUpload": "Click to select a file or drag and drop",
+			"acceptedFormats": "Accepted formats: .xlsx, .xls",
+			"importing": "Importing...",
+			"importButton": "Import"
+		},
+		"messages": {
+			"fetchError": "Failed to fetch budget details",
+			"fetchSegmentsError": "Failed to fetch budget segments",
+			"addSegmentSuccess": "Segment added successfully",
+			"addSegmentError": "Failed to add segment",
+			"deleteSegmentSuccess": "Segment deleted successfully",
+			"deleteSegmentError": "Failed to delete segment",
+			"updateBudgetSuccess": "Budget updated successfully",
+			"updateBudgetError": "Failed to update budget",
+			"updateSegmentSuccess": "Segment updated successfully",
+			"updateSegmentError": "Failed to update segment",
+			"activateSuccess": "Budget activated successfully",
+			"activateError": "Failed to activate budget",
+			"cannotEditNonDraft": "Only DRAFT budgets can be edited",
+			"cannotEditClosedBudget": "Cannot edit segments in CLOSED budgets",
+			"cannotActivateNonDraft": "Only DRAFT budgets can be activated",
+			"downloadSuccess": "Template downloaded successfully",
+			"downloadError": "Failed to download template",
+			"importSuccess": "Budget imported successfully",
+			"importError": "Failed to import budget",
+			"invalidFileType": "Please upload an Excel file (.xlsx or .xls)"
+		}
+	},
+	"workingFrequencies": {
+		"day": "Day",
+		"week": "Week",
+		"month": "Month",
+		"year": "Year"
 	}
 }

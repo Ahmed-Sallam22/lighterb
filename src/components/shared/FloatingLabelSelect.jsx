@@ -43,7 +43,7 @@ const FloatingLabelSelect = memo(
 
 		// Filter options based on search term
 		const filteredOptions = searchable
-			? options.filter(option => option.label.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+			? options.filter(option => option?.label?.toString().toLowerCase().includes(searchTerm.toLowerCase()))
 			: options;
 
 		// Update dropdown position when opened

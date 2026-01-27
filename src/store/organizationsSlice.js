@@ -101,8 +101,7 @@ export const fetchBusinessGroupsFromOrganizations = createAsyncThunk(
 			});
 			const data = response.data?.data || response.data;
 			return {
-				results: data.results.filter(org => org.is_business_group)
-				 || data || [],
+				results: data.results.filter(org => org.is_business_group) || data || [],
 				count: data.count || 0,
 				next: data.next,
 				previous: data.previous,
@@ -114,6 +113,27 @@ export const fetchBusinessGroupsFromOrganizations = createAsyncThunk(
 );
 
 // Fetch departments only (organizations with is_business_group = false)
+export const fetchNotBusinessGroupFromOrganizations = createAsyncThunk(
+	"organizations/fetchNotBusinessGroupDepartments",
+	async (params = {}, { rejectWithValue }) => {
+		try {
+			const response = await api.get("/hr/work_structures/organizations/", {
+				params: { ...params },
+			});
+			const data = response.data?.data || response.data;
+			return {
+				// results: data.results || data || [],
+				results: data.results.filter(org => !org.is_business_group) || data || [],
+				count: data.count || 0,
+				next: data.next,
+				previous: data.previous,
+			};
+		} catch (error) {
+			return rejectWithValue(error.message || "Failed to fetch departments");
+		}
+	}
+);
+
 export const fetchDepartmentsFromOrganizations = createAsyncThunk(
 	"organizations/fetchDepartments",
 	async (params = {}, { rejectWithValue }) => {
@@ -123,9 +143,7 @@ export const fetchDepartmentsFromOrganizations = createAsyncThunk(
 			});
 			const data = response.data?.data || response.data;
 			return {
-				// results: data.results || data || [],
-				results: data.results.filter(org => !org.is_business_group)
-				 || data || [],
+				results: data.results.filter(org => org.organization_type === "Department") || data || [],
 				count: data.count || 0,
 				next: data.next,
 				previous: data.previous,
@@ -341,6 +359,19 @@ const organizationsSlice = createSlice({
 			})
 
 			// Fetch departments
+			.addCase(fetchNotBusinessGroupFromOrganizations.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchNotBusinessGroupFromOrganizations.fulfilled, (state, action) => {
+				state.loading = false;
+				state.departments = action.payload.results;
+				state.departmentsCount = action.payload.count;
+			})
+			.addCase(fetchNotBusinessGroupFromOrganizations.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
 			.addCase(fetchDepartmentsFromOrganizations.pending, state => {
 				state.loading = true;
 				state.error = null;
@@ -354,7 +385,6 @@ const organizationsSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			})
-
 			// Fetch organization classifications
 			.addCase(fetchOrgClassifications.pending, state => {
 				state.lookupsLoading = true;

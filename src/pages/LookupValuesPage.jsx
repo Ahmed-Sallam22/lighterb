@@ -10,7 +10,7 @@ import FloatingLabelTextarea from "../components/shared/FloatingLabelTextarea";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import Button from "../components/shared/Button";
 import ConfirmModal from "../components/shared/ConfirmModal";
-import usePageTitle from "../hooks/usePageTitle";
+import { usePageTitle } from "../hooks/usePageTitle";
 import {
 	fetchLookupValuesList,
 	fetchLookupValueById,

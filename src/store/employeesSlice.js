@@ -91,12 +91,57 @@ export const fetchEmployeeById = createAsyncThunk("employees/fetchById", async (
 	}
 });
 
+// Update employee (PATCH)
+export const updateEmployee = createAsyncThunk("employees/update", async ({ id, data }, { rejectWithValue }) => {
+	try {
+		const response = await api.patch(`/hr/person/employees/${id}/`, data);
+		return response.data?.data ?? response.data;
+	} catch (error) {
+		if (error.response?.data) {
+			const errorData = error.response.data;
+			let errorMessage = "";
+
+			if (typeof errorData === "object" && !errorData.message && !errorData.error && !errorData.detail) {
+				const fieldErrors = Object.entries(errorData)
+					.map(([field, messages]) => {
+						const messageText = Array.isArray(messages) ? messages.join(", ") : messages;
+						return `${field}: ${messageText}`;
+					})
+					.join(" | ");
+				errorMessage = fieldErrors;
+			} else {
+				errorMessage = errorData.message || errorData.error || errorData.detail || "Failed to update employee";
+			}
+			return rejectWithValue(errorMessage);
+		}
+		return rejectWithValue(error.message || "Failed to update employee");
+	}
+});
+
+// Delete employee
+export const deleteEmployee = createAsyncThunk("employees/delete", async (id, { rejectWithValue }) => {
+	try {
+		await api.delete(`/hr/person/employees/${id}/`);
+		return id;
+	} catch (error) {
+		const errorMessage =
+			error.response?.data?.message ||
+			error.response?.data?.error ||
+			error.response?.data?.detail ||
+			error.message ||
+			"Failed to delete employee";
+		return rejectWithValue(errorMessage);
+	}
+});
+
 const initialState = {
 	employees: [],
 	selectedEmployee: null,
 	loading: false,
 	loadingEmployee: false,
 	creating: false,
+	updating: false,
+	deleting: false,
 	error: null,
 	actionError: null,
 	count: 0,
@@ -163,6 +208,37 @@ const employeesSlice = createSlice({
 			})
 			.addCase(fetchEmployeeById.rejected, (state, action) => {
 				state.loadingEmployee = false;
+				state.actionError = action.payload;
+			})
+			// Update employee
+			.addCase(updateEmployee.pending, state => {
+				state.updating = true;
+				state.actionError = null;
+			})
+			.addCase(updateEmployee.fulfilled, (state, action) => {
+				state.updating = false;
+				state.selectedEmployee = action.payload;
+				const index = state.employees.findIndex(emp => emp.id === action.payload.id);
+				if (index !== -1) {
+					state.employees[index] = action.payload;
+				}
+			})
+			.addCase(updateEmployee.rejected, (state, action) => {
+				state.updating = false;
+				state.actionError = action.payload;
+			})
+			// Delete employee
+			.addCase(deleteEmployee.pending, state => {
+				state.deleting = true;
+				state.actionError = null;
+			})
+			.addCase(deleteEmployee.fulfilled, (state, action) => {
+				state.deleting = false;
+				state.employees = state.employees.filter(emp => emp.id !== action.payload);
+				state.count -= 1;
+			})
+			.addCase(deleteEmployee.rejected, (state, action) => {
+				state.deleting = false;
 				state.actionError = action.payload;
 			});
 	},

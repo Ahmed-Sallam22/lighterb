@@ -17,6 +17,7 @@ export const fetchLookupValues = createAsyncThunk(
 	async ({ lookupType, parent = null }, { rejectWithValue }) => {
 		try {
 			let url = `/core/lookups/values/?lookup_type=${lookupType}`;
+			console.log(url);
 			if (parent) {
 				url += `&parent=${parent}`;
 			}

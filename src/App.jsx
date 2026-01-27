@@ -58,7 +58,6 @@ const Receiving = lazy(() => import("./pages/ReceivingPage"));
 const CreateGRNPage = lazy(() => import("./pages/CreateGRNPage"));
 const WorkStructurePage = lazy(() => import("./pages/WorkStructurePage"));
 const OrganizationsPage = lazy(() => import("./pages/OrganizationsPage"));
-const DepartmentsPage = lazy(() => import("./pages/DepartmentsPage"));
 const GradesAndRatesPage = lazy(() => import("./pages/GradesAndRatesPage"));
 const LocationsPage = lazy(() => import("./pages/LocationsPage"));
 const PositionsPage = lazy(() => import("./pages/PositionsPage"));
@@ -86,6 +85,8 @@ const LookupTypesPage = lazy(() => import("./pages/LookupTypesPage"));
 const LookupValuesPage = lazy(() => import("./pages/LookupValuesPage"));
 const BudgetsPage = lazy(() => import("./pages/BudgetsPage"));
 const BudgetDetailsPage = lazy(() => import("./pages/BudgetDetailsPage"));
+const CreateEmployeePage = lazy(() => import("./pages/CreateEmployeePage"));
+const CreateAssignmentPage = lazy(() => import("./pages/CreateAssignmentPage"));
 
 const App = () => {
 	const { i18n } = useTranslation();
@@ -162,13 +163,15 @@ const App = () => {
 						<Route path="work-structure" element={<WorkStructurePage />} />
 						<Route path="workforce-management" element={<WorkforceManagementPage />} />
 						<Route path="organizations" element={<OrganizationsPage />} />
-						<Route path="departments" element={<DepartmentsPage />} />
 						<Route path="grades-and-rates" element={<GradesAndRatesPage />} />
 						<Route path="locations" element={<LocationsPage />} />
 						<Route path="positions" element={<PositionsPage />} />
 						<Route path="default-values" element={<DefaultValuesPage />} />
 						<Route path="employee-search" element={<EmployeeSearchPage />} />
+						<Route path="create-employee" element={<CreateEmployeePage />} />
+						<Route path="create-assignment" element={<CreateAssignmentPage />} />
 						<Route path="profile" element={<ProfilePage />} />
+						<Route path="profile/:employeeId" element={<ProfilePage />} />
 						<Route path="fiscal-periods" element={<FiscalPeriodPage />} />
 						<Route path="fiscal-periods/generate" element={<GeneratePeriodsPage />} />
 						<Route path="fiscal-periods/ar" element={<ARPeriodsPage />} />

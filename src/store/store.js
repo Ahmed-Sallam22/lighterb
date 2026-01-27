@@ -28,7 +28,6 @@ import grnReducer from "./grnSlice";
 import locationsReducer from "./locationsSlice";
 import enterprisesReducer from "./enterprisesSlice";
 import businessGroupsReducer from "./businessGroupsSlice";
-import departmentsReducer from "./departmentsSlice";
 import organizationsReducer from "./organizationsSlice";
 import gradesReducer from "./gradesSlice";
 import positionsReducer from "./positionsSlice";
@@ -51,6 +50,8 @@ import lookupManagementReducer from "./lookupManagementSlice";
 import addressesReducer from "./addressesSlice";
 import personTypesReducer from "./personTypesSlice";
 import competenciesReducer from "./competenciesSlice";
+import assignmentsReducer from "./assignmentsSlice";
+import contractsReducer from "./contractsSlice";
 
 export const store = configureStore({
 	reducer: {
@@ -83,7 +84,6 @@ export const store = configureStore({
 		locations: locationsReducer,
 		enterprises: enterprisesReducer,
 		businessGroups: businessGroupsReducer,
-		departments: departmentsReducer,
 		organizations: organizationsReducer,
 		grades: gradesReducer,
 		positions: positionsReducer,
@@ -106,6 +106,8 @@ export const store = configureStore({
 		addresses: addressesReducer,
 		personTypes: personTypesReducer,
 		competencies: competenciesReducer,
+		assignments: assignmentsReducer,
+		contracts: contractsReducer,
 	},
 });
 

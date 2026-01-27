@@ -218,6 +218,45 @@ export const threeWayMatchAPInvoice = createAsyncThunk("apInvoices/threeWayMatch
 	}
 });
 
+// Fetch variance preview for AP invoice from GRN
+export const fetchVariancePreview = createAsyncThunk(
+	"apInvoices/fetchVariancePreview",
+	async (previewData, { rejectWithValue }) => {
+		try {
+			const response = await api.post("/finance/invoice/ap/variance-preview/", previewData);
+			return response.data?.data ?? response.data;
+		} catch (error) {
+			const errorMessage =
+				error.response?.data?.message ||
+				error.response?.data?.error ||
+				error.response?.data?.detail ||
+				error.message ||
+				"Failed to fetch variance preview";
+			return rejectWithValue(errorMessage);
+		}
+	}
+);
+
+// Create AP invoice from GRN (with variance)
+export const createAPInvoiceFromGRN = createAsyncThunk(
+	"apInvoices/createFromGRN",
+	async (invoiceData, { rejectWithValue }) => {
+		try {
+			const response = await api.post("/finance/invoice/ap/variance-preview/", invoiceData);
+			return response.data?.data ?? response.data;
+		} catch (error) {
+			console.error("AP invoice from GRN creation error:", error);
+			const errorMessage =
+				error.response?.data?.message ||
+				error.response?.data?.error ||
+				error.response?.data?.detail ||
+				error.message ||
+				"Failed to create AP invoice from GRN";
+			return rejectWithValue(errorMessage);
+		}
+	}
+);
+
 const apInvoicesSlice = createSlice({
 	name: "apInvoices",
 	initialState: {
@@ -230,6 +269,10 @@ const apInvoicesSlice = createSlice({
 		hasPrevious: false,
 		loading: false,
 		error: null,
+		// Variance preview state
+		variancePreview: null,
+		variancePreviewLoading: false,
+		variancePreviewError: null,
 	},
 	reducers: {
 		clearError: state => {
@@ -237,6 +280,10 @@ const apInvoicesSlice = createSlice({
 		},
 		setPage: (state, action) => {
 			state.page = action.payload;
+		},
+		clearVariancePreview: state => {
+			state.variancePreview = null;
+			state.variancePreviewError = null;
 		},
 	},
 	extraReducers: builder => {
@@ -368,9 +415,36 @@ const apInvoicesSlice = createSlice({
 			.addCase(threeWayMatchAPInvoice.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
+			})
+			// Variance preview
+			.addCase(fetchVariancePreview.pending, state => {
+				state.variancePreviewLoading = true;
+				state.variancePreviewError = null;
+			})
+			.addCase(fetchVariancePreview.fulfilled, (state, action) => {
+				state.variancePreviewLoading = false;
+				state.variancePreview = action.payload;
+			})
+			.addCase(fetchVariancePreview.rejected, (state, action) => {
+				state.variancePreviewLoading = false;
+				state.variancePreviewError = action.payload;
+			})
+			// Create from GRN
+			.addCase(createAPInvoiceFromGRN.pending, state => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(createAPInvoiceFromGRN.fulfilled, (state, action) => {
+				state.loading = false;
+				state.invoices.push(action.payload);
+				state.variancePreview = null;
+			})
+			.addCase(createAPInvoiceFromGRN.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
 			});
 	},
 });
 
-export const { clearError, setPage } = apInvoicesSlice.actions;
+export const { clearError, setPage, clearVariancePreview } = apInvoicesSlice.actions;
 export default apInvoicesSlice.reducer;
