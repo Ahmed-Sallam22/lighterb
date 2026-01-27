@@ -676,7 +676,14 @@
         "workEndTime": "وقت انتهاء العمل",
         "workFromHome": "العمل من المنزل",
         "workStartTime": "وقت بدء العمل",
-        "workingFrequency": "تردد العمل"
+        "workingFrequency": "تردد العمل",
+        "selectContract": "حدد العقد",
+        "selectHourlySalaried": "حدد الأجر بالساعة",
+        "selectPayroll": "حدد كشوف المرتبات",
+        "selectProbationPeriod": "اختر فترة الاختبار",
+        "selectSalaryBasis": "حدد أساس الراتب",
+        "selectTerminationNoticePeriod": "حدد فترة إشعار الإنهاء",
+        "selectWorkingFrequency": "حدد تردد العمل"
       },
       "placeholders": {
         "businessGroupId": "اختر مجموعة الأعمال",
@@ -714,6 +721,14 @@
       "statuses": {
         "active": "نشط",
         "inactive": "غير نشط"
+      },
+      "options": {
+        "day": "حدد تردد العمل",
+        "hourly": "كل ساعة",
+        "month": "أسبوع",
+        "salaried": "براتب",
+        "week": "يوم",
+        "year": "شهر"
       }
     },
     "organization": {
@@ -5852,7 +5867,8 @@
       "arabicNames": "الأسماء العربية",
       "employmentDetails": "تفاصيل التوظيف",
       "personalDetails": "التفاصيل الشخصية",
-      "personalInfo": "معلومات شخصية"
+      "personalInfo": "معلومات شخصية",
+      "additionalInfo": "معلومات إضافية"
     },
     "steps": {
       "details": "تفاصيل",

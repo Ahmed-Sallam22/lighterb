@@ -46,7 +46,6 @@ import {
 	createContract,
 	updateContract,
 	deleteContract,
-	clearSelectedContract,
 } from "../store/contractsSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -126,7 +125,6 @@ const ProfilePage = () => {
 		loading: loadingAssignments,
 		creating: creatingAssignment,
 		updating: updatingAssignment,
-		deleting: deletingAssignment,
 		assignmentStatuses,
 		actionReasons,
 	} = useSelector(state => state.assignments);
@@ -137,7 +135,6 @@ const ProfilePage = () => {
 		loading: loadingContracts,
 		creating: creatingContract,
 		updating: updatingContract,
-		deleting: deletingContract,
 	} = useSelector(state => state.contracts);
 
 	// Selectors - Jobs, Positions, Grades, Organizations (Business Groups)
@@ -472,7 +469,6 @@ const ProfilePage = () => {
 	// Address Modals
 	const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
 	const [isEditAddressModalOpen, setIsEditAddressModalOpen] = useState(false);
-	const [selectedAddress, setSelectedAddress] = useState(null);
 	const [addressForm, setAddressForm] = useState({
 		addressId: null,
 		email: "",
@@ -492,7 +488,6 @@ const ProfilePage = () => {
 	// Emergency Modals
 	const [isAddEmergencyModalOpen, setIsAddEmergencyModalOpen] = useState(false);
 	const [isEditEmergencyModalOpen, setIsEditEmergencyModalOpen] = useState(false);
-	const [selectedEmergency, setSelectedEmergency] = useState(null);
 	const [emergencyForm, setEmergencyForm] = useState({
 		name: "",
 		phone: "",
@@ -568,16 +563,6 @@ const ProfilePage = () => {
 		{ id: "qualifications", label: t("profile.tabs.qualifications") },
 		{ id: "organization", label: t("profile.tabs.organization") },
 	];
-
-	const assignmentTypeOptions = useMemo(
-		() => [
-			{ value: "", label: t("profile.modals.fields.assignmentType") },
-			{ value: "full_time", label: t("profile.modals.options.assignmentTypes.fullTime") },
-			{ value: "part_time", label: t("profile.modals.options.assignmentTypes.partTime") },
-			{ value: "contract", label: t("profile.modals.options.assignmentTypes.contract") },
-		],
-		[t]
-	);
 
 	const qualificationTypeOptions = useMemo(
 		() => [
@@ -784,14 +769,6 @@ const ProfilePage = () => {
 		setQualificationForm(prev => ({ ...prev, [name]: value }));
 	};
 
-	const handleCompetencyToggle = id => {
-		setCompetencies(prev =>
-			prev.map(comp =>
-				comp.id === id ? { ...comp, selected: !comp.selected, level: !comp.selected ? "" : comp.level } : comp
-			)
-		);
-	};
-
 	const handleCompetencyLevelChange = (id, level) => {
 		setCompetencies(prev => prev.map(comp => (comp.id === id ? { ...comp, level, selected: true } : comp)));
 		// Keep dropdown open to allow changing level
@@ -821,21 +798,22 @@ const ProfilePage = () => {
 		setIsEditQualificationModalOpen(true);
 	};
 
-	const handleAddAddress = () => {
-		setAddressForm({
-			email: "",
-			isEmailMain: false,
-			phone: "",
-			isPhoneMain: false,
-			address: "",
-			isAddressMain: false,
-			addressType: "",
-			isAddressTypeMain: false,
-			lastUpdate: "",
-			isLastUpdateMain: false,
-		});
-		setIsAddAddressModalOpen(true);
-	};
+	// Removed handleAddAddress - not used
+	// const handleAddAddress = () => {
+	// 	setAddressForm({
+	// 		email: "",
+	// 		isEmailMain: false,
+	// 		phone: "",
+	// 		isPhoneMain: false,
+	// 		address: "",
+	// 		isAddressMain: false,
+	// 		addressType: "",
+	// 		isAddressTypeMain: false,
+	// 		lastUpdate: "",
+	// 		isLastUpdateMain: false,
+	// 	});
+	// 	setIsAddAddressModalOpen(true);
+	// };
 
 	const handleAddEmergency = () => {
 		setEmergencyForm({
@@ -848,7 +826,6 @@ const ProfilePage = () => {
 	};
 
 	const handleEditEmergency = contact => {
-		setSelectedEmergency(contact);
 		// Note: The hardcoded data 'CONTACTS_DATA' has structure issues (layout in original code vs simple array).
 		// Assuming we map correctly in render.
 		// For now simple mapping:
@@ -890,33 +867,31 @@ const ProfilePage = () => {
 		);
 	};
 
-	const getLevelBadgeColor = level => {
-		switch (level.toLowerCase()) {
-			case "beginner":
-				return "bg-orange-100 text-orange-600";
-			case "intermediate":
-				return "bg-blue-100 text-blue-600";
-			case "advanced":
-				return "bg-green-100 text-green-700";
-			default:
-				return "bg-gray-100 text-gray-600";
-		}
-	};
+	// Removed unused helper functions
+	// const getLevelBadgeColor = level => {
+	// 	switch (level.toLowerCase()) {
+	// 		case "beginner":
+	// 			return "bg-orange-100 text-orange-600";
+	// 		case "intermediate":
+	// 			return "bg-blue-100 text-blue-600";
+	// 		case "advanced":
+	// 			return "bg-green-100 text-green-700";
+	// 		default:
+	// 			return "bg-gray-100 text-gray-600";
+	// 	}
+	// };
 
-	const latestContactId = useMemo(() => {
-		if (!CONTACTS_DATA.length) return null;
-
-		return CONTACTS_DATA.reduce((latest, contact) => {
-			const currentTime = new Date(contact.lastUpdate).getTime();
-
-			if (!latest) {
-				return contact;
-			}
-
-			const latestTime = new Date(latest.lastUpdate).getTime();
-			return currentTime > latestTime ? contact : latest;
-		}, null)?.id;
-	}, []);
+	// const latestContactId = useMemo(() => {
+	// 	if (!CONTACTS_DATA.length) return null;
+	// 	return CONTACTS_DATA.reduce((latest, contact) => {
+	// 		const currentTime = new Date(contact.lastUpdate).getTime();
+	// 		if (!latest) {
+	// 			return contact;
+	// 		}
+	// 		const latestTime = new Date(latest.lastUpdate).getTime();
+	// 		return currentTime > latestTime ? contact : latest;
+	// 	}, null)?.id;
+	// }, []);
 
 	// Fetch employee data when employeeId is available
 	useEffect(() => {

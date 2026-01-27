@@ -56,24 +56,24 @@ const BLOOD_TYPE_OPTIONS = [
 
 // Initial form state based on API docs
 const INITIAL_FORM_STATE = {
-	// Step 1: Personal Information (person_details - required fields)
+	// Step 1: Personal Information (required + high priority fields)
 	first_name: "",
-	last_name: "",
-	email_address: "",
-	date_of_birth: "",
-	gender: "",
-	marital_status: "",
-	nationality: "",
-
-	// Step 2: Personal Details (person_details - optional fields)
 	middle_name: "",
+	last_name: "",
 	title: "",
 	national_id: "",
+	date_of_birth: "",
+	gender: "",
+	email_address: "",
+
+	// Step 2: Personal Details (optional + additional fields)
 	first_name_arabic: "",
 	middle_name_arabic: "",
 	last_name_arabic: "",
 	religion: "",
 	blood_type: "",
+	marital_status: "",
+	nationality: "",
 
 	// Step 3: Employment Details (required + optional)
 	employee_type_id: "", // required
@@ -171,14 +171,14 @@ const CreateEmployeePage = () => {
 				if (!formData.gender) {
 					errors.gender = t("createEmployee.errors.genderRequired");
 				}
+			} else if (stepIndex === 1) {
+				// Step 2: Personal Details (required fields for API)
 				if (!formData.marital_status) {
 					errors.marital_status = t("createEmployee.errors.maritalStatusRequired");
 				}
 				if (!formData.nationality.trim()) {
 					errors.nationality = t("createEmployee.errors.nationalityRequired");
 				}
-			} else if (stepIndex === 1) {
-				// Step 2: Personal Details - all optional, no validation needed
 			} else if (stepIndex === 2) {
 				// Step 3: Employment Details (required fields)
 				if (!formData.employee_type_id) {
@@ -298,14 +298,20 @@ const CreateEmployeePage = () => {
 		navigate("/employee-search");
 	}, [navigate]);
 
-	// Render Step 1: Personal Information (required person_details fields)
+	// Render Step 1: Personal Information (required + high priority fields)
 	const renderPersonalStep = () => (
 		<div className="space-y-6">
 			<h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
 				{t("createEmployee.sections.personalInfo")}
 			</h3>
 
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+			<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+				<FloatingLabelSelect
+					label={t("createEmployee.fields.title")}
+					value={formData.title}
+					onChange={e => handleInputChange("title", e.target.value)}
+					options={TITLE_OPTIONS}
+				/>
 				<FloatingLabelInput
 					label={t("createEmployee.fields.firstName")}
 					value={formData.first_name}
@@ -314,11 +320,24 @@ const CreateEmployeePage = () => {
 					required
 				/>
 				<FloatingLabelInput
+					label={t("createEmployee.fields.middleName")}
+					value={formData.middle_name}
+					onChange={e => handleInputChange("middle_name", e.target.value)}
+				/>
+				<FloatingLabelInput
 					label={t("createEmployee.fields.lastName")}
 					value={formData.last_name}
 					onChange={e => handleInputChange("last_name", e.target.value)}
 					error={formErrors.last_name}
 					required
+				/>
+			</div>
+
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<FloatingLabelInput
+					label={t("createEmployee.fields.nationalId")}
+					value={formData.national_id}
+					onChange={e => handleInputChange("national_id", e.target.value)}
 				/>
 				<FloatingLabelInput
 					label={t("createEmployee.fields.email")}
@@ -348,54 +367,17 @@ const CreateEmployeePage = () => {
 					required
 				/>
 			</div>
-
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-				<FloatingLabelSelect
-					label={t("createEmployee.fields.maritalStatus")}
-					value={formData.marital_status}
-					onChange={e => handleInputChange("marital_status", e.target.value)}
-					options={MARITAL_STATUS_OPTIONS}
-					error={formErrors.marital_status}
-					required
-				/>
-				<FloatingLabelInput
-					label={t("createEmployee.fields.nationality")}
-					value={formData.nationality}
-					onChange={e => handleInputChange("nationality", e.target.value)}
-					error={formErrors.nationality}
-					required
-				/>
-			</div>
 		</div>
 	);
 
-	// Render Step 2: Personal Details (optional person_details fields)
+	// Render Step 2: Personal Details (optional + additional fields)
 	const renderDetailsStep = () => (
 		<div className="space-y-6">
 			<h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
 				{t("createEmployee.sections.personalDetails")}
 			</h3>
 
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-				<FloatingLabelSelect
-					label={t("createEmployee.fields.title")}
-					value={formData.title}
-					onChange={e => handleInputChange("title", e.target.value)}
-					options={TITLE_OPTIONS}
-				/>
-				<FloatingLabelInput
-					label={t("createEmployee.fields.middleName")}
-					value={formData.middle_name}
-					onChange={e => handleInputChange("middle_name", e.target.value)}
-				/>
-				<FloatingLabelInput
-					label={t("createEmployee.fields.nationalId")}
-					value={formData.national_id}
-					onChange={e => handleInputChange("national_id", e.target.value)}
-				/>
-			</div>
-
-			<h4 className="text-md font-medium text-gray-700 mt-4">{t("createEmployee.sections.arabicNames")}</h4>
+			<h4 className="text-md font-medium text-gray-700">{t("createEmployee.sections.arabicNames")}</h4>
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 				<FloatingLabelInput
 					label={t("createEmployee.fields.firstNameArabic")}
@@ -428,6 +410,25 @@ const CreateEmployeePage = () => {
 					value={formData.blood_type}
 					onChange={e => handleInputChange("blood_type", e.target.value)}
 					options={BLOOD_TYPE_OPTIONS}
+				/>
+			</div>
+
+			<h4 className="text-md font-medium text-gray-700 mt-4">{t("createEmployee.sections.additionalInfo")}</h4>
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<FloatingLabelSelect
+					label={t("createEmployee.fields.maritalStatus")}
+					value={formData.marital_status}
+					onChange={e => handleInputChange("marital_status", e.target.value)}
+					options={MARITAL_STATUS_OPTIONS}
+					error={formErrors.marital_status}
+					required
+				/>
+				<FloatingLabelInput
+					label={t("createEmployee.fields.nationality")}
+					value={formData.nationality}
+					onChange={e => handleInputChange("nationality", e.target.value)}
+					error={formErrors.nationality}
+					required
 				/>
 			</div>
 		</div>
@@ -475,9 +476,7 @@ const CreateEmployeePage = () => {
 				/>
 			</div>
 
-			<p className="text-sm text-gray-500 italic">
-				{t("createEmployee.hints.employeeNumber")}
-			</p>
+			<p className="text-sm text-gray-500 italic">{t("createEmployee.hints.employeeNumber")}</p>
 		</div>
 	);
 
