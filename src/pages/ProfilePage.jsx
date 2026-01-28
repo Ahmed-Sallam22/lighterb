@@ -116,7 +116,12 @@ const ProfilePage = () => {
 	const { lookupValues } = useSelector(state => state.lookups);
 
 	// Selectors - Employee
-	const { selectedEmployee, loadingEmployee, updating: updatingEmployee, employees = [] } = useSelector(state => state.employees);
+	const {
+		selectedEmployee,
+		loadingEmployee,
+		updating: updatingEmployee,
+		employees = [],
+	} = useSelector(state => state.employees);
 
 	// Selectors - Assignments
 	const {
@@ -193,7 +198,7 @@ const ProfilePage = () => {
 			{ value: "", label: t("profile.assignment.placeholders.jobId") },
 			...(jobs?.data || jobs || []).map(job => ({
 				value: job.id,
-				label: `${job.job_title_name } - ${job.business_group_name}`,
+				label: `${job.job_title_name} - ${job.business_group_name}`,
 			})),
 		];
 	}, [jobs, t]);
@@ -413,7 +418,9 @@ const ProfilePage = () => {
 		if (profileForm.bloodType) personDetails.blood_type = profileForm.bloodType;
 
 		try {
-			await dispatch(updateEmployee({ id: selectedEmployee.id, data: { person_details: personDetails } })).unwrap();
+			await dispatch(
+				updateEmployee({ id: selectedEmployee.id, data: { person_details: personDetails } })
+			).unwrap();
 			toast.success(t("profile.messages.updateSuccess"));
 			setIsEditProfileModalOpen(false);
 			// Refresh employee data
@@ -656,8 +663,6 @@ const ProfilePage = () => {
 		navigate(`/create-assignment?personId=${personId}`);
 	};
 
-	
-
 	const handleEditAssignmentChange = e => {
 		const { name, value, type, checked } = e.target;
 		setEditAssignmentFormData(prev => ({
@@ -665,8 +670,6 @@ const ProfilePage = () => {
 			[name]: type === "checkbox" ? checked : value,
 		}));
 	};
-
-	
 
 	const handleEditAssignmentSubmit = async () => {
 		if (!selectedAssignment?.id) {
@@ -917,7 +920,6 @@ const ProfilePage = () => {
 			}));
 		}
 	}, [lookupValues]);
-
 
 	// Fetch Cities when Country changes
 	// Fetch Cities when Country changes
@@ -2232,11 +2234,7 @@ const ProfilePage = () => {
 						title={t("common.cancel")}
 						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none px-6"
 					/>
-					<Button 
-						onClick={handleEditProfileSubmit} 
-						title={t("common.save")} 
-						disabled={updatingEmployee}
-					/>
+					<Button onClick={handleEditProfileSubmit} title={t("common.save")} disabled={updatingEmployee} />
 				</div>
 			</SlideUpModal>
 

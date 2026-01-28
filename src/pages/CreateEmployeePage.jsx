@@ -13,7 +13,13 @@ import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import Button from "../components/shared/Button";
 import { FiArrowLeft, FiArrowRight, FiCheck, FiUser } from "react-icons/fi";
 
-import { createEmployee, updateEmployee, fetchEmployeeById, clearError, clearSelectedEmployee } from "../store/employeesSlice";
+import {
+	createEmployee,
+	updateEmployee,
+	fetchEmployeeById,
+	clearError,
+	clearSelectedEmployee,
+} from "../store/employeesSlice";
 import { fetchPersonTypes } from "../store/personTypesSlice";
 import { parseApiError } from "../utils/errorHandler";
 import LoadingSpan from "../components/shared/LoadingSpan";
@@ -97,7 +103,9 @@ const CreateEmployeePage = () => {
 	usePageTitle(isEditMode ? t("createEmployee.editTitle") : t("createEmployee.title"));
 
 	// Redux state
-	const { creating, updating, loadingEmployee, actionError, selectedEmployee } = useSelector(state => state.employees || {});
+	const { creating, updating, loadingEmployee, actionError, selectedEmployee } = useSelector(
+		state => state.employees || {}
+	);
 	const { personTypes = [] } = useSelector(state => state.personTypes || {});
 
 	// Local state
@@ -120,12 +128,12 @@ const CreateEmployeePage = () => {
 	// Fetch required data on mount
 	useEffect(() => {
 		dispatch(fetchPersonTypes({ is_active: true, base_type: "EMP" }));
-		
+
 		// If edit mode, fetch employee details
 		if (isEditMode && employeeId) {
 			dispatch(fetchEmployeeById(employeeId));
 		}
-		
+
 		// Cleanup on unmount
 		return () => {
 			dispatch(clearSelectedEmployee());
@@ -342,7 +350,7 @@ const CreateEmployeePage = () => {
 					return;
 				}
 			}
-			
+
 			setTimeout(() => {
 				navigate("/employee-search");
 			}, 1500);
