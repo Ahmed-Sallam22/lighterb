@@ -89,16 +89,7 @@ const WorkStructurePage = () => {
 			total: jobsCount || 0,
 			route: "/jobs",
 			bgColor: "bg-[#1D7A8C]",
-		},
-		{
-			id: "Employees",
-			title: t("workStructure.cards.employees.title"),
-			description: t("workStructure.cards.employees.description"),
-			icon: IoPeople,
-			total: jobsCount || 0,
-			route: "/employee-search",
-			bgColor: "bg-[#1D7A8C]",
-		},
+		}
 	];
 
 	const handleCardClick = route => {

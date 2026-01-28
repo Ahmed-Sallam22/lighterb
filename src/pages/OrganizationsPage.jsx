@@ -67,13 +67,11 @@ const INITIAL_FILTERS = {
 const OrganizationsPage = () => {
 	const { t, i18n } = useTranslation();
 	usePageTitle(t("organizations.title"));
-	const isRtl = i18n.dir() === "rtl";
 	const dispatch = useDispatch();
 
 	// Redux state
 	const {
 		organizations,
-		currentOrganization,
 		businessGroups,
 		loading,
 		count,
@@ -176,17 +174,6 @@ const OrganizationsPage = () => {
 		dispatch(setPage(1));
 	};
 
-	const handleSearch = () => {
-		dispatch(setPage(1));
-		const params = {
-			page: 1,
-			page_size: localPageSize,
-		};
-		if (filters.search) params.search = filters.search;
-		if (filters.business_group) params.business_group = filters.business_group;
-		if (filters.location) params.location = filters.location;
-		dispatch(fetchOrganizations(params));
-	};
 
 	const renderStatus = value => (
 		<span
@@ -587,14 +574,7 @@ const OrganizationsPage = () => {
 							showBorder={true}
 						/>
 					</div>
-					<div className="flex items-end md:justify-end mt-5">
-						<Button
-							onClick={handleSearch}
-							icon={<HiSearch className="w-5 h-5" />}
-							title={t("common.search")}
-							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
-						/>
-					</div>
+					
 				</div>
 
 				{/* Table Section */}
@@ -731,6 +711,7 @@ const OrganizationsPage = () => {
 							onChange={handleInputChange}
 							disabled={!!editingItem}
 							bgColor="bg-[#fff]"
+							required={true}
 						/>
 						<CustomInput
 							label={t("organizations.form.endDate")}

@@ -43,7 +43,7 @@ import { fetchOrganizations } from "../store/organizationsSlice";
 
 const GRADE_FORM_INITIAL = {
 	grade_name_id: "",
-	organization_id: "",
+	business_group_id: "",
 	sequence: "",
 	effective_from: "",
 };
@@ -211,9 +211,7 @@ const GradesAndRatesPage = () => {
 		dispatch(setRatesPage(1));
 	};
 
-	const handleSearch = () => {
-		dispatch(setGradePage(1));
-	};
+	
 
 	const handleRatesSearch = () => {
 		dispatch(setRatesPage(1));
@@ -256,8 +254,8 @@ const GradesAndRatesPage = () => {
 			render: value => value || "-",
 		},
 		{
-			header: t("gradesAndRates.grades.table.organization"),
-			accessor: "organization_name",
+			header: t("gradesAndRates.grades.table.businessGroup"),
+			accessor: "business_group_name",
 			render: value => value || "-",
 		},
 		{
@@ -278,11 +276,6 @@ const GradesAndRatesPage = () => {
 			header: t("gradesAndRates.gradeRates.table.rateCode"),
 			accessor: "rate_type_code",
 			render: value => value || "-",
-		},
-		{
-			header: t("gradesAndRates.gradeRates.table.hasRange"),
-			accessor: "has_range",
-			render: renderBoolean,
 		},
 		{
 			header: t("gradesAndRates.gradeRates.table.minAmount"),
@@ -337,7 +330,7 @@ const GradesAndRatesPage = () => {
 		() => [
 			{ value: "", label: t("gradesAndRates.filters.allOrganizations") },
 			...businessGroups.map(org => ({
-				value: org.id,
+				value: org.business_group_id,
 				label: org.organization_name,
 			})),
 		],
@@ -371,7 +364,7 @@ const GradesAndRatesPage = () => {
 			{ value: "", label: t("gradesAndRates.filters.allGrades") },
 			...grades.map(g => ({
 				value: g.id,
-				label: `${g.grade_name} - ${g.organization_name}`,
+				label: `${g.grade_name} - ${g.business_group_name}`,
 			})),
 		],
 		[grades, t]
@@ -415,7 +408,7 @@ const GradesAndRatesPage = () => {
 
 			setGradeFormData({
 				grade_name_id: gradeData.grade_name_id ? gradeData.grade_name_id : "",
-				organization_id: gradeData.organization ? gradeData.organization : "",
+				business_group_id: gradeData.organization ? gradeData.organization : "",
 				sequence: gradeData.sequence ? gradeData.sequence.toString() : "",
 				effective_from: gradeData.effective_from || "",
 			});
@@ -446,8 +439,8 @@ const GradesAndRatesPage = () => {
 		if (!gradeFormData.grade_name_id) {
 			errors.grade_name_id = t("gradesAndRates.grades.form.gradeNameRequired");
 		}
-		if (!editingGrade && !gradeFormData.organization_id) {
-			errors.organization_id = t("gradesAndRates.grades.form.organizationRequired");
+		if (!editingGrade && !gradeFormData.business_group_id) {
+			errors.business_group_id = t("gradesAndRates.grades.form.organizationRequired");
 		}
 		if (!gradeFormData.sequence || parseInt(gradeFormData.sequence) < 1) {
 			errors.sequence = t("gradesAndRates.grades.form.sequenceRequired");
@@ -478,7 +471,7 @@ const GradesAndRatesPage = () => {
 				// For POST: send all required fields
 				const payload = {
 					grade_name_id: parseInt(gradeFormData.grade_name_id),
-					organization_id: parseInt(gradeFormData.organization_id),
+					business_group_id: parseInt(gradeFormData.business_group_id),
 					sequence: parseInt(gradeFormData.sequence),
 					effective_from: gradeFormData.effective_from,
 				};
@@ -809,14 +802,7 @@ const GradesAndRatesPage = () => {
 									options={filterOrganizationOptions}
 									showBorder={true}
 								/>
-								<div className="flex items-end">
-									<Button
-										onClick={handleSearch}
-										icon={<HiSearch className="w-5 h-5" />}
-										title={t("common.search")}
-										className="bg-[#1D7A8C] hover:bg-[#156576] text-white w-full"
-									/>
-								</div>
+								
 							</div>
 						</div>
 
@@ -880,14 +866,7 @@ const GradesAndRatesPage = () => {
 									options={filterRateTypeOptions}
 									showBorder={true}
 								/>
-								<div className="flex items-end">
-									<Button
-										onClick={handleRatesSearch}
-										icon={<HiSearch className="w-5 h-5" />}
-										title={t("common.search")}
-										className="bg-[#1D7A8C] hover:bg-[#156576] text-white w-full"
-									/>
-								</div>
+								
 							</div>
 						</div>
 
@@ -970,11 +949,11 @@ const GradesAndRatesPage = () => {
 				<form onSubmit={handleGradeSubmit} className="space-y-4 p-4">
 					<CustomDropdown
 						label={t("gradesAndRates.grades.form.organization")}
-						name="organization_id"
-						value={gradeFormData.organization_id}
+						name="business_group_id"
+						value={gradeFormData.business_group_id}
 						onChange={handleGradeInputChange}
 						options={organizationOptions}
-						error={formErrors.organization_id}
+						error={formErrors.business_group_id}
 						required={!editingGrade}
 						disabled={!!editingGrade}
 						bgColor="bg-[#fff]"

@@ -14,6 +14,7 @@ import ConfirmModal from "../components/shared/ConfirmModal";
 import FloatingLabelInput from "../components/shared/FloatingLabelInput";
 import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import FloatingLabelTextarea from "../components/shared/FloatingLabelTextarea";
+import MultiSelectDropdown from "../components/shared/MultiSelectDropdown";
 import Button from "../components/shared/Button";
 import LoadingSpan from "../components/shared/LoadingSpan";
 
@@ -25,6 +26,7 @@ import { fetchCurrencies } from "../store/currenciesSlice";
 import { BiPlus, BiTrash } from "react-icons/bi";
 import { HiOutlineCurrencyDollar, HiOutlineEye, HiOutlineBan, HiOutlineCheckCircle } from "react-icons/hi";
 import { BsFileEarmarkSpreadsheet } from "react-icons/bs";
+import { IoLockClosed } from "react-icons/io5";
 
 // Control level options
 const CONTROL_LEVEL_OPTIONS = [
@@ -52,29 +54,11 @@ const FORM_INITIAL_STATE = {
 	currency_id: "",
 	default_control_level: "ABSOLUTE",
 	notes: "",
-	segment_values: [],
+	segment_rows: [], // Array of { segment_type_id, selected_segment_values, control_level, notes }
 };
 
 // Segment Value Row Component
-const SegmentValueRow = ({
-	index,
-	segmentValue,
-	segmentTypes,
-	segmentValues,
-	onUpdate,
-	onRemove,
-	onSegmentTypeChange,
-	t,
-}) => {
-	const controlLevelOptions = useMemo(
-		() =>
-			CONTROL_LEVEL_OPTIONS.map(opt => ({
-				value: opt.value,
-				label: t(`budgets.controlLevels.${opt.value.toLowerCase()}`) || opt.label,
-			})),
-		[t]
-	);
-
+const SegmentValueRow = ({ index, row, segmentTypes, segmentValues, onUpdate, onRemove, controlLevelOptions, t }) => {
 	const segmentTypeOptions = useMemo(
 		() => [
 			{ value: "", label: t("budgets.form.selectSegmentType") },
@@ -87,54 +71,70 @@ const SegmentValueRow = ({
 	);
 
 	const filteredSegmentValueOptions = useMemo(() => {
-		if (!segmentValue.segment_type_id) {
-			return [{ value: "", label: t("budgets.form.selectSegmentTypeFirst") }];
+		if (!row.segment_type_id) {
+			return [];
 		}
-		const filtered = segmentValues.filter(sv => sv.segment_type === parseInt(segmentValue.segment_type_id));
-		return [
-			{ value: "", label: t("budgets.form.selectSegmentValue") },
-			...filtered.map(sv => ({
-				value: sv.id,
-				label: `${sv.code} - ${sv.alias || sv.name || ""}`,
-			})),
-		];
-	}, [segmentValue.segment_type_id, segmentValues, t]);
+		const filtered = segmentValues.filter(sv => sv.segment_type === parseInt(row.segment_type_id));
+		return filtered.map(sv => ({
+			value: sv.id,
+			label: `${sv.code} - ${sv.alias || sv.name || ""}`,
+		}));
+	}, [row.segment_type_id, segmentValues]);
+
+	const handleSegmentTypeChange = e => {
+		onUpdate(index, "segment_type_id", e.target.value);
+		onUpdate(index, "selected_segment_values", []); // Reset values when type changes
+	};
+
+	const handleSegmentValuesChange = selectedIds => {
+		const values = selectedIds?.target?.value || selectedIds;
+		onUpdate(index, "selected_segment_values", values);
+	};
 
 	return (
-		<div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-			<div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3">
-				<FloatingLabelSelect
-					label={t("budgets.form.segmentType")}
-					value={segmentValue.segment_type_id || ""}
-					onChange={e => onSegmentTypeChange(index, e.target.value)}
-					options={segmentTypeOptions}
-				/>
-				<FloatingLabelSelect
-					label={t("budgets.form.segmentValue")}
-					value={segmentValue.segment_value_id || ""}
-					onChange={e => onUpdate(index, "segment_value_id", e.target.value)}
-					options={filteredSegmentValueOptions}
-					disabled={!segmentValue.segment_type_id}
-				/>
-				<FloatingLabelSelect
-					label={t("budgets.form.controlLevel")}
-					value={segmentValue.control_level || "ABSOLUTE"}
-					onChange={e => onUpdate(index, "control_level", e.target.value)}
-					options={controlLevelOptions}
-				/>
-				<FloatingLabelInput
-					label={t("budgets.form.notes")}
-					value={segmentValue.notes || ""}
-					onChange={e => onUpdate(index, "notes", e.target.value)}
-				/>
+		<div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
+			<div className="flex items-start gap-3">
+				<div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+					<FloatingLabelSelect
+						label={t("budgets.form.segmentType")}
+						value={row.segment_type_id || ""}
+						onChange={handleSegmentTypeChange}
+						options={segmentTypeOptions}
+					/>
+					{row.segment_type_id && (
+						<MultiSelectDropdown
+							label={t("budgets.form.segmentValue")}
+							value={row.selected_segment_values || []}
+							onChange={handleSegmentValuesChange}
+							options={filteredSegmentValueOptions}
+							placeholder={t("budgets.form.selectSegmentValues")}
+							searchable={true}
+						/>
+					)}
+				</div>
+				<button
+					type="button"
+					onClick={() => onRemove(index)}
+					className="mt-2 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+				>
+					<BiTrash className="w-5 h-5" />
+				</button>
 			</div>
-			<button
-				type="button"
-				onClick={() => onRemove(index)}
-				className="mt-2 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-			>
-				<BiTrash className="w-5 h-5" />
-			</button>
+			{row.selected_segment_values && row.selected_segment_values.length > 0 && (
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-gray-200">
+					<FloatingLabelSelect
+						label={t("budgets.form.controlLevel")}
+						value={row.control_level || "ADVISORY"}
+						onChange={e => onUpdate(index, "control_level", e.target.value)}
+						options={controlLevelOptions}
+					/>
+					<FloatingLabelInput
+						label={t("budgets.form.notes")}
+						value={row.notes || ""}
+						onChange={e => onUpdate(index, "notes", e.target.value)}
+					/>
+				</div>
+			)}
 		</div>
 	);
 };
@@ -149,6 +149,7 @@ const BudgetsPage = () => {
 	// Redux state
 	const { types: segmentTypes, values: segmentValues } = useSelector(state => state.segments);
 	const { currencies } = useSelector(state => state.currencies);
+	const { user } = useSelector(state => state.auth);
 
 	// State
 	const [budgets, setBudgets] = useState([]);
@@ -176,6 +177,8 @@ const BudgetsPage = () => {
 	const [budgetToClose, setBudgetToClose] = useState(null);
 	const [confirmDeactivateOpen, setConfirmDeactivateOpen] = useState(false);
 	const [budgetToDeactivate, setBudgetToDeactivate] = useState(null);
+	const [confirmActivateOpen, setConfirmActivateOpen] = useState(false);
+	const [budgetToActivate, setBudgetToActivate] = useState(null);
 
 	// Remove local state - now using Redux
 	// Dropdown data is managed by Redux store
@@ -348,45 +351,33 @@ const BudgetsPage = () => {
 		}
 	};
 
-	const handleAddSegmentValue = () => {
+	const handleAddSegmentRow = () => {
 		setFormData(prev => ({
 			...prev,
-			segment_values: [
-				...prev.segment_values,
+			segment_rows: [
+				...prev.segment_rows,
 				{
 					segment_type_id: "",
-					segment_value_id: "",
-					control_level: "ABSOLUTE",
+					selected_segment_values: [],
+					control_level: "ADVISORY",
 					notes: "",
 				},
 			],
 		}));
 	};
 
-	const handleUpdateSegmentValue = (index, field, value) => {
+	const handleUpdateSegmentRow = (index, field, value) => {
 		setFormData(prev => {
-			const newSegments = [...prev.segment_values];
-			newSegments[index] = { ...newSegments[index], [field]: value };
-			return { ...prev, segment_values: newSegments };
+			const newRows = [...prev.segment_rows];
+			newRows[index] = { ...newRows[index], [field]: value };
+			return { ...prev, segment_rows: newRows };
 		});
 	};
 
-	const handleSegmentTypeChange = (index, typeId) => {
-		setFormData(prev => {
-			const newSegments = [...prev.segment_values];
-			newSegments[index] = {
-				...newSegments[index],
-				segment_type_id: typeId,
-				segment_value_id: "", // Reset segment value when type changes
-			};
-			return { ...prev, segment_values: newSegments };
-		});
-	};
-
-	const handleRemoveSegmentValue = index => {
+	const handleRemoveSegmentRow = index => {
 		setFormData(prev => ({
 			...prev,
-			segment_values: prev.segment_values.filter((_, i) => i !== index),
+			segment_rows: prev.segment_rows.filter((_, i) => i !== index),
 		}));
 	};
 
@@ -428,6 +419,20 @@ const BudgetsPage = () => {
 
 		setActionLoading(true);
 		try {
+			// Build segment_values array by expanding each row's multiselect values
+			const segment_values = [];
+			formData.segment_rows.forEach(row => {
+				if (row.selected_segment_values && row.selected_segment_values.length > 0) {
+					row.selected_segment_values.forEach(segmentValueId => {
+						segment_values.push({
+							segment_value_id: parseInt(segmentValueId),
+							control_level: row.control_level || "ADVISORY",
+							notes: row.notes?.trim() || null,
+						});
+					});
+				}
+			});
+
 			const submitData = {
 				budget_code: formData.budget_code.trim(),
 				budget_name: formData.budget_name.trim(),
@@ -437,13 +442,7 @@ const BudgetsPage = () => {
 				currency_id: parseInt(formData.currency_id),
 				default_control_level: formData.default_control_level,
 				notes: formData.notes.trim() || null,
-				segment_values: formData.segment_values
-					.filter(sv => sv.segment_value_id)
-					.map(sv => ({
-						segment_value_id: parseInt(sv.segment_value_id),
-						control_level: sv.control_level,
-						notes: sv.notes || null,
-					})),
+				segment_values: segment_values,
 			};
 
 			await api.post("/finance/budget/budget-headers/", submitData);
@@ -528,17 +527,58 @@ const BudgetsPage = () => {
 		}
 	};
 
-	// Custom actions for table
+	const handleActivateClick = row => {
+		const budget = row.rawData || row;
+		setBudgetToActivate(budget);
+		setConfirmActivateOpen(true);
+	};
+
+	const handleConfirmActivate = async () => {
+		if (!budgetToActivate) return;
+		setActionLoading(true);
+		try {
+			await api.post(`/finance/budget/budget-headers/${budgetToActivate.id}/activate/`, {
+				activated_by: user?.id || user?.user_id,
+			});
+			toast.success(t("budgets.messages.activateSuccess"));
+			setConfirmActivateOpen(false);
+			setBudgetToActivate(null);
+			fetchBudgets();
+		} catch (error) {
+			toast.error(parseApiError(error) || t("budgets.messages.activateError"));
+		} finally {
+			setActionLoading(false);
+		}
+	};
+
+	// Custom actions for table - conditional based on status
 	const customActions = [
 		{
 			title: t("budgets.actions.close"),
-			icon: <HiOutlineCheckCircle className="w-5 h-5 text-green-600" />,
+			icon: <IoLockClosed className="w-5 h-5 text-red-600" />,
 			onClick: handleCloseClick,
+			showWhen: row => {
+				const budget = row.rawData || row;
+				return budget.status !== "CLOSED";
+			},
+		},
+		{
+			title: t("budgets.actions.activate"),
+			icon: <HiOutlineCheckCircle className="w-5 h-5 text-green-600" />,
+			onClick: handleActivateClick,
+			showWhen: row => {
+				const budget = row.rawData || row;
+				return budget.status === "DRAFT";
+			},
 		},
 		{
 			title: t("budgets.actions.deactivate"),
 			icon: <HiOutlineBan className="w-5 h-5 text-yellow-600" />,
 			onClick: handleDeactivateClick,
+			showWhen: row => {
+				const budget = row.rawData || row;
+				return budget.status === "ACTIVE";
+			},
 		},
 	];
 
@@ -712,27 +752,27 @@ const BudgetsPage = () => {
 						<div className="flex justify-between items-center mb-4">
 							<h3 className="text-lg font-semibold text-gray-900">{t("budgets.form.segmentValues")}</h3>
 							<Button
-								onClick={handleAddSegmentValue}
+								onClick={handleAddSegmentRow}
 								title={t("budgets.form.addSegment")}
 								icon={<BiPlus className="text-lg" />}
 								className="bg-[#28819C] hover:bg-[#206b85] text-white"
 							/>
 						</div>
 
-						{formData.segment_values.length === 0 ? (
+						{formData.segment_rows.length === 0 ? (
 							<p className="text-gray-500 text-center py-4">{t("budgets.form.noSegments")}</p>
 						) : (
 							<div className="space-y-3">
-								{formData.segment_values.map((sv, index) => (
+								{formData.segment_rows.map((row, index) => (
 									<SegmentValueRow
 										key={index}
 										index={index}
-										segmentValue={sv}
+										row={row}
 										segmentTypes={segmentTypes}
 										segmentValues={segmentValues}
-										onUpdate={handleUpdateSegmentValue}
-										onRemove={handleRemoveSegmentValue}
-										onSegmentTypeChange={handleSegmentTypeChange}
+										onUpdate={handleUpdateSegmentRow}
+										onRemove={handleRemoveSegmentRow}
+										controlLevelOptions={defaultControlLevelOptions}
 										t={t}
 									/>
 								))}
@@ -802,6 +842,22 @@ const BudgetsPage = () => {
 				confirmText={actionLoading ? t("common.processing") : t("budgets.actions.deactivate")}
 				cancelText={t("common.cancel")}
 				variant="warning"
+				loading={actionLoading}
+			/>
+
+			{/* Activate Confirmation Modal */}
+			<ConfirmModal
+				isOpen={confirmActivateOpen}
+				onClose={() => {
+					setConfirmActivateOpen(false);
+					setBudgetToActivate(null);
+				}}
+				onConfirm={handleConfirmActivate}
+				title={t("budgets.activateModal.title")}
+				message={t("budgets.activateModal.message", { code: budgetToActivate?.budget_code })}
+				confirmText={actionLoading ? t("common.processing") : t("budgets.actions.activate")}
+				cancelText={t("common.cancel")}
+				variant="success"
 				loading={actionLoading}
 			/>
 		</div>

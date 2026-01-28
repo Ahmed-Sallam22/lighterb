@@ -134,15 +134,7 @@ const LookupTypesPage = () => {
 		setFilters(prev => ({ ...prev, [name]: value }));
 	};
 
-	const handleSearch = () => {
-		dispatch(
-			fetchLookupTypesList({
-				page: 1,
-				pageSize: localPageSize,
-				search: filters.search,
-			})
-		);
-	};
+	
 
 	const handleClearSearch = () => {
 		setFilters({ search: "" });
@@ -317,12 +309,7 @@ const LookupTypesPage = () => {
 								placeholder={t("lookupTypes.filters.searchPlaceholder")}
 							/>
 						</div>
-						<Button
-							onClick={handleSearch}
-							icon={<FaSearch className="w-5 h-5" />}
-							title={t("common.search")}
-							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
-						/>
+						
 						{filters.search && (
 							<Button
 								onClick={handleClearSearch}

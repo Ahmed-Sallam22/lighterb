@@ -28,7 +28,7 @@ const ConfirmModal = ({
 		confirmColor === "green" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700";
 
 	return (
-		<div className="fixed inset-0 z-9999 flex items-center justify-center overflow-y-auto">
+		<div className="fixed inset-0 z-1000 flex items-center justify-center overflow-y-auto">
 			<div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={onClose} />
 
 			<div className="relative z-10000 w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl">

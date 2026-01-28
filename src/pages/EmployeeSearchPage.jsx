@@ -48,7 +48,7 @@ const EmployeeSearchPage = () => {
 
 	// Modal state
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [modalMode, setModalMode] = useState("create");
+	const [modalMode] = useState("create");
 	const [selectedEmployee, setSelectedEmployee] = useState(null);
 
 	// Delete modal state
@@ -152,9 +152,8 @@ const EmployeeSearchPage = () => {
 	};
 
 	const handleEditEmployee = employee => {
-		setModalMode("edit");
-		setSelectedEmployee(employee);
-		setIsModalOpen(true);
+		// Navigate to create-employee page with ID for edit mode
+		navigate(`/create-employee?id=${employee.id}`);
 	};
 
 	const handleDeleteClick = employee => {
@@ -203,7 +202,7 @@ const EmployeeSearchPage = () => {
 
 				<div className="bg-white rounded-2xl shadow-lg p-6">
 					<div className="flex flex-col gap-6">
-						<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+						<div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
 							<CustomInput
 								label={t("employeeSearch.fields.employeeNumber")}
 								name="employeeNumber"
@@ -235,7 +234,7 @@ const EmployeeSearchPage = () => {
 								<Button
 									onClick={handleSearch}
 									title={t("employeeSearch.buttons.search")}
-									className="shadow-none"
+									disabled={loading}
 								/>
 							</div>
 						</div>

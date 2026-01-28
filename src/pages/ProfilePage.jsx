@@ -25,7 +25,7 @@ import userImage from "../assets/userimage.png";
 // Slices
 import { fetchAddresses, createAddress, updateAddress } from "../store/addressesSlice";
 import { fetchLookupValues } from "../store/lookupsSlice";
-import { fetchEmployeeById, clearSelectedEmployee, fetchEmployees } from "../store/employeesSlice";
+import { fetchEmployeeById, clearSelectedEmployee, fetchEmployees, updateEmployee } from "../store/employeesSlice";
 import {
 	fetchAssignments,
 	fetchPrimaryAssignment,
@@ -116,7 +116,7 @@ const ProfilePage = () => {
 	const { lookupValues } = useSelector(state => state.lookups);
 
 	// Selectors - Employee
-	const { selectedEmployee, loadingEmployee, employees = [] } = useSelector(state => state.employees);
+	const { selectedEmployee, loadingEmployee, updating: updatingEmployee, employees = [] } = useSelector(state => state.employees);
 
 	// Selectors - Assignments
 	const {
@@ -193,7 +193,7 @@ const ProfilePage = () => {
 			{ value: "", label: t("profile.assignment.placeholders.jobId") },
 			...(jobs?.data || jobs || []).map(job => ({
 				value: job.id,
-				label: job.job_title_name || job.name || `Job ${job.id}`,
+				label: `${job.job_title_name } - ${job.business_group_name}`,
 			})),
 		];
 	}, [jobs, t]);
@@ -203,7 +203,7 @@ const ProfilePage = () => {
 			{ value: "", label: t("profile.assignment.placeholders.positionId") },
 			...(positions?.data || positions || []).map(pos => ({
 				value: pos.id,
-				label: pos.position_title_name || pos.name || `Position ${pos.id}`,
+				label: `${pos.position_title_name} - ${pos.business_group_name}`,
 			})),
 		];
 	}, [positions, t]);
@@ -213,9 +213,7 @@ const ProfilePage = () => {
 			{ value: "", label: t("profile.assignment.placeholders.gradeId") },
 			...(grades?.data || grades || []).map(grade => ({
 				value: grade.id,
-				label: grade.code
-					? `${grade.code} - ${grade.grade_name || grade.name || ""}`
-					: grade.grade_name || grade.name || `Grade ${grade.id}`,
+				label: `${grade.grade_name} - ${grade.business_group_name}`,
 			})),
 		];
 	}, [grades, t]);
@@ -386,6 +384,44 @@ const ProfilePage = () => {
 			});
 		}
 	}, [selectedEmployee]);
+
+	// Handler for editing profile
+	const handleEditProfileSubmit = async () => {
+		if (!selectedEmployee?.id) {
+			toast.error(t("profile.messages.noEmployee"));
+			return;
+		}
+
+		const personDetails = {
+			first_name: profileForm.firstNameEn.trim(),
+			last_name: profileForm.lastNameEn.trim(),
+			email_address: profileForm.email.trim(),
+			date_of_birth: profileForm.dateOfBirth,
+			gender: profileForm.gender,
+			marital_status: profileForm.maritalStatus,
+			nationality: profileForm.nationality.trim(),
+		};
+
+		// Add optional fields
+		if (profileForm.middleNameEn?.trim()) personDetails.middle_name = profileForm.middleNameEn.trim();
+		if (profileForm.title) personDetails.title = profileForm.title;
+		if (profileForm.nationalId?.trim()) personDetails.national_id = profileForm.nationalId.trim();
+		if (profileForm.firstNameAr?.trim()) personDetails.first_name_arabic = profileForm.firstNameAr.trim();
+		if (profileForm.middleNameAr?.trim()) personDetails.middle_name_arabic = profileForm.middleNameAr.trim();
+		if (profileForm.lastNameAr?.trim()) personDetails.last_name_arabic = profileForm.lastNameAr.trim();
+		if (profileForm.religion?.trim()) personDetails.religion = profileForm.religion.trim();
+		if (profileForm.bloodType) personDetails.blood_type = profileForm.bloodType;
+
+		try {
+			await dispatch(updateEmployee({ id: selectedEmployee.id, data: { person_details: personDetails } })).unwrap();
+			toast.success(t("profile.messages.updateSuccess"));
+			setIsEditProfileModalOpen(false);
+			// Refresh employee data
+			dispatch(fetchEmployeeById(selectedEmployee.id));
+		} catch (error) {
+			toast.error(parseApiError(error, t, "profile.messages.updateError"));
+		}
+	};
 
 	// Assignment modals
 	const [isViewAssignmentModalOpen, setIsViewAssignmentModalOpen] = useState(false);
@@ -561,7 +597,6 @@ const ProfilePage = () => {
 		{ id: "contracts", label: t("profile.tabs.contracts") },
 		{ id: "contacts", label: t("profile.tabs.contacts") },
 		{ id: "qualifications", label: t("profile.tabs.qualifications") },
-		{ id: "organization", label: t("profile.tabs.organization") },
 	];
 
 	const qualificationTypeOptions = useMemo(
@@ -621,13 +656,7 @@ const ProfilePage = () => {
 		navigate(`/create-assignment?personId=${personId}`);
 	};
 
-	const handleCreateAssignmentChange = e => {
-		const { name, value, type, checked } = e.target;
-		setCreateAssignmentForm(prev => ({
-			...prev,
-			[name]: type === "checkbox" ? checked : value,
-		}));
-	};
+	
 
 	const handleEditAssignmentChange = e => {
 		const { name, value, type, checked } = e.target;
@@ -637,70 +666,7 @@ const ProfilePage = () => {
 		}));
 	};
 
-	const handleCreateAssignmentSubmit = async () => {
-		if (!personId) {
-			toast.error(t("profile.assignment.errors.noEmployee"));
-			return;
-		}
-
-		const payload = {
-			// Required fields
-			person_id: personId,
-			business_group_id: parseInt(createAssignmentForm.business_group_id) || null,
-			assignment_no: createAssignmentForm.assignment_no,
-			department_id:
-				parseInt(createAssignmentForm.department_id) ||
-				parseInt(createAssignmentForm.business_group_id) ||
-				null,
-			job_id: parseInt(createAssignmentForm.job_id) || null,
-			position_id: parseInt(createAssignmentForm.position_id) || null,
-			grade_id: parseInt(createAssignmentForm.grade_id) || null,
-			assignment_action_reason_id: parseInt(createAssignmentForm.assignment_action_reason_id) || null,
-			assignment_status_id: parseInt(createAssignmentForm.assignment_status_id) || null,
-			effective_start_date: createAssignmentForm.effective_start_date,
-		};
-
-		// Optional fields - only add if they have values
-		if (createAssignmentForm.primary_assignment !== undefined)
-			payload.primary_assignment = createAssignmentForm.primary_assignment;
-		if (createAssignmentForm.line_manager_id)
-			payload.line_manager_id = parseInt(createAssignmentForm.line_manager_id);
-		if (createAssignmentForm.project_manager_id)
-			payload.project_manager_id = parseInt(createAssignmentForm.project_manager_id);
-		if (createAssignmentForm.payroll_id) payload.payroll_id = parseInt(createAssignmentForm.payroll_id);
-		if (createAssignmentForm.salary_basis_id)
-			payload.salary_basis_id = parseInt(createAssignmentForm.salary_basis_id);
-		if (createAssignmentForm.contract_id) payload.contract_id = parseInt(createAssignmentForm.contract_id);
-		if (createAssignmentForm.probation_period_start)
-			payload.probation_period_start = createAssignmentForm.probation_period_start;
-		if (createAssignmentForm.probation_period_id)
-			payload.probation_period_id = parseInt(createAssignmentForm.probation_period_id);
-		if (createAssignmentForm.termination_notice_period_id)
-			payload.termination_notice_period_id = parseInt(createAssignmentForm.termination_notice_period_id);
-		if (createAssignmentForm.hourly_salaried) payload.hourly_salaried = createAssignmentForm.hourly_salaried;
-		if (createAssignmentForm.working_frequency) payload.working_frequency = createAssignmentForm.working_frequency;
-		if (createAssignmentForm.work_start_time) payload.work_start_time = createAssignmentForm.work_start_time;
-		if (createAssignmentForm.work_end_time) payload.work_end_time = createAssignmentForm.work_end_time;
-		if (createAssignmentForm.work_from_home !== undefined)
-			payload.work_from_home = createAssignmentForm.work_from_home;
-		if (createAssignmentForm.is_manager !== undefined) payload.is_manager = createAssignmentForm.is_manager;
-		if (createAssignmentForm.title) payload.title = createAssignmentForm.title;
-		if (createAssignmentForm.employment_confirmation_date)
-			payload.employment_confirmation_date = createAssignmentForm.employment_confirmation_date;
-		if (createAssignmentForm.effective_end_date)
-			payload.effective_end_date = createAssignmentForm.effective_end_date;
-
-		try {
-			await dispatch(createAssignment(payload)).unwrap();
-			toast.success(t("profile.assignment.messages.createSuccess"));
-			setIsCreateAssignmentModalOpen(false);
-			// Refresh assignments
-			dispatch(fetchAssignments({ person: personId }));
-			dispatch(fetchPrimaryAssignment(personId));
-		} catch (error) {
-			toast.error(parseApiError(error, t, "profile.assignment.messages.createError"));
-		}
-	};
+	
 
 	const handleEditAssignmentSubmit = async () => {
 		if (!selectedAssignment?.id) {
@@ -744,7 +710,7 @@ const ProfilePage = () => {
 			toast.success(t("profile.assignment.messages.updateSuccess"));
 			setIsEditAssignmentModalOpen(false);
 			// Refresh assignments
-			dispatch(fetchAssignments({ person: personId }));
+			dispatch(fetchAssignments({ person_id: personId }));
 			dispatch(fetchPrimaryAssignment(personId));
 		} catch (error) {
 			toast.error(parseApiError(error, t, "profile.assignment.messages.updateError"));
@@ -756,7 +722,7 @@ const ProfilePage = () => {
 			try {
 				await dispatch(deleteAssignment(assignment.id)).unwrap();
 				toast.success(t("profile.assignment.messages.deleteSuccess"));
-				dispatch(fetchAssignments({ person: personId }));
+				dispatch(fetchAssignments({ person_id: personId }));
 				dispatch(fetchPrimaryAssignment(personId));
 			} catch (error) {
 				toast.error(parseApiError(error, t, "profile.assignment.messages.deleteError"));
@@ -911,8 +877,8 @@ const ProfilePage = () => {
 		if (personId) {
 			dispatch(fetchAddresses(personId));
 			dispatch(fetchPrimaryAssignment(personId));
-			dispatch(fetchAssignments({ person: personId }));
-			dispatch(fetchContracts({ person: personId }));
+			dispatch(fetchAssignments({ person_id: personId }));
+			dispatch(fetchContracts({ person_id: personId }));
 		}
 	}, [dispatch, personId]);
 
@@ -952,9 +918,6 @@ const ProfilePage = () => {
 		}
 	}, [lookupValues]);
 
-	useEffect(() => {
-		console.log(localLookups);
-	}, [localLookups]);
 
 	// Fetch Cities when Country changes
 	// Fetch Cities when Country changes
@@ -1181,7 +1144,7 @@ const ProfilePage = () => {
 			await dispatch(createContract(payload)).unwrap();
 			toast.success(t("profile.contracts.messages.contractCreated"));
 			setIsCreateContractModalOpen(false);
-			dispatch(fetchContracts({ person: personId }));
+			dispatch(fetchContracts({ person_id: personId }));
 		} catch (error) {
 			toast.error(parseApiError(error, t, "profile.contracts.messages.contractCreateFailed"));
 		}
@@ -1213,7 +1176,7 @@ const ProfilePage = () => {
 			await dispatch(updateContract({ id: selectedContract.id, data: payload })).unwrap();
 			toast.success(t("profile.contracts.messages.contractUpdated"));
 			setIsEditContractModalOpen(false);
-			dispatch(fetchContracts({ person: personId }));
+			dispatch(fetchContracts({ person_id: personId }));
 		} catch (error) {
 			toast.error(parseApiError(error, t, "profile.contracts.messages.contractUpdateFailed"));
 		}
@@ -1224,7 +1187,7 @@ const ProfilePage = () => {
 			try {
 				await dispatch(deleteContract(contractId)).unwrap();
 				toast.success(t("profile.contracts.messages.contractDeleted"));
-				dispatch(fetchContracts({ person: personId }));
+				dispatch(fetchContracts({ person_id: personId }));
 			} catch (error) {
 				toast.error(parseApiError(error, t, "profile.contracts.messages.contractDeleteFailed"));
 			}
@@ -2127,7 +2090,7 @@ const ProfilePage = () => {
 			<SlideUpModal
 				isOpen={isEditProfileModalOpen}
 				onClose={() => setIsEditProfileModalOpen(false)}
-				title="Edit Profile"
+				title={t("profile.modals.editProfile")}
 				maxWidth="760px"
 			>
 				<div className="py-6 space-y-6">
@@ -2136,10 +2099,25 @@ const ProfilePage = () => {
 							{t("profile.general.personalInfoEn").toUpperCase()}
 						</h4>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<FloatingLabelSelect
+								label={t("profile.general.fields.title")}
+								value={profileForm.title}
+								onChange={e => setProfileForm(prev => ({ ...prev, title: e.target.value }))}
+								options={[
+									{ value: "", label: "Select Title" },
+									{ value: "Mr", label: "Mr" },
+									{ value: "Mrs", label: "Mrs" },
+									{ value: "Ms", label: "Ms" },
+									{ value: "Dr", label: "Dr" },
+									{ value: "Prof", label: "Prof" },
+									{ value: "Eng", label: "Eng" },
+								]}
+							/>
 							<FloatingLabelInput
 								label={t("profile.general.fields.firstName")}
 								value={profileForm.firstNameEn}
 								onChange={e => setProfileForm(prev => ({ ...prev, firstNameEn: e.target.value }))}
+								required
 							/>
 							<FloatingLabelInput
 								label={t("profile.general.fields.middleName")}
@@ -2148,26 +2126,78 @@ const ProfilePage = () => {
 							/>
 							<FloatingLabelInput
 								label={t("profile.general.fields.lastName")}
-								className="md:col-span-2"
 								value={profileForm.lastNameEn}
 								onChange={e => setProfileForm(prev => ({ ...prev, lastNameEn: e.target.value }))}
+								required
+							/>
+							<FloatingLabelInput
+								label={t("profile.general.fields.email")}
+								type="email"
+								value={profileForm.email}
+								onChange={e => setProfileForm(prev => ({ ...prev, email: e.target.value }))}
+								required
+							/>
+							<FloatingLabelInput
+								label={t("profile.general.fields.dateOfBirth")}
+								type="date"
+								value={profileForm.dateOfBirth}
+								onChange={e => setProfileForm(prev => ({ ...prev, dateOfBirth: e.target.value }))}
+								required
 							/>
 							<FloatingLabelSelect
 								label={t("profile.general.fields.gender")}
 								value={profileForm.gender}
 								onChange={e => setProfileForm(prev => ({ ...prev, gender: e.target.value }))}
 								options={[
-									{ value: "male", label: "Male" },
-									{ value: "female", label: "Female" },
+									{ value: "", label: "Select Gender" },
+									{ value: "Male", label: "Male" },
+									{ value: "Female", label: "Female" },
 								]}
+								required
 							/>
 							<FloatingLabelSelect
 								label={t("profile.general.fields.maritalStatus")}
 								value={profileForm.maritalStatus}
 								onChange={e => setProfileForm(prev => ({ ...prev, maritalStatus: e.target.value }))}
 								options={[
-									{ value: "single", label: "Single" },
-									{ value: "married", label: "Married" },
+									{ value: "", label: "Select Marital Status" },
+									{ value: "Single", label: "Single" },
+									{ value: "Married", label: "Married" },
+									{ value: "Divorced", label: "Divorced" },
+									{ value: "Widowed", label: "Widowed" },
+								]}
+								required
+							/>
+							<FloatingLabelInput
+								label={t("profile.general.fields.nationality")}
+								value={profileForm.nationality}
+								onChange={e => setProfileForm(prev => ({ ...prev, nationality: e.target.value }))}
+								required
+							/>
+							<FloatingLabelInput
+								label={t("profile.general.fields.nationalId")}
+								value={profileForm.nationalId}
+								onChange={e => setProfileForm(prev => ({ ...prev, nationalId: e.target.value }))}
+							/>
+							<FloatingLabelInput
+								label={t("profile.general.fields.religion")}
+								value={profileForm.religion}
+								onChange={e => setProfileForm(prev => ({ ...prev, religion: e.target.value }))}
+							/>
+							<FloatingLabelSelect
+								label={t("profile.general.fields.bloodType")}
+								value={profileForm.bloodType}
+								onChange={e => setProfileForm(prev => ({ ...prev, bloodType: e.target.value }))}
+								options={[
+									{ value: "", label: "Select Blood Type" },
+									{ value: "A+", label: "A+" },
+									{ value: "A-", label: "A-" },
+									{ value: "B+", label: "B+" },
+									{ value: "B-", label: "B-" },
+									{ value: "AB+", label: "AB+" },
+									{ value: "AB-", label: "AB-" },
+									{ value: "O+", label: "O+" },
+									{ value: "O-", label: "O-" },
 								]}
 							/>
 						</div>
@@ -2190,31 +2220,8 @@ const ProfilePage = () => {
 							/>
 							<FloatingLabelInput
 								label={t("profile.general.labels.lastNameAr")}
-								className="md:col-span-2"
 								value={profileForm.lastNameAr}
 								onChange={e => setProfileForm(prev => ({ ...prev, lastNameAr: e.target.value }))}
-							/>
-						</div>
-					</div>
-
-					<div>
-						<h4 className="text-sm font-bold text-gray-700 uppercase mb-4">
-							{t("profile.general.address").toUpperCase()}
-						</h4>
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<FloatingLabelInput
-								label={t("profile.general.fields.address")}
-								value={profileForm.address}
-								onChange={e => setProfileForm(prev => ({ ...prev, address: e.target.value }))}
-							/>
-							<FloatingLabelSelect
-								label={t("profile.general.fields.addressType")}
-								value={profileForm.addressType}
-								onChange={e => setProfileForm(prev => ({ ...prev, addressType: e.target.value }))}
-								options={[
-									{ value: "Home", label: "Home" },
-									{ value: "Office", label: "Office" },
-								]}
 							/>
 						</div>
 					</div>
@@ -2225,7 +2232,11 @@ const ProfilePage = () => {
 						title={t("common.cancel")}
 						className="bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-none px-6"
 					/>
-					<Button onClick={() => setIsEditProfileModalOpen(false)} title={t("common.edit")} />
+					<Button 
+						onClick={handleEditProfileSubmit} 
+						title={t("common.save")} 
+						disabled={updatingEmployee}
+					/>
 				</div>
 			</SlideUpModal>
 

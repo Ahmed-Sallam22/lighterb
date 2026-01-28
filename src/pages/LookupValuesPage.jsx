@@ -160,16 +160,7 @@ const LookupValuesPage = () => {
 		setFilters(prev => ({ ...prev, [name]: value }));
 	};
 
-	const handleSearch = () => {
-		dispatch(
-			fetchLookupValuesList({
-				page: 1,
-				pageSize: localPageSize,
-				lookupType: filters.lookupType,
-				parentName: filters.parentName,
-			})
-		);
-	};
+	
 
 	const handleClearFilters = () => {
 		setFilters(INITIAL_FILTERS);
@@ -422,12 +413,7 @@ const LookupValuesPage = () => {
 						/>
 					</div>
 					<div className="flex items-center gap-4">
-						<Button
-							onClick={handleSearch}
-							icon={<FaSearch className="w-5 h-5" />}
-							title={t("common.search")}
-							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
-						/>
+						
 						{(filters.lookupType || filters.parentName) && (
 							<Button
 								onClick={handleClearFilters}

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { usePageTitle } from "../hooks/usePageTitle";
-import { useLocale } from "../hooks/useLocale";
 import { HiOfficeBuilding, HiViewGrid, HiTrendingUp } from "react-icons/hi";
 import { IoPeople, IoPerson } from "react-icons/io5";
 
@@ -13,83 +12,34 @@ import LocationIcon from "../assets/location.svg?react";
 import Building from "../assets/building.svg?react";
 import BagIcon from "../assets/bag.svg?react";
 import JobIcon from "../assets/bag.svg?react";
-import { fetchOrganizations } from "../store/organizationsSlice";
-import { fetchLocations } from "../store/locationsSlice";
-import { fetchGrades } from "../store/gradesSlice";
-import { fetchPositions } from "../store/positionsSlice";
-import { fetchJobs } from "../store/jobsSlice";
+import { fetchEmployees } from "../store/employeesSlice";
+
 
 const WorkforceManagementPage = () => {
 	const { t } = useTranslation();
 	usePageTitle(t("workforceManagement.title"));
-	const { locale } = useLocale();
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const isRTL = locale === "AR";
 
 	// Get counts from Redux store
-	const { count: organizationsCount } = useSelector(state => state.organizations);
-	const { count: locationsCount } = useSelector(state => state.locations);
-	const { count: gradesCount } = useSelector(state => state.grades);
-	const { count: positionsCount } = useSelector(state => state.positions);
-	const { count: jobsCount } = useSelector(state => state.jobs);
 
+	const { count: employeesCount } = useSelector(state => state.employees);
 	// Fetch counts on component mount
 	useEffect(() => {
-		dispatch(fetchOrganizations({ page: 1, page_size: 1 }));
-		dispatch(fetchLocations({ page: 1, page_size: 1 }));
-		dispatch(fetchGrades({ page: 1, page_size: 1 }));
-		dispatch(fetchPositions({ page: 1, page_size: 1 }));
-		dispatch(fetchJobs({ page: 1, page_size: 1 }));
+
+		dispatch(fetchEmployees({ page: 1, page_size: 1 }));
 	}, [dispatch]);
 
 	const workStructureCards = [
 		{
-			id: "enterprise-business-groups",
-			title: t("workStructure.cards.organizations.title"),
-			description: t("workStructure.cards.organizations.description"),
-			icon: HiOfficeBuilding,
-			total: organizationsCount || 0,
-			route: "/organizations",
-			bgColor: "bg-[#1D7A8C]",
-		},
-		{
-			id: "locations",
-			title: t("workStructure.cards.locations.title"),
-			description: t("workStructure.cards.locations.description"),
-			icon: LocationIcon,
-			total: locationsCount || 0,
-			route: "/locations",
-			bgColor: "bg-[#1D7A8C]",
-		},
-
-		{
-			id: "positions",
-			title: t("workStructure.cards.positions.title"),
-			description: t("workStructure.cards.positions.description"),
-			icon: BagIcon,
-			total: positionsCount || 0,
-			route: "/positions",
-			bgColor: "bg-[#1D7A8C]",
-		},
-		{
-			id: "grades-rates",
-			title: t("workStructure.cards.gradesRates.title"),
-			description: t("workStructure.cards.gradesRates.description"),
-			icon: HiTrendingUp,
-			total: gradesCount || 0,
-			route: "/grades-and-rates",
-			bgColor: "bg-[#1D7A8C]",
-		},
-		{
-			id: "jobs",
-			title: t("workStructure.cards.jobs.title"),
-			description: t("workStructure.cards.jobs.description"),
-			icon: JobIcon,
-			total: jobsCount || 0,
-			route: "/jobs",
-			bgColor: "bg-[#1D7A8C]",
-		},
+					id: "Employees",
+					title: t("workStructure.cards.employees.title"),
+					description: t("workStructure.cards.employees.description"),
+					icon: IoPeople,
+					total: employeesCount || 0,
+					route: "/employee-search",
+					bgColor: "bg-[#1D7A8C]",
+				},
 	];
 
 	const handleCardClick = route => {

@@ -17,4 +17,9 @@ export const getHomeRoutes = t => [
 	{ name: t("home.routes.banks"), key: "Banks", path: "/banks" },
 
 	{ name: t("home.routes.budgets"), key: "Budgets", path: "/budgets" },
+	{
+		name: t("home.routes.lookups"),
+		key: "Lookups",
+		path: "/lookups/types"
+	}
 ];

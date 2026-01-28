@@ -230,9 +230,6 @@ const PositionsPage = () => {
 		dispatch(setPage(1));
 	};
 
-	const handleSearch = () => {
-		dispatch(setPage(1));
-	};
 
 	const formatDate = dateString => {
 		if (!dateString) return "-";
@@ -847,14 +844,6 @@ const PositionsPage = () => {
 							showBorder={true}
 						/>
 					</div>
-					<div className="flex items-end md:justify-end mt-5">
-						<Button
-							onClick={handleSearch}
-							icon={<HiSearch className="w-5 h-5" />}
-							title={t("common.search")}
-							className="bg-[#1D7A8C] hover:bg-[#156576] text-white"
-						/>
-					</div>
 				</div>
 
 				{/* Table Section */}
@@ -1278,6 +1267,12 @@ const PositionsPage = () => {
 										{t("positions.form.organization")}
 									</label>
 									<p className="text-gray-900">{currentPosition.organization_name || "-"}</p>
+								</div>
+								<div>
+									<label className="text-sm font-medium text-gray-500">
+										{t("positions.form.businessGroup")}
+									</label>
+									<p className="text-gray-900">{currentPosition.business_group_name || "-"}</p>
 								</div>
 							</div>
 							<div className="grid grid-cols-2 gap-4">

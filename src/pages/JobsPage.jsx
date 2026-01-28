@@ -174,9 +174,6 @@ const JobsPage = () => {
 		dispatch(setPage(1));
 	};
 
-	const handleSearch = () => {
-		dispatch(setPage(1));
-	};
 
 	const formatDate = dateString => {
 		if (!dateString) return "-";
@@ -348,8 +345,6 @@ const JobsPage = () => {
 				new_start_date: "",
 			});
 		} catch (error) {
-			toast.error(parseApiError(error) || t("jobs.messages.fetchError"));
-			// Fallback to item data if fetch fails
 			setFormData({
 				code: item.code || "",
 				business_group_id: item.business_group_id || "",
@@ -608,7 +603,6 @@ const JobsPage = () => {
 			const result = await dispatch(fetchJobVersions(item.id)).unwrap();
 			setVersionsData(result || []);
 		} catch (error) {
-			toast.error(parseApiError(error) || t("jobs.messages.versionsError"));
 			setVersionsData([]);
 		} finally {
 			setVersionsLoading(false);
@@ -663,12 +657,7 @@ const JobsPage = () => {
 							showBorder={true}
 						/>
 						<div className="flex items-end">
-							<Button
-								onClick={handleSearch}
-								icon={<HiSearch className="w-5 h-5" />}
-								title={t("common.search")}
-								className="bg-[#1D7A8C] hover:bg-[#156576] text-white w-full"
-							/>
+							
 						</div>
 					</div>
 				</div>

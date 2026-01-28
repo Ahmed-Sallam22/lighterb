@@ -91,7 +91,7 @@ const LocationsPage = () => {
 			page,
 			page_size: localPageSize,
 			...(searchTerm && { search: searchTerm }),
-			...(filterOrganization && { organization: filterOrganization }),
+			...(filterOrganization && { business_group: filterOrganization }),
 		};
 		dispatch(fetchLocations(params));
 	}, [dispatch, page, localPageSize, searchTerm, filterOrganization]);
@@ -103,7 +103,7 @@ const LocationsPage = () => {
 		} else {
 			dispatch(clearCities());
 		}
-	}, [formData.country_id, dispatch]);
+	}, [formData.country_id, dispatch, countries]);
 
 	const handlePageChange = useCallback(
 		newPage => {

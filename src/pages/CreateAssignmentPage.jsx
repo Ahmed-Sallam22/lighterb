@@ -121,7 +121,7 @@ const CreateAssignmentPage = () => {
 		dispatch(fetchLookupValues({ lookupType: "Working Frequency" }));
 
 		if (personId) {
-			dispatch(fetchContracts({ person: personId }));
+			dispatch(fetchContracts({ person_id: personId }));
 		}
 	}, [dispatch, personId]);
 
@@ -173,7 +173,7 @@ const CreateAssignmentPage = () => {
 			{ value: "", label: t("createAssignment.placeholders.position") },
 			...positions.map(pos => ({
 				value: pos.id,
-				label: pos.name || pos.code || "Unnamed",
+				label: `${pos.position_title_name} - ${pos.business_group_name}`,
 			})),
 		];
 	}, [positions, t]);
@@ -183,7 +183,7 @@ const CreateAssignmentPage = () => {
 			{ value: "", label: t("createAssignment.placeholders.grade") },
 			...grades.map(grade => ({
 				value: grade.id,
-				label: grade.grade_name,
+				label: `${grade.grade_name} - ${grade.business_group_name}`,
 			})),
 		];
 	}, [grades, t]);
@@ -411,9 +411,7 @@ const CreateAssignmentPage = () => {
 			setTimeout(() => {
 				navigate(`/profile/${personId}`);
 			}, 1500);
-		} catch (error) {
-			toast.error(parseApiError(error, t, "createAssignment.messages.createError"));
-		}
+		} catch (error) {}
 	}, [formData, personId, validateStep, dispatch, navigate, t]);
 
 	const handleCancel = useCallback(() => {

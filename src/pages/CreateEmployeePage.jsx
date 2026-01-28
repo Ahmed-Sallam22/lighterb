@@ -13,9 +13,10 @@ import FloatingLabelSelect from "../components/shared/FloatingLabelSelect";
 import Button from "../components/shared/Button";
 import { FiArrowLeft, FiArrowRight, FiCheck, FiUser } from "react-icons/fi";
 
-import { createEmployee, clearError } from "../store/employeesSlice";
+import { createEmployee, updateEmployee, fetchEmployeeById, clearError, clearSelectedEmployee } from "../store/employeesSlice";
 import { fetchPersonTypes } from "../store/personTypesSlice";
 import { parseApiError } from "../utils/errorHandler";
+import LoadingSpan from "../components/shared/LoadingSpan";
 
 // Options based on API docs
 const GENDER_OPTIONS = [
@@ -84,20 +85,26 @@ const INITIAL_FORM_STATE = {
 
 const CreateEmployeePage = () => {
 	const { t, i18n } = useTranslation();
-	usePageTitle(t("createEmployee.title"));
 	const isRtl = i18n.dir() === "rtl";
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const [searchParams] = useSearchParams();
 
+	// Check if editing an existing employee
+	const employeeId = searchParams.get("id");
+	const isEditMode = !!employeeId;
+
+	usePageTitle(isEditMode ? t("createEmployee.editTitle") : t("createEmployee.title"));
+
 	// Redux state
-	const { creating, actionError } = useSelector(state => state.employees || {});
+	const { creating, updating, loadingEmployee, actionError, selectedEmployee } = useSelector(state => state.employees || {});
 	const { personTypes = [] } = useSelector(state => state.personTypes || {});
 
 	// Local state
 	const [currentStep, setCurrentStep] = useState(0);
 	const [formData, setFormData] = useState(INITIAL_FORM_STATE);
 	const [formErrors, setFormErrors] = useState({});
+	const [isFormLoaded, setIsFormLoaded] = useState(!isEditMode); // True immediately if not edit mode
 	const [completedSteps, setCompletedSteps] = useState([]);
 
 	// Steps configuration - 3 steps based on API docs
@@ -113,7 +120,49 @@ const CreateEmployeePage = () => {
 	// Fetch required data on mount
 	useEffect(() => {
 		dispatch(fetchPersonTypes({ is_active: true, base_type: "EMP" }));
-	}, [dispatch]);
+		
+		// If edit mode, fetch employee details
+		if (isEditMode && employeeId) {
+			dispatch(fetchEmployeeById(employeeId));
+		}
+		
+		// Cleanup on unmount
+		return () => {
+			dispatch(clearSelectedEmployee());
+		};
+	}, [dispatch, isEditMode, employeeId]);
+
+	// Populate form when employee data is loaded in edit mode
+	useEffect(() => {
+		if (isEditMode && selectedEmployee) {
+			const person = selectedEmployee.person || selectedEmployee.person_details || {};
+			setFormData({
+				// Personal Information
+				first_name: person.first_name || "",
+				middle_name: person.middle_name || "",
+				last_name: person.last_name || "",
+				title: person.title || "",
+				national_id: person.national_id || "",
+				date_of_birth: person.date_of_birth || "",
+				gender: person.gender || "",
+				email_address: person.email_address || "",
+				// Personal Details
+				first_name_arabic: person.first_name_arabic || "",
+				middle_name_arabic: person.middle_name_arabic || "",
+				last_name_arabic: person.last_name_arabic || "",
+				religion: person.religion || "",
+				blood_type: person.blood_type || "",
+				marital_status: person.marital_status || "",
+				nationality: person.nationality || "",
+				// Employment Details
+				employee_type_id: selectedEmployee.employee_type || selectedEmployee.employee_type?.id || "",
+				effective_start_date: selectedEmployee.effective_start_date || "",
+				hire_date: selectedEmployee.hire_date || "",
+				employee_number: selectedEmployee.employee_number || "",
+			});
+			setIsFormLoaded(true);
+		}
+	}, [isEditMode, selectedEmployee]);
 
 	// Show error toast
 	useEffect(() => {
@@ -275,24 +324,32 @@ const CreateEmployeePage = () => {
 		if (formData.employee_number?.trim()) employeeData.employee_number = formData.employee_number.trim();
 
 		try {
-			const result = await dispatch(createEmployee(employeeData)).unwrap();
-			toast.success(t("createEmployee.messages.createSuccess"));
-
-			// Check if we should redirect to create assignment
-			const createAssignment = searchParams.get("createAssignment");
-			if (createAssignment === "true" && result?.id) {
-				setTimeout(() => {
-					navigate(`/create-assignment?personId=${result.id}`);
-				}, 1500);
+			if (isEditMode) {
+				// Update existing employee
+				await dispatch(updateEmployee({ id: employeeId, data: employeeData })).unwrap();
+				toast.success(t("createEmployee.messages.updateSuccess"));
 			} else {
-				setTimeout(() => {
-					navigate("/employee-search");
-				}, 1500);
+				// Create new employee
+				const result = await dispatch(createEmployee(employeeData)).unwrap();
+				toast.success(t("createEmployee.messages.createSuccess"));
+
+				// Check if we should redirect to create assignment
+				const createAssignment = searchParams.get("createAssignment");
+				if (createAssignment === "true" && result?.id) {
+					setTimeout(() => {
+						navigate(`/create-assignment?personId=${result.id}`);
+					}, 1500);
+					return;
+				}
 			}
+			
+			setTimeout(() => {
+				navigate("/employee-search");
+			}, 1500);
 		} catch (error) {
-			toast.error(parseApiError(error, t, "createEmployee.messages.createError"));
+			const errorKey = isEditMode ? "createEmployee.messages.updateError" : "createEmployee.messages.createError";
 		}
-	}, [formData, validateStep, steps.length, dispatch, navigate, t, searchParams]);
+	}, [formData, validateStep, steps.length, dispatch, navigate, t, searchParams, isEditMode, employeeId]);
 
 	const handleCancel = useCallback(() => {
 		navigate("/employee-search");
@@ -496,10 +553,17 @@ const CreateEmployeePage = () => {
 
 	return (
 		<div className="min-h-screen bg-gray-50">
+			{/* Loading state for edit mode */}
+			{isEditMode && loadingEmployee && (
+				<div className="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
+					<LoadingSpan text={t("common.loading")} />
+				</div>
+			)}
+
 			{/* Header */}
 			<PageHeader
-				title={t("createEmployee.title")}
-				subtitle={t("createEmployee.subtitle")}
+				title={isEditMode ? t("createEmployee.editTitle") : t("createEmployee.title")}
+				subtitle={isEditMode ? t("createEmployee.editSubtitle") : t("createEmployee.subtitle")}
 				icon={<FiUser className="w-8 h-8 text-[#28819C]" />}
 			/>
 
@@ -561,7 +625,7 @@ const CreateEmployeePage = () => {
 								onClick={handleCancel}
 								title={t("createEmployee.actions.cancel")}
 								className="bg-white text-gray-700 border border-gray-200 hover:bg-gray-100 shadow-none"
-								disabled={creating}
+								disabled={creating || updating}
 							/>
 							{currentStep < steps.length - 1 ? (
 								<Button
@@ -574,12 +638,14 @@ const CreateEmployeePage = () => {
 								<Button
 									onClick={handleSubmit}
 									title={
-										creating
-											? t("createEmployee.actions.creating")
-											: t("createEmployee.actions.create")
+										creating || updating
+											? t("common.processing")
+											: isEditMode
+												? t("createEmployee.actions.update")
+												: t("createEmployee.actions.create")
 									}
 									icon={<FiCheck size={18} />}
-									disabled={creating}
+									disabled={creating || updating || (isEditMode && !isFormLoaded)}
 								/>
 							)}
 						</div>
